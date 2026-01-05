@@ -1,0 +1,57 @@
+# --- [ Unity 공식 제외 항목 ] ---
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[MemoryCaptures]/
+/[Aa]ssets/AssetStoreTools*
+
+# --- [ 에셋 스토어 / 외부 패키지 ] ---
+# 외부 패키지는 서버 용량 절약을 위해 제외하기도 하지만, 
+# 팀원이 동일한 환경을 갖추기 위해 Assets 폴더 내부는 기본적으로 포함하는 것이 좋습니다.
+# 단, 샘플이나 튜토리얼 데이터가 너무 크면 아래에 추가하세요.
+
+# --- [ 비주얼 스튜디오 / IDE 관련 ] ---
+.vs/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# --- [ OS / 시스템 생성 파일 ] ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# --- [ Git LFS 사용 시 주의사항 ] ---
+# LFS로 관리되는 파일(.fbx, .png 등)은 이 gitignore에 적지 마세요!
+# 대신 .gitattributes 파일에 적어야 합니다.
+# 여기에 적어버리면 LFS고 뭐고 아예 서버에 안 올라가게 됩니다.
+
+# --- [ 유니티 메타데이터 ] ---
+# 아래 파일들은 절대 제외하면 안 됩니다! (참고용으로 적어둠)
+# !*.meta  <- 이런 식으로 제외 방지 설정을 하기도 함
+
+# --- [ 빌드 결과물 ] ---
+*.apk
+*.unitypackage
+*.app

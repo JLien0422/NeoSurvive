@@ -12,6 +12,7 @@ namespace NeoSurvive.Weapon
         public float damage;
         public float attackInterval;
         public float range;
+        public int level = 0;
 
         protected float timer;
         protected float tickTimer; // 장판 데미지용 틱 타이머

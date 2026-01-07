@@ -1587,17 +1587,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-<<<<<<< HEAD
-    x: 1611.2001
-    y: 80.8
-    width: 428.59998
-    height: 1103.4
-=======
     x: 1212.8
     y: 73.6
     width: 322.19995
     height: 701.8
->>>>>>> 956b814d970450b9c42e6d8f1ca8580b9951884a
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0

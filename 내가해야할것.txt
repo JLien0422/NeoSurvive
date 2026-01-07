@@ -1,0 +1,64 @@
+**맹진호**
+
+- Weapon - 사이보그 - 계속 함
+- Object **~** 01-07 (수)
+    - ExpGem
+    - Chest
+
+**이현승** 
+
+- Weapon -해커 - 계속 함
+- Buff & Debuff **~** 01-07 (수)
+- Projectile **~** 01-07 (수)
+- Tile Map ~ 01-07 (수)
+
+**정민균 ~ 01-07 (수)**
+
+- Player
+- Enemy
+- Stat
+- Controller (Player + Enemy)
+
+남은 클래스
+
+- Character
+    - **Stat**
+    - **Enemy**
+        - **EnemyController**
+    - **Player**
+    - P**layerController**
+    - **Buff & Debuff**
+    - **Weapon**
+        - 무기
+        - 패시브
+- Object
+    - **ExpGem**
+    - **Chest**
+    - **Projectile**
+
+- Manager
+    - GameManager (게임의 상태 등등)
+    - SaveManager (EaseSave)
+    - UIManager
+- UI
+    - 걍 UI
+    - DamageText
+- Minigame
+- Map
+    - Tile
+- Effect
+- GameCollection ( 게임 외부적인 업그레이드, 재화 등)
+- Achievement
+
+- 씬배치 - 민균정
+
+### 기획
+
+- 레벨디자인, 밸런스 - 다같이
+- 기획 - 기획서 기반다같이
+
+### 아트
+
+- 사운드 - 민균정
+- 스프라이트 (UI 포함)
+- 폰트 - 민균정

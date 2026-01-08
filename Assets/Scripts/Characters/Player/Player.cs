@@ -17,6 +17,11 @@ public class Player : Character
   // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
   public int Level => level;
 
+  public int MaxExperience => level * 100; // 임시 레벨업 필요 경험치량
+
+  public static event System.Action<int, int> OnExpChanged; // (current, max)
+  public static event System.Action<int> OnLevelUp; // (new level)
+
   [Header("자동 공격 설정")]
   // 공격력
   [SerializeField]
@@ -101,9 +106,23 @@ public class Player : Character
   public void GainExperience(int amount)
   {
     experience += amount;
+
+    // 레벨업 체크
+    while (experience >= MaxExperience)
+    {
+      LevelUp();
+    }
+
+    OnExpChanged?.Invoke(experience, MaxExperience);
     Debug.Log($"플레이어가 경험치 {amount}를 획득했습니다. 현재 경험치: {experience}");
-    // 여기에 레벨업 로직을 추가할 수 있습니다.
-    // 예: if (experience >= requiredExperienceForNextLevel) { LevelUp(); }
+  }
+
+  private void LevelUp()
+  {
+    experience -= MaxExperience;
+    level++;
+    OnLevelUp?.Invoke(level);
+    Debug.Log($"레벨업! 현재 레벨: {level}");
   }
 
 #if UNITY_EDITOR

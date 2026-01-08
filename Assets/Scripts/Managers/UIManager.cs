@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NeoSurvive.Weapon;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class UIManager : MonoBehaviour
   [Header("Weapon UI")]
   public GameObject weaponUIPanel;
   public GameObject weaponIconPrefab;
+
+  [Header("Exp UI")]
+  public Slider expSlider;
+  public TextMeshProUGUI levelText;
 
   private void Awake()
   {
@@ -31,11 +36,32 @@ public class UIManager : MonoBehaviour
   private void OnEnable()
   {
     WeaponManager.OnWeaponChanged += RefreshWeaponUI;
+    Player.OnExpChanged += UpdateExpUI;
+    Player.OnLevelUp += UpdateLevelUI;
   }
 
   private void OnDisable()
   {
     WeaponManager.OnWeaponChanged -= RefreshWeaponUI;
+    Player.OnExpChanged -= UpdateExpUI;
+    Player.OnLevelUp -= UpdateLevelUI;
+  }
+
+  private void UpdateExpUI(int currentExp, int maxExp)
+  {
+    if (expSlider != null)
+    {
+      expSlider.maxValue = maxExp;
+      expSlider.value = currentExp;
+    }
+  }
+
+  private void UpdateLevelUI(int level)
+  {
+    if (levelText != null)
+    {
+      levelText.text = $"Lv. {level}";
+    }
   }
 
   private void DrawWeapons(List<WeaponBase> weapons)
@@ -83,4 +109,6 @@ public class UIManager : MonoBehaviour
       dt.Setup(damage, position);
     }
   }
+
+
 }

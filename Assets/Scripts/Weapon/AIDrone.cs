@@ -10,32 +10,25 @@ namespace NeoSurvive.Weapon
     {
         public GameObject projectilePrefab;
         public float followDistance = 2f;
-        public float followSpeed = 5f;
+        public float followSpeed = 1f;
 
-        private Vector3 offset;
+        public GameObject player;
+        public Vector3 offset;
 
         private void Start()
         {
             offset = Random.insideUnitCircle.normalized * followDistance;
             
-            // 드론 비주얼이 없을 경우를 대비해 간단한 스프라이트 추가
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            if (sr == null)
-            {
-                sr = gameObject.AddComponent<SpriteRenderer>();
-                // 기본 사각형 스프라이트 설정 (에디터에서 자동 설정 스크립트가 처리하겠지만 안전장치)
-                sr.color = Color.green;
-                sr.sortingOrder = 5;
-            }
+            player = GameObject.FindWithTag("Player");
         }
 
         protected override void Update()
         {
             base.Update();
             // 플레이어 주변 따라다니기
-            if (transform.parent != null)
+            if (player != null)
             {
-                Vector3 targetPos = transform.parent.position + offset;
+                Vector3 targetPos = player.transform.position + offset;
                 transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * followSpeed);
             }
         }

@@ -33,7 +33,7 @@ namespace NeoSurvive.Enemy
         public void TakeDamage(float amount)
         {
             health -= amount;
-            
+
             // 데미지 텍스트 표시
             if (DamageTextManager.Instance != null)
             {
@@ -49,8 +49,21 @@ namespace NeoSurvive.Enemy
 
         protected virtual void Die()
         {
-            Debug.Log($"{gameObject.name} 처치됨!");
-            Destroy(gameObject);
+            Debug.Log($"[EnemyBase] Die() 호출됨: {gameObject.name} (type={GetType().Name})");
+
+        OnDeath();
+
+        Debug.Log($"{gameObject.name} 처치됨!");
+        Destroy(gameObject);
+        }
+
+
+        /// <summary>
+        /// 죽을 때 추가 행동(경험치 드랍, 이펙트, 골드 등)을 파생 클래스에서 구현
+        /// </summary>
+        protected virtual void OnDeath()
+        {
+            // 기본 EnemyBase는 아무것도 안 함
         }
     }
 }

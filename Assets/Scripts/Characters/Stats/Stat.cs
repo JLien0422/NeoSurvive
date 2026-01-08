@@ -7,27 +7,41 @@ using System.Collections.Generic;
 [Serializable]
 public class Stat
 {
-    // 인스펙터에서 설정할 수 있는 기본 능력치 값입니다.
-    [SerializeField]
-    private float baseValue;
+  // 인스펙터에서 설정할 수 있는 기본 능력치 값입니다.
+  [SerializeField]
+  private float baseValue;
 
-    // 기본 능력치 값을 가져오거나 설정하는 프로퍼티입니다.
-    public float BaseValue
-    {
-        get { return baseValue; }
-        set { baseValue = value; }
-    }
+  // 능력치 수정을 위한 변수들
+  private float fixedModifier = 0f;
+  private float percentModifier = 0f;
 
-    // 생성자: 기본 능력치 값으로 Stat 객체를 초기화합니다.
-    public Stat(float baseValue)
-    {
-        this.baseValue = baseValue;
-    }
+  // 기본 능력치 값을 가져오거나 설정하는 프로퍼티입니다.
+  public float BaseValue
+  {
+    get { return baseValue; }
+    set { baseValue = value; }
+  }
 
-    // 최종 능력치 값을 반환하는 가상 메서드입니다.
-    // 현재는 기본값만 반환하지만, 상속을 통해 더 복잡한 계산(예: 버프, 디버프 적용)이 가능합니다.
-    public virtual float GetValue()
-    {
-        return BaseValue;
-    }
+  // 생성자: 기본 능력치 값으로 Stat 객체를 초기화합니다.
+  public Stat(float baseValue)
+  {
+    this.baseValue = baseValue;
+  }
+
+  public void AddFixedModifier(float value)
+  {
+    fixedModifier += value;
+  }
+
+  public void AddPercentModifier(float value)
+  {
+    percentModifier += value;
+  }
+
+  // 최종 능력치 값을 반환하는 가상 메서드입니다.
+  // 기본값 * (1 + 퍼센트) + 고정수치
+  public virtual float GetValue()
+  {
+    return baseValue * (1.0f + percentModifier) + fixedModifier;
+  }
 }

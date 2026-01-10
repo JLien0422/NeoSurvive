@@ -7,6 +7,7 @@
 /[Ll]ogs/
 /[MemoryCaptures]/
 /[Aa]ssets/AssetStoreTools*
+/[Uu]ser[Ss]ettings/
 
 # --- [ 에셋 스토어 / 외부 패키지 ] ---
 # 외부 패키지는 서버 용량 절약을 위해 제외하기도 하지만, 

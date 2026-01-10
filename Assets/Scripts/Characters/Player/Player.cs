@@ -17,6 +17,13 @@ public class Player : Character
     // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
     public int Level => level;
 
+    // 레벨업 관련 설정(추가)
+    [Header("Level Up Settings (추가)")]
+    // 다음 레벨업에 필요한 경험치
+    [SerializeField] private int requiredExpForNextLevel = 5;
+    // 경험치 요구량 증가 배율
+    [SerializeField] private float growthMultiplier = 1.25f;
+
     [Header("자동 공격 설정")]
     // 공격력
     [SerializeField]
@@ -75,6 +82,55 @@ public class Player : Character
         Debug.Log($"플레이어가 경험치 {amount}를 획득했습니다. 현재 경험치: {experience}");
         // 여기에 레벨업 로직을 추가할 수 있습니다.
         // 예: if (experience >= requiredExperienceForNextLevel) { LevelUp(); }
+        CheckLevelUp();
+    }
+
+    // 레벨업을 처리하는 메서드입니다.(추가)
+    private void CheckLevelUp()
+    {
+        while (experience >= requiredExpForNextLevel)
+        {
+            experience -= requiredExpForNextLevel;
+            level++;
+
+            requiredExpForNextLevel = Mathf.CeilToInt(requiredExpForNextLevel * growthMultiplier);
+
+            Debug.Log($"[LEVEL UP] 레벨업! 현재 레벨: {level}, 남은 EXP: {experience}, 다음 필요 EXP: {requiredExpForNextLevel}");
+            // TODO: 여기서 스킬 선택 UI 호출하면 뱀서 느낌 완성
+        }
+    }
+
+    // 플레이어가 경험치 오브와 충돌했을 때 호출되는 메서드입니다.(추가)
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // ExpOrb 프리팹의 Tag를 "ExpOrb"로 설정해두는 걸 추천
+        if (!other.CompareTag("ExpOrb")) return;
+
+        // Enemy가 orb.name에 심어둔 값("ExpOrb_10")을 파싱
+        int amount = ParseExpFromOrbName(other.gameObject.name);
+
+        if (amount > 0)
+        {
+            GainExperience(amount);
+            Destroy(other.gameObject);
+        }
+        else
+        {
+            Debug.LogWarning($"ExpOrb 이름에서 경험치 파싱 실패: {other.gameObject.name}");
+        }
+    }
+
+    private int ParseExpFromOrbName(string orbName)
+    {
+        // 기대 형식: "ExpOrb_10"
+        const string prefix = "ExpOrb_";
+        if (!orbName.StartsWith(prefix)) return 0;
+
+        string num = orbName.Substring(prefix.Length);
+        if (int.TryParse(num, out int value))
+            return Mathf.Max(1, value);
+
+        return 0;
     }
 
 #if UNITY_EDITOR

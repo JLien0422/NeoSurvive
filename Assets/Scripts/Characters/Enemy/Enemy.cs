@@ -8,6 +8,12 @@ public class Enemy : Character
   [SerializeField]
   private int experienceToGive = 10;
 
+  // 경험치 오브 드랍 설정(추가)
+  [Header("EXP Orb Drop (추가)")]
+  [SerializeField] private GameObject expOrbPrefab;   // "스크립트 없는" ExpOrb 프리팹(콜라이더/스프라이트)
+  [SerializeField] private int dropCount = 1;
+  [SerializeField] private float scatterRadius = 0.5f;
+
   // 적이 죽었을 때 드랍할 아이템입니다. (추후 아이템 시스템 구현 시 확장)
   // [SerializeField]
   // private Item lootDrop;
@@ -18,6 +24,9 @@ public class Enemy : Character
   {
     // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
     base.Die();
+
+    // 경험치 오브 드랍 메서드 호출 (추가)
+    DropExpOrbs();
 
     // 경험치 제공 로직
     // 씬에서 "Player" 태그를 가진 오브젝트를 찾아 Player 컴포넌트를 가져옵니다.
@@ -36,5 +45,32 @@ public class Enemy : Character
 
     // 죽음 처리 후 적 오브젝트를 파괴합니다.
     Destroy(gameObject);
+  }
+
+  // 경험치 오브 드랍 메서드 (추가)
+  private void DropExpOrbs()
+  {
+    if (expOrbPrefab == null)
+    {
+      Debug.LogWarning($"{name}: expOrbPrefab이 연결되지 않았습니다.");
+      return;
+    }
+
+    // 오브 1개당 얼마를 줄지 (dropCount로 나눠서 떨어뜨리기)
+    int perOrb = Mathf.Max(1, experienceToGive / Mathf.Max(1, dropCount));
+    int remainder = experienceToGive - (perOrb * dropCount);
+
+    for (int i = 0; i < dropCount; i++)
+    {
+      Vector2 offset = Random.insideUnitCircle * scatterRadius;
+      Vector3 spawnPos = transform.position + (Vector3)offset;
+
+      GameObject orb = Instantiate(expOrbPrefab, spawnPos, Quaternion.identity);
+
+      // 🔥 새 스크립트 없이 값을 전달해야 하므로,
+      // 오브 이름에 경험치를 심어둠: "ExpOrb_10"
+      int amount = perOrb + (i == 0 ? remainder : 0); // 나머지는 첫 오브에 몰아주기
+      orb.name = $"ExpOrb_{amount}";
+    }
   }
 }

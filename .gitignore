@@ -9,6 +9,9 @@
 /[Aa]ssets/AssetStoreTools*
 /[Uu]ser[Ss]ettings/
 
+.plastic/
+.plastic
+
 # --- [ 에셋 스토어 / 외부 패키지 ] ---
 # 외부 패키지는 서버 용량 절약을 위해 제외하기도 하지만, 
 # 팀원이 동일한 환경을 갖추기 위해 Assets 폴더 내부는 기본적으로 포함하는 것이 좋습니다.

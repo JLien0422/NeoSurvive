@@ -7,7 +7,12 @@ public class PlayerController : MonoBehaviour
 {
     // 플레이어의 이동 속도를 나타냅니다. 인스펙터에서 조절할 수 있습니다.
     [SerializeField]
-    private float moveSpeed = 5f;
+    private float _moveSpeed = 5f;
+    public float MoveSpeed
+    {
+        get { return _moveSpeed; }
+        set { _moveSpeed = value; }
+    }
 
     // 이 컨트롤러가 조종할 Player 컴포넌트에 대한 참조입니다.
     private Player player;
@@ -51,7 +56,7 @@ public class PlayerController : MonoBehaviour
         // 이렇게 하면 물리 엔진을 통해 이동이 처리되어 충돌 등이 더 자연스럽습니다.
         if (rb != null)
         {
-            rb.velocity = moveInput * moveSpeed;
+            rb.velocity = moveInput * _moveSpeed;
         }
     }
 }

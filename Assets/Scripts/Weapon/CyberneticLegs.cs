@@ -15,7 +15,7 @@ namespace NeoSurvive.Weapon
             PlayerController controller = player.GetComponent<PlayerController>();
             if (controller != null)
             {
-                controller.moveSpeed *= speedMultiplier;
+                controller.MoveSpeed *= speedMultiplier;
                 Debug.Log($"{itemName} 적용: 이동 속도 {speedMultiplier}배 증가");
             }
         }
@@ -25,7 +25,7 @@ namespace NeoSurvive.Weapon
             PlayerController controller = player.GetComponent<PlayerController>();
             if (controller != null)
             {
-                controller.moveSpeed /= speedMultiplier;
+                controller.MoveSpeed /= speedMultiplier;
             }
         }
     }

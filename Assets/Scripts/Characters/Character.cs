@@ -21,32 +21,42 @@ public abstract class Character : MonoBehaviour
   public float CurrentHealth => currentHealth;
 
   // 컴포넌트가 처음 활성화될 때 호출되는 유니티 생명주기 메서드입니다.
+  // 체력 변경 알림 이벤트 (현재 체력, 최대 체력)
+  public event System.Action<float, float> OnHealthChanged;
+
   protected virtual void Awake()
   {
-    // 인스펙터에서 healthStat이 설정되지 않은 경우, 기본값(100)으로 초기화합니다.
     if (healthStat == null)
     {
       healthStat = new Stat(100f);
     }
-    // 현재 체력을 최대 체력(기본 능력치 값)으로 설정합니다.
     currentHealth = healthStat.GetValue();
   }
 
-  // 캐릭터가 데미지를 입었을 때 호출되는 가상 메서드입니다.
+  protected virtual void Start()
+  {
+    // 초기 체력 값 전송
+    OnHealthChanged?.Invoke(currentHealth, healthStat.GetValue());
+  }
+
   public virtual void TakeDamage(float amount)
   {
     currentHealth -= amount;
 
     // 데미지 텍스트 표시
-    if (UIManager.instance != null)
+    if (UIManager.Instance != null)
     {
-      UIManager.instance.ShowDamageText(transform.position, amount);
+      UIManager.Instance.ShowDamageText(transform.position, amount);
     }
 
-    // 체력이 0 이하로 떨어지면 죽음 처리 로직을 호출합니다.
+    // 체력 변경 알림
+    OnHealthChanged?.Invoke(currentHealth, healthStat.GetValue());
+
     if (currentHealth <= 0)
     {
       currentHealth = 0;
+      // 0으로 보정 후 다시 알림
+      OnHealthChanged?.Invoke(currentHealth, healthStat.GetValue());
       Die();
     }
   }

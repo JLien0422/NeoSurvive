@@ -25,6 +25,12 @@ public class Enemy : Character
     // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
     base.Die();
 
+    // 킬 카운트 증가
+    if (GameManager.Instance != null)
+    {
+      GameManager.Instance.AddKill();
+    }
+
     // 경험치 오브 드랍 메서드 호출 (추가)
     DropExpOrbs();
 

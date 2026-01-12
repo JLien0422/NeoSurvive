@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace NeoSurvive.UI.Map
 {
 
+
   /// <summary>
   /// 오브젝트 풀링 기반 무한 타일 매니저
   /// 플레이어 주변의 타일만 활성화하고, 범위를 벗어나면 풀로 반합합니다.
@@ -23,12 +24,14 @@ namespace NeoSurvive.UI.Map
     public float gap = 0f;
 
     [Header("최적화 및 생성 설정")]
-    public int viewDistance = 3;
+    public int viewDistanceX = 3;
+    public int viewDistanceY = 3;
     public int seed = 42;
     [Range(0f, 1f)] public float flowerChance = 0.1f; // 꽃이 나올 확률
     [Range(0f, 1f)] public float grassChance = 0.2f;  // 풀이 나올 확률
     public Transform playerTransform;
 
+    // 타일 크기 계산용
     private float actualTileSize;
     private Dictionary<Vector2Int, GameObject> activeTiles = new();
 
@@ -44,14 +47,33 @@ namespace NeoSurvive.UI.Map
         playerTransform = GameObject.FindWithTag("Player").transform;
 
       actualTileSize = (tilePixelSize / pixelsPerUnit) + gap;
-
       UpdateTiles();
+
+      Camera cam = Camera.main;
+      UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
     }
 
     private void Update()
     {
       if (playerTransform == null) return;
+
       UpdateTiles();
+    }
+
+    void UpdateScreenSize(Vector2 size)
+    {
+      Camera cam = Camera.main;
+      if (cam == null) return;
+
+      // 카메라가 월드 공간에서 바라보는 높이와 너비를 구합니다.
+      float worldHeight = cam.orthographicSize * 2f;
+      float worldWidth = worldHeight * cam.aspect;
+
+      // 월드 크기를 타일의 실제 월드 크기로 나누어 필요한 타일의 '반지름' 개수를 구합니다.
+      viewDistanceX = Mathf.CeilToInt((worldWidth / actualTileSize) * 0.5f) + 2;
+      viewDistanceY = Mathf.CeilToInt((worldHeight / actualTileSize) * 0.5f) + 2;
+
+      Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
     }
 
     private void UpdateTiles()
@@ -62,7 +84,7 @@ namespace NeoSurvive.UI.Map
       List<Vector2Int> toRemove = new();
       foreach (var key in activeTiles.Keys)
       {
-        if (Mathf.Abs(key.x - currentX) > viewDistance || Mathf.Abs(key.y - currentY) > viewDistance)
+        if (Mathf.Abs(key.x - currentX) > viewDistanceX || Mathf.Abs(key.y - currentY) > viewDistanceY)
         {
           toRemove.Add(key);
         }
@@ -73,9 +95,9 @@ namespace NeoSurvive.UI.Map
         ReturnTileToPool(key);
       }
 
-      for (int x = currentX - viewDistance; x <= currentX + viewDistance; x++)
+      for (int x = currentX - viewDistanceX; x <= currentX + viewDistanceX; x++)
       {
-        for (int y = currentY - viewDistance; y <= currentY + viewDistance; y++)
+        for (int y = currentY - viewDistanceY; y <= currentY + viewDistanceY; y++)
         {
           Vector2Int coord = new(x, y);
           if (!activeTiles.ContainsKey(coord))

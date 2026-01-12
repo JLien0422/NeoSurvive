@@ -43,6 +43,15 @@ public class Player : Character
   [SerializeField]
   private Stat attackSpeed = new Stat(1.0f);
 
+  protected override void Start()
+  {
+    base.Start();
+    if (UIManager.Instance != null)
+    {
+      UIManager.Instance.SetPlayerHealthBar(this);
+    }
+  }
+
   public void ApplyStatChange(StatType type, float flat, float percent)
   {
     switch (type)

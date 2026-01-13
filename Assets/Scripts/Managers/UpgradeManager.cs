@@ -43,7 +43,6 @@ public class UpgradeManager : MonoBehaviour
   {
     if (upgradeWindow != null)
     {
-      Debug.Log("이거임?");
       upgradeWindow.SetActive(true);
       RefreshUpgradeList();
     }

@@ -8,6 +8,10 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class AIDrone : MonoBehaviour
   {
+
+    public Animator anim;
+    public AnimationClip attackClip;
+
     /// <summary>
     /// 발사체 프리팹
     /// </summary>
@@ -53,6 +57,10 @@ namespace NeoSurvive.Weapon
       offset = Random.insideUnitCircle.normalized * followDistance;
 
       player = GameObject.FindWithTag("Player");
+
+      anim = GetComponent<Animator>();
+
+      updateAnimationSpeed();
     }
 
     protected void Update()
@@ -92,6 +100,15 @@ namespace NeoSurvive.Weapon
         proj.Initialize(transform.right, 5f); // 5f는 임시 데미지입니다.
         proj.SetTarget(target);
       }
+      anim.SetTrigger("doAttack");
+    }
+
+    private void updateAnimationSpeed()
+    {
+      if (attackClip == null) return;
+
+      float multiplier = attackClip.length * attackSpeed;
+      anim.SetFloat("AttackSpeedMult", multiplier);
     }
 
     private Transform FindClosestEnemy()

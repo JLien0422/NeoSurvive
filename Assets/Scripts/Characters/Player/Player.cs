@@ -64,6 +64,13 @@ public class Player : Character
     protected override void Die()
     {
         Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
+        
+        // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPlayerDeath();
+        }
+
         // 요청에 따라 게임 오브젝트를 파괴합니다.
         Destroy(gameObject);
     }

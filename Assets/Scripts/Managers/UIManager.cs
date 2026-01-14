@@ -31,6 +31,9 @@ public class UIManager : MonoBehaviour
 
   public GameManager gameManager;
 
+  [Header("Character Choice UI")]
+  public GameObject characterChoicePanel;
+
   private Transform playerTransform;
   [Header("Health Bar Positioning")]
   public Vector3 healthBarOffset = new Vector3(0, 1.0f, 0); // 캐릭터 머리 위 오프셋
@@ -231,5 +234,10 @@ public class UIManager : MonoBehaviour
       Vector3 worldPos = playerTransform.position + healthBarOffset;
       playerHealthSlider.transform.position = Camera.main.WorldToScreenPoint(worldPos);
     }
+  }
+
+  void ShowCharacterChoice()
+  {
+    characterChoicePanel.SetActive(true);
   }
 }

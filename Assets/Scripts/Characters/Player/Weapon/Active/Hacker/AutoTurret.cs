@@ -47,6 +47,39 @@ namespace NeoSurvive.Weapon
 
     public float elpased = 0f;
 
+    private float baseDamage;
+    private float baseRange;
+    private float baseLifeTime;
+
+    private void Start()
+    {
+      baseDamage = damage;
+      baseRange = range;
+      baseLifeTime = lifeTime;
+    }
+
+    public void OnLevelUp(int level)
+    {
+      if (baseDamage == 0 && damage > 0)
+      {
+        baseDamage = damage;
+        baseRange = range;
+        baseLifeTime = lifeTime;
+      }
+
+      // 레벨업 스탯 증가
+      damage = baseDamage * (1f + (level - 1) * 0.2f);
+      range = baseRange * (1f + (level - 1) * 0.1f);
+      lifeTime = baseLifeTime * (1f + (level - 1) * 0.1f);
+
+      Debug.Log($"[AutoTurret] Lv.{level} : Damage {damage}, Range {range}, Duration {lifeTime}");
+
+      if (level >= 5)
+      {
+        // TODO: 호위 기능 (DeployedTurret 이동 로직 필요)
+      }
+    }
+
     private void Update()
     {
       elpased += Time.deltaTime;

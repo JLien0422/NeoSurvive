@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.Rendering;
+using NeoSurvive.Network;
 
 [System.Serializable]
 public class UpgradeDef
@@ -23,20 +24,30 @@ public class UpgradeManager : MonoBehaviour
   public GameObject upgradeItemPrefab;  // 업그레이드 항목 프리팹
   public TextMeshProUGUI goldText;      // 현재 골드 표시
 
-  [Header("Upgrade Definitions")]
-  public List<UpgradeDef> upgrades = new List<UpgradeDef>();
+  // 서버에서 받은 업그레이드 목록
+  private List<UpgradeDTO> serverUpgrades = new List<UpgradeDTO>();
+  private GameServerAPI gameServerAPI;
 
   private void Start()
   {
-    // 초기화
-    // if (upgradeWindow != null) upgradeWindow.SetActive(false); // 시작 시 자기 자신을 꺼버리는 문제 방지
-    UpdateGoldUI(DataManager.Instance.Gold);
-    DataManager.OnGoldChanged += UpdateGoldUI;
-  }
+    // GameServerAPI 참조 가져오기
+    if (GameManager.Instance != null)
+    {
+      gameServerAPI = GameManager.Instance.GetComponent<GameServerAPI>();
+    }
 
-  private void OnDestroy()
-  {
-    DataManager.OnGoldChanged -= UpdateGoldUI;
+    if (gameServerAPI == null)
+    {
+      gameServerAPI = FindObjectOfType<GameServerAPI>();
+    }
+
+    if (gameServerAPI == null)
+    {
+      Debug.LogError("UpgradeManager: GameServerAPI를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 초기화 시엔 윈도우가 닫혀있을 수 있으므로 UI 갱신은 창을 열 때 수행
   }
 
   public void OpenUpgradeWindow()
@@ -44,7 +55,7 @@ public class UpgradeManager : MonoBehaviour
     if (upgradeWindow != null)
     {
       upgradeWindow.SetActive(true);
-      RefreshUpgradeList();
+      RefreshDataFromServer();
     }
   }
 
@@ -59,7 +70,22 @@ public class UpgradeManager : MonoBehaviour
       goldText.text = $"{gold:N0} G";
   }
 
-  private void RefreshUpgradeList()
+  private void RefreshDataFromServer()
+  {
+    if (gameServerAPI == null) return;
+
+    StartCoroutine(gameServerAPI.GetPlayerUpgrades((response) =>
+    {
+      if (response != null)
+      {
+        serverUpgrades = response.upgrades;
+        UpdateGoldUI(response.playerGold);
+        CreateUpgradeItems();
+      }
+    }));
+  }
+
+  private void CreateUpgradeItems()
   {
     // 기존 아이템 삭제
     foreach (Transform child in contentRoot)
@@ -68,49 +94,56 @@ public class UpgradeManager : MonoBehaviour
     }
 
     // 목록 생성
-    foreach (var def in upgrades)
+    foreach (var dto in serverUpgrades)
     {
-      CreateUpgradeItem(def);
+      CreateUpgradeItem(dto);
     }
   }
 
-  private void CreateUpgradeItem(UpgradeDef def)
+  private void CreateUpgradeItem(UpgradeDTO dto)
   {
     if (upgradeItemPrefab == null) return;
 
     GameObject itemObj = Instantiate(upgradeItemPrefab, contentRoot);
-    itemObj.SetActive(true); // 프리팹이 비활성화 상태일 수 있으므로 강제로 켬
-    // 여기서 프리팹의 컴포넌트를 가져와서 데이터 세팅
-    // (UpgradeItemUI 컴포넌트가 필요함)
+    itemObj.SetActive(true);
+
     UpgradeItemUI itemUI = itemObj.GetComponent<UpgradeItemUI>();
     if (itemUI != null)
     {
-      int currentLevel = DataManager.Instance.GetUpgradeLevel(def.id);
-      int cost = CalculateCost(def, currentLevel);
-      itemUI.Setup(def, currentLevel, cost, this);
+      UpgradeDef def = new UpgradeDef
+      {
+        id = dto.id,
+        displayName = dto.displayName,
+        baseCost = dto.baseCost,
+        costPerLevel = dto.costPerLevel,
+        valuePerLevel = dto.valuePerLevel,
+        maxLevel = dto.maxLevel
+      };
+
+      int cost = dto.nextCost;
+      itemUI.Setup(def, dto.currentLevel, cost, this);
     }
   }
 
-  public int CalculateCost(UpgradeDef def, int level)
-  {
-    return def.baseCost + (def.costPerLevel * level);
-  }
-
+  // UI에서 구매 버튼 클릭 시 호출됨 (UpgradeItemUI가 호출)
   public void TryBuyUpgrade(UpgradeDef def)
   {
-    int currentLevel = DataManager.Instance.GetUpgradeLevel(def.id);
-    if (def.maxLevel > 0 && currentLevel >= def.maxLevel) return; // 만렙
+    if (gameServerAPI == null) return;
 
-    int cost = CalculateCost(def, currentLevel);
-    if (DataManager.Instance.SpendGold(cost))
+    StartCoroutine(gameServerAPI.PurchasePlayerUpgrade(def.id, (response) =>
     {
-      DataManager.Instance.LevelUpUpgrade(def.id);
-      RefreshUpgradeList(); // 목록 갱신 (비용/레벨 변경 반영)
-                            // 효과음 재생 등 추가 가능
-    }
-    else
-    {
-      Debug.Log("골드가 부족합니다.");
-    }
+      if (response.success)
+      {
+        // 성공 시 UI 갱신 (서버에서 최신 상태를 다시 받아오거나, 로컬에서 예측 갱신)
+        // 신뢰성을 위해 다시 받아오는 것을 권장하지만, 반응성을 위해 여기선 일부만 갱신하거나 전체 갱신.
+        UpdateGoldUI(response.remainingGold);
+        RefreshDataFromServer(); // 전체 목록 갱신 (가장 안전)
+      }
+      else
+      {
+        Debug.LogWarning($"구매 실패: {response.errorMessage}");
+        // 실패 알림 UI 표시 가능
+      }
+    }));
   }
 }

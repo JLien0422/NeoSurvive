@@ -52,15 +52,58 @@ namespace NeoSurvive.Weapon
 
     public Transform target;
 
+    public Vector2 fireOffset;
+
+    public float damage = 5f;
+    private float baseDamage;
+    private System.Collections.Generic.List<AIDrone> subDrones = new System.Collections.Generic.List<AIDrone>();
+
     private void Start()
     {
+      baseDamage = damage;
+
       offset = Random.insideUnitCircle.normalized * followDistance;
 
       player = GameObject.FindWithTag("Player");
 
       anim = GetComponent<Animator>();
 
-      updateAnimationSpeed();
+      UpdateAnimationSpeed();
+    }
+
+    public void OnLevelUp(int level)
+    {
+      if (baseDamage == 0 && damage > 0) baseDamage = damage;
+
+      // 데미지 20% 증가
+      damage = baseDamage * (1f + (level - 1) * 0.2f);
+
+      // 기존 서브 드론들 스탯 업데이트
+      for (int i = subDrones.Count - 1; i >= 0; i--)
+      {
+        if (subDrones[i] == null) subDrones.RemoveAt(i);
+        else subDrones[i].damage = damage;
+      }
+
+      // 드론 개수 증가 (레벨당 1마리 추가 생성)
+      // Lv 1: 1 (Main)
+      // Lv 2: 2 (Main + 1 Sub)
+      int desiredSubCount = level - 1;
+      int currentSubCount = subDrones.Count;
+
+      for (int i = 0; i < desiredSubCount - currentSubCount; i++)
+      {
+        // 자신을 복제
+        GameObject clone = Instantiate(gameObject, transform.position, Quaternion.identity);
+        if (clone.TryGetComponent<AIDrone>(out var cloneScript))
+        {
+          cloneScript.damage = damage;
+          // 복제된 드론의 Start()가 호출되면서 offset이 랜덤하게 재설정되어 겹치지 않음
+          subDrones.Add(cloneScript);
+        }
+      }
+
+      Debug.Log($"[AIDrone] Lv.{level}, Total Drones: {1 + subDrones.Count}, Damage: {damage}");
     }
 
     protected void Update()
@@ -94,16 +137,16 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
-      GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+      GameObject obj = Instantiate(projectilePrefab, transform.position + (Vector3)fireOffset, Quaternion.identity);
       if (obj.TryGetComponent<Projectile>(out var proj))
       {
-        proj.Initialize(transform.right, 5f); // 5f는 임시 데미지입니다.
+        proj.Initialize(transform.right, damage, 20f);
         proj.SetTarget(target);
       }
       anim.SetTrigger("doAttack");
     }
 
-    private void updateAnimationSpeed()
+    private void UpdateAnimationSpeed()
     {
       if (attackClip == null) return;
 

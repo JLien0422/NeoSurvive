@@ -19,10 +19,11 @@ namespace NeoSurvive.Weapon
 
     public event System.Action OnHitEvent;
 
-    public virtual void Initialize(Vector3 dir, float dmg)
+    public virtual void Initialize(Vector3 dir, float dmg, float speed)
     {
       direction = dir.normalized;
       damage = dmg;
+      this.speed = speed;
       Destroy(gameObject, lifeTime);
     }
 

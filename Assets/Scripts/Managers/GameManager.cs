@@ -1,8 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using NeoSurvive.Characters;
+using NeoSurvive.Network;
 
-// GameManager 클래스는 게임의 전반적인 흐름과 상태를 관리합니다.
-// (예: 게임 시작, 종료, 점수 관리, 적 생성 등)
 // GameManager 클래스는 게임의 전반적인 흐름과 상태를 관리합니다.
 // (예: 게임 시작, 종료, 점수 관리, 적 생성 등)
 public class GameManager : MonoBehaviour
@@ -12,35 +12,42 @@ public class GameManager : MonoBehaviour
   // 킬 카운트 변경 알림 이벤트
   public static event System.Action<int> OnKillCountChanged;
 
+  [Header("적 스폰 설정")]
   private int killCount = 0;
 
+  [Header("골드 관리")]
+  // 이번 판에서 획득한 골드
+  [SerializeField]
+  private int currentRunGold = 0;
+  // 저장된 총 골드
+  private int totalGold = 0;
+
+  [Header("캐릭터 선택")]
+  // 선택된 캐릭터 타입
+  private CharacterType selectedCharacter = CharacterType.Hacker;
+
+  [Header("서버 연동")]
+  [SerializeField] private GameServerAPI serverAPI;
+  private int currentSessionId = -1;
+
+  // 참조
+  private Transform playerTransform;
+  private const string GOLD_SAVE_KEY = "TotalGold"; // PlayerPrefs 키
+
+  // 컴포넌트가 처음 활성화될 때 호출됩니다.
   private void Awake()
   {
+    // 싱글톤 패턴 구현
     if (Instance == null)
     {
       Instance = this;
+      DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 파괴되지 않도록 설정
     }
     else
     {
-      Destroy(gameObject);
+      Destroy(gameObject); // 이미 인스턴스가 있다면 이 오브젝트는 파괴
     }
   }
-  // 인스펙터에서 할당할 적 프리āb입니다.
-  [SerializeField]
-  private GameObject enemyPrefab;
-
-  // 적이 생성될 주기를 초 단위로 설정합니다.
-  [SerializeField]
-  private float spawnInterval = 3.0f;
-
-  // 플레이어를 중심으로 적이 생성될 최소/최대 반경입니다.
-  [SerializeField]
-  private float minSpawnRadius = 5.0f;
-  [SerializeField]
-  private float maxSpawnRadius = 10.0f;
-
-  // 플레이어의 Transform 컴포넌트에 대한 참조입니다.
-  private Transform playerTransform;
 
   private float startTime = 0f;
 
@@ -48,21 +55,6 @@ public class GameManager : MonoBehaviour
   private void Start()
   {
     startTime = Time.time;
-    // 씬에서 플레이어 오브젝트를 찾아 Transform을 저장합니다.
-    GameObject playerObject = GameObject.FindWithTag("Player");
-    if (playerObject != null)
-    {
-      playerTransform = playerObject.transform;
-    }
-    else
-    {
-      Debug.LogError("플레이어를 찾을 수 없습니다! 'Player' 태그가 설정되었는지 확인해주세요.");
-      // 플레이어가 없으면 스포너를 시작하지 않습니다.
-      return;
-    }
-
-    // 적 생성 코루틴을 시작합니다.
-    StartCoroutine(SpawnEnemies());
   }
 
   public float GetGameTime()
@@ -70,41 +62,71 @@ public class GameManager : MonoBehaviour
     return Time.time - startTime;
   }
 
-  // 일정 주기로 적을 생성하는 코루틴입니다.
-  private IEnumerator SpawnEnemies()
+  // 골드를 추가하는 공용 메서드
+  public void AddGold(int amount)
   {
-    // 게임이 실행되는 동안 무한히 반복합니다.
-    while (true)
-    {
-      // 다음 생성까지 지정된 시간만큼 기다립니다.
-      yield return new WaitForSeconds(spawnInterval);
+    currentRunGold += amount;
+    // Debug.Log($"골드 {amount} 획득! 이번 판 총 골드: {currentRunGold}");
+  }
 
-      // 적을 생성합니다. (플레이어가 존재할 경우에만)
-      if (playerTransform != null && enemyPrefab != null)
-      {
-        SpawnEnemy();
-      }
+  // 플레이어가 죽었을 때 호출될 메서드
+  public void OnPlayerDeath()
+  {
+    // 서버에 게임 종료 전송
+    if (serverAPI != null && currentSessionId >= 0)
+    {
+      float survivalTime = GetGameTime();
+      StartCoroutine(serverAPI.EndGame(
+        survivalTime: Mathf.RoundToInt(survivalTime),
+        enemiesKilled: killCount,
+        isCleared: false
+      ));
+    }
+    else
+    {
+      // 오프라인 모드: 로컬에 골드 저장
+      totalGold += currentRunGold;
+      SaveGold();
+      currentRunGold = 0;
+      Debug.Log($"이번 판에 얻은 골드가 총 골드에 합산되었습니다. 현재 총 골드: {totalGold}");
     }
   }
 
-  // 적 하나를 생성하는 메서드입니다.
-  private void SpawnEnemy()
+  // 골드를 PlayerPrefs에 저장
+  private void SaveGold()
   {
-    // 플레이어 주변의 랜덤한 위치에 적을 생성합니다.
-    // 1. 랜덤 각도를 구합니다. (0 ~ 360도)
-    float randomAngle = Random.Range(0f, 360f);
-    // 2. 랜덤 거리를 구합니다. (최소 ~ 최대 반경)
-    float randomRadius = Random.Range(minSpawnRadius, maxSpawnRadius);
-    // 3. 각도와 거리를 사용하여 원형 좌표를 계산하고, 플레이어 위치를 더해 최종 생성 위치를 구합니다.
-    Vector2 spawnPosition = playerTransform.position + (Vector3)(new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle)) * randomRadius);
+    PlayerPrefs.SetInt(GOLD_SAVE_KEY, totalGold);
+    PlayerPrefs.Save(); // 변경사항을 디스크에 즉시 저장
+    Debug.Log($"총 골드 {totalGold}를 저장했습니다.");
+  }
 
-    // enemyPrefab을 spawnPosition에 생성합니다.
-    Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+  // PlayerPrefs에서 골드를 불러옴
+  private void LoadGold()
+  {
+    totalGold = PlayerPrefs.GetInt(GOLD_SAVE_KEY, 0); // 저장된 값이 없으면 0을 기본값으로 사용
+    Debug.Log($"저장된 총 골드 {totalGold}를 불러왔습니다.");
   }
 
   public void AddKill()
   {
     killCount++;
     OnKillCountChanged?.Invoke(killCount);
+  }
+
+  /// <summary>
+  /// 선택된 캐릭터를 설정합니다.
+  /// </summary>
+  public void SetSelectedCharacter(CharacterType characterType)
+  {
+    selectedCharacter = characterType;
+    Debug.Log($"GameManager: 캐릭터 선택됨 - {characterType}");
+  }
+
+  /// <summary>
+  /// 선택된 캐릭터 타입을 반환합니다.
+  /// </summary>
+  public CharacterType GetSelectedCharacter()
+  {
+    return selectedCharacter;
   }
 }

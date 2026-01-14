@@ -4,15 +4,24 @@ using UnityEngine;
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Enemy : Character
 {
-  // 적이 죽었을 때 플레이어에게 줄 경험치입니다.
-  [SerializeField]
-  private int experienceToGive = 10;
-
   // 경험치 오브 드랍 설정(추가)
   [Header("EXP Orb Drop (추가)")]
   [SerializeField] private GameObject expOrbPrefab;   // "스크립트 없는" ExpOrb 프리팹(콜라이더/스프라이트)
   [SerializeField] private int dropCount = 1;
   [SerializeField] private float scatterRadius = 0.5f;
+  [Header("보상 설정")]
+  // 적이 죽었을 때 플레이어에게 줄 경험치입니다.
+  [SerializeField]
+  private int experienceToGive = 10;
+
+  // 골드 드랍 확률 (0 ~ 100)
+  [SerializeField]
+  [Range(0, 100)]
+  private float goldDropChance = 25f;
+
+  // 인스펙터에서 할당할 골드 프리팹입니다.
+  [SerializeField]
+  private GameObject goldPrefab;
 
   // 적이 죽었을 때 드랍할 아이템입니다. (추후 아이템 시스템 구현 시 확장)
   // [SerializeField]
@@ -29,28 +38,33 @@ public class Enemy : Character
     if (GameManager.Instance != null)
     {
       GameManager.Instance.AddKill();
+      // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
+      base.Die();
+
+      // 경험치 제공 로직
+      Player player = FindObjectOfType<Player>();
+      if (player != null)
+      {
+        player.GainExperience(experienceToGive);
+      }
+
+      // 골드 드랍 로직
+      // 0.0 ~ 100.0 사이의 랜덤 값을 뽑습니다.
+      float randomValue = Random.Range(0f, 100f);
+      // 랜덤 값이 설정된 드랍 확률보다 낮고, 골드 프리팹이 할당되어 있다면
+      if (randomValue <= goldDropChance && goldPrefab != null)
+      {
+        // 현재 적의 위치에 골드 프리팹을 생성합니다.
+        Instantiate(goldPrefab, transform.position, Quaternion.identity);
+        Debug.Log("골드를 드랍했습니다!");
+      }
+
+      // 죽음 처리 후 적 오브젝트를 파괴합니다.
+      Destroy(gameObject);
     }
 
     // 경험치 오브 드랍 메서드 호출 (추가)
     DropExpOrbs();
-
-    // 경험치 제공 로직
-    // 씬에서 "Player" 태그를 가진 오브젝트를 찾아 Player 컴포넌트를 가져옵니다.
-    // 이는 간단한 구현이며, 더 큰 게임에서는 GameManager나 이벤트 시스템을 통해 플레이어를 참조하는 것이 좋습니다.
-    Player player = FindObjectOfType<Player>();
-    if (player != null)
-    {
-      player.GainExperience(experienceToGive);
-    }
-
-    // 아이템 드랍 로직 (추후 구현)
-    // if (lootDrop != null)
-    // {
-    //     // Instantiate(lootDrop, transform.position, Quaternion.identity);
-    // }
-
-    // 죽음 처리 후 적 오브젝트를 파괴합니다.
-    Destroy(gameObject);
   }
 
   // 경험치 오브 드랍 메서드 (추가)

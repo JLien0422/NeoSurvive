@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using NeoSurvive.UI;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -8,42 +9,44 @@ public class LobbyManager : MonoBehaviour
   public string gameSceneName = "lhsScene"; // 이동할 게임 씬 이름
 
   [Header("UI References")]
-  public Button startButton;
+  public Button mainStartButton;
   public Button exitButton;
-  public Button upgradeButton; // 추가
+  public Button upgradeButton;
+  public GameObject mainMenuPanel; // 메인 버튼들을 포함하는 패널
 
-  public UpgradeManager upgradeManager; // 연결 필요
+  [Header("Managers")]
+  public UpgradeManager upgradeManager;
+  public CharacterSelector characterSelector;
 
   private void Start()
   {
-    // UI가 연결되지 않았다면 이름으로 찾아서 연결 시도
-    if (startButton == null)
-      startButton = GameObject.Find("StartButton")?.GetComponent<Button>();
 
-    if (exitButton == null)
-      exitButton = GameObject.Find("ExitButton")?.GetComponent<Button>();
-
-    if (upgradeButton == null)
-      upgradeButton = GameObject.Find("UpgradeButton")?.GetComponent<Button>(); // 이름 추정
-
-    if (upgradeManager == null)
-      upgradeManager = FindObjectOfType<UpgradeManager>(true);
+    if (upgradeManager == null) upgradeManager = FindObjectOfType<UpgradeManager>(true);
+    if (characterSelector == null) characterSelector = FindObjectOfType<CharacterSelector>(true);
 
     // 이벤트 연결
-    if (startButton != null)
-      startButton.onClick.AddListener(OnStartButtonClicked);
+    if (mainStartButton != null)
+    {
+      mainStartButton.onClick.RemoveAllListeners();
+      mainStartButton.onClick.AddListener(characterSelector.ShowCharacterSelection);
+    }
 
     if (exitButton != null)
+    {
+      exitButton.onClick.RemoveAllListeners();
       exitButton.onClick.AddListener(OnExitButtonClicked);
+    }
 
     if (upgradeButton != null && upgradeManager != null)
+    {
+      upgradeButton.onClick.RemoveAllListeners();
       upgradeButton.onClick.AddListener(upgradeManager.OpenUpgradeWindow);
+    }
   }
 
-  public void OnStartButtonClicked()
+  private void LoadGameScene()
   {
-    Debug.Log("Start Button Clicked: Loading Game Scene...");
-    // 씬 전환
+    Debug.Log($"Loading Game Scene: {gameSceneName}");
     SceneManager.LoadScene(gameSceneName);
   }
 

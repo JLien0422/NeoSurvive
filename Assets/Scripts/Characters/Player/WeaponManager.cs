@@ -5,7 +5,7 @@ public enum WeaponType
 {
   AIDrone = 0,
   AutoTurret,
-  Pistol,
+  LinkPistol,
   EMPShield,
   WEAPON_TYPE_COUNT
 }
@@ -37,14 +37,22 @@ namespace NeoSurvive.Weapon
       // 이미 보유 중인 무기인지 확인
       if (activeWeapons.Contains(weaponData))
       {
-        // 레벨업 로직 (예시)
+        // 레벨업 로직
         weaponData.level++;
         OnWeaponChanged?.Invoke(activeWeapons);
+
+        // 생성된 무기 오브젝트에 레벨업 알림
+        if (spawnedWeapons.TryGetValue(weaponData, out GameObject existingWeapon))
+        {
+          existingWeapon.SendMessage("OnLevelUp", weaponData.level, SendMessageOptions.DontRequireReceiver);
+        }
         return;
       }
 
       // 새로운 무기 추가
       activeWeapons.Add(weaponData);
+      // 초기 레벨 설정 (혹시 모르니)
+      weaponData.level = 1;
 
       GameObject weaponObj = null;
       if (weaponData.weaponPrefab != null)
@@ -58,6 +66,9 @@ namespace NeoSurvive.Weapon
           weaponObj = Instantiate(weaponData.weaponPrefab, transform);
         }
         spawnedWeapons.Add(weaponData, weaponObj);
+
+        // 초기화 알림
+        weaponObj.SendMessage("OnLevelUp", 1, SendMessageOptions.DontRequireReceiver);
       }
 
       OnWeaponChanged?.Invoke(activeWeapons);
@@ -85,6 +96,34 @@ namespace NeoSurvive.Weapon
       if (Input.GetKeyDown(KeyCode.F3))
       {
         AddWeapon(2);
+      }
+      if (Input.GetKeyDown(KeyCode.F4))
+      {
+        AddWeapon(3);
+      }
+      if (Input.GetKeyDown(KeyCode.F5))
+      {
+        AddWeapon(4);
+      }
+      if (Input.GetKeyDown(KeyCode.F6))
+      {
+        AddWeapon(5);
+      }
+      if (Input.GetKeyDown(KeyCode.F7))
+      {
+        AddWeapon(6);
+      }
+      if (Input.GetKeyDown(KeyCode.F8))
+      {
+        AddWeapon(7);
+      }
+      if (Input.GetKeyDown(KeyCode.F9))
+      {
+        AddWeapon(8);
+      }
+      if (Input.GetKeyDown(KeyCode.F10))
+      {
+        AddWeapon(9);
       }
     }
   }

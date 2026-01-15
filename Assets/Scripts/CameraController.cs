@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
     player = GameObject.FindWithTag("Player").transform;
   }
 
-  void FixedUpdate()
+  void LateUpdate()
   {
     transform.position = new Vector3(player.position.x, player.position.y, -10);
   }

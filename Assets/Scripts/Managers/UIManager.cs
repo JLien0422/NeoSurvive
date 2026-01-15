@@ -138,9 +138,9 @@ public class UIManager : MonoBehaviour
         weaponIcon.transform.localPosition = new Vector3(x, 0, 0);
       }
 
-      var img = weaponIcon.GetComponent<Image>();
-      if (img != null) img.sprite = weapon.weaponIcon;
-
+      if (weaponIcon.TryGetComponent<Image>(out var img)) img.sprite = weapon.weaponIcon;
+      TextMeshProUGUI lvlText = weaponIcon.GetComponentInChildren<TextMeshProUGUI>();
+      if (lvlText != null) lvlText.text = weapon.level.ToString();
       x += gap;
     }
   }
@@ -175,6 +175,7 @@ public class UIManager : MonoBehaviour
       dt.Setup(damage, position);
     }
   }
+
   public void ShowGameTime()
   {
     if (gameManager == null)
@@ -224,7 +225,6 @@ public class UIManager : MonoBehaviour
       playerHealthSlider.value = current;
     }
   }
-
 
   private void LateUpdate()
   {

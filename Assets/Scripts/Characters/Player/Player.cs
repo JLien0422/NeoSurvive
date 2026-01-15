@@ -122,6 +122,18 @@ public class Player : Character
     }
   }
 
+  public void AddExp(int amount)
+  {
+    experience += amount;
+    OnExpChanged?.Invoke(experience, MaxExperience);
+    if (experience >= MaxExperience)
+    {
+      level++;
+      experience = 0;
+      OnLevelUp?.Invoke(level);
+    }
+  }
+
   // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
   // 플레이어에게 특화된 죽음 처리 로직을 구현합니다.
   protected override void Die()

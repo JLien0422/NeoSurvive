@@ -52,6 +52,11 @@ public class Player : Character
     [SerializeField]
     private Stat attackSpeed = new Stat(1.0f);
 
+    [Header("이동 속도 설정")]
+    [SerializeField]
+    private Stat moveSpeed = new Stat(5f); // PlayerController가 참조할 이동 속도 Stat
+    public float CurrentMoveSpeed => moveSpeed.GetValue(); // PlayerController가 최종 이동 속도를 가져갈 프로퍼티
+
     public void ApplyStatChange(StatType type, float flat, float percent)
     {
         switch (type)

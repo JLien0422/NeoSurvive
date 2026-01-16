@@ -43,6 +43,12 @@ public class Player : Character
   [SerializeField]
   private Stat attackSpeed = new Stat(1.0f);
 
+  [Header("이동 속도 설정")]
+  [SerializeField]
+  private Stat moveSpeed = new Stat(5f); // PlayerController가 참조할 이동 속도 Stat
+  public float CurrentMoveSpeed => moveSpeed.GetValue(); // PlayerController가 최종 이동 속도를 가져갈 프로퍼티
+
+
   public void ApplyStatChange(StatType type, float flat, float percent)
   {
     switch (type)
@@ -64,7 +70,37 @@ public class Player : Character
         healthStat.AddFixedModifier(flat);
         healthStat.AddPercentModifier(percent);
         break;
+      case StatType.MoveSpeed:
+        moveSpeed.AddFixedModifier(flat);
+        moveSpeed.AddPercentModifier(percent);
+        break;
     }
+  }
+
+  // 게임 시작 시 호출됩니다.
+  protected override void Awake()
+  {
+      base.Awake(); // 부모 Awake 호출
+      ApplyUpgrades(); // 업그레이드 적용
+  }
+
+  // 업그레이드 매니저로부터 스탯 보너스를 가져와 적용하는 메서드
+  private void ApplyUpgrades()
+  {
+      if (UpgradeManager.Instance != null)
+      {
+          // 체력 업그레이드 적용 (기본 체력에 보너스 추가)
+          healthStat.AddFixedModifier(UpgradeManager.Instance.GetHealthUpgradeBonus());
+          currentHealth = healthStat.GetValue(); // 체력 즉시 반영
+
+          // 공격력 업그레이드 적용
+          attackDamage.AddFixedModifier(UpgradeManager.Instance.GetDamageUpgradeBonus());
+
+          // 이동 속도 업그레이드 적용
+          moveSpeed.AddFixedModifier(UpgradeManager.Instance.GetMoveSpeedUpgradeBonus());
+          
+          Debug.Log("플레이어에게 영구 업그레이드 보너스 적용 완료.");
+      }
   }
 
   // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
@@ -72,6 +108,13 @@ public class Player : Character
   protected override void Die()
   {
     Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
+    
+    // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
+    if (GameManager.Instance != null)
+    {
+        GameManager.Instance.OnPlayerDeath();
+    }
+
     // 요청에 따라 게임 오브젝트를 파괴합니다.
     Destroy(gameObject);
   }

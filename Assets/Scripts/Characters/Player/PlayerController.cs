@@ -5,15 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
-    // 플레이어의 이동 속도를 나타냅니다. 인스펙터에서 조절할 수 있습니다.
-    [SerializeField]
-    private float _moveSpeed = 5f;
-    public float MoveSpeed
-    {
-        get { return _moveSpeed; }
-        set { _moveSpeed = value; }
-    }
-
     // 이 컨트롤러가 조종할 Player 컴포넌트에 대한 참조입니다.
     private Player player;
     // 플레이어의 Rigidbody2D 컴포넌트에 대한 참조입니다. (물리 기반 이동을 위해)
@@ -53,10 +44,10 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         // Rigidbody의 속도를 변경하여 플레이어를 움직입니다.
-        // 이렇게 하면 물리 엔진을 통해 이동이 처리되어 충돌 등이 더 자연스럽습니다.
-        if (rb != null)
+        // 이제 Player 스크립트에 있는 최종 계산된 이동 속도(CurrentMoveSpeed)를 사용합니다.
+        if (rb != null && player != null)
         {
-            rb.velocity = moveInput * _moveSpeed;
+            rb.velocity = moveInput * player.CurrentMoveSpeed;
         }
     }
 }

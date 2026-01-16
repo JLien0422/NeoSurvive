@@ -123,4 +123,9 @@ public class UpgradeManager : MonoBehaviour
     public int GetMoveSpeedUpgradeLevel() => moveSpeedUpgradeLevel;
     public float GetMoveSpeedUpgradeBonus() => moveSpeedUpgradeLevel * moveSpeedPerLevel;
     public int GetMoveSpeedUpgradeCost() => UPGRADE_COST;
+
+    public void OpenUpgradeWindow()
+    {
+        Debug.Log("업그레이드 창 열기");
+    }
 }

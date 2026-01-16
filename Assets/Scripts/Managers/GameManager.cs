@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     // 이번 판에서 획득한 골드 (디버깅용으로 인스펙터에 표시)
     [SerializeField]
     private int currentRunGold = 0;
+
+    [SerializeField]
     // 저장된 총 골드
     private int totalGold = 0;
     // UI 등에서 총 골드를 참조하기 위한 public 프로퍼티
@@ -60,7 +62,6 @@ public class GameManager : MonoBehaviour
         if (playerObject != null)
         {
             playerTransform = playerObject.transform;
-            StartCoroutine(SpawnEnemies());
         }
         else
         {
@@ -97,19 +98,6 @@ public class GameManager : MonoBehaviour
         // "TotalGold" 키로 저장된 값이 있으면 불러오고, 없으면 0을 기본값으로 사용합니다.
         totalGold = ES3.Load(GOLD_SAVE_KEY, 0);
         Debug.Log($"Easy Save에서 총 골드 {totalGold}를 불러왔습니다.");
-    }
-
-    // 일정 주기로 적을 생성하는 코루틴
-    private IEnumerator SpawnEnemies()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(spawnInterval);
-            if (playerTransform != null && enemyPrefab != null)
-            {
-                SpawnEnemy();
-            }
-        }
     }
 
     public float GetGameTime()

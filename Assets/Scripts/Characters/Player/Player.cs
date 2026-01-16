@@ -52,52 +52,6 @@ public class Player : Character
     [SerializeField]
     private Stat attackSpeed = new Stat(1.0f);
 
-    protected override void Start()
-    {
-        base.Start();
-
-        // GameManager에서 선택된 캐릭터 타입 가져오기
-        if (GameManager.Instance != null)
-        {
-            CharacterType selectedType = GameManager.Instance.GetSelectedCharacter();
-            CharacterData selectedData = selectedType == CharacterType.Hacker ? hackerData : cyborgData;
-
-            if (selectedData != null)
-            {
-                InitializeFromCharacterData(selectedData);
-            }
-            else
-            {
-                Debug.LogWarning($"캐릭터 데이터가 할당되지 않음: {selectedType}");
-            }
-        }
-
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.SetPlayerHealthBar(this);
-        }
-    }
-
-    /// <summary>
-    /// 캐릭터 데이터로부터 플레이어 스텟을 초기화합니다.
-    /// </summary>
-    private void InitializeFromCharacterData(CharacterData data)
-    {
-        Debug.Log($"캐릭터 초기화: {data.characterName} ({data.characterType})");
-
-        // 스텟 초기화
-        healthStat = new Stat(data.baseHealth);
-        currentHealth = healthStat.GetValue();
-
-        attackDamage = new Stat(data.baseAttackDamage);
-        attackRange = new Stat(data.baseAttackRange);
-        attackSpeed = new Stat(data.baseAttackSpeed);
-        // TODO: moveSpeed는 Character 클래스에 추가되면 활성화
-        // moveSpeed = new Stat(data.baseMoveSpeed);
-
-        Debug.Log($"스텟 초기화 완료 - HP: {healthStat.GetValue()}, 공격력: {attackDamage.GetValue()}, 공격 속도: {attackSpeed.GetValue()}");
-    }
-
     public void ApplyStatChange(StatType type, float flat, float percent)
     {
         switch (type)
@@ -119,6 +73,36 @@ public class Player : Character
                 healthStat.AddFixedModifier(flat);
                 healthStat.AddPercentModifier(percent);
                 break;
+            case StatType.MoveSpeed:
+                moveSpeed.AddFixedModifier(flat);
+                moveSpeed.AddPercentModifier(percent);
+                break;
+        }
+    }
+
+    // 게임 시작 시 호출됩니다.
+    protected override void Awake()
+    {
+        base.Awake(); // 부모 Awake 호출
+        ApplyUpgrades(); // 업그레이드 적용
+    }
+
+    // 업그레이드 매니저로부터 스탯 보너스를 가져와 적용하는 메서드
+    private void ApplyUpgrades()
+    {
+        if (UpgradeManager.Instance != null)
+        {
+            // 체력 업그레이드 적용 (기본 체력에 보너스 추가)
+            healthStat.AddFixedModifier(UpgradeManager.Instance.GetHealthUpgradeBonus());
+            currentHealth = healthStat.GetValue(); // 체력 즉시 반영
+
+            // 공격력 업그레이드 적용
+            attackDamage.AddFixedModifier(UpgradeManager.Instance.GetDamageUpgradeBonus());
+
+            // 이동 속도 업그레이드 적용
+            moveSpeed.AddFixedModifier(UpgradeManager.Instance.GetMoveSpeedUpgradeBonus());
+
+            Debug.Log("플레이어에게 영구 업그레이드 보너스 적용 완료.");
         }
     }
 
@@ -139,6 +123,13 @@ public class Player : Character
     protected override void Die()
     {
         Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
+
+        // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPlayerDeath();
+        }
+
         // 요청에 따라 게임 오브젝트를 파괴합니다.
         Destroy(gameObject);
     }

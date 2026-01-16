@@ -85,6 +85,56 @@ public class Player : Character
     // 예: if (experience >= requiredExperienceForNextLevel) { LevelUp(); }
   }
 
+  // ===================== Exp Orb 처리 (추가) =====================
+
+  private void OnTriggerEnter2D(Collider2D other) // (추가)
+  {
+      // Enemy가 만든 Exp Orb인지 확인 (추가)
+      if (!other.name.StartsWith("ExpOrb_")) return; // (추가)
+
+      int amount = ParseExpOrbAmount(other.name); // (추가)
+      if (amount <= 0) amount = 1; // (추가)
+
+      GainExperience(amount); // 기존 메서드 사용
+      CheckLevelUp(); // (추가)
+
+      Destroy(other.gameObject); // (추가)
+  }
+
+  private int ParseExpOrbAmount(string orbName) // (추가)
+  {
+      int idx = orbName.LastIndexOf('_'); // (추가)
+      if (idx < 0 || idx == orbName.Length - 1) return 0; // (추가)
+
+      string value = orbName.Substring(idx + 1); // (추가)
+      return int.TryParse(value, out int result) ? result : 0; // (추가)
+  }
+
+  // ===================== 레벨업 로직 (추가) =====================
+
+  private void CheckLevelUp() // (추가)
+  {
+      while (experience >= requiredExpForNextLevel) // (추가)
+      {
+          experience -= requiredExpForNextLevel; // (추가)
+          LevelUpInternal(); // (추가)
+      }
+
+      OnExpChanged?.Invoke(experience, requiredExpForNextLevel); // (추가)
+  }
+
+  private void LevelUpInternal() // (추가)
+  {
+      level++; // (추가)
+
+      requiredExpForNextLevel =
+        Mathf.CeilToInt(requiredExpForNextLevel * growthMultiplier); // (추가)
+
+      Debug.Log($"🎉 레벨업! 현재 레벨: {level}"); // (추가)
+
+      OnLevelUp?.Invoke(level); // (추가)
+  }
+
 #if UNITY_EDITOR
     // 에디터에서 공격 범위를 시각적으로 보여주는 기즈모입니다.
     private void OnDrawGizmosSelected()

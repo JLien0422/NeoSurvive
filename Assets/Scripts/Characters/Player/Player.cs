@@ -6,208 +6,208 @@ using NeoSurvive.Characters;
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
 {
-  // 플레이어의 경험치를 저장하는 변수입니다.
-  [SerializeField]
-  private int experience = 0;
-  // 외부에서 경험치를 읽을 수 있는 프로퍼티입니다. (읽기 전용)
-  public int Experience => experience;
+    // 플레이어의 경험치를 저장하는 변수입니다.
+    [SerializeField]
+    private int experience = 0;
+    // 외부에서 경험치를 읽을 수 있는 프로퍼티입니다. (읽기 전용)
+    public int Experience => experience;
 
-  // 플레이어의 레벨을 저장하는 변수입니다.
-  [SerializeField]
-  private int level = 1;
-  // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
-  public int Level => level;
+    // 플레이어의 레벨을 저장하는 변수입니다.
+    [SerializeField]
+    private int level = 1;
+    // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
+    public int Level => level;
 
-  public int MaxExperience => level * 100; // 임시 레벨업 필요 경험치량
+    public int MaxExperience => level * 100; // 임시 레벨업 필요 경험치량
 
-  public static event System.Action<int, int> OnExpChanged; // (current, max)
-  public static event System.Action<int> OnLevelUp; // (new level)
+    public static event System.Action<int, int> OnExpChanged; // (current, max)
+    public static event System.Action<int> OnLevelUp; // (new level)
 
-  // 레벨업 관련 설정(추가)
-  [Header("Level Up Settings (추가)")]
-  // 다음 레벨업에 필요한 경험치
-  [SerializeField] private int requiredExpForNextLevel = 5;
-  // 경험치 요구량 증가 배율
-  [SerializeField] private float growthMultiplier = 1.25f;
+    // 레벨업 관련 설정(추가)
+    [Header("Level Up Settings (추가)")]
+    // 다음 레벨업에 필요한 경험치
+    [SerializeField] private int requiredExpForNextLevel = 5;
+    // 경험치 요구량 증가 배율
+    [SerializeField] private float growthMultiplier = 1.25f;
 
-  [Header("캐릭터 데이터")]
-  [Tooltip("해커 캐릭터 데이터")]
-  [SerializeField]
-  private CharacterData hackerData;
-  [Tooltip("사이보그 캐릭터 데이터")]
-  [SerializeField]
-  private CharacterData cyborgData;
+    [Header("캐릭터 데이터")]
+    [Tooltip("해커 캐릭터 데이터")]
+    [SerializeField]
+    private CharacterData hackerData;
+    [Tooltip("사이보그 캐릭터 데이터")]
+    [SerializeField]
+    private CharacterData cyborgData;
 
-  [Header("자동 공격 설정")]
-  // 공격력
-  [SerializeField]
-  private Stat attackDamage = new Stat(10f);
-  // 공격 범위
-  [SerializeField]
-  private Stat attackRange = new Stat(3f);
-  // 기본 공격 주기 (초)
-  [SerializeField]
-  private float baseAttackInterval = 1.0f;
-  // 공격 속도 (1.0 = 100%)
-  [SerializeField]
-  private Stat attackSpeed = new Stat(1.0f);
+    [Header("자동 공격 설정")]
+    // 공격력
+    [SerializeField]
+    private Stat attackDamage = new Stat(10f);
+    // 공격 범위
+    [SerializeField]
+    private Stat attackRange = new Stat(3f);
+    // 기본 공격 주기 (초)
+    [SerializeField]
+    private float baseAttackInterval = 1.0f;
+    // 공격 속도 (1.0 = 100%)
+    [SerializeField]
+    private Stat attackSpeed = new Stat(1.0f);
 
-  protected override void Start()
-  {
-    base.Start();
-
-    // GameManager에서 선택된 캐릭터 타입 가져오기
-    if (GameManager.Instance != null)
+    protected override void Start()
     {
-      CharacterType selectedType = GameManager.Instance.GetSelectedCharacter();
-      CharacterData selectedData = selectedType == CharacterType.Hacker ? hackerData : cyborgData;
+        base.Start();
 
-      if (selectedData != null)
-      {
-        InitializeFromCharacterData(selectedData);
-      }
-      else
-      {
-        Debug.LogWarning($"캐릭터 데이터가 할당되지 않음: {selectedType}");
-      }
+        // GameManager에서 선택된 캐릭터 타입 가져오기
+        if (GameManager.Instance != null)
+        {
+            CharacterType selectedType = GameManager.Instance.GetSelectedCharacter();
+            CharacterData selectedData = selectedType == CharacterType.Hacker ? hackerData : cyborgData;
+
+            if (selectedData != null)
+            {
+                InitializeFromCharacterData(selectedData);
+            }
+            else
+            {
+                Debug.LogWarning($"캐릭터 데이터가 할당되지 않음: {selectedType}");
+            }
+        }
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.SetPlayerHealthBar(this);
+        }
     }
 
-    if (UIManager.Instance != null)
+    /// <summary>
+    /// 캐릭터 데이터로부터 플레이어 스텟을 초기화합니다.
+    /// </summary>
+    private void InitializeFromCharacterData(CharacterData data)
     {
-      UIManager.Instance.SetPlayerHealthBar(this);
+        Debug.Log($"캐릭터 초기화: {data.characterName} ({data.characterType})");
+
+        // 스텟 초기화
+        healthStat = new Stat(data.baseHealth);
+        currentHealth = healthStat.GetValue();
+
+        attackDamage = new Stat(data.baseAttackDamage);
+        attackRange = new Stat(data.baseAttackRange);
+        attackSpeed = new Stat(data.baseAttackSpeed);
+        // TODO: moveSpeed는 Character 클래스에 추가되면 활성화
+        // moveSpeed = new Stat(data.baseMoveSpeed);
+
+        Debug.Log($"스텟 초기화 완료 - HP: {healthStat.GetValue()}, 공격력: {attackDamage.GetValue()}, 공격 속도: {attackSpeed.GetValue()}");
     }
-  }
 
-  /// <summary>
-  /// 캐릭터 데이터로부터 플레이어 스텟을 초기화합니다.
-  /// </summary>
-  private void InitializeFromCharacterData(CharacterData data)
-  {
-    Debug.Log($"캐릭터 초기화: {data.characterName} ({data.characterType})");
-
-    // 스텟 초기화
-    healthStat = new Stat(data.baseHealth);
-    currentHealth = healthStat.GetValue();
-
-    attackDamage = new Stat(data.baseAttackDamage);
-    attackRange = new Stat(data.baseAttackRange);
-    attackSpeed = new Stat(data.baseAttackSpeed);
-    // TODO: moveSpeed는 Character 클래스에 추가되면 활성화
-    // moveSpeed = new Stat(data.baseMoveSpeed);
-
-    Debug.Log($"스텟 초기화 완료 - HP: {healthStat.GetValue()}, 공격력: {attackDamage.GetValue()}, 공격 속도: {attackSpeed.GetValue()}");
-  }
-
-  public void ApplyStatChange(StatType type, float flat, float percent)
-  {
-    switch (type)
+    public void ApplyStatChange(StatType type, float flat, float percent)
     {
-      case StatType.AttackDamage:
-        attackDamage.AddFixedModifier(flat);
-        attackDamage.AddPercentModifier(percent);
-        break;
-      case StatType.AttackRange:
-        attackRange.AddFixedModifier(flat);
-        attackRange.AddPercentModifier(percent);
-        break;
-      case StatType.AttackSpeed:
-        attackSpeed.AddFixedModifier(flat);
-        attackSpeed.AddPercentModifier(percent);
-        break;
-      case StatType.MaxHP:
-        // Character.cs defines healthStat
-        healthStat.AddFixedModifier(flat);
-        healthStat.AddPercentModifier(percent);
-        break;
+        switch (type)
+        {
+            case StatType.AttackDamage:
+                attackDamage.AddFixedModifier(flat);
+                attackDamage.AddPercentModifier(percent);
+                break;
+            case StatType.AttackRange:
+                attackRange.AddFixedModifier(flat);
+                attackRange.AddPercentModifier(percent);
+                break;
+            case StatType.AttackSpeed:
+                attackSpeed.AddFixedModifier(flat);
+                attackSpeed.AddPercentModifier(percent);
+                break;
+            case StatType.MaxHP:
+                // Character.cs defines healthStat
+                healthStat.AddFixedModifier(flat);
+                healthStat.AddPercentModifier(percent);
+                break;
+        }
     }
-  }
 
-  public void AddExp(int amount)
-  {
-    experience += amount;
-    OnExpChanged?.Invoke(experience, MaxExperience);
-    if (experience >= MaxExperience)
+    public void AddExp(int amount)
     {
-      level++;
-      experience = 0;
-      OnLevelUp?.Invoke(level);
+        experience += amount;
+        OnExpChanged?.Invoke(experience, MaxExperience);
+        if (experience >= MaxExperience)
+        {
+            level++;
+            experience = 0;
+            OnLevelUp?.Invoke(level);
+        }
     }
-  }
 
-  // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
-  // 플레이어에게 특화된 죽음 처리 로직을 구현합니다.
-  protected override void Die()
-  {
-    Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
-    // 요청에 따라 게임 오브젝트를 파괴합니다.
-    Destroy(gameObject);
-  }
+    // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
+    // 플레이어에게 특화된 죽음 처리 로직을 구현합니다.
+    protected override void Die()
+    {
+        Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
+        // 요청에 따라 게임 오브젝트를 파괴합니다.
+        Destroy(gameObject);
+    }
 
-  // 플레이어가 경험치를 얻었을 때 호출되는 메서드입니다.
-  public void GainExperience(int amount)
-  {
-    experience += amount;
-    // Debug.Log($"플레이어가 경험치 {amount}를 획득했습니다. 현재 경험치: {experience}");
-    // 여기에 레벨업 로직을 추가할 수 있습니다.
-    // 예: if (experience >= requiredExperienceForNextLevel) { LevelUp(); }
-  }
+    // 플레이어가 경험치를 얻었을 때 호출되는 메서드입니다.
+    public void GainExperience(int amount)
+    {
+        experience += amount;
+        // Debug.Log($"플레이어가 경험치 {amount}를 획득했습니다. 현재 경험치: {experience}");
+        // 여기에 레벨업 로직을 추가할 수 있습니다.
+        // 예: if (experience >= requiredExperienceForNextLevel) { LevelUp(); }
+    }
 
-  // ===================== Exp Orb 처리 (추가) =====================
+    // ===================== Exp Orb 처리 (추가) =====================
 
-  private void OnTriggerEnter2D(Collider2D other) // (추가)
-  {
-      // Enemy가 만든 Exp Orb인지 확인 (추가)
-      if (!other.name.StartsWith("ExpOrb_")) return; // (추가)
+    private void OnTriggerEnter2D(Collider2D other) // (추가)
+    {
+        // Enemy가 만든 Exp Orb인지 확인 (추가)
+        if (!other.name.StartsWith("ExpOrb_")) return; // (추가)
 
-      int amount = ParseExpOrbAmount(other.name); // (추가)
-      if (amount <= 0) amount = 1; // (추가)
+        int amount = ParseExpOrbAmount(other.name); // (추가)
+        if (amount <= 0) amount = 1; // (추가)
 
-      GainExperience(amount); // 기존 메서드 사용
-      CheckLevelUp(); // (추가)
+        GainExperience(amount); // 기존 메서드 사용
+        CheckLevelUp(); // (추가)
 
-      Destroy(other.gameObject); // (추가)
-  }
+        Destroy(other.gameObject); // (추가)
+    }
 
-  private int ParseExpOrbAmount(string orbName) // (추가)
-  {
-      int idx = orbName.LastIndexOf('_'); // (추가)
-      if (idx < 0 || idx == orbName.Length - 1) return 0; // (추가)
+    private int ParseExpOrbAmount(string orbName) // (추가)
+    {
+        int idx = orbName.LastIndexOf('_'); // (추가)
+        if (idx < 0 || idx == orbName.Length - 1) return 0; // (추가)
 
-      string value = orbName.Substring(idx + 1); // (추가)
-      return int.TryParse(value, out int result) ? result : 0; // (추가)
-  }
+        string value = orbName.Substring(idx + 1); // (추가)
+        return int.TryParse(value, out int result) ? result : 0; // (추가)
+    }
 
-  // ===================== 레벨업 로직 (추가) =====================
+    // ===================== 레벨업 로직 (추가) =====================
 
-  private void CheckLevelUp() // (추가)
-  {
-      while (experience >= requiredExpForNextLevel) // (추가)
-      {
-          experience -= requiredExpForNextLevel; // (추가)
-          LevelUpInternal(); // (추가)
-      }
+    private void CheckLevelUp() // (추가)
+    {
+        while (experience >= requiredExpForNextLevel) // (추가)
+        {
+            experience -= requiredExpForNextLevel; // (추가)
+            LevelUpInternal(); // (추가)
+        }
 
-      OnExpChanged?.Invoke(experience, requiredExpForNextLevel); // (추가)
-  }
+        OnExpChanged?.Invoke(experience, requiredExpForNextLevel); // (추가)
+    }
 
-  private void LevelUpInternal() // (추가)
-  {
-      level++; // (추가)
+    private void LevelUpInternal() // (추가)
+    {
+        level++; // (추가)
 
-      requiredExpForNextLevel =
-        Mathf.CeilToInt(requiredExpForNextLevel * growthMultiplier); // (추가)
+        requiredExpForNextLevel =
+          Mathf.CeilToInt(requiredExpForNextLevel * growthMultiplier); // (추가)
 
-      Debug.Log($"🎉 레벨업! 현재 레벨: {level}"); // (추가)
+        Debug.Log($"🎉 레벨업! 현재 레벨: {level}"); // (추가)
 
-      OnLevelUp?.Invoke(level); // (추가)
-  }
+        OnLevelUp?.Invoke(level); // (추가)
+    }
 
 #if UNITY_EDITOR
     // 에디터에서 공격 범위를 시각적으로 보여주는 기즈모입니다.
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
-        if(attackRange != null)
+        if (attackRange != null)
             Gizmos.DrawWireSphere(transform.position, attackRange.GetValue());
     }
 #endif

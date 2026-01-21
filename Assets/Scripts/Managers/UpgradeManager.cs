@@ -35,7 +35,6 @@ public class UpgradeManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadUpgrades(); // 저장된 업그레이드 레벨 불러오기
         }
         else
         {
@@ -43,21 +42,27 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // 모든 업그레이드 레벨을 불러옵니다.
-    private void LoadUpgrades()
+    private async void Start()
     {
-        healthUpgradeLevel = ES3.Load(UPGRADE_HEALTH_LEVEL_KEY, 0);
-        damageUpgradeLevel = ES3.Load(UPGRADE_DAMAGE_LEVEL_KEY, 0);
-        moveSpeedUpgradeLevel = ES3.Load(UPGRADE_MOVESPEED_LEVEL_KEY, 0);
+        // GameServerAPI 초기화 대기 후 데이터 로드
+        await LoadUpgradesAsync();
+    }
+
+    // 모든 업그레이드 레벨을 불러옵니다 (비동기)
+    private async System.Threading.Tasks.Task LoadUpgradesAsync()
+    {
+        healthUpgradeLevel = await ServerSaveSystem.LoadAsync(UPGRADE_HEALTH_LEVEL_KEY, 0);
+        damageUpgradeLevel = await ServerSaveSystem.LoadAsync(UPGRADE_DAMAGE_LEVEL_KEY, 0);
+        moveSpeedUpgradeLevel = await ServerSaveSystem.LoadAsync(UPGRADE_MOVESPEED_LEVEL_KEY, 0);
         Debug.Log($"업그레이드 레벨 불러오기: 체력 {healthUpgradeLevel}, 공격력 {damageUpgradeLevel}, 이동속도 {moveSpeedUpgradeLevel}");
     }
 
     // 모든 업그레이드 레벨을 저장합니다.
     private void SaveUpgrades()
     {
-        ES3.Save(UPGRADE_HEALTH_LEVEL_KEY, healthUpgradeLevel);
-        ES3.Save(UPGRADE_DAMAGE_LEVEL_KEY, damageUpgradeLevel);
-        ES3.Save(UPGRADE_MOVESPEED_LEVEL_KEY, moveSpeedUpgradeLevel);
+        ServerSaveSystem.Save(UPGRADE_HEALTH_LEVEL_KEY, healthUpgradeLevel);
+        ServerSaveSystem.Save(UPGRADE_DAMAGE_LEVEL_KEY, damageUpgradeLevel);
+        ServerSaveSystem.Save(UPGRADE_MOVESPEED_LEVEL_KEY, moveSpeedUpgradeLevel);
         Debug.Log($"업그레이드 레벨 저장 완료.");
     }
 

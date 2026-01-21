@@ -1,0 +1,6 @@
+<linker>
+  <assembly fullname="Google.Protobuf" preserve="all"/>
+  <assembly fullname="Assembly-CSharp">
+    <namespace fullname="NeoSurvive.Network.Protocol" preserve="all"/>
+  </assembly>
+</linker>

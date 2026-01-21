@@ -12,8 +12,11 @@ namespace NeoSurvive.Network
   /// </summary>
   public class GameServerAPI : MonoBehaviour
   {
+    // 싱글턴 인스턴스
+    public static GameServerAPI Instance { get; private set; }
+
     [Header("서버 설정")]
-    [SerializeField] private string serverUrl = "http://localhost:5157/api";
+    [SerializeField] private string serverUrl = "http://nasdac.kro.kr:5157/api";
 
     // 현재 플레이어 정보
     private int playerId = -1;
@@ -22,6 +25,7 @@ namespace NeoSurvive.Network
 
     // PlayerId 외부 접근용
     public int PlayerId => playerId;
+    public string DeviceUID => deviceUID;
 
     // 이벤트
     public event Action<LoginResponse> OnLoginSuccess;
@@ -30,6 +34,18 @@ namespace NeoSurvive.Network
 
     private void Awake()
     {
+      // 싱글턴 설정
+      if (Instance == null)
+      {
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+      }
+      else
+      {
+        Destroy(gameObject);
+        return;
+      }
+
       // 디바이스 UID 생성 또는 로드
       deviceUID = GetOrCreateDeviceUID();
     }
@@ -59,7 +75,7 @@ namespace NeoSurvive.Network
           var response = JsonConvert.DeserializeObject<LoginResponse>(request.downloadHandler.text);
           playerId = response.playerId;
 
-          Debug.Log($"✅ 로그인 성공! PlayerId: {playerId}, Nickname: {response.nickname}");
+          Debug.Log($"✅ 로그인 성공! PlayerId: {playerId}, DeviceUID: {deviceUID}");
           Debug.Log($"Level: {response.level}, Gold: {response.gold}, Gems: {response.gems}");
 
           OnLoginSuccess?.Invoke(response);
@@ -430,9 +446,9 @@ namespace NeoSurvive.Network
     }
 
     /// <summary>
-    /// POST 요청 생성
+    /// POST 요청 생성 (Public - NetworkManager와 ServerSaveSystem에서 사용)
     /// </summary>
-    private UnityWebRequest CreatePostRequest(string endpoint, string json)
+    public UnityWebRequest CreatePostRequest(string endpoint, string json)
     {
       var request = new UnityWebRequest(serverUrl + endpoint, "POST");
       byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);

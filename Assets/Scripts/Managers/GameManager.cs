@@ -48,7 +48,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 파괴되지 않도록 설정
-            LoadTotalGold(); // 게임 시작 시 저장된 골드 불러오기
         }
         else
         {
@@ -56,8 +55,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    private async void Start()
     {
+        // GameServerAPI 초기화 대기 후 데이터 로드
+        await LoadTotalGoldAsync();
+
         GameObject playerObject = GameObject.FindWithTag("Player");
         if (playerObject != null)
         {
@@ -85,19 +87,19 @@ public class GameManager : MonoBehaviour
         Debug.Log($"이번 판에 얻은 골드가 총 골드에 합산되었습니다. 현재 총 골드: {totalGold}");
     }
 
-    // 골드를 Easy Save로 저장
+    // 골드를 서버에 저장
     private void SaveTotalGold()
     {
-        ES3.Save(GOLD_SAVE_KEY, totalGold);
-        Debug.Log($"총 골드 {totalGold}를 Easy Save로 저장했습니다.");
+        ServerSaveSystem.Save(GOLD_SAVE_KEY, totalGold);
+        Debug.Log($"총 골드 {totalGold}를 서버에 저장했습니다.");
     }
 
-    // Easy Save에서 골드를 불러옴
-    private void LoadTotalGold()
+    // 서버에서 골드를 불러옴 (비동기)
+    private async System.Threading.Tasks.Task LoadTotalGoldAsync()
     {
         // "TotalGold" 키로 저장된 값이 있으면 불러오고, 없으면 0을 기본값으로 사용합니다.
-        totalGold = ES3.Load(GOLD_SAVE_KEY, 0);
-        Debug.Log($"Easy Save에서 총 골드 {totalGold}를 불러왔습니다.");
+        totalGold = await ServerSaveSystem.LoadAsync(GOLD_SAVE_KEY, 0);
+        Debug.Log($"서버에서 총 골드 {totalGold}를 불러왔습니다.");
     }
 
     public float GetGameTime()

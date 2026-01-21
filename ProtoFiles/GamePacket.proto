@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option csharp_namespace = "NeoSurvive.Network.Protocol";
+
+// 게임 패킷 - UDP로 전송될 플레이어 위치 데이터
+message GamePacket {
+  uint32 player_id = 1;   // 문자열보다 정수 ID가 효율적
+  int64 timestamp = 2;    // 순서 보장을 위한 타임스탬프
+  float pos_x = 3;
+  float pos_y = 4;
+}

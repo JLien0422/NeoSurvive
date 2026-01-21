@@ -54,7 +54,10 @@
         "ProjectSettings/": true,
         "UserSettings/": true,
         "temp/": true,
-        "Temp/": true
+        "Temp/": true,
+        "**/*.csproj": true,
+        "*.sln": true
     },
-    "dotnet.defaultSolution": "NeoSurvive.sln"
+    "dotnet.defaultSolution": "disable",
+    "dotnet.server.useOmnisharp": true
 }

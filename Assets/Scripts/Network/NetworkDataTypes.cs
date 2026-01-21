@@ -149,13 +149,15 @@ namespace NeoSurvive.Network
   [Serializable]
   public class WebSocketMessage
   {
-    public string messageType; // "PlayerUpdate", "EnemySpawn", "ItemDrop" etc.
-    public long timestamp;
+    public string MessageType; // "PlayerUpdate", "EnemySpawn", "ItemDrop" etc.
+    public long Timestamp;
+
+    public WebSocketMessage() { } // 기본 생성자 추가
 
     protected WebSocketMessage(string type)
     {
-      messageType = type;
-      timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+      MessageType = type;
+      Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
   }
 
@@ -414,7 +416,7 @@ namespace NeoSurvive.Network
       state.position = new Vector2(update.x, update.y);
       state.velocity = new Vector2(update.vx, update.vy);
       state.rotation = update.rot;
-      state.lastUpdateTimestamp = update.timestamp;
+      state.lastUpdateTimestamp = update.Timestamp;
     }
   }
 

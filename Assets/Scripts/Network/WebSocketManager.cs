@@ -357,14 +357,20 @@ namespace NeoSurvive.Network
         // 메시지 타입 파싱
         var baseMessage = ES3SerializationHelper.DeserializeFromJson<WebSocketMessage>(json);
 
-        if (baseMessage != null && messageHandlers.ContainsKey(baseMessage.messageType))
+        if (baseMessage == null || string.IsNullOrEmpty(baseMessage.MessageType))
+        {
+          Debug.LogError($"[WebSocket] 메시지 헤더 파싱 실패! (구조나 대소문자 확인 필요)\n원본 데이터: {json}");
+          return;
+        }
+
+        if (messageHandlers.ContainsKey(baseMessage.MessageType))
         {
           // 등록된 핸들러 호출
-          messageHandlers[baseMessage.messageType]?.Invoke(json);
+          messageHandlers[baseMessage.MessageType]?.Invoke(json);
         }
         else
         {
-          Debug.LogWarning($"[WebSocket] 처리되지 않은 메시지 타입: {baseMessage?.messageType}");
+          Debug.LogWarning($"[WebSocket] 처리 핸들러가 없는 메시지 타입: {baseMessage.MessageType}\n원본 데이터: {json}");
         }
       }
       catch (Exception e)
@@ -444,7 +450,7 @@ namespace NeoSurvive.Network
     /// </summary>
     private void SendPing()
     {
-      SendMessage("{\"messageType\":\"Ping\",\"timestamp\":" +
+      SendMessage("{\"MessageType\":\"Ping\",\"Timestamp\":" +
           DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "}");
     }
 

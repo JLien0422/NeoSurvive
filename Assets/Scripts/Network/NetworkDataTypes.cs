@@ -144,10 +144,10 @@ namespace NeoSurvive.Network
   #region WebSocket 메시지 타입 (WebSocket Message Types)
 
   /// <summary>
-  /// WebSocket 메시지 베이스 클래스
+  /// WebSocket 메시지 베베이스 클래스
   /// </summary>
   [Serializable]
-  public abstract class WebSocketMessage
+  public class WebSocketMessage
   {
     public string messageType; // "PlayerUpdate", "EnemySpawn", "ItemDrop" etc.
     public long timestamp;
@@ -296,6 +296,19 @@ namespace NeoSurvive.Network
     public string message;
 
     public ChatMessage() : base("Chat") { }
+  }
+
+  /// <summary>
+  /// 플레이어 입장 메시지 (서버에서 전송)
+  /// </summary>
+  [Serializable]
+  public class PlayerJoinedMessage : WebSocketMessage
+  {
+    public int PlayerId;
+    public string Nickname;
+    public string CharacterType;
+
+    public PlayerJoinedMessage() : base("PlayerJoined") { }
   }
 
   #endregion

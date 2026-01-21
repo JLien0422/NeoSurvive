@@ -126,6 +126,7 @@ namespace NeoSurvive.Network
         websocketManager.RegisterHandler("PlayerDamage", HandlePlayerDamage);
         websocketManager.RegisterHandler("Chat", HandleChatMessage);
         websocketManager.RegisterHandler("GameOver", HandleGameOver);
+        websocketManager.RegisterHandler("PlayerJoined", HandlePlayerJoined);
       }
     }
 
@@ -220,6 +221,19 @@ namespace NeoSurvive.Network
 
             // 현재 게임 상태 로드
             localGameState = response.currentState;
+
+            // 기존 플레이어 목록 동기화
+            if (localGameState != null && localGameState.players != null)
+            {
+              foreach (var p in localGameState.players)
+              {
+                // 자기 자신은 제외하고 원격 플레이어 리스트에 추가
+                if (p.playerId != httpAPI.PlayerId)
+                {
+                  remotePlayers[p.playerId] = p;
+                }
+              }
+            }
 
             // WebSocket URL 보정
             string websocketUrl = FormatWebSocketUrl(response.websocketUrl, characterType.ToString());
@@ -538,8 +552,33 @@ namespace NeoSurvive.Network
       var message = ES3SerializationHelper.DeserializeFromJson<ChatMessage>(json);
       if (message != null)
       {
-        string chatText = $"[{message.senderNickname}]: {message.message}";
-        OnChatMessageReceived?.Invoke(chatText);
+        Debug.Log($"[Chat] {message.senderNickname}: {message.message}");
+        // TODO: 채팅 UI 업데이트
+      }
+    }
+
+    private void HandlePlayerJoined(string json)
+    {
+      var message = ES3SerializationHelper.DeserializeFromJson<PlayerJoinedMessage>(json);
+      if (message != null)
+      {
+        Debug.Log($"[NetworkManager] 새로운 플레이어 입장: ID {message.PlayerId}, 닉네임 {message.Nickname}");
+
+        // PlayerState로 변환하여 기존 시스템에 통합
+        PlayerState newState = new PlayerState
+        {
+          playerId = message.PlayerId,
+          nickname = message.Nickname,
+          health = 100,
+          isAlive = true
+        };
+
+        // 원격 플레이어 리스트에 추가
+        if (!remotePlayers.ContainsKey(newState.playerId))
+        {
+          remotePlayers[newState.playerId] = newState;
+          OnRemotePlayerJoined?.Invoke(newState);
+        }
       }
     }
 

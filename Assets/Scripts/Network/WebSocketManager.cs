@@ -163,7 +163,7 @@ namespace NeoSurvive.Network
     {
       var message = new PlayerPositionUpdate
       {
-        playerId = localPlayerId,
+        PlayerId = localPlayerId,
         x = position.x,
         y = position.y,
         vx = velocity.x,
@@ -272,10 +272,10 @@ namespace NeoSurvive.Network
     {
       var message = new PlayerDamageMessage
       {
-        playerId = playerId,
-        damage = damage,
-        remainingHealth = remainingHealth,
-        attackerId = attackerId
+        PlayerId = playerId,
+        Damage = damage,
+        RemainingHealth = remainingHealth,
+        AttackerId = attackerId
       };
 
       string json = ES3SerializationHelper.SerializeToJson(message);
@@ -292,9 +292,9 @@ namespace NeoSurvive.Network
     {
       var chatMsg = new ChatMessage
       {
-        senderId = localPlayerId,
-        senderNickname = GameManager.Instance?.GetSelectedCharacter().ToString() ?? "Player",
-        message = message
+        SenderId = localPlayerId,
+        SenderNickname = GameManager.Instance?.GetSelectedCharacter().ToString() ?? "Player",
+        Message = message
       };
 
       string json = ES3SerializationHelper.SerializeToJson(chatMsg);

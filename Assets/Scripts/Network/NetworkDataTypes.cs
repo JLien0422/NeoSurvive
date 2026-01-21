@@ -279,10 +279,10 @@ namespace NeoSurvive.Network
   [Serializable]
   public class PlayerDamageMessage : WebSocketMessage
   {
-    public int playerId;
-    public float damage;
-    public float remainingHealth;
-    public int attackerId; // 공격한 적 ID
+    public int PlayerId;
+    public float Damage;
+    public float RemainingHealth;
+    public int AttackerId; // 공격한 적 ID
 
     public PlayerDamageMessage() : base("PlayerDamage") { }
   }
@@ -293,9 +293,9 @@ namespace NeoSurvive.Network
   [Serializable]
   public class ChatMessage : WebSocketMessage
   {
-    public int senderId;
-    public string senderNickname;
-    public string message;
+    public int SenderId;
+    public string SenderNickname;
+    public string Message;
 
     public ChatMessage() : base("Chat") { }
   }

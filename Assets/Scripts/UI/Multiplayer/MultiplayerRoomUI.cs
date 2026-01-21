@@ -63,7 +63,7 @@ namespace NeoSurvive.UI.Multiplayer
 
     private void HandlePlayerEvent(PlayerState state)
     {
-      Debug.Log($"[MultiplayerRoomUI] 플레이어 이벤트 감지: ID {state.playerId}");
+      Debug.Log($"[MultiplayerRoomUI] 플레이어 이벤트 감지: ID {state.PlayerId}");
       UpdatePlayerList();
     }
 
@@ -370,7 +370,7 @@ namespace NeoSurvive.UI.Multiplayer
         var remotePlayers = NetworkManager.Instance.GetAllRemotePlayers();
         foreach (var player in remotePlayers)
         {
-          CreatePlayerItem($"Player {player.playerId}", false, false);
+          CreatePlayerItem($"Player {player.PlayerId}", false, false);
         }
       }
     }

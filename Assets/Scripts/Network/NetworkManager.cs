@@ -553,10 +553,10 @@ namespace NeoSurvive.Network
     private void HandlePlayerDamage(string json)
     {
       var message = ES3SerializationHelper.DeserializeFromJson<PlayerDamageMessage>(json);
-      if (message != null && remotePlayers.ContainsKey(message.playerId))
+      if (message != null && remotePlayers.ContainsKey(message.PlayerId))
       {
-        remotePlayers[message.playerId].health = message.remainingHealth;
-        OnRemotePlayerUpdated?.Invoke(remotePlayers[message.playerId]);
+        remotePlayers[message.PlayerId].Health = message.RemainingHealth;
+        OnRemotePlayerUpdated?.Invoke(remotePlayers[message.PlayerId]);
       }
     }
 
@@ -565,7 +565,7 @@ namespace NeoSurvive.Network
       var message = ES3SerializationHelper.DeserializeFromJson<ChatMessage>(json);
       if (message != null)
       {
-        Debug.Log($"[Chat] {message.senderNickname}: {message.message}");
+        Debug.Log($"[Chat] {message.SenderNickname}: {message.Message}");
         // TODO: 채팅 UI 업데이트
       }
     }

@@ -211,16 +211,16 @@ namespace NeoSurvive.Network
           var response = ES3SerializationHelper.DeserializeFromJson<JoinMultiLobbyResponse>(
               webRequest.downloadHandler.text);
 
-          if (response != null && response.Success)
+          if (response != null && response.success)
           {
-            currentMultiLobbySessionId = response.SessionId;
+            currentMultiLobbySessionId = response.sessionId;
             currentSessionCode = sessionCode;
             isHost = false;
 
             Debug.Log($"✅ 멀티플레이어 로비 참가 완료! SessionId: {currentMultiLobbySessionId}");
 
             // 현재 게임 상태 로드
-            localGameState = response.CurrentState;
+            localGameState = response.currentState;
 
             // 기존 플레이어 목록 동기화
             if (localGameState != null && localGameState.Players != null)
@@ -236,7 +236,7 @@ namespace NeoSurvive.Network
             }
 
             // WebSocket URL 보정
-            string websocketUrl = FormatWebSocketUrl(response.WebsocketUrl, characterType.ToString());
+            string websocketUrl = FormatWebSocketUrl(response.websocketUrl, characterType.ToString());
             Debug.Log($"[NetworkManager] WebSocket 연결 시도: {websocketUrl}");
 
             // WebSocket 연결
@@ -247,7 +247,7 @@ namespace NeoSurvive.Network
           }
           else
           {
-            Debug.LogError($"❌ 멀티플레이어 로비 참가 실패: {response?.ErrorMessage}");
+            Debug.LogError($"❌ 멀티플레이어 로비 참가 실패: {response?.errorMessage}");
           }
         }
         else
@@ -280,22 +280,16 @@ namespace NeoSurvive.Network
     }
 
     /// <summary>
-    /// 게임 세션을 서버에 저장합니다.
+    /// 멀티플레이어 로비 세션을 서버에 저장합니다.
     /// </summary>
-    public IEnumerator SaveGameSession(GameSessionState sessionState)
+    public IEnumerator SaveMultiLobbySession()
     {
-      if (currentMultiLobbySessionId < 0)
-      {
-        Debug.LogWarning("[NetworkManager] 멀티플레이어 로비가 없어 저장할 수 없습니다.");
-        yield break;
-      }
-
-      Debug.Log("[NetworkManager] 게임 세션 저장 중...");
+      if (!IsInMultiLobby) yield break;
 
       var request = new SaveSessionRequest
       {
         sessionId = currentMultiLobbySessionId,
-        sessionState = sessionState
+        sessionState = localGameState
       };
 
       string json = ES3SerializationHelper.SerializeToJson(request);
@@ -317,10 +311,6 @@ namespace NeoSurvive.Network
           {
             Debug.LogError($"❌ 세션 저장 실패: {response?.errorMessage}");
           }
-        }
-        else
-        {
-          Debug.LogError($"❌ 세션 저장 실패: {webRequest.error}");
         }
       }
     }

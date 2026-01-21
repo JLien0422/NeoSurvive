@@ -324,9 +324,9 @@ namespace NeoSurvive.Network
   public class CreateMultiLobbyRequest
   {
     public int hostPlayerId;
-    public string characterType; // "Hacker" or "Cyborg"
+    public string characterType;
     public int stage;
-    public int maxPlayers; // 기본 2명
+    public int maxPlayers;
   }
 
   /// <summary>
@@ -336,9 +336,9 @@ namespace NeoSurvive.Network
   public class CreateMultiLobbyResponse
   {
     public int sessionId;
-    public string websocketUrl; // WebSocket 연결 주소
-    public string sessionCode; // 6자리 세션 코드
-    public string createdAt; // ISO 8601 문자열 형식
+    public string websocketUrl;
+    public string sessionCode;
+    public string createdAt;
   }
 
   /// <summary>
@@ -358,11 +358,11 @@ namespace NeoSurvive.Network
   [Serializable]
   public class JoinMultiLobbyResponse
   {
-    public bool Success;
-    public int SessionId;
-    public string WebsocketUrl;
-    public GameSessionState CurrentState; // 현재 세션 상태
-    public string ErrorMessage;
+    public bool success;
+    public int sessionId;
+    public string websocketUrl;
+    public GameSessionState currentState;
+    public string errorMessage;
   }
 
   /// <summary>

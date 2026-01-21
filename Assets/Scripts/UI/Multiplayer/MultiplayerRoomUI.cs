@@ -41,6 +41,38 @@ namespace NeoSurvive.UI.Multiplayer
     private string currentRoomCode = "";
     private List<GameObject> playerItemInstances = new List<GameObject>();
 
+    private void OnEnable()
+    {
+      if (NetworkManager.Instance != null)
+      {
+        NetworkManager.Instance.OnRemotePlayerJoined += HandlePlayerEvent;
+        NetworkManager.Instance.OnRemotePlayerLeft += HandlePlayerLeftEvent;
+        NetworkManager.Instance.OnRemotePlayerUpdated += HandlePlayerEvent;
+      }
+    }
+
+    private void OnDisable()
+    {
+      if (NetworkManager.Instance != null)
+      {
+        NetworkManager.Instance.OnRemotePlayerJoined -= HandlePlayerEvent;
+        NetworkManager.Instance.OnRemotePlayerLeft -= HandlePlayerLeftEvent;
+        NetworkManager.Instance.OnRemotePlayerUpdated -= HandlePlayerEvent;
+      }
+    }
+
+    private void HandlePlayerEvent(PlayerState state)
+    {
+      Debug.Log($"[MultiplayerRoomUI] 플레이어 이벤트 감지: ID {state.playerId}");
+      UpdatePlayerList();
+    }
+
+    private void HandlePlayerLeftEvent(int playerId)
+    {
+      Debug.Log($"[MultiplayerRoomUI] 플레이어 퇴장 감지: ID {playerId}");
+      UpdatePlayerList();
+    }
+
     private void Start()
     {
       // 버튼 이벤트 연결

@@ -66,9 +66,16 @@ namespace NeoSurvive.Network
 
     #region 이벤트
 
+    // 로비 이벤트
+
+    // 방에 플레이어가 들어옴
     public event Action<PlayerState> OnRemotePlayerJoined;
+    // 방에서 플레이어가 나감
     public event Action<int> OnRemotePlayerLeft;
+    // 방에서 플레이어 정보가 업데이트됨
     public event Action<PlayerState> OnRemotePlayerUpdated;
+
+    // 게임 이벤트
     public event Action<EnemyState> OnEnemySpawned;
     public event Action<int> OnEnemyDied;
     public event Action<DropItemState> OnItemDropped;
@@ -161,7 +168,7 @@ namespace NeoSurvive.Network
             Debug.Log($"✅ 멀티플레이어 로비 생성 완료! 코드: {currentSessionCode}");
 
             // WebSocket URL 보정
-            string websocketUrl = FormatWebSocketUrl(response.websocketUrl);
+            string websocketUrl = FormatWebSocketUrl(response.websocketUrl, characterType.ToString());
             Debug.Log($"[NetworkManager] WebSocket 연결 시도: {websocketUrl}");
 
             // WebSocket 연결
@@ -215,7 +222,7 @@ namespace NeoSurvive.Network
             localGameState = response.currentState;
 
             // WebSocket URL 보정
-            string websocketUrl = FormatWebSocketUrl(response.websocketUrl);
+            string websocketUrl = FormatWebSocketUrl(response.websocketUrl, characterType.ToString());
             Debug.Log($"[NetworkManager] WebSocket 연결 시도: {websocketUrl}");
 
             // WebSocket 연결
@@ -309,21 +316,27 @@ namespace NeoSurvive.Network
     #region 유틸리티 (Utilities)
 
     /// <summary>
-    /// 서버에서 받은 WebSocket URL을 현재 환경에 맞게 보정합니다.
+    /// 서버에서 받은 WebSocket URL을 현재 환경에 맞게 보정하고 필요한 파라미터를 추가합니다.
     /// </summary>
-    private string FormatWebSocketUrl(string originalUrl)
+    private string FormatWebSocketUrl(string originalUrl, string charType)
     {
       if (string.IsNullOrEmpty(originalUrl)) return originalUrl;
 
-      // 1. localhost 치환
+      // 1. 도메인 보정
       string formattedUrl = originalUrl.Replace("localhost", "nasdac.kro.kr");
 
-      // 2. 필수 쿼리 파라미터 추가 (서버 식별용)
-      if (!formattedUrl.Contains("playerId="))
+      // 2. 쿼리 스트링 초기화 (서버가 준 URL에 쿼리가 이미 있다면 제거하고 새로 생성)
+      if (formattedUrl.Contains("?"))
       {
-        string separator = formattedUrl.Contains("?") ? "&" : "?";
-        formattedUrl += $"{separator}playerId={httpAPI.PlayerId}";
+        int queryIndex = formattedUrl.IndexOf("?");
+        formattedUrl = formattedUrl.Substring(0, queryIndex);
       }
+
+      // 3. 사용자 요청 형식 적용: ?playerId={id}&nickname={name}&characterType={type}
+      // 현재 닉네임 프로퍼티가 없으므로 임시로 Player_{id} 사용
+      string nickname = $"Player_{httpAPI.PlayerId}";
+
+      formattedUrl += $"?playerId={httpAPI.PlayerId}&nickname={nickname}&characterType={charType}";
 
       Debug.Log($"[NetworkManager] 최종 WebSocket 주소: {formattedUrl}");
       return formattedUrl;

@@ -211,32 +211,32 @@ namespace NeoSurvive.Network
           var response = ES3SerializationHelper.DeserializeFromJson<JoinMultiLobbyResponse>(
               webRequest.downloadHandler.text);
 
-          if (response != null && response.success)
+          if (response != null && response.Success)
           {
-            currentMultiLobbySessionId = response.sessionId;
+            currentMultiLobbySessionId = response.SessionId;
             currentSessionCode = sessionCode;
             isHost = false;
 
             Debug.Log($"✅ 멀티플레이어 로비 참가 완료! SessionId: {currentMultiLobbySessionId}");
 
             // 현재 게임 상태 로드
-            localGameState = response.currentState;
+            localGameState = response.CurrentState;
 
             // 기존 플레이어 목록 동기화
-            if (localGameState != null && localGameState.players != null)
+            if (localGameState != null && localGameState.Players != null)
             {
-              foreach (var p in localGameState.players)
+              foreach (var p in localGameState.Players)
               {
                 // 자기 자신은 제외하고 원격 플레이어 리스트에 추가
-                if (p.playerId != httpAPI.PlayerId)
+                if (p.PlayerId != httpAPI.PlayerId)
                 {
-                  remotePlayers[p.playerId] = p;
+                  remotePlayers[p.PlayerId] = p;
                 }
               }
             }
 
             // WebSocket URL 보정
-            string websocketUrl = FormatWebSocketUrl(response.websocketUrl, characterType.ToString());
+            string websocketUrl = FormatWebSocketUrl(response.WebsocketUrl, characterType.ToString());
             Debug.Log($"[NetworkManager] WebSocket 연결 시도: {websocketUrl}");
 
             // WebSocket 연결
@@ -247,7 +247,7 @@ namespace NeoSurvive.Network
           }
           else
           {
-            Debug.LogError($"❌ 멀티플레이어 로비 참가 실패: {response?.errorMessage}");
+            Debug.LogError($"❌ 멀티플레이어 로비 참가 실패: {response?.ErrorMessage}");
           }
         }
         else
@@ -459,35 +459,48 @@ namespace NeoSurvive.Network
 
     private void HandlePlayerPositionUpdate(string json)
     {
-      var message = ES3SerializationHelper.DeserializeFromJson<PlayerPositionUpdate>(json);
-      if (message != null && message.playerId != httpAPI.PlayerId)
+      var update = ES3SerializationHelper.DeserializeFromJson<PlayerPositionUpdate>(json);
+      if (update != null && update.PlayerId != httpAPI.PlayerId)
       {
-        // 원격 플레이어 위치 업데이트
-        if (!remotePlayers.ContainsKey(message.playerId))
+        if (remotePlayers.TryGetValue(update.PlayerId, out PlayerState state))
         {
-          remotePlayers[message.playerId] = new PlayerState { playerId = message.playerId };
-        }
+          state.Position = new Vector2(update.x, update.y);
+          state.Velocity = new Vector2(update.vx, update.vy);
+          state.Rotation = update.rot;
+          state.LastUpdateTimestamp = update.Timestamp;
 
-        remotePlayers[message.playerId].ApplyPositionUpdate(message);
-        OnRemotePlayerUpdated?.Invoke(remotePlayers[message.playerId]);
+          OnRemotePlayerUpdated?.Invoke(state);
+        }
+        else
+        {
+          // 위치 정보가 먼저 왔는데 플레이어가 없는 경우, 새로운 플레이어로 처리
+          PlayerState newState = new PlayerState { PlayerId = update.PlayerId, Health = 100, IsAlive = true };
+          remotePlayers[update.PlayerId] = newState;
+          newState.ApplyPositionUpdate(update);
+          OnRemotePlayerJoined?.Invoke(newState);
+        }
       }
     }
 
     private void HandlePlayerStateUpdate(string json)
     {
       var message = ES3SerializationHelper.DeserializeFromJson<PlayerStateUpdate>(json);
-      if (message?.playerState != null && message.playerState.playerId != httpAPI.PlayerId)
+      if (message?.playerState != null && message.playerState.PlayerId != httpAPI.PlayerId)
       {
-        int playerId = message.playerState.playerId;
+        int playerId = message.playerState.PlayerId;
 
         if (!remotePlayers.ContainsKey(playerId))
         {
           // 새로운 플레이어 참가
+          remotePlayers[playerId] = message.playerState;
           OnRemotePlayerJoined?.Invoke(message.playerState);
         }
-
-        remotePlayers[playerId] = message.playerState;
-        OnRemotePlayerUpdated?.Invoke(message.playerState);
+        else
+        {
+          // 기존 플레이어 정보 업데이트
+          remotePlayers[playerId] = message.playerState;
+          OnRemotePlayerUpdated?.Invoke(message.playerState);
+        }
       }
     }
 
@@ -567,16 +580,16 @@ namespace NeoSurvive.Network
         // PlayerState로 변환하여 기존 시스템에 통합
         PlayerState newState = new PlayerState
         {
-          playerId = message.PlayerId,
-          nickname = message.Nickname,
-          health = 100,
-          isAlive = true
+          PlayerId = message.PlayerId,
+          Nickname = message.Nickname,
+          Health = 100,
+          IsAlive = true
         };
 
         // 원격 플레이어 리스트에 추가
-        if (!remotePlayers.ContainsKey(newState.playerId))
+        if (!remotePlayers.ContainsKey(newState.PlayerId))
         {
-          remotePlayers[newState.playerId] = newState;
+          remotePlayers[newState.PlayerId] = newState;
           OnRemotePlayerJoined?.Invoke(newState);
         }
       }

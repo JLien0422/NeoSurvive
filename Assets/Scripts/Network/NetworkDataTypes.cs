@@ -13,21 +13,21 @@ namespace NeoSurvive.Network
   [Serializable]
   public class PlayerState
   {
-    public int playerId;
-    public string nickname;
-    public Vector2 position;
-    public Vector2 velocity;
-    public float rotation;
+    public int PlayerId;
+    public string Nickname;
+    public Vector2 Position;
+    public Vector2 Velocity;
+    public float Rotation;
 
     // 스탯
-    public float health;
-    public float maxHealth;
-    public int level;
-    public int experience;
+    public float Health;
+    public float MaxHealth;
+    public int Level;
+    public int Experience;
 
     // 게임 상태
-    public bool isAlive;
-    public long lastUpdateTimestamp; // Unix timestamp (ms)
+    public bool IsAlive;
+    public long LastUpdateTimestamp; // Unix timestamp (ms)
 
     // 무기 및 버프
     public List<WeaponState> activeWeapons;
@@ -104,25 +104,25 @@ namespace NeoSurvive.Network
   [Serializable]
   public class GameSessionState
   {
-    public int sessionId;
-    public string hostPlayerId;
-    public List<PlayerState> players;
-    public List<EnemyState> enemies;
-    public List<DropItemState> dropItems;
+    public int SessionId;
+    public string HostPlayerId;
+    public List<PlayerState> Players;
+    public List<EnemyState> Enemies;
+    public List<DropItemState> DropItems;
 
     // 게임 진행 상황
-    public float gameTime;
-    public int waveNumber;
-    public int totalKills;
-    public bool isGameActive;
+    public float GameTime;
+    public int WaveNumber;
+    public int TotalKills;
+    public bool IsGameActive;
 
-    public long lastSyncTimestamp; // 마지막 동기화 시간
+    public long LastSyncTimestamp; // 마지막 동기화 시간
 
     public GameSessionState()
     {
-      players = new List<PlayerState>();
-      enemies = new List<EnemyState>();
-      dropItems = new List<DropItemState>();
+      Players = new List<PlayerState>();
+      Enemies = new List<EnemyState>();
+      DropItems = new List<DropItemState>();
     }
   }
 
@@ -167,7 +167,7 @@ namespace NeoSurvive.Network
   [Serializable]
   public class PlayerPositionUpdate : WebSocketMessage
   {
-    public int playerId;
+    public int PlayerId;
     public float x;
     public float y;
     public float vx; // velocity x
@@ -358,11 +358,11 @@ namespace NeoSurvive.Network
   [Serializable]
   public class JoinMultiLobbyResponse
   {
-    public bool success;
-    public int sessionId;
-    public string websocketUrl;
-    public GameSessionState currentState; // 현재 세션 상태
-    public string errorMessage;
+    public bool Success;
+    public int SessionId;
+    public string WebsocketUrl;
+    public GameSessionState CurrentState; // 현재 세션 상태
+    public string ErrorMessage;
   }
 
   /// <summary>
@@ -399,12 +399,12 @@ namespace NeoSurvive.Network
     {
       return new PlayerPositionUpdate
       {
-        playerId = state.playerId,
-        x = state.position.x,
-        y = state.position.y,
-        vx = state.velocity.x,
-        vy = state.velocity.y,
-        rot = state.rotation
+        PlayerId = state.PlayerId,
+        x = state.Position.x,
+        y = state.Position.y,
+        vx = state.Velocity.x,
+        vy = state.Velocity.y,
+        rot = state.Rotation
       };
     }
 
@@ -413,10 +413,10 @@ namespace NeoSurvive.Network
     /// </summary>
     public static void ApplyPositionUpdate(this PlayerState state, PlayerPositionUpdate update)
     {
-      state.position = new Vector2(update.x, update.y);
-      state.velocity = new Vector2(update.vx, update.vy);
-      state.rotation = update.rot;
-      state.lastUpdateTimestamp = update.Timestamp;
+      state.Position = new Vector2(update.x, update.y);
+      state.Velocity = new Vector2(update.vx, update.vy);
+      state.Rotation = update.rot;
+      state.LastUpdateTimestamp = update.Timestamp;
     }
   }
 

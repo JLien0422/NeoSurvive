@@ -22,7 +22,7 @@ public class Player : Character
 
     public static event System.Action<int, int> OnExpChanged; // (current, max)
     public static event System.Action<int> OnLevelUp; // (new level)
-
+    
     // 레벨업 관련 설정(추가)
     [Header("Level Up Settings (추가)")]
     // 다음 레벨업에 필요한 경험치

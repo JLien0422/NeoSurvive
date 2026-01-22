@@ -43,27 +43,25 @@ namespace NeoSurvive.UI.Multiplayer
 
     private void OnEnable()
     {
-      if (NetworkManager.Instance != null)
+      if (NetworkManager.Instance?.Lobby != null)
       {
-        NetworkManager.Instance.OnRemotePlayerJoined += HandlePlayerEvent;
-        NetworkManager.Instance.OnRemotePlayerLeft += HandlePlayerLeftEvent;
-        NetworkManager.Instance.OnRemotePlayerUpdated += HandlePlayerEvent;
+        NetworkManager.Instance.Lobby.OnPlayerJoined += HandlePlayerEvent;
+        NetworkManager.Instance.Lobby.OnPlayerLeft += HandlePlayerLeftEvent;
       }
     }
 
     private void OnDisable()
     {
-      if (NetworkManager.Instance != null)
+      if (NetworkManager.Instance?.Lobby != null)
       {
-        NetworkManager.Instance.OnRemotePlayerJoined -= HandlePlayerEvent;
-        NetworkManager.Instance.OnRemotePlayerLeft -= HandlePlayerLeftEvent;
-        NetworkManager.Instance.OnRemotePlayerUpdated -= HandlePlayerEvent;
+        NetworkManager.Instance.Lobby.OnPlayerJoined -= HandlePlayerEvent;
+        NetworkManager.Instance.Lobby.OnPlayerLeft -= HandlePlayerLeftEvent;
       }
     }
 
     private void HandlePlayerEvent(PlayerState state)
     {
-      Debug.Log($"[MultiplayerRoomUI] 플레이어 이벤트 감지: ID {state.PlayerId}");
+      Debug.Log($"[MultiplayerRoomUI] 플레이어 이벤트 감지: ID {state.playerId}");
       UpdatePlayerList();
     }
 
@@ -130,6 +128,10 @@ namespace NeoSurvive.UI.Multiplayer
       StartCoroutine(CreateRoom(selectedCharacter));
     }
 
+    /// <summary>
+    /// [1순위] UI의 '참가' 버튼 클릭 시 호출됩니다.
+    /// 입력창의 코드를 확인하고 참가 프로세스를 시작합니다.
+    /// </summary>
     private void OnJoinRoomClicked()
     {
       if (roomCodeInput == null || string.IsNullOrEmpty(roomCodeInput.text))
@@ -139,10 +141,11 @@ namespace NeoSurvive.UI.Multiplayer
       }
 
       string roomCode = roomCodeInput.text.ToUpper();
-      Debug.Log($"[MultiplayerRoomUI] 방 참가: {roomCode}");
+      Debug.Log($"[MultiplayerRoomUI] 방 참가 시도: {roomCode}");
 
       CharacterType selectedCharacter = GetSelectedCharacter();
 
+      // [2순위] Coroutine을 통해 비동기 참가 프로세스 실행
       StartCoroutine(JoinRoom(roomCode, selectedCharacter));
     }
 
@@ -173,10 +176,13 @@ namespace NeoSurvive.UI.Multiplayer
     private void OnReadyClicked()
     {
       isReady = !isReady;
-      Debug.Log($"[MultiplayerRoomUI] 준비 상태: {isReady}");
+      Debug.Log($"[MultiplayerRoomUI] 준비 상태 변경 시도: {isReady}");
 
       // 준비 상태를 서버에 전송
-      // TODO: 서버 API 연동
+      if (NetworkManager.Instance != null)
+      {
+        NetworkManager.Instance.Lobby.SendReadyStatus(isReady);
+      }
 
       UpdateReadyButton();
     }
@@ -189,12 +195,13 @@ namespace NeoSurvive.UI.Multiplayer
         return;
       }
 
-      Debug.Log("[MultiplayerRoomUI] 게임 시작!");
+      Debug.Log("[MultiplayerRoomUI] 게임 시작 요청 전송");
 
-      // TODO: 모든 플레이어가 준비되었는지 확인
-
-      // 게임 시작
-      StartCoroutine(StartMultiplayerGame());
+      // 서버에 게임 시작 신호 전송
+      if (NetworkManager.Instance != null)
+      {
+        NetworkManager.Instance.Lobby.SendGameStart();
+      }
     }
 
     private void OnLeaveRoomClicked()
@@ -223,11 +230,11 @@ namespace NeoSurvive.UI.Multiplayer
         yield break;
       }
 
-      yield return NetworkManager.Instance.CreateMultiLobby(characterType, 1);
+      yield return NetworkManager.Instance.Lobby.CreateLobby(characterType);
 
-      if (NetworkManager.Instance.IsInMultiLobby)
+      if (NetworkManager.Instance.Lobby.IsInLobby)
       {
-        currentRoomCode = NetworkManager.Instance.SessionCode;
+        currentRoomCode = NetworkManager.Instance.Lobby.SessionCode;
         isHost = true;
         isReady = true; // 방장은 자동 준비
 
@@ -241,6 +248,10 @@ namespace NeoSurvive.UI.Multiplayer
       }
     }
 
+    /// <summary>
+    /// [2순위] 로비 참가 로직을 관리하는 코루틴입니다.
+    /// NetworkManager(MultiLobbyManager)를 통해 서버에 접속합니다.
+    /// </summary>
     private IEnumerator JoinRoom(string roomCode, CharacterType characterType)
     {
       if (NetworkManager.Instance == null)
@@ -249,14 +260,17 @@ namespace NeoSurvive.UI.Multiplayer
         yield break;
       }
 
-      yield return NetworkManager.Instance.JoinMultiLobby(roomCode, characterType);
+      // [3순위] MultiLobbyManager에게 서버 요청 및 연결 처리를 위임합니다.
+      yield return NetworkManager.Instance.Lobby.JoinLobby(roomCode, characterType);
 
-      if (NetworkManager.Instance.IsInMultiLobby)
+      // 성공적으로 로비에 진입했는지 확인합니다.
+      if (NetworkManager.Instance.Lobby.IsInLobby)
       {
         currentRoomCode = roomCode;
         isHost = false;
         isReady = false;
 
+        // 방 대기실 UI로 전환합니다.
         ShowRoom();
 
         Debug.Log($"✅ 방 참가 완료! 코드: {currentRoomCode}");
@@ -274,7 +288,7 @@ namespace NeoSurvive.UI.Multiplayer
         yield break;
       }
 
-      yield return NetworkManager.Instance.LeaveMultiLobby();
+      yield return NetworkManager.Instance.Lobby.LeaveLobby();
 
       currentRoomCode = "";
       isHost = false;
@@ -347,19 +361,14 @@ namespace NeoSurvive.UI.Multiplayer
         return;
 
       // 1. 자기 자신 추가
-      string myName = "Me (Local)";
-      if (GameServerAPI.Instance != null)
+      string myName = "Me";
+      if (DBManager.Instance != null && !string.IsNullOrEmpty(DBManager.Instance.Nickname))
       {
-        if (GameServerAPI.Instance.PlayerId > 0)
-        {
-          myName = $"Player {GameServerAPI.Instance.PlayerId}";
-        }
-        else
-        {
-          string uid = GameServerAPI.Instance.DeviceUID;
-          if (!string.IsNullOrEmpty(uid))
-            myName = uid.Substring(0, Mathf.Min(8, uid.Length));
-        }
+        myName = DBManager.Instance.Nickname;
+      }
+      else if (GameServerAPI.Instance != null && GameServerAPI.Instance.PlayerId > 0)
+      {
+        myName = $"Player {GameServerAPI.Instance.PlayerId}";
       }
 
       CreatePlayerItem(myName, isHost, isReady);
@@ -367,10 +376,14 @@ namespace NeoSurvive.UI.Multiplayer
       // 2. 원격 플레이어 추가 (NetworkManager에서 가져오기)
       if (NetworkManager.Instance != null)
       {
-        var remotePlayers = NetworkManager.Instance.GetAllRemotePlayers();
+        var remotePlayers = NetworkManager.Instance.Lobby.GetLobbyPlayers();
         foreach (var player in remotePlayers)
         {
-          CreatePlayerItem($"Player {player.PlayerId}", false, false);
+          // 자기 자신은 이미 추가했으므로 제외
+          if (DBManager.Instance != null && player.playerId == DBManager.Instance.PlayerId)
+            continue;
+
+          CreatePlayerItem(player.nickname, false, player.isReady);
         }
       }
     }

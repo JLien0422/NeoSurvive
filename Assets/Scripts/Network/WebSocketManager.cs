@@ -72,7 +72,8 @@ namespace NeoSurvive.Network
     #region 연결 관리 (Connection Management)
 
     /// <summary>
-    /// WebSocket 서버에 연결합니다.
+    /// [4순위] WebSocket 서버에 실제 연결을 수행합니다.
+    /// URL, 플레이어 ID, 세션 ID를 사용하여 서버와 핸드셰이크를 진행합니다.
     /// </summary>
     public IEnumerator Connect(string websocketUrl, int playerId, string sessionId)
     {
@@ -85,17 +86,18 @@ namespace NeoSurvive.Network
       this.sessionId = sessionId;
       this.localPlayerId = playerId;
 
-      Debug.Log($"[WebSocket] 연결 시도: {websocketUrl}");
+      Debug.Log($"[WebSocket] 서버 연결 시도: {websocketUrl}");
 
+      // [4-1] 소켓 객체 생성
       websocket = new WebSocket(websocketUrl);
 
-      // 이벤트 핸들러 등록
+      // [4-2] 소켓 이벤트 핸들러(열림, 메시지 수신, 에러, 닫힘) 등록
       websocket.OnOpen += HandleOpen;
       websocket.OnMessage += HandleMessage;
       websocket.OnError += HandleError;
       websocket.OnClose += HandleClose;
 
-      // 연결 시작
+      // [4-3] 서버에 연결 요청 (성공 시 HandleOpen 호출됨)
       yield return websocket.Connect();
     }
 
@@ -138,7 +140,7 @@ namespace NeoSurvive.Network
     /// <summary>
     /// 메시지를 서버에 전송합니다.
     /// </summary>
-    private void SendMessage(string json)
+    public void SendWebSocketMessage(string json)
     {
       if (!isConnected || websocket == null)
       {
@@ -163,7 +165,7 @@ namespace NeoSurvive.Network
     {
       var message = new PlayerPositionUpdate
       {
-        PlayerId = localPlayerId,
+        playerId = localPlayerId,
         x = position.x,
         y = position.y,
         vx = velocity.x,
@@ -174,7 +176,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -191,7 +193,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -208,7 +210,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -226,7 +228,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -243,7 +245,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -261,7 +263,7 @@ namespace NeoSurvive.Network
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -272,16 +274,16 @@ namespace NeoSurvive.Network
     {
       var message = new PlayerDamageMessage
       {
-        PlayerId = playerId,
-        Damage = damage,
-        RemainingHealth = remainingHealth,
-        AttackerId = attackerId
+        playerId = playerId,
+        damage = damage,
+        remainingHealth = remainingHealth,
+        attackerId = attackerId
       };
 
       string json = ES3SerializationHelper.SerializeToJson(message);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -292,15 +294,15 @@ namespace NeoSurvive.Network
     {
       var chatMsg = new ChatMessage
       {
-        SenderId = localPlayerId,
-        SenderNickname = GameManager.Instance?.GetSelectedCharacter().ToString() ?? "Player",
-        Message = message
+        senderId = localPlayerId,
+        senderNickname = GameManager.Instance?.GetSelectedCharacter().ToString() ?? "Player",
+        message = message
       };
 
       string json = ES3SerializationHelper.SerializeToJson(chatMsg);
       if (json != null)
       {
-        SendMessage(json);
+        SendWebSocketMessage(json);
       }
     }
 
@@ -357,20 +359,20 @@ namespace NeoSurvive.Network
         // 메시지 타입 파싱
         var baseMessage = ES3SerializationHelper.DeserializeFromJson<WebSocketMessage>(json);
 
-        if (baseMessage == null || string.IsNullOrEmpty(baseMessage.MessageType))
+        if (baseMessage == null || string.IsNullOrEmpty(baseMessage.messageType))
         {
           Debug.LogError($"[WebSocket] 메시지 헤더 파싱 실패! (구조나 대소문자 확인 필요)\n원본 데이터: {json}");
           return;
         }
 
-        if (messageHandlers.ContainsKey(baseMessage.MessageType))
+        if (messageHandlers.ContainsKey(baseMessage.messageType))
         {
           // 등록된 핸들러 호출
-          messageHandlers[baseMessage.MessageType]?.Invoke(json);
+          messageHandlers[baseMessage.messageType]?.Invoke(json);
         }
         else
         {
-          Debug.LogWarning($"[WebSocket] 처리 핸들러가 없는 메시지 타입: {baseMessage.MessageType}\n원본 데이터: {json}");
+          Debug.LogWarning($"[WebSocket] 처리 핸들러가 없는 메시지 타입: {baseMessage.messageType}\n원본 데이터: {json}");
         }
       }
       catch (Exception e)
@@ -450,7 +452,7 @@ namespace NeoSurvive.Network
     /// </summary>
     private void SendPing()
     {
-      SendMessage("{\"MessageType\":\"Ping\",\"Timestamp\":" +
+      SendWebSocketMessage("{\"messageType\":\"Ping\",\"timestamp\":" +
           DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "}");
     }
 

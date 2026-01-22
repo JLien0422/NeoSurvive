@@ -337,7 +337,7 @@ namespace NeoSurvive.UI.Multiplayer
     {
       if (readyButtonText != null)
       {
-        readyButtonText.text = isReady ? "준비 취소" : "준비";
+        readyButtonText.text = isReady ? "cancel" : "ready";
       }
 
       if (readyButton != null)
@@ -360,30 +360,19 @@ namespace NeoSurvive.UI.Multiplayer
       if (playerListContainer == null || playerItemPrefab == null)
         return;
 
-      // 1. 자기 자신 추가
-      string myName = "Me";
-      if (DBManager.Instance != null && !string.IsNullOrEmpty(DBManager.Instance.Nickname))
+      // MultiLobbyManager의 통합된 플레이어 목록(로컬 포함)을 사용하여 UI를 갱신합니다.
+      if (NetworkManager.Instance != null && NetworkManager.Instance.Lobby != null)
       {
-        myName = DBManager.Instance.Nickname;
-      }
-      else if (GameServerAPI.Instance != null && GameServerAPI.Instance.PlayerId > 0)
-      {
-        myName = $"Player {GameServerAPI.Instance.PlayerId}";
-      }
+        var allPlayers = NetworkManager.Instance.Lobby.GetLobbyPlayers();
+        int localId = DBManager.Instance?.PlayerId ?? -1;
 
-      CreatePlayerItem(myName, isHost, isReady);
-
-      // 2. 원격 플레이어 추가 (NetworkManager에서 가져오기)
-      if (NetworkManager.Instance != null)
-      {
-        var remotePlayers = NetworkManager.Instance.Lobby.GetLobbyPlayers();
-        foreach (var player in remotePlayers)
+        foreach (var player in allPlayers)
         {
-          // 자기 자신은 이미 추가했으므로 제외
-          if (DBManager.Instance != null && player.playerId == DBManager.Instance.PlayerId)
-            continue;
+          bool isMe = (player.playerId == localId);
+          string displayName = isMe ? $"{player.nickname} (Me)" : player.nickname;
 
-          CreatePlayerItem(player.nickname, false, player.isReady);
+          // 방장 여부와 준비 상태를 반영하여 아이콘 표시
+          CreatePlayerItem(displayName, (isMe && isHost), player.isReady);
         }
       }
     }

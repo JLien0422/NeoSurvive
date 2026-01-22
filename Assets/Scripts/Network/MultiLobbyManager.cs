@@ -84,6 +84,9 @@ namespace NeoSurvive.Network
           var response = ES3SerializationHelper.DeserializeFromJson<CreateMultiLobbyResponse>(webRequest.downloadHandler.text);
           SetupLobby(response.sessionId, response.sessionCode, true);
 
+          // [방장 본인 추가]
+          AddLocalPlayerToList(characterType.ToString());
+
           string wsUrl = FormatWSUrl(response.websocketUrl, characterType.ToString());
           yield return websocketManager.Connect(wsUrl, DBManager.Instance.PlayerId, response.sessionId.ToString());
         }
@@ -117,22 +120,26 @@ namespace NeoSurvive.Network
 
           if (response.success)
           {
-            // [3-3] 참가 성공 시 로컬 로비 데이터 설정
+            // [3-3] 참가 성공 시 로컬 로비 데이터 설정 (리스트 비우기)
             SetupLobby(response.sessionId, code, false);
 
             // [3-4] 이미 방에 있는 다른 플레이어 목록을 동기화합니다.
             if (response.players != null)
             {
+              foreach (var p in response.players)
+              {
+                if (p.nickname != null) p.nickname = p.nickname.Replace("플레이어", "Player");
+              }
+
               lobbyPlayers = response.players.ToArray();
-              var players = string.Join(", ", lobbyPlayers.Select(p => $"[{p.playerId}: {p.nickname}]"));
-              Debug.Log($"[MultiLobbyManager] 로비 참가 완료. 현재 인원 목록 ({lobbyPlayers.Length}): {players}");
-            }
-            else
-            {
-              Debug.LogWarning($"[MultiLobbyManager] 로비 참가 응답에 플레이어 목록이 없습니다.");
+              var playersLog = string.Join(", ", lobbyPlayers.Select(p => $"[{p.playerId}: {p.nickname}]"));
+              Debug.Log($"[MultiLobbyManager] 로비 참가 완료. 인원 ({lobbyPlayers.Length}): {playersLog}");
             }
 
-            // [3-5] 실시간 통신을 위한 WebSocket 연결을 시작합니다 (4순위로 이어짐)
+            // [3-5] 참여자 본인 추가
+            AddLocalPlayerToList(characterType.ToString());
+
+            // [3-6] 실시간 통신을 위한 WebSocket 연결을 시작합니다
             string wsUrl = FormatWSUrl(response.websocketUrl, characterType.ToString());
             yield return websocketManager.Connect(wsUrl, DBManager.Instance.PlayerId, response.sessionId.ToString());
           }
@@ -153,11 +160,33 @@ namespace NeoSurvive.Network
       }
     }
 
+    private void AddLocalPlayerToList(string charType)
+    {
+      int myId = DBManager.Instance.PlayerId;
+      if (!lobbyPlayers.Any(p => p.playerId == myId))
+      {
+        string myNickname = DBManager.Instance.Nickname;
+        if (myNickname != null) myNickname = myNickname.Replace("플레이어", "Player");
+
+        var me = new PlayerState
+        {
+          playerId = myId,
+          nickname = myNickname,
+          characterType = charType,
+          isReady = isHost // 방장은 항상 준비 상태
+        };
+        lobbyPlayers = lobbyPlayers.Append(me).ToArray();
+        Debug.Log($"[MultiLobbyManager] 로컬 플레이어 목록에 추가: {me.nickname}");
+        OnPlayerJoined?.Invoke(me);
+      }
+    }
+
     private void SetupLobby(int id, string code, bool host)
     {
       currentSessionId = id;
       currentSessionCode = code;
       isHost = host;
+      // 초기화 시 비우기 (서버 응답이나 PlayerJoined 메시지로 채워짐)
       lobbyPlayers = Array.Empty<PlayerState>();
     }
 
@@ -182,7 +211,13 @@ namespace NeoSurvive.Network
     private void HandlePlayerJoined(string json)
     {
       var msg = ES3SerializationHelper.DeserializeFromJson<PlayerJoinedMessage>(json);
-      if (msg.playerId == DBManager.Instance.PlayerId) return;
+
+      // 이름 영어로 변환
+      if (msg.nickname != null) msg.nickname = msg.nickname.Replace("플레이어", "Player");
+
+      Debug.Log($"[WebSocket] 플레이어 입장 수신: {msg.nickname} (ID: {msg.playerId}, 캐릭터: {msg.characterType})");
+
+      // 로컬 플레이어도 목록에 포함시켜 일관되게 관리합니다. (MultiplayManager 등에서 사용)
 
       PlayerState newState = new PlayerState
       {
@@ -226,7 +261,12 @@ namespace NeoSurvive.Network
     {
       var msg = ES3SerializationHelper.DeserializeFromJson<GameStartNotificationMessage>(json);
       Debug.Log($"[MultiLobbyManager] 게임 시작 알림 수신! UDP: {msg.udpServerHost}:{msg.udpServerPort}");
-      // TODO: Co-op 게임 씬으로 전환 및 UDP 소켓 초기화 로직 구현
+
+      // UDP 정보 저장 (나중에 사용)
+      // TODO: UDP 클라이언트 초기화
+
+      // 멀티플레이어 게임 씬으로 이동
+      UnityEngine.SceneManagement.SceneManager.LoadScene("multiScene");
     }
 
     private void HandleLobbyChat(string json)

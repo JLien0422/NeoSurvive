@@ -24,12 +24,20 @@ namespace NeoSurvive.UI.Map
     public float gap = 0f;
 
     [Header("최적화 및 생성 설정")]
-    public int viewDistanceX = 3;
-    public int viewDistanceY = 3;
+    public int viewDistanceX = 10;
+    public int viewDistanceY = 10;
+    [Tooltip("타일이 삭제되기 전 추가로 유지되는 거리 (히스테리시스)")]
+    public int despawnMargin = 2;
     public int seed = 42;
     [Range(0f, 1f)] public float flowerChance = 0.1f; // 꽃이 나올 확률
     [Range(0f, 1f)] public float grassChance = 0.2f;  // 풀이 나올 확률
     public Transform playerTransform;
+
+    public void SetTarget(Transform target)
+    {
+      playerTransform = target;
+      UpdateTiles(); // 즉시 타일 업데이트
+    }
 
     // 타일 크기 계산용
     private float actualTileSize;
@@ -43,14 +51,18 @@ namespace NeoSurvive.UI.Map
 
     private void Start()
     {
-      if (playerTransform == null)
-        playerTransform = GameObject.FindWithTag("Player").transform;
-
       actualTileSize = (tilePixelSize / pixelsPerUnit) + gap;
-      UpdateTiles();
+
+      if (playerTransform != null)
+      {
+        UpdateTiles();
+      }
 
       Camera cam = Camera.main;
-      UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
+      if (cam != null)
+      {
+        UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
+      }
     }
 
     private void Update()
@@ -81,10 +93,13 @@ namespace NeoSurvive.UI.Map
       int currentX = Mathf.RoundToInt(playerTransform.position.x / actualTileSize);
       int currentY = Mathf.RoundToInt(playerTransform.position.y / actualTileSize);
 
+      int despawnDistX = viewDistanceX + despawnMargin;
+      int despawnDistY = viewDistanceY + despawnMargin;
+
       List<Vector2Int> toRemove = new();
       foreach (var key in activeTiles.Keys)
       {
-        if (Mathf.Abs(key.x - currentX) > viewDistanceX || Mathf.Abs(key.y - currentY) > viewDistanceY)
+        if (Mathf.Abs(key.x - currentX) > despawnDistX || Mathf.Abs(key.y - currentY) > despawnDistY)
         {
           toRemove.Add(key);
         }
@@ -139,6 +154,11 @@ namespace NeoSurvive.UI.Map
 
       tile.name = $"Type_{typeIndex}_{subIndex}"; // 풀링 식별용 이름
       tile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, TILE_Z);
+
+      // 혹시라도 이전에 설정된 부모나 스케일 등이 있다면 초기화
+      tile.transform.rotation = Quaternion.identity;
+      tile.transform.localScale = Vector3.one;
+
       tile.SetActive(true);
       activeTiles.Add(coord, tile);
     }

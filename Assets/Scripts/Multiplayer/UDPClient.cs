@@ -5,9 +5,13 @@ using System.Net.Sockets;
 using Google.Protobuf;
 using NeoSurvive.Network.Protocol;
 using NeoSurvive.Network;
+using System.Collections.Generic;
 
 public class UDPClient : MonoBehaviour
 {
+
+  public static UDPClient Instance { get; private set; }
+
   [Header("서버 설정")]
   [SerializeField] private string serverAddress = "nasdac.kro.kr";
   [SerializeField] private int serverPort = 5158;
@@ -19,9 +23,38 @@ public class UDPClient : MonoBehaviour
   private IPEndPoint serverEndpoint;
   private bool isConnected = false;
 
+  // 플레이어 관리 (ID별 매핑)
+  private Dictionary<int, Player> _allPlayers = new Dictionary<int, Player>();
+  private Player _localPlayer;
+
+  public Player LocalPlayer => _localPlayer;
+
+  private void Awake()
+  {
+    if (Instance == null)
+      Instance = this;
+    else
+      Destroy(gameObject);
+  }
+
   private void Start()
   {
     InitializeUdpClient();
+  }
+
+  public void RegisterPlayer(int id, Player player, bool isLocal)
+  {
+    if (!_allPlayers.ContainsKey(id))
+    {
+      _allPlayers[id] = player;
+      if (isLocal) _localPlayer = player;
+      Debug.Log($"[UDP] 플레이어 등록 완료: ID {id}, Local: {isLocal}");
+    }
+  }
+
+  public Player GetPlayer(int id)
+  {
+    return _allPlayers.TryGetValue(id, out var p) ? p : null;
   }
 
   private void InitializeUdpClient()
@@ -116,14 +149,17 @@ public class UDPClient : MonoBehaviour
 
     try
     {
+      if (_localPlayer == null) return;
+
+      int myId = DBManager.Instance?.PlayerId ?? 1;
+
       // 패킷 생성
       GamePacket packet = new GamePacket
       {
-        PlayerId = 1, // 테스트용 하드코딩 유지
-        // 서버 호환성을 위해 Ticks 대신 Milliseconds 사용 권장 (Ticks는 너무 큼)
+        PlayerId = (uint)myId,
         Timestamp = DateTimeOffset.UtcNow.Ticks,
-        PosX = transform.position.x,
-        PosY = transform.position.y
+        PosX = _localPlayer.transform.position.x,
+        PosY = _localPlayer.transform.position.y
       };
 
       // 직렬화

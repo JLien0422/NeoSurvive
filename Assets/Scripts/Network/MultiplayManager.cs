@@ -77,18 +77,30 @@ namespace NeoSurvive.Network
 
         // 로컬 플레이어 여부에 따른 컨트롤러 처리
         PlayerController controller = pObj.GetComponent<PlayerController>();
-        if (pState.playerId == localPlayerId)
+        bool isLocal = (pState.playerId == localPlayerId);
+
+        if (isLocal)
         {
           pObj.tag = "Player";
           Debug.Log($"[MultiplayManager] 로컬 플레이어 생성: {pState.nickname} (ID: {pState.playerId})");
+
+          // 카메라 및 맵 매니저 대상 설정
+          CameraController cam = FindObjectOfType<CameraController>();
+          if (cam != null) cam.SetTarget(pObj.transform);
+
+          var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
+          if (mapManager != null) mapManager.SetTarget(pObj.transform);
         }
         else
         {
-          if (controller != null)
-          {
-            controller.enabled = false; // 원격 플레이어의 입력 처리는 비활성화
-          }
+          if (controller != null) controller.enabled = false;
           Debug.Log($"[MultiplayManager] 원격 플레이어 생성: {pState.nickname} (ID: {pState.playerId})");
+        }
+
+        // UDPClient에 플레이어 등록 (ID 기반 매핑)
+        if (UDPClient.Instance != null && playerScript != null)
+        {
+          UDPClient.Instance.RegisterPlayer(pState.playerId, playerScript, isLocal);
         }
       }
     }

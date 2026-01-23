@@ -16,12 +16,12 @@ namespace NeoSurvive.UI.Map
     public List<GameObject> flowerPrefabs;    // 꽃 장식 타일들
     public List<GameObject> grassPrefabs;     // 풀 장식 타일들
 
-    public const float TILE_Z = 100f;
-
     [Header("맵 설정 (Pixel 방식)")]
+    public bool autoSizeFromPrefab = true; // 프리팹 스프라이트 크기에 맞춰 자동 조절
     public float tilePixelSize = 32f;
     public float pixelsPerUnit = 100f;
     public float gap = 0f;
+    public float tileZValue = 100f; // 기존 100f에서 0f로 변경 제안
 
     [Header("최적화 및 생성 설정")]
     public int viewDistanceX = 10;
@@ -36,12 +36,19 @@ namespace NeoSurvive.UI.Map
     public void SetTarget(Transform target)
     {
       playerTransform = target;
-      UpdateTiles(); // 즉시 타일 업데이트
+      if (playerTransform != null)
+      {
+        int currentX = Mathf.FloorToInt(playerTransform.position.x / actualTileSize);
+        int currentY = Mathf.FloorToInt(playerTransform.position.y / actualTileSize);
+        lastCoord = new Vector2Int(currentX, currentY);
+        UpdateTiles(currentX, currentY);
+      }
     }
 
     // 타일 크기 계산용
     private float actualTileSize;
     private Dictionary<Vector2Int, GameObject> activeTiles = new();
+    private Vector2Int lastCoord = new Vector2Int(int.MinValue, int.MinValue);
 
     // 카테고리별 풀 관리를 위한 딕셔너리
     // 0: Base, 1: Flower, 2: Grass
@@ -51,25 +58,70 @@ namespace NeoSurvive.UI.Map
 
     private void Start()
     {
-      actualTileSize = (tilePixelSize / pixelsPerUnit) + gap;
-
-      if (playerTransform != null)
-      {
-        UpdateTiles();
-      }
+      UpdateActualTileSize();
 
       Camera cam = Camera.main;
       if (cam != null)
       {
         UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
       }
+
+      if (playerTransform != null)
+      {
+        int currentX = Mathf.FloorToInt(playerTransform.position.x / actualTileSize);
+        int currentY = Mathf.FloorToInt(playerTransform.position.y / actualTileSize);
+        lastCoord = new Vector2Int(currentX, currentY);
+        UpdateTiles(currentX, currentY);
+      }
+    }
+
+    private void UpdateActualTileSize()
+    {
+      if (autoSizeFromPrefab && baseTilePrefab != null)
+      {
+        var sr = baseTilePrefab.GetComponentInChildren<SpriteRenderer>();
+        if (sr != null && sr.sprite != null)
+        {
+          // 프리팹의 스프라이트가 월드에서 차지하는 원래 크기를 계산
+          float spriteWorldSize = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
+          actualTileSize = spriteWorldSize + gap;
+          return;
+        }
+      }
+      actualTileSize = (tilePixelSize / pixelsPerUnit) + gap;
     }
 
     private void Update()
     {
-      if (playerTransform == null) return;
+      if (playerTransform == null)
+      {
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+        {
+          SetTarget(playerObj.transform);
+        }
+        else
+        {
+          return;
+        }
+      }
 
-      UpdateTiles();
+#if UNITY_EDITOR
+      // 에디터에서 값이 바뀌었을 때 실시간 반영을 위해 (성능에 민감하면 OnValidate로 옮길 수 있음)
+      UpdateActualTileSize();
+      Camera cam = Camera.main;
+      if (cam != null) UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
+#endif
+
+      int currentX = Mathf.FloorToInt(playerTransform.position.x / actualTileSize);
+      int currentY = Mathf.FloorToInt(playerTransform.position.y / actualTileSize);
+
+      // 플레이어가 새로운 타일 그리드로 이동했을 때만 업데이트하여 성능 최적화
+      if (currentX != lastCoord.x || currentY != lastCoord.y)
+      {
+        lastCoord = new Vector2Int(currentX, currentY);
+        UpdateTiles(currentX, currentY);
+      }
     }
 
     void UpdateScreenSize(Vector2 size)
@@ -88,11 +140,8 @@ namespace NeoSurvive.UI.Map
       Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
     }
 
-    private void UpdateTiles()
+    private void UpdateTiles(int currentX, int currentY)
     {
-      int currentX = Mathf.RoundToInt(playerTransform.position.x / actualTileSize);
-      int currentY = Mathf.RoundToInt(playerTransform.position.y / actualTileSize);
-
       int despawnDistX = viewDistanceX + despawnMargin;
       int despawnDistY = viewDistanceY + despawnMargin;
 
@@ -153,11 +202,25 @@ namespace NeoSurvive.UI.Map
       }
 
       tile.name = $"Type_{typeIndex}_{subIndex}"; // 풀링 식별용 이름
-      tile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, TILE_Z);
+      tile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, tileZValue);
 
-      // 혹시라도 이전에 설정된 부모나 스케일 등이 있다면 초기화
+      // 타일이 실제 칸(actualTileSize)을 꽉 채우도록 스케일 조정
+      var sr = tile.GetComponentInChildren<SpriteRenderer>();
+      if (sr != null && sr.sprite != null)
+      {
+        float spriteWorldWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
+        if (spriteWorldWidth > 0)
+        {
+          float scale = (actualTileSize - gap) / spriteWorldWidth;
+          tile.transform.localScale = new Vector3(scale, scale, 1f);
+        }
+      }
+      else
+      {
+        tile.transform.localScale = Vector3.one;
+      }
+
       tile.transform.rotation = Quaternion.identity;
-      tile.transform.localScale = Vector3.one;
 
       tile.SetActive(true);
       activeTiles.Add(coord, tile);

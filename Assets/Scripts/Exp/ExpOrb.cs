@@ -20,7 +20,7 @@ namespace NeoSurvive.Exp
       Player player = other.GetComponent<Player>();
       if (player != null)
       {
-        player.AddExp(amount);
+        player.GainExperience(amount);
         Destroy(gameObject);
       }
     }

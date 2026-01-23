@@ -26,10 +26,16 @@ public class EnemyController : MonoBehaviour
   [SerializeField]
   private bool showGizmos = true;
 
+  [Header("메커니즘 설정")]
+  [SerializeField]
+  [Tooltip("적 메커니즘 타입")]
+  private EnemyMechanismType mechanismType = EnemyMechanismType.Basic;
+
   // 참조
   private Enemy enemy;
   private Rigidbody2D rb;
   private Transform target; // 추적 대상 (Player 또는 Decoy)
+  private EnemyMechanismBase currentMechanism; // 현재 활성화된 메커니즘
 
   private float searchTimer;
 
@@ -46,6 +52,51 @@ public class EnemyController : MonoBehaviour
     }
 
     UpdateTarget();
+    InitializeMechanism();
+  }
+
+  /// <summary>
+  /// 메커니즘 초기화
+  /// </summary>
+  private void InitializeMechanism()
+  {
+    // 기존 메커니즘 제거
+    if (currentMechanism != null)
+    {
+      Destroy(currentMechanism);
+    }
+
+    // 메커니즘 타입에 따라 컴포넌트 추가
+    switch (mechanismType)
+    {
+      case EnemyMechanismType.Basic:
+        // 일반형 메커니즘은 EnemyController 자체가 처리 (기본 추적)
+        currentMechanism = null;
+        break;
+
+      case EnemyMechanismType.Shooter:
+        currentMechanism = gameObject.AddComponent<ShooterMechanism>();
+        break;
+
+      case EnemyMechanismType.Rusher:
+        currentMechanism = gameObject.AddComponent<RusherMechanism>();
+        break;
+
+      case EnemyMechanismType.Bomber:
+        currentMechanism = gameObject.AddComponent<BomberMechanism>();
+        break;
+
+      case EnemyMechanismType.Tanker:
+        currentMechanism = gameObject.AddComponent<TankerMechanism>();
+        break;
+    }
+
+    // 메커니즘 초기화
+    if (currentMechanism != null)
+    {
+      currentMechanism.Initialize(enemy, this);
+      currentMechanism.SetTarget(target);
+    }
   }
 
   // 게임 시작 시 호출됩니다.
@@ -62,6 +113,12 @@ public class EnemyController : MonoBehaviour
     {
       UpdateTarget();
       searchTimer = 0f;
+    }
+
+    // 메커니즘 공격 로직 업데이트
+    if (currentMechanism != null)
+    {
+      currentMechanism.UpdateAttack();
     }
   }
 
@@ -99,6 +156,12 @@ public class EnemyController : MonoBehaviour
     }
 
     target = closest;
+
+    // 메커니즘에 타겟 전달
+    if (currentMechanism != null)
+    {
+      currentMechanism.SetTarget(target);
+    }
   }
 
   // 외부에서 이속 제어 (슬로우 효과)
@@ -113,6 +176,63 @@ public class EnemyController : MonoBehaviour
     moveSpeed *= mult;
     yield return new WaitForSeconds(duration);
     moveSpeed = original;
+  }
+
+  // 아군으로 전환 시 적을 타겟으로 설정
+  public void SetTargetToEnemies()
+  {
+    // 적을 찾아서 타겟으로 설정
+    UpdateTarget();
+    // TODO: 적을 공격하도록 AI 로직 수정 필요
+  }
+
+  // 다시 적으로 복귀 시 플레이어를 타겟으로 설정
+  public void SetTargetToPlayer()
+  {
+    UpdateTarget();
+  }
+
+  /// <summary>
+  /// 적 사망 시 호출 (메커니즘의 OnDeath 처리)
+  /// </summary>
+  public void OnEnemyDeath()
+  {
+    if (currentMechanism != null)
+    {
+      currentMechanism.OnDeath();
+    }
+  }
+
+  /// <summary>
+  /// 이동 속도 가져오기 (메커니즘에서 사용)
+  /// </summary>
+  public float GetMoveSpeed()
+  {
+    return moveSpeed;
+  }
+
+  /// <summary>
+  /// 공격 범위 가져오기 (메커니즘에서 사용)
+  /// </summary>
+  public float GetAttackRange()
+  {
+    return attackRange;
+  }
+
+  /// <summary>
+  /// 현재 메커니즘 타입 가져오기
+  /// </summary>
+  public EnemyMechanismType GetMechanismType()
+  {
+    return mechanismType;
+  }
+
+  /// <summary>
+  /// 현재 활성화된 메커니즘 가져오기 (null이면 Basic)
+  /// </summary>
+  public EnemyMechanismBase GetCurrentMechanism()
+  {
+    return currentMechanism;
   }
 
   // 일정 주기로 플레이어를 공격하는 코루틴입니다.
@@ -141,24 +261,32 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
-    if (target != null)
+    // 메커니즘이 있으면 메커니즘의 이동 로직 사용
+    if (currentMechanism != null)
     {
-      float distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-      if (distanceToTarget > attackRange)
+      currentMechanism.UpdateMovement();
+    }
+    else
+    {
+      // 기본 이동 로직
+      if (target != null)
       {
-        Vector2 direction = (target.position - transform.position).normalized;
-        rb.velocity = direction * moveSpeed;
+        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+
+        if (distanceToTarget > attackRange)
+        {
+          Vector2 direction = (target.position - transform.position).normalized;
+          rb.velocity = direction * moveSpeed;
+        }
+        else
+        {
+          rb.velocity = Vector2.zero;
+        }
       }
       else
       {
         rb.velocity = Vector2.zero;
       }
-    }
-    else
-    {
-      rb.velocity = Vector2.zero;
-      // 타겟 놓치면 즉시 재검색 권장? 다음 틱 UpdateTarget에서 처리됨
     }
   }
 

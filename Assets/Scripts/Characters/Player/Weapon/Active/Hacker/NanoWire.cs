@@ -15,7 +15,6 @@ namespace NeoSurvive.Weapon
         private float activationDelay = 1.0f; // 1초 뒤 활성화
 
         private bool isActivated = false;
-        private float elapsed = 0f;
 
         [SerializeField] private SpriteRenderer spriteRenderer;
         

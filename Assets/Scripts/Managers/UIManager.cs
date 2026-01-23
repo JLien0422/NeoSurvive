@@ -34,9 +34,35 @@ public class UIManager : MonoBehaviour
   [Header("Character Choice UI")]
   public GameObject characterChoicePanel;
 
+  [Header("사이코 잠식도 UI")]
+  public Slider psychoCorruptionSlider;
+  public TextMeshProUGUI psychoCorruptionText;
+
+  [Header("화면 노이즈 효과")]
+  public GameObject screenNoiseOverlay; // 화면 모서리 노이즈 오버레이 (60% 이상일 때 표시)
+
+  [Header("신경링크 UI")]
+  public Slider neuralLinkSlider;
+  public TextMeshProUGUI neuralLinkText;
+
   private Transform playerTransform;
   [Header("Health Bar Positioning")]
   public Vector3 healthBarOffset = new Vector3(0, 1.0f, 0); // 캐릭터 머리 위 오프셋
+
+  // =========================
+  // 무기 선택 UI (추가)
+  // =========================
+  [Header("Weapon Choice UI (추가)")]
+  public GameObject weaponChoicePanel;                     // (추가)
+  public Button[] weaponChoiceButtons = new Button[3];     // (추가)
+  public Image[] weaponChoiceIcons = new Image[3];         // (추가)
+  public TextMeshProUGUI[] weaponChoiceTexts = new TextMeshProUGUI[3]; // (추가)
+
+  private Action<int> onWeaponChoicePicked;                // (추가)
+
+  // ===== 상자 보상 선택 저장용 (추가) ===== //
+  private NeoSurvive.Weapon.WeaponBase[] currentChoices;
+
 
   private void Awake()
   {
@@ -73,6 +99,13 @@ public class UIManager : MonoBehaviour
     Player.OnExpChanged += UpdateExpUI;
     Player.OnLevelUp += UpdateLevelUI;
     GameManager.OnKillCountChanged += UpdateKillCountUI;
+    Player.OnPsychoCorruptionChanged += UpdatePsychoCorruptionUI;
+    Player.OnBerserkStarted += OnBerserkStarted;
+    Player.OnBerserkEnded += OnBerserkEnded;
+    Player.OnNeuralLinkGaugeChanged += UpdateNeuralLinkUI;
+    Player.OnNeuralLinkActivated += OnNeuralLinkActivated;
+
+    ChestPickup.OnChestOpened += HandleChestOpened; // *** 상자 열림 이벤트 구독
 
     // Coroutine을 사용하여 ShowGameTime을 호출
     StartCoroutine(ShowGameTimeCoroutine());
@@ -84,6 +117,94 @@ public class UIManager : MonoBehaviour
     Player.OnExpChanged -= UpdateExpUI;
     Player.OnLevelUp -= UpdateLevelUI;
     GameManager.OnKillCountChanged -= UpdateKillCountUI;
+    Player.OnPsychoCorruptionChanged -= UpdatePsychoCorruptionUI;
+    Player.OnBerserkStarted -= OnBerserkStarted;
+    Player.OnBerserkEnded -= OnBerserkEnded;
+    Player.OnNeuralLinkGaugeChanged -= UpdateNeuralLinkUI;
+    Player.OnNeuralLinkActivated -= OnNeuralLinkActivated;
+    ChestPickup.OnChestOpened -= HandleChestOpened; // *** 상자 열림 이벤트 구독 해제
+  }
+
+  // =========================
+  // 상자 열림 → 무기 선택 UI 표시 (추가)
+  // =========================
+  private void HandleChestOpened() // ***
+  {
+    Debug.Log("[UIManager] Chest opened → Weapon choice UI"); // ***
+
+    // 씬에서 WeaponManager 찾기 // *****
+    var wm = FindObjectOfType<NeoSurvive.Weapon.WeaponManager>(); // *****
+    if (wm == null) // *****
+    {
+      Debug.LogError("[UIManager] WeaponManager not found in scene!"); // *****
+      return; // *****
+    }
+
+    // allWeaponDatas에서 랜덤 3개 뽑기 // *****
+    var choices = Pick3RandomWeapons(wm.allWeaponDatas); // *****
+    if (choices == null) // *****
+    {
+      Debug.LogError("[UIManager] Not enough weapons in allWeaponDatas (need 3+)"); // *****
+      return; // *****
+    }
+
+    // UI 띄우기 + 선택하면 WeaponManager.AddWeapon 호출 // *****
+    ShowWeaponChoiceByData(choices, (picked) => // *****
+    {
+      if (picked == null) return; // *****
+      wm.AddWeapon(picked); // *****
+      Debug.Log($"[UIManager] Picked weapon: {picked.name}"); // *****
+    }); // *****
+  }
+
+  // allWeaponDatas에서 중복 없이 3개 랜덤 선택 (추가) // *****
+  private NeoSurvive.Weapon.WeaponBase[] Pick3RandomWeapons(List<NeoSurvive.Weapon.WeaponBase> all) // *****
+  {
+    if (all == null || all.Count < 3) return null; // *****
+
+    List<NeoSurvive.Weapon.WeaponBase> temp = new List<NeoSurvive.Weapon.WeaponBase>(all); // *****
+
+    for (int i = 0; i < temp.Count; i++) // *****
+    {
+      int j = UnityEngine.Random.Range(i, temp.Count); // *****
+      var t = temp[i]; temp[i] = temp[j]; temp[j] = t; // *****
+    }
+
+    return new NeoSurvive.Weapon.WeaponBase[] { temp[0], temp[1], temp[2] }; // *****
+  }
+
+  // WeaponBase 3개를 UI에 표시하고, 선택된 WeaponBase를 콜백으로 전달 (추가) // *****
+  public void ShowWeaponChoiceByData(NeoSurvive.Weapon.WeaponBase[] choices, Action<NeoSurvive.Weapon.WeaponBase> onPicked) // *****
+  {
+    if (weaponChoicePanel == null) return; // *****
+    if (choices == null || choices.Length != 3) return; // *****
+
+    currentChoices = choices; // *****
+
+    for (int i = 0; i < 3; i++) // *****
+    {
+      var w = choices[i]; // *****
+
+      if (weaponChoiceIcons[i] != null) // *****
+        weaponChoiceIcons[i].sprite = (w != null) ? w.weaponIcon : null; // *****
+
+      if (weaponChoiceTexts[i] != null) // *****
+        weaponChoiceTexts[i].text = (w != null) ? w.name : "NULL"; // *****
+
+      int idx = i; // *****
+      weaponChoiceButtons[i].onClick.RemoveAllListeners(); // *****
+      weaponChoiceButtons[i].onClick.AddListener(() => // *****
+      {
+        weaponChoicePanel.SetActive(false); // *****
+        Time.timeScale = 1f; // *****
+
+        onPicked?.Invoke(currentChoices[idx]); // *****
+        currentChoices = null; // *****
+      }); // *****
+    }
+
+    weaponChoicePanel.SetActive(true); // *****
+    Time.timeScale = 0f; // *****
   }
 
   private IEnumerator ShowGameTimeCoroutine()
@@ -236,8 +357,136 @@ public class UIManager : MonoBehaviour
     }
   }
 
-  void ShowCharacterChoice()
+  // =========================
+  // 무기 선택 UI (추가)
+  // =========================
+  public void ShowWeaponChoice(
+    Sprite[] icons,
+    string[] names,
+    Action<int> onPicked
+  )
   {
-    characterChoicePanel.SetActive(true);
+    if (weaponChoicePanel == null) return;
+
+    onWeaponChoicePicked = onPicked;
+
+    for (int i = 0; i < 3; i++)
+    {
+      weaponChoiceIcons[i].sprite = icons[i];
+      weaponChoiceTexts[i].text = names[i];
+
+      int idx = i;
+      weaponChoiceButtons[i].onClick.RemoveAllListeners();
+      weaponChoiceButtons[i].onClick.AddListener(() => PickWeapon(idx));
+    }
+
+    weaponChoicePanel.SetActive(true);
+    Time.timeScale = 0f;
+  }
+
+  private void PickWeapon(int index)
+  {
+    weaponChoicePanel.SetActive(false);
+    Time.timeScale = 1f;
+
+    onWeaponChoicePicked?.Invoke(index);
+    onWeaponChoicePicked = null;
+  }
+
+  public void HideWeaponChoice()
+  {
+    weaponChoicePanel.SetActive(false);
+    Time.timeScale = 1f;
+    onWeaponChoicePicked = null;
+  }
+
+  // =========================
+  // 테스트용 (추가)
+  // =========================
+  private void Update()
+  {
+    if (Input.GetKeyDown(KeyCode.F8))
+    {
+      ShowWeaponChoice(
+        new Sprite[3] { null, null, null },
+        new string[3] { "AIDrone", "EmpField", "LinkPistol" },
+        (idx) => Debug.Log($"선택한 무기 인덱스: {idx}")
+      );
+    }
+  }
+
+  // ===================== 사이코 잠식도 UI =====================
+
+  /// <summary>
+  /// 사이코 잠식도 UI 업데이트
+  /// </summary>
+  private void UpdatePsychoCorruptionUI(float current, float max)
+  {
+    if (psychoCorruptionSlider != null)
+    {
+      psychoCorruptionSlider.maxValue = max;
+      psychoCorruptionSlider.value = current;
+    }
+
+    if (psychoCorruptionText != null)
+    {
+      psychoCorruptionText.text = $"과부하: {current:F1}%";
+    }
+  }
+
+  /// <summary>
+  /// 화면 노이즈 효과 표시/숨김 (60% 이상일 때)
+  /// </summary>
+  public void SetScreenNoise(bool active)
+  {
+    if (screenNoiseOverlay != null)
+    {
+      screenNoiseOverlay.SetActive(active);
+    }
+  }
+
+  /// <summary>
+  /// 폭주 상태 시작 시 호출
+  /// </summary>
+  private void OnBerserkStarted()
+  {
+    // 폭주 상태 UI 효과 (예: 화면 빨간색 오버레이 등)
+    Debug.Log("[UIManager] 폭주 상태 시작!");
+  }
+
+  /// <summary>
+  /// 폭주 상태 종료 시 호출
+  /// </summary>
+  private void OnBerserkEnded()
+  {
+    // 폭주 상태 UI 효과 제거
+    Debug.Log("[UIManager] 폭주 상태 종료!");
+  }
+
+  // ===================== 신경링크 UI =====================
+
+  /// <summary>
+  /// 신경링크 게이지 UI 업데이트
+  /// </summary>
+  private void UpdateNeuralLinkUI(float current, float max)
+  {
+    if (neuralLinkSlider != null)
+    {
+      neuralLinkSlider.maxValue = max;
+      neuralLinkSlider.value = current;
+    }
+
+    if (neuralLinkText != null)
+    {
+      neuralLinkText.text = $"신경링크: {current:F0}%";
+    }
+  }
+
+  /// <summary>
+  /// 신경링크 발동 시 호출
+  /// </summary>
+  private void OnNeuralLinkActivated(NeoSurvive.Characters.CharacterType characterType)
+  {
+    Debug.Log($"[UIManager] 신경링크 발동! ({characterType})");
   }
 }

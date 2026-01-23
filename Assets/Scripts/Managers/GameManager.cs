@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
 
     [Header("서버 연동")]
     [SerializeField] private GameServerAPI serverAPI;
-    private int currentSessionId = -1;
 
     private float startTime = 0f;
 
@@ -64,6 +63,14 @@ public class GameManager : MonoBehaviour
         if (playerObject != null)
         {
             playerTransform = playerObject.transform;
+
+            // 카메라 타겟 설정 (싱글플레이용)
+            CameraController cam = FindObjectOfType<CameraController>();
+            if (cam != null) cam.SetTarget(playerTransform);
+
+            // 맵 매니저 타겟 설정 (싱글플레이용)
+            var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
+            if (mapManager != null) mapManager.SetTarget(playerTransform);
         }
         else
         {

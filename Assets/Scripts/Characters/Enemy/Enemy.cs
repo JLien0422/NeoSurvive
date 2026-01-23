@@ -25,10 +25,35 @@ public class Enemy : Character
     [SerializeField]
     private GameObject goldPrefab;
 
+    [Header("사이코 잠식도 아이템")]
+    // 사이코 잠식도 아이템 드랍 확률 (0 ~ 100)
+    [SerializeField]
+    [Range(0, 100)]
+    private float psychoCorruptionDropChance = 5f;
+    // 인스펙터에서 할당할 사이코 잠식도 아이템 프리팹입니다.
+    [SerializeField]
+    private GameObject psychoCorruptionItemPrefab;
+
+    [Header("데이터칩 (신경링크)")]
+    // 데이터칩 드랍 확률 (0 ~ 100)
+    [SerializeField]
+    [Range(0, 100)]
+    private float dataChipDropChance = 10f;
+    // 인스펙터에서 할당할 데이터칩 프리팹입니다.
+    [SerializeField]
+    private GameObject dataChipPrefab;
+
     // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
     // 적에게 특화된 죽음 처리 로직을 구현합니다.
     protected override void Die()
     {
+        // 메커니즘의 사망 효과 처리 (Bomber 등)
+        EnemyController controller = GetComponent<EnemyController>();
+        if (controller != null)
+        {
+            controller.OnEnemyDeath();
+        }
+
         // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
         base.Die();
 
@@ -65,6 +90,10 @@ public class Enemy : Character
         DropExpOrbs();
         // 골드 드랍 메서드 호출
         DropGold();
+        // 사이코 잠식도 아이템 드랍 메서드 호출
+        DropPsychoCorruptionItem();
+        // 데이터칩 드랍 메서드 호출
+        DropDataChip();
     }
 
     // 경험치 오브 드랍 메서드
@@ -111,6 +140,36 @@ public class Enemy : Character
             // 현재 적의 위치에 골드 프리팹을 생성합니다.
             Instantiate(goldPrefab, transform.position, Quaternion.identity);
             Debug.Log("골드를 드랍했습니다!");
+        }
+    }
+
+    // 사이코 잠식도 아이템 드랍 메서드
+    private void DropPsychoCorruptionItem()
+    {
+        // 0.0 ~ 100.0 사이의 랜덤 값을 뽑습니다.
+        float randomValue = Random.Range(0f, 100f);
+
+        // 랜덤 값이 설정된 드랍 확률보다 낮고, 사이코 잠식도 아이템 프리팹이 할당되어 있다면
+        if (randomValue <= psychoCorruptionDropChance && psychoCorruptionItemPrefab != null)
+        {
+            // 현재 적의 위치에 사이코 잠식도 아이템 프리팹을 생성합니다.
+            Instantiate(psychoCorruptionItemPrefab, transform.position, Quaternion.identity);
+            Debug.Log("사이코 잠식도 아이템을 드랍했습니다!");
+        }
+    }
+
+    // 데이터칩 드랍 메서드
+    private void DropDataChip()
+    {
+        // 0.0 ~ 100.0 사이의 랜덤 값을 뽑습니다.
+        float randomValue = Random.Range(0f, 100f);
+
+        // 랜덤 값이 설정된 드랍 확률보다 낮고, 데이터칩 프리팹이 할당되어 있다면
+        if (randomValue <= dataChipDropChance && dataChipPrefab != null)
+        {
+            // 현재 적의 위치에 데이터칩 프리팹을 생성합니다.
+            Instantiate(dataChipPrefab, transform.position, Quaternion.identity);
+            Debug.Log("데이터칩을 드랍했습니다!");
         }
     }
 }

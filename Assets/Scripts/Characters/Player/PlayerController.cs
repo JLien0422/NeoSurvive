@@ -12,6 +12,22 @@ public class PlayerController : MonoBehaviour
     // 플레이어의 입력을 저장할 변수입니다.
     private Vector2 moveInput;
 
+    // 해킹 중 고정 상태 (이동 불가)
+    private bool isLockedDown = false;
+    public bool IsLockedDown => isLockedDown;
+
+    /// <summary>
+    /// 고정 상태 설정 (해킹 중 이동/입력 불가)
+    /// </summary>
+    public void SetLockdown(bool locked)
+    {
+        isLockedDown = locked;
+        if (locked && rb != null)
+        {
+            rb.velocity = Vector2.zero; // 즉시 정지
+        }
+    }
+
     // 컴포넌트가 처음 활성화될 때 호출됩니다.
     private void Awake()
     {
@@ -31,13 +47,60 @@ public class PlayerController : MonoBehaviour
     // 매 프레임마다 호출됩니다. 입력 처리에 적합합니다.
     private void Update()
     {
-        // 수평 및 수직 입력을 받아옵니다. (기본적으로 키보드 화살표 또는 WASD)
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
+        // 고정 상태면 입력 무시
+        if (isLockedDown)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
 
-        // 입력 값을 Vector2 형태로 저장하고 정규화(normalize)합니다.
-        // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.
-        moveInput = new Vector2(moveX, moveY).normalized;
+        // 폭주 상태일 때는 자동 이동
+        if (player != null && player.IsBerserk)
+        {
+            // 가장 가까운 적을 향해 자동 이동
+            GameObject closestEnemy = FindClosestEnemy();
+            if (closestEnemy != null)
+            {
+                Vector3 direction = (closestEnemy.transform.position - transform.position).normalized;
+                moveInput = new Vector2(direction.x, direction.y);
+            }
+            else
+            {
+                // 적이 없으면 랜덤 방향으로 이동
+                moveInput = Random.insideUnitCircle.normalized;
+            }
+        }
+        else
+        {
+            // 수평 및 수직 입력을 받아옵니다. (기본적으로 키보드 화살표 또는 WASD)
+            float moveX = Input.GetAxisRaw("Horizontal");
+            float moveY = Input.GetAxisRaw("Vertical");
+
+            // 입력 값을 Vector2 형태로 저장하고 정규화(normalize)합니다.
+            // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.
+            moveInput = new Vector2(moveX, moveY).normalized;
+        }
+    }
+    
+    /// <summary>
+    /// 가장 가까운 적을 찾습니다.
+    /// </summary>
+    private GameObject FindClosestEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (GameObject enemy in enemies)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = enemy;
+            }
+        }
+        return closest;
     }
 
     // 고정된 시간 간격으로 호출됩니다. 물리 계산에 적합합니다.

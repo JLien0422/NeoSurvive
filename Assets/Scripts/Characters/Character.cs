@@ -68,6 +68,14 @@ public abstract class Character : MonoBehaviour
     // 여기에 기본적인 죽음 처리 로직을 구현합니다. (예: 게임 오브젝트 비활성화, 애니메이션 재생 등)
   }
 
+  /// <summary>
+  /// 체력 변경을 알리는 protected 메서드 (자식 클래스에서 호출 가능)
+  /// </summary>
+  protected void NotifyHealthChanged()
+  {
+    OnHealthChanged?.Invoke(currentHealth, healthStat.GetValue());
+  }
+
   // 추후 컨트롤러를 참조하기 위한 플레이스홀더 주석입니다.
   // public CharacterController CharacterController { get; protected set; }
 }

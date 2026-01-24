@@ -57,35 +57,6 @@ public class Enemy : Character
         // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
         base.Die();
 
-        // 킬 카운트 증가
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.AddKill();
-            // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
-            base.Die();
-
-            // 경험치 제공 로직
-            Player player = FindObjectOfType<Player>();
-            if (player != null)
-            {
-                player.GainExperience(experienceToGive);
-            }
-
-            // 골드 드랍 로직
-            // 0.0 ~ 100.0 사이의 랜덤 값을 뽑습니다.
-            float randomValue = Random.Range(0f, 100f);
-            // 랜덤 값이 설정된 드랍 확률보다 낮고, 골드 프리팹이 할당되어 있다면
-            if (randomValue <= goldDropChance && goldPrefab != null)
-            {
-                // 현재 적의 위치에 골드 프리팹을 생성합니다.
-                Instantiate(goldPrefab, transform.position, Quaternion.identity);
-                Debug.Log("골드를 드랍했습니다!");
-            }
-
-            // 죽음 처리 후 적 오브젝트를 파괴합니다.
-            Destroy(gameObject);
-        }
-
         // 경험치 오브 드랍 메서드 호출 (추가)
         DropExpOrbs();
         // 골드 드랍 메서드 호출
@@ -94,6 +65,15 @@ public class Enemy : Character
         DropPsychoCorruptionItem();
         // 데이터칩 드랍 메서드 호출
         DropDataChip();
+
+        // 킬 카운트 증가
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddKill();
+        }
+
+        // 죽음 처리 후 적 오브젝트를 파괴합니다.
+        Destroy(gameObject);
     }
 
     // 경험치 오브 드랍 메서드

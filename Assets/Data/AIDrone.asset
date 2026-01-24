@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:88dfd2c448090a631845d6271e680182a5be0e9168ac84a7d13f747815ab050f
-size 793
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: AIDrone
+  m_EditorClassIdentifier: 
+  weaponName: "AI \uB4DC\uB860"
+  weaponIcon: {fileID: 21300000, guid: 90dfe47a8ad7f4344aca9d162353352f, type: 3}
+  description: "\uD50C\uB808\uC774\uC5B4 \uC8FC\uBCC0\uC744 \uB530\uB77C\uB2E4\uB2C8\uB294
+    \uC790\uB3D9 \uBC1C\uC0AC AI \uB4DC\uB860\uC785\uB2C8\uB2E4."
+  weaponPrefab: {fileID: 8909741650533778054, guid: d4345f27cbd5179458a7b6711fd8de8c, type: 3}
+  level: 10
+  isIndependent: 1

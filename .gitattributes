@@ -29,10 +29,6 @@
 *.avi filter=lfs diff=lfs merge=lfs -text
 
 # Unity Internal types (바이너리로 저장되는 에셋들)
-*.asset filter=lfs diff=lfs merge=lfs -text
-*.mat filter=lfs diff=lfs merge=lfs -text
-*.prefab filter=lfs diff=lfs merge=lfs -text
-*.unity filter=lfs diff=lfs merge=lfs -text
 *.controller filter=lfs diff=lfs merge=lfs -text
 *.overrideController filter=lfs diff=lfs merge=lfs -text
 *.anim filter=lfs diff=lfs merge=lfs -text

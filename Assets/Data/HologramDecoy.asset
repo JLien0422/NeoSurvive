@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:52f6be6ce6c2346190ede95ce0943d3bce5ad72ca58ce19766e4da17fb8eaf2e
-size 729
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: HologramDecoy
+  m_EditorClassIdentifier: 
+  weaponName: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
+  weaponIcon: {fileID: 21300000, guid: 5860e5e4ed4f453439be9a4396e2b941, type: 3}
+  description: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
+  weaponPrefab: {fileID: 474004203620960840, guid: ee74eca0d709c5f4ca664f9b96a9f05c, type: 3}
+  level: 1
+  isIndependent: 0

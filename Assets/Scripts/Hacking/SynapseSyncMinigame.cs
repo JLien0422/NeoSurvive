@@ -18,6 +18,7 @@ public class SynapseSyncMinigame : HackingMinigameBase
 
     [SerializeField]
     private GameObject centerCircle; // 중앙 고정 원
+
     [SerializeField]
     private GameObject outerCircle; // 안으로 좁혀지는 원
 
@@ -214,7 +215,7 @@ public class SynapseSyncMinigame : HackingMinigameBase
     private IEnumerator SuccessRoutine()
     {
         waitingForInput = false;
-        
+
         // 성공 이펙트 (원 색상 변경)
         if (outerCircle != null)
         {

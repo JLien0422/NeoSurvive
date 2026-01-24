@@ -231,6 +231,11 @@ public class UDPClient : MonoBehaviour
         UdpReceiveResult result = await client.ReceiveAsync();
         byte[] receivedData = result.Buffer;
 
+        if (showDebugLog)
+        {
+          Debug.Log($"[UDP 수신] 원본 데이터: {receivedData.Length} bytes from {result.RemoteEndPoint}");
+        }
+
         // 수신된 데이터 처리
         GameSnapshot snapshot = GameSnapshot.Parser.ParseFrom(receivedData);
 
@@ -243,15 +248,24 @@ public class UDPClient : MonoBehaviour
           if (!remotePlayerData.ContainsKey(playerId))
           {
             remotePlayerData[playerId] = new RemotePlayerData();
+            if (showDebugLog)
+            {
+              Debug.Log($"[UDP] 새로운 원격 플레이어 등록: ID={playerId}");
+            }
           }
 
           remotePlayerData[playerId].targetPosition = new Vector2(playerState.PosX, playerState.PosY);
           remotePlayerData[playerId].lastUpdateTime = playerState.Timestamp;
+
+          if (showDebugLog)
+          {
+            Debug.Log($"[UDP] Player {playerId}: Pos=({playerState.PosX:F2}, {playerState.PosY:F2}), Time={playerState.Timestamp}");
+          }
         }
 
         if (showDebugLog)
         {
-          Debug.Log($"[UDP] 스냅샷 수신: TimeStamp={snapshot.Timestamp}, 플레이어 수={snapshot.PlayerStates.Count}");
+          Debug.Log($"[UDP 스냅샷] TimeStamp={snapshot.Timestamp}, 플레이어 수={snapshot.PlayerStates.Count}");
         }
       }
       catch (Exception e)

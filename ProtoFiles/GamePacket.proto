@@ -9,3 +9,8 @@ message GamePacket {
   float pos_x = 3;
   float pos_y = 4;
 }
+
+message GameSnapshot {
+  int64 timestamp = 1;
+  repeated GamePacket player_states = 2;
+}

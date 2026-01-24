@@ -27,6 +27,15 @@ public class UDPClient : MonoBehaviour
   private Dictionary<int, Player> _allPlayers = new Dictionary<int, Player>();
   private Player _localPlayer;
 
+  // 원격 플레이어 위치 동기화
+  private class RemotePlayerData
+  {
+    public Vector2 targetPosition;
+    public long lastUpdateTime;
+  }
+  private Dictionary<uint, RemotePlayerData> remotePlayerData = new Dictionary<uint, RemotePlayerData>();
+  [SerializeField] private float lerpSpeed = 10f;
+
   public Player LocalPlayer => _localPlayer;
 
   private void Awake()
@@ -40,6 +49,8 @@ public class UDPClient : MonoBehaviour
   private void Start()
   {
     InitializeUdpClient();
+    SendPlayerPosition();
+    ReceiveDataLoop();
   }
 
   public void RegisterPlayer(int id, Player player, bool isLocal)
@@ -136,6 +147,30 @@ public class UDPClient : MonoBehaviour
     {
       SendPlayerData();
     }
+
+    // 원격 플레이어 위치 보간
+    UpdateRemotePlayerPositions();
+  }
+
+  private void UpdateRemotePlayerPositions()
+  {
+    foreach (var kvp in remotePlayerData)
+    {
+      uint playerId = kvp.Key;
+      RemotePlayerData data = kvp.Value;
+
+      // 해당 플레이어 객체 찾기
+      if (_allPlayers.TryGetValue((int)playerId, out Player player))
+      {
+        // 로컬 플레이어는 스킵
+        if (player == _localPlayer) continue;
+
+        // Lerp로 부드럽게 이동
+        Vector3 currentPos = player.transform.position;
+        Vector3 targetPos = new Vector3(data.targetPosition.x, data.targetPosition.y, currentPos.z);
+        player.transform.position = Vector3.Lerp(currentPos, targetPos, Time.deltaTime * lerpSpeed);
+      }
+    }
   }
 
   void SendPlayerData()
@@ -175,6 +210,55 @@ public class UDPClient : MonoBehaviour
     {
       Debug.LogError($"[UDP] 전송 예외 발생: {e.Message}");
       isConnected = false;
+    }
+  }
+
+  private async void SendPlayerPosition()
+  {
+    while (isConnected)
+    {
+      SendPlayerData();
+      await System.Threading.Tasks.Task.Delay(33); // 30 Hz
+    }
+  }
+
+  async void ReceiveDataLoop()
+  {
+    while (isConnected)
+    {
+      try
+      {
+        UdpReceiveResult result = await client.ReceiveAsync();
+        byte[] receivedData = result.Buffer;
+
+        // 수신된 데이터 처리
+        GameSnapshot snapshot = GameSnapshot.Parser.ParseFrom(receivedData);
+
+        // 모든 플레이어 상태 업데이트
+        foreach (var playerState in snapshot.PlayerStates)
+        {
+          uint playerId = playerState.PlayerId;
+
+          // 원격 플레이어 데이터 업데이트
+          if (!remotePlayerData.ContainsKey(playerId))
+          {
+            remotePlayerData[playerId] = new RemotePlayerData();
+          }
+
+          remotePlayerData[playerId].targetPosition = new Vector2(playerState.PosX, playerState.PosY);
+          remotePlayerData[playerId].lastUpdateTime = playerState.Timestamp;
+        }
+
+        if (showDebugLog)
+        {
+          Debug.Log($"[UDP] 스냅샷 수신: TimeStamp={snapshot.Timestamp}, 플레이어 수={snapshot.PlayerStates.Count}");
+        }
+      }
+      catch (Exception e)
+      {
+        Debug.LogError($"[UDP] 수신 예외 발생: {e.Message}");
+        isConnected = false;
+      }
     }
   }
 

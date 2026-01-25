@@ -83,13 +83,7 @@ namespace NeoSurvive.Network
         {
           pObj.tag = "Player";
           Debug.Log($"[MultiplayManager] 로컬 플레이어 생성: {pState.nickname} (ID: {pState.playerId})");
-
-          // 카메라 및 맵 매니저 대상 설정
-          CameraController cam = FindObjectOfType<CameraController>();
-          if (cam != null) cam.SetTarget(pObj.transform);
-
-          var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
-          if (mapManager != null) mapManager.SetTarget(pObj.transform);
+          // 카메라와 맵 매니저는 자동으로 UDPClient.LocalPlayer를 추적합니다
         }
         else
         {

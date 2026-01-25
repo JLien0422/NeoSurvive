@@ -86,14 +86,23 @@ namespace NeoSurvive.UI.Map
     {
       if (playerTransform == null)
       {
-        GameObject playerObj = GameObject.FindWithTag("Player");
-        if (playerObj != null)
+        // 멀티플레이인 경우: UDPClient의 LocalPlayer를 추적
+        if (UDPClient.Instance != null && UDPClient.Instance.LocalPlayer != null)
         {
-          SetTarget(playerObj.transform);
+          SetTarget(UDPClient.Instance.LocalPlayer.transform);
         }
+        // 싱글플레이인 경우: "Player" 태그로 찾기
         else
         {
-          return;
+          GameObject playerObj = GameObject.FindWithTag("Player");
+          if (playerObj != null)
+          {
+            SetTarget(playerObj.transform);
+          }
+          else
+          {
+            return;
+          }
         }
       }
 

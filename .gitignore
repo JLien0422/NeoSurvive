@@ -56,7 +56,7 @@ Thumbs.db
 # !*.meta  <- 이런 식으로 제외 방지 설정을 하기도 함
 
 # --- [ VSCode 관련 ] ---
-.vscode/
+.vscode
 *.code-workspace
 
 # --- [ JetBrains Rider 관련 ] ---
@@ -114,3 +114,4 @@ packages/
 기획서.txt
 내가해야할것.txt
 Project_Memo.txt
+.docs

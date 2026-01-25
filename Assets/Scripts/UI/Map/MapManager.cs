@@ -21,11 +21,12 @@ namespace NeoSurvive.UI.Map
     public float tilePixelSize = 32f;
     public float pixelsPerUnit = 100f;
     public float gap = 0f;
-    public float tileZValue = 100f; // 기존 100f에서 0f로 변경 제안
+    public float tileZValue = 100f; // 절대 수정 금지. 100f로 정의하였음.
 
     [Header("최적화 및 생성 설정")]
     public int viewDistanceX = 10;
     public int viewDistanceY = 10;
+
     [Tooltip("타일이 삭제되기 전 추가로 유지되는 거리 (히스테리시스)")]
     public int despawnMargin = 2;
     public int seed = 42;
@@ -63,7 +64,7 @@ namespace NeoSurvive.UI.Map
       Camera cam = Camera.main;
       if (cam != null)
       {
-        UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
+        UpdateScreenSize(new Vector2(cam.orthographicSize * cam.aspect, cam.orthographicSize));
       }
 
       if (playerTransform != null)
@@ -77,17 +78,7 @@ namespace NeoSurvive.UI.Map
 
     private void UpdateActualTileSize()
     {
-      if (autoSizeFromPrefab && baseTilePrefab != null)
-      {
-        var sr = baseTilePrefab.GetComponentInChildren<SpriteRenderer>();
-        if (sr != null && sr.sprite != null)
-        {
-          // 프리팹의 스프라이트가 월드에서 차지하는 원래 크기를 계산
-          float spriteWorldSize = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
-          actualTileSize = spriteWorldSize + gap;
-          return;
-        }
-      }
+      // 타일 크기를 tilePixelSize/pixelsPerUnit으로 일관되게 계산
       actualTileSize = (tilePixelSize / pixelsPerUnit) + gap;
     }
 
@@ -106,12 +97,6 @@ namespace NeoSurvive.UI.Map
         }
       }
 
-#if UNITY_EDITOR
-      // 에디터에서 값이 바뀌었을 때 실시간 반영을 위해 (성능에 민감하면 OnValidate로 옮길 수 있음)
-      UpdateActualTileSize();
-      Camera cam = Camera.main;
-      if (cam != null) UpdateScreenSize(new Vector2(cam.pixelWidth, cam.pixelHeight));
-#endif
 
       int currentX = Mathf.FloorToInt(playerTransform.position.x / actualTileSize);
       int currentY = Mathf.FloorToInt(playerTransform.position.y / actualTileSize);
@@ -134,8 +119,9 @@ namespace NeoSurvive.UI.Map
       float worldWidth = worldHeight * cam.aspect;
 
       // 월드 크기를 타일의 실제 월드 크기로 나누어 필요한 타일의 '반지름' 개수를 구합니다.
-      viewDistanceX = Mathf.CeilToInt((worldWidth / actualTileSize) * 0.5f) + 2;
-      viewDistanceY = Mathf.CeilToInt((worldHeight / actualTileSize) * 0.5f) + 2;
+      // 배경이 보이지 않도록 충분한 여유를 둡니다
+      viewDistanceX = Mathf.CeilToInt((worldWidth / actualTileSize) * 1.0f) + 4;
+      viewDistanceY = Mathf.CeilToInt((worldHeight / actualTileSize) * 1.0f) + 4;
 
       // Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
     }
@@ -205,13 +191,14 @@ namespace NeoSurvive.UI.Map
       tile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, tileZValue);
 
       // 타일이 실제 칸(actualTileSize)을 꽉 채우도록 스케일 조정
+      // 1.01배로 약간 크게 만들어서 타일 사이 간격이 보이지 않도록 함
       var sr = tile.GetComponentInChildren<SpriteRenderer>();
       if (sr != null && sr.sprite != null)
       {
         float spriteWorldWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
         if (spriteWorldWidth > 0)
         {
-          float scale = (actualTileSize - gap) / spriteWorldWidth;
+          float scale = ((actualTileSize - gap) / spriteWorldWidth) * 1.01f;
           tile.transform.localScale = new Vector3(scale, scale, 1f);
         }
       }

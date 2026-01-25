@@ -345,7 +345,7 @@ MonoBehaviour:
   isFullscreen: 1
   qualityIndex: 0
   vSyncEnabled: 1
-  targetFPS: 60
+  targetFPS: 300
   backgroundFPS: 30
   postProcessingEnabled: 1
   showDamageNumbers: 1
@@ -808,7 +808,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3da247f3b376443a8f7545575c95e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1346802443}
 --- !u!1 &578128025
 GameObject:
   m_ObjectHideFlags: 0

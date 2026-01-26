@@ -1294,8 +1294,7 @@ MonoBehaviour:
   serverAddress: nasdac.kro.kr
   serverPort: 5158
   showDebugLog: 1
-  colleague: {fileID: 0}
-  localPlayer: {fileID: 0}
+  lerpSpeed: 10
 --- !u!1 &1091626777
 GameObject:
   m_ObjectHideFlags: 0
@@ -1530,6 +1529,7 @@ Transform:
   - {fileID: 384367195}
   - {fileID: 2018592942}
   - {fileID: 1004926091}
+  - {fileID: 1601759287}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1297347790
@@ -2042,9 +2042,11 @@ MonoBehaviour:
   - {fileID: 511734254542703334, guid: bcb7b75be32fdc14282839cbbc6697fa, type: 3}
   grassPrefabs:
   - {fileID: 511734254542703334, guid: bcc9c95fbdb7b38488937df8b174e365, type: 3}
+  autoSizeFromPrefab: 1
   tilePixelSize: 32
   pixelsPerUnit: 64
   gap: 0
+  tileZValue: 100
   viewDistanceX: 10
   viewDistanceY: 10
   despawnMargin: 2
@@ -2292,6 +2294,53 @@ Transform:
   - {fileID: 1561183029}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1601759286
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1601759287}
+  - component: {fileID: 1601759288}
+  m_Layer: 0
+  m_Name: EnemyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1601759287
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601759286}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 9.342169, y: 0.6727592, z: -0.029320046}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1193739107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1601759288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601759286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a78717c074310f1478e373d5455248b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyPrefabs:
+  - typeId: 0
+    prefab: {fileID: 149778303937110121, guid: 3e5cc0911af2943449ccad02bf645d92, type: 3}
 --- !u!1 &1680738889
 GameObject:
   m_ObjectHideFlags: 0
@@ -2853,7 +2902,25 @@ MonoBehaviour:
   playerHealthSlider: {fileID: 459883540}
   gameManager: {fileID: 345991728}
   characterChoicePanel: {fileID: 0}
+  psychoCorruptionSlider: {fileID: 0}
+  psychoCorruptionText: {fileID: 0}
+  screenNoiseOverlay: {fileID: 0}
+  neuralLinkSlider: {fileID: 0}
+  neuralLinkText: {fileID: 0}
   healthBarOffset: {x: 0, y: 1, z: 0}
+  weaponChoicePanel: {fileID: 0}
+  weaponChoiceButtons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  weaponChoiceIcons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  weaponChoiceTexts:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!4 &2018592942
 Transform:
   m_ObjectHideFlags: 0

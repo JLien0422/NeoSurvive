@@ -19,10 +19,12 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
     private float baseDamage;
+    private Player owner;
 
     private void Start()
     {
       baseDamage = damage;
+      owner = GetComponentInParent<Player>();
     }
 
     public void OnLevelUp(int level)
@@ -42,6 +44,9 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
+      // 로컬 플레이어만 자동 공격 시도
+      if (owner != null && !owner.IsLocal) return;
+
       fireTimer += Time.deltaTime;
       if (fireTimer >= fireRate)
       {
@@ -58,10 +63,27 @@ namespace NeoSurvive.Weapon
       if (target == null) return;
       Vector3 dir = (target.transform.position - transform.position).normalized;
 
+      // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
+      if (owner != null && owner.IsLocal && UDPClient.Instance != null)
+      {
+        // 8번은 LinkPistol의 임시 타입 인덱스로 사용 (Value 필드 활용 가능)
+        UDPClient.Instance.SendAction(NeoSurvive.Network.Protocol.ActionType.Attack, 0, new Vector2(dir.x, dir.y), 8);
+      }
+
+      ExecuteAttack(dir);
+    }
+
+    /// <summary>
+    /// 실제 발사체 생성 (로컬/원격 공용)
+    /// </summary>
+    public void ExecuteAttack(Vector3 direction)
+    {
+      if (projectilePrefab == null) return;
+
       GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
       obj.SetActive(true);
       Projectile p = obj.GetComponent<Projectile>();
-      if (p != null) p.Initialize(dir, damage, bulletSpeed);
+      if (p != null) p.Initialize(direction, damage, bulletSpeed);
     }
 
     private GameObject FindClosestEnemy()

@@ -24,36 +24,68 @@ namespace NeoSurvive.Network.Protocol {
     static GamePacketReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChBHYW1lUGFja2V0LnByb3RvIlAKCkdhbWVQYWNrZXQSEQoJcGxheWVyX2lk",
+            "ChBHYW1lUGFja2V0LnByb3RvIm4KClBsYXllck1vdmUSEQoJcGxheWVyX2lk",
             "GAEgASgNEhEKCXRpbWVzdGFtcBgCIAEoAxINCgVwb3NfeBgDIAEoAhINCgVw",
-            "b3NfeRgEIAEoAiJFCgxHYW1lU25hcHNob3QSEQoJdGltZXN0YW1wGAEgASgD",
-            "EiIKDXBsYXllcl9zdGF0ZXMYAiADKAsyCy5HYW1lUGFja2V0Qh6qAhtOZW9T",
-            "dXJ2aXZlLk5ldHdvcmsuUHJvdG9jb2xiBnByb3RvMw=="));
+            "b3NfeRgEIAEoAhINCgV2ZWxfeBgFIAEoAhINCgV2ZWxfeRgGIAEoAiKhAQoM",
+            "UGxheWVyQWN0aW9uEhEKCXBsYXllcl9pZBgBIAEoDRIgCgthY3Rpb25fdHlw",
+            "ZRgCIAEoDjILLkFjdGlvblR5cGUSEQoJdGFyZ2V0X2lkGAMgASgNEg0KBXBv",
+            "c194GAQgASgCEg0KBXBvc195GAUgASgCEg0KBWRpcl94GAYgASgCEg0KBWRp",
+            "cl95GAcgASgCEg0KBXZhbHVlGAggASgNImEKCkVuZW15U3RhdGUSEAoIZW5l",
+            "bXlfaWQYASABKA0SDwoHdHlwZV9pZBgCIAEoDRINCgVwb3NfeBgDIAEoAhIN",
+            "CgVwb3NfeRgEIAEoAhISCgpjdXJyZW50X2hwGAUgASgNIksKCUl0ZW1TdGF0",
+            "ZRIPCgdpdGVtX2lkGAEgASgNEg8KB3R5cGVfaWQYAiABKA0SDQoFcG9zX3gY",
+            "AyABKAISDQoFcG9zX3kYBCABKAIinAEKDEdhbWVTbmFwc2hvdBIRCgl0aW1l",
+            "c3RhbXAYASABKAMSEQoJZ2FtZV90aW1lGAIgASgCEiIKDXBsYXllcl9zdGF0",
+            "ZXMYAyADKAsyCy5QbGF5ZXJNb3ZlEiEKDGVuZW15X3N0YXRlcxgEIAMoCzIL",
+            "LkVuZW15U3RhdGUSHwoLaXRlbV9zdGF0ZXMYBSADKAsyCi5JdGVtU3RhdGUi",
+            "eAoKR2FtZVBhY2tldBIbCgRtb3ZlGAEgASgLMgsuUGxheWVyTW92ZUgAEh8K",
+            "BmFjdGlvbhgCIAEoCzINLlBsYXllckFjdGlvbkgAEiEKCHNuYXBzaG90GAMg",
+            "ASgLMg0uR2FtZVNuYXBzaG90SABCCQoHcGF5bG9hZCppCgpBY3Rpb25UeXBl",
+            "EgoKBkFUVEFDSxAAEgkKBVNLSUxMEAESDwoLTkVVUkFMX0xJTksQAhIPCgtJ",
+            "VEVNX1BJQ0tVUBADEgoKBkRBTUFHRRAEEggKBERFQUQQBRIMCghMRVZFTF9V",
+            "UBAGQh6qAhtOZW9TdXJ2aXZlLk5ldHdvcmsuUHJvdG9jb2xiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "PlayerStates" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::NeoSurvive.Network.Protocol.ActionType), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerMove), global::NeoSurvive.Network.Protocol.PlayerMove.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY", "VelX", "VelY" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.EnemyState), global::NeoSurvive.Network.Protocol.EnemyState.Parser, new[]{ "EnemyId", "TypeId", "PosX", "PosY", "CurrentHp" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.ItemState), global::NeoSurvive.Network.Protocol.ItemState.Parser, new[]{ "ItemId", "TypeId", "PosX", "PosY" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "GameTime", "PlayerStates", "EnemyStates", "ItemStates" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "Move", "Action", "Snapshot" }, new[]{ "Payload" }, null, null, null)
           }));
     }
     #endregion
 
   }
+  #region Enums
+  public enum ActionType {
+    [pbr::OriginalName("ATTACK")] Attack = 0,
+    [pbr::OriginalName("SKILL")] Skill = 1,
+    [pbr::OriginalName("NEURAL_LINK")] NeuralLink = 2,
+    [pbr::OriginalName("ITEM_PICKUP")] ItemPickup = 3,
+    [pbr::OriginalName("DAMAGE")] Damage = 4,
+    [pbr::OriginalName("DEAD")] Dead = 5,
+    [pbr::OriginalName("LEVEL_UP")] LevelUp = 6,
+  }
+
+  #endregion
+
   #region Messages
   /// <summary>
-  /// 게임 패킷 - UDP로 전송될 플레이어 위치 데이터
+  /// [Periodic] 플레이어 이동 데이터 (UDP 30Hz)
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class GamePacket : pb::IMessage<GamePacket>
+  public sealed partial class PlayerMove : pb::IMessage<PlayerMove>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<GamePacket> _parser = new pb::MessageParser<GamePacket>(() => new GamePacket());
+    private static readonly pb::MessageParser<PlayerMove> _parser = new pb::MessageParser<PlayerMove>(() => new PlayerMove());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<GamePacket> Parser { get { return _parser; } }
+    public static pb::MessageParser<PlayerMove> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -69,7 +101,7 @@ namespace NeoSurvive.Network.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket() {
+    public PlayerMove() {
       OnConstruction();
     }
 
@@ -77,26 +109,25 @@ namespace NeoSurvive.Network.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket(GamePacket other) : this() {
+    public PlayerMove(PlayerMove other) : this() {
       playerId_ = other.playerId_;
       timestamp_ = other.timestamp_;
       posX_ = other.posX_;
       posY_ = other.posY_;
+      velX_ = other.velX_;
+      velY_ = other.velY_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket Clone() {
-      return new GamePacket(this);
+    public PlayerMove Clone() {
+      return new PlayerMove(this);
     }
 
     /// <summary>Field number for the "player_id" field.</summary>
     public const int PlayerIdFieldNumber = 1;
     private uint playerId_;
-    /// <summary>
-    /// 문자열보다 정수 ID가 효율적
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public uint PlayerId {
@@ -109,9 +140,6 @@ namespace NeoSurvive.Network.Protocol {
     /// <summary>Field number for the "timestamp" field.</summary>
     public const int TimestampFieldNumber = 2;
     private long timestamp_;
-    /// <summary>
-    /// 순서 보장을 위한 타임스탬프
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public long Timestamp {
@@ -145,15 +173,42 @@ namespace NeoSurvive.Network.Protocol {
       }
     }
 
+    /// <summary>Field number for the "vel_x" field.</summary>
+    public const int VelXFieldNumber = 5;
+    private float velX_;
+    /// <summary>
+    /// 추측 항법(Dead Reckoning)을 위한 속도
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as GamePacket);
+    public float VelX {
+      get { return velX_; }
+      set {
+        velX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "vel_y" field.</summary>
+    public const int VelYFieldNumber = 6;
+    private float velY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float VelY {
+      get { return velY_; }
+      set {
+        velY_ = value;
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(GamePacket other) {
+    public override bool Equals(object other) {
+      return Equals(other as PlayerMove);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(PlayerMove other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -164,6 +219,8 @@ namespace NeoSurvive.Network.Protocol {
       if (Timestamp != other.Timestamp) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosX, other.PosX)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosY, other.PosY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(VelX, other.VelX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(VelY, other.VelY)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -175,6 +232,8 @@ namespace NeoSurvive.Network.Protocol {
       if (Timestamp != 0L) hash ^= Timestamp.GetHashCode();
       if (PosX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosX);
       if (PosY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosY);
+      if (VelX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(VelX);
+      if (VelY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(VelY);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -209,6 +268,14 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(37);
         output.WriteFloat(PosY);
       }
+      if (VelX != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(VelX);
+      }
+      if (VelY != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(VelY);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -234,6 +301,14 @@ namespace NeoSurvive.Network.Protocol {
       if (PosY != 0F) {
         output.WriteRawTag(37);
         output.WriteFloat(PosY);
+      }
+      if (VelX != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(VelX);
+      }
+      if (VelY != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(VelY);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -257,6 +332,12 @@ namespace NeoSurvive.Network.Protocol {
       if (PosY != 0F) {
         size += 1 + 4;
       }
+      if (VelX != 0F) {
+        size += 1 + 4;
+      }
+      if (VelY != 0F) {
+        size += 1 + 4;
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -265,7 +346,7 @@ namespace NeoSurvive.Network.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(GamePacket other) {
+    public void MergeFrom(PlayerMove other) {
       if (other == null) {
         return;
       }
@@ -274,6 +355,1137 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (other.Timestamp != 0L) {
         Timestamp = other.Timestamp;
+      }
+      if (other.PosX != 0F) {
+        PosX = other.PosX;
+      }
+      if (other.PosY != 0F) {
+        PosY = other.PosY;
+      }
+      if (other.VelX != 0F) {
+        VelX = other.VelX;
+      }
+      if (other.VelY != 0F) {
+        VelY = other.VelY;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            PlayerId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            Timestamp = input.ReadInt64();
+            break;
+          }
+          case 29: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            VelX = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            VelY = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            PlayerId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            Timestamp = input.ReadInt64();
+            break;
+          }
+          case 29: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            VelX = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            VelY = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// [Event] 플레이어 액션 및 상호작용 (Event-based)
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class PlayerAction : pb::IMessage<PlayerAction>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<PlayerAction> _parser = new pb::MessageParser<PlayerAction>(() => new PlayerAction());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<PlayerAction> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerAction() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerAction(PlayerAction other) : this() {
+      playerId_ = other.playerId_;
+      actionType_ = other.actionType_;
+      targetId_ = other.targetId_;
+      posX_ = other.posX_;
+      posY_ = other.posY_;
+      dirX_ = other.dirX_;
+      dirY_ = other.dirY_;
+      value_ = other.value_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerAction Clone() {
+      return new PlayerAction(this);
+    }
+
+    /// <summary>Field number for the "player_id" field.</summary>
+    public const int PlayerIdFieldNumber = 1;
+    private uint playerId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint PlayerId {
+      get { return playerId_; }
+      set {
+        playerId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "action_type" field.</summary>
+    public const int ActionTypeFieldNumber = 2;
+    private global::NeoSurvive.Network.Protocol.ActionType actionType_ = global::NeoSurvive.Network.Protocol.ActionType.Attack;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.ActionType ActionType {
+      get { return actionType_; }
+      set {
+        actionType_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "target_id" field.</summary>
+    public const int TargetIdFieldNumber = 3;
+    private uint targetId_;
+    /// <summary>
+    /// 대상 ID (적, 아이템 등)
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint TargetId {
+      get { return targetId_; }
+      set {
+        targetId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_x" field.</summary>
+    public const int PosXFieldNumber = 4;
+    private float posX_;
+    /// <summary>
+    /// 발생 위치
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosX {
+      get { return posX_; }
+      set {
+        posX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_y" field.</summary>
+    public const int PosYFieldNumber = 5;
+    private float posY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosY {
+      get { return posY_; }
+      set {
+        posY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_x" field.</summary>
+    public const int DirXFieldNumber = 6;
+    private float dirX_;
+    /// <summary>
+    /// 조준 방향
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirX {
+      get { return dirX_; }
+      set {
+        dirX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_y" field.</summary>
+    public const int DirYFieldNumber = 7;
+    private float dirY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirY {
+      get { return dirY_; }
+      set {
+        dirY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "value" field.</summary>
+    public const int ValueFieldNumber = 8;
+    private uint value_;
+    /// <summary>
+    /// 대미지, 스킬/아이템 고유 번호 등
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Value {
+      get { return value_; }
+      set {
+        value_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as PlayerAction);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(PlayerAction other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (PlayerId != other.PlayerId) return false;
+      if (ActionType != other.ActionType) return false;
+      if (TargetId != other.TargetId) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosX, other.PosX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosY, other.PosY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirX, other.DirX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
+      if (Value != other.Value) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (PlayerId != 0) hash ^= PlayerId.GetHashCode();
+      if (ActionType != global::NeoSurvive.Network.Protocol.ActionType.Attack) hash ^= ActionType.GetHashCode();
+      if (TargetId != 0) hash ^= TargetId.GetHashCode();
+      if (PosX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosX);
+      if (PosY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosY);
+      if (DirX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirX);
+      if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
+      if (Value != 0) hash ^= Value.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (PlayerId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(PlayerId);
+      }
+      if (ActionType != global::NeoSurvive.Network.Protocol.ActionType.Attack) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) ActionType);
+      }
+      if (TargetId != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(TargetId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(PosY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(DirY);
+      }
+      if (Value != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(Value);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (PlayerId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(PlayerId);
+      }
+      if (ActionType != global::NeoSurvive.Network.Protocol.ActionType.Attack) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) ActionType);
+      }
+      if (TargetId != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(TargetId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(PosY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(DirY);
+      }
+      if (Value != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(Value);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (PlayerId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(PlayerId);
+      }
+      if (ActionType != global::NeoSurvive.Network.Protocol.ActionType.Attack) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) ActionType);
+      }
+      if (TargetId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TargetId);
+      }
+      if (PosX != 0F) {
+        size += 1 + 4;
+      }
+      if (PosY != 0F) {
+        size += 1 + 4;
+      }
+      if (DirX != 0F) {
+        size += 1 + 4;
+      }
+      if (DirY != 0F) {
+        size += 1 + 4;
+      }
+      if (Value != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Value);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(PlayerAction other) {
+      if (other == null) {
+        return;
+      }
+      if (other.PlayerId != 0) {
+        PlayerId = other.PlayerId;
+      }
+      if (other.ActionType != global::NeoSurvive.Network.Protocol.ActionType.Attack) {
+        ActionType = other.ActionType;
+      }
+      if (other.TargetId != 0) {
+        TargetId = other.TargetId;
+      }
+      if (other.PosX != 0F) {
+        PosX = other.PosX;
+      }
+      if (other.PosY != 0F) {
+        PosY = other.PosY;
+      }
+      if (other.DirX != 0F) {
+        DirX = other.DirX;
+      }
+      if (other.DirY != 0F) {
+        DirY = other.DirY;
+      }
+      if (other.Value != 0) {
+        Value = other.Value;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            PlayerId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            ActionType = (global::NeoSurvive.Network.Protocol.ActionType) input.ReadEnum();
+            break;
+          }
+          case 24: {
+            TargetId = input.ReadUInt32();
+            break;
+          }
+          case 37: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 64: {
+            Value = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            PlayerId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            ActionType = (global::NeoSurvive.Network.Protocol.ActionType) input.ReadEnum();
+            break;
+          }
+          case 24: {
+            TargetId = input.ReadUInt32();
+            break;
+          }
+          case 37: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 64: {
+            Value = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// [Snapshot] 적(Enemy) 상태 정보
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class EnemyState : pb::IMessage<EnemyState>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<EnemyState> _parser = new pb::MessageParser<EnemyState>(() => new EnemyState());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<EnemyState> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnemyState() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnemyState(EnemyState other) : this() {
+      enemyId_ = other.enemyId_;
+      typeId_ = other.typeId_;
+      posX_ = other.posX_;
+      posY_ = other.posY_;
+      currentHp_ = other.currentHp_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EnemyState Clone() {
+      return new EnemyState(this);
+    }
+
+    /// <summary>Field number for the "enemy_id" field.</summary>
+    public const int EnemyIdFieldNumber = 1;
+    private uint enemyId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint EnemyId {
+      get { return enemyId_; }
+      set {
+        enemyId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "type_id" field.</summary>
+    public const int TypeIdFieldNumber = 2;
+    private uint typeId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint TypeId {
+      get { return typeId_; }
+      set {
+        typeId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_x" field.</summary>
+    public const int PosXFieldNumber = 3;
+    private float posX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosX {
+      get { return posX_; }
+      set {
+        posX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_y" field.</summary>
+    public const int PosYFieldNumber = 4;
+    private float posY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosY {
+      get { return posY_; }
+      set {
+        posY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "current_hp" field.</summary>
+    public const int CurrentHpFieldNumber = 5;
+    private uint currentHp_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint CurrentHp {
+      get { return currentHp_; }
+      set {
+        currentHp_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as EnemyState);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(EnemyState other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (EnemyId != other.EnemyId) return false;
+      if (TypeId != other.TypeId) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosX, other.PosX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosY, other.PosY)) return false;
+      if (CurrentHp != other.CurrentHp) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (EnemyId != 0) hash ^= EnemyId.GetHashCode();
+      if (TypeId != 0) hash ^= TypeId.GetHashCode();
+      if (PosX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosX);
+      if (PosY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosY);
+      if (CurrentHp != 0) hash ^= CurrentHp.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (EnemyId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(EnemyId);
+      }
+      if (TypeId != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(TypeId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosY);
+      }
+      if (CurrentHp != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(CurrentHp);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (EnemyId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(EnemyId);
+      }
+      if (TypeId != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(TypeId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosY);
+      }
+      if (CurrentHp != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(CurrentHp);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (EnemyId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(EnemyId);
+      }
+      if (TypeId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TypeId);
+      }
+      if (PosX != 0F) {
+        size += 1 + 4;
+      }
+      if (PosY != 0F) {
+        size += 1 + 4;
+      }
+      if (CurrentHp != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(CurrentHp);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(EnemyState other) {
+      if (other == null) {
+        return;
+      }
+      if (other.EnemyId != 0) {
+        EnemyId = other.EnemyId;
+      }
+      if (other.TypeId != 0) {
+        TypeId = other.TypeId;
+      }
+      if (other.PosX != 0F) {
+        PosX = other.PosX;
+      }
+      if (other.PosY != 0F) {
+        PosY = other.PosY;
+      }
+      if (other.CurrentHp != 0) {
+        CurrentHp = other.CurrentHp;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            EnemyId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            TypeId = input.ReadUInt32();
+            break;
+          }
+          case 29: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            CurrentHp = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            EnemyId = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            TypeId = input.ReadUInt32();
+            break;
+          }
+          case 29: {
+            PosX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            PosY = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            CurrentHp = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// [Snapshot] 드롭 아이템(Item/ExpOrb) 정보
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ItemState : pb::IMessage<ItemState>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ItemState> _parser = new pb::MessageParser<ItemState>(() => new ItemState());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ItemState> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ItemState() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ItemState(ItemState other) : this() {
+      itemId_ = other.itemId_;
+      typeId_ = other.typeId_;
+      posX_ = other.posX_;
+      posY_ = other.posY_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ItemState Clone() {
+      return new ItemState(this);
+    }
+
+    /// <summary>Field number for the "item_id" field.</summary>
+    public const int ItemIdFieldNumber = 1;
+    private uint itemId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint ItemId {
+      get { return itemId_; }
+      set {
+        itemId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "type_id" field.</summary>
+    public const int TypeIdFieldNumber = 2;
+    private uint typeId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint TypeId {
+      get { return typeId_; }
+      set {
+        typeId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_x" field.</summary>
+    public const int PosXFieldNumber = 3;
+    private float posX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosX {
+      get { return posX_; }
+      set {
+        posX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pos_y" field.</summary>
+    public const int PosYFieldNumber = 4;
+    private float posY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PosY {
+      get { return posY_; }
+      set {
+        posY_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ItemState);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ItemState other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (ItemId != other.ItemId) return false;
+      if (TypeId != other.TypeId) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosX, other.PosX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosY, other.PosY)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (ItemId != 0) hash ^= ItemId.GetHashCode();
+      if (TypeId != 0) hash ^= TypeId.GetHashCode();
+      if (PosX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosX);
+      if (PosY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosY);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (ItemId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(ItemId);
+      }
+      if (TypeId != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(TypeId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosY);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (ItemId != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(ItemId);
+      }
+      if (TypeId != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(TypeId);
+      }
+      if (PosX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(PosX);
+      }
+      if (PosY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(PosY);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (ItemId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ItemId);
+      }
+      if (TypeId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TypeId);
+      }
+      if (PosX != 0F) {
+        size += 1 + 4;
+      }
+      if (PosY != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ItemState other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ItemId != 0) {
+        ItemId = other.ItemId;
+      }
+      if (other.TypeId != 0) {
+        TypeId = other.TypeId;
       }
       if (other.PosX != 0F) {
         PosX = other.PosX;
@@ -297,11 +1509,11 @@ namespace NeoSurvive.Network.Protocol {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            PlayerId = input.ReadUInt32();
+            ItemId = input.ReadUInt32();
             break;
           }
           case 16: {
-            Timestamp = input.ReadInt64();
+            TypeId = input.ReadUInt32();
             break;
           }
           case 29: {
@@ -328,11 +1540,11 @@ namespace NeoSurvive.Network.Protocol {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            PlayerId = input.ReadUInt32();
+            ItemId = input.ReadUInt32();
             break;
           }
           case 16: {
-            Timestamp = input.ReadInt64();
+            TypeId = input.ReadUInt32();
             break;
           }
           case 29: {
@@ -350,6 +1562,9 @@ namespace NeoSurvive.Network.Protocol {
 
   }
 
+  /// <summary>
+  /// [Periodic] 월드 스냅샷 (서버 브로드캐스트)
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class GameSnapshot : pb::IMessage<GameSnapshot>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -365,7 +1580,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[1]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -386,7 +1601,10 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GameSnapshot(GameSnapshot other) : this() {
       timestamp_ = other.timestamp_;
+      gameTime_ = other.gameTime_;
       playerStates_ = other.playerStates_.Clone();
+      enemyStates_ = other.enemyStates_.Clone();
+      itemStates_ = other.itemStates_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -408,15 +1626,52 @@ namespace NeoSurvive.Network.Protocol {
       }
     }
 
-    /// <summary>Field number for the "player_states" field.</summary>
-    public const int PlayerStatesFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::NeoSurvive.Network.Protocol.GamePacket> _repeated_playerStates_codec
-        = pb::FieldCodec.ForMessage(18, global::NeoSurvive.Network.Protocol.GamePacket.Parser);
-    private readonly pbc::RepeatedField<global::NeoSurvive.Network.Protocol.GamePacket> playerStates_ = new pbc::RepeatedField<global::NeoSurvive.Network.Protocol.GamePacket>();
+    /// <summary>Field number for the "game_time" field.</summary>
+    public const int GameTimeFieldNumber = 2;
+    private float gameTime_;
+    /// <summary>
+    /// 동기화된 게임 시간
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::NeoSurvive.Network.Protocol.GamePacket> PlayerStates {
+    public float GameTime {
+      get { return gameTime_; }
+      set {
+        gameTime_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "player_states" field.</summary>
+    public const int PlayerStatesFieldNumber = 3;
+    private static readonly pb::FieldCodec<global::NeoSurvive.Network.Protocol.PlayerMove> _repeated_playerStates_codec
+        = pb::FieldCodec.ForMessage(26, global::NeoSurvive.Network.Protocol.PlayerMove.Parser);
+    private readonly pbc::RepeatedField<global::NeoSurvive.Network.Protocol.PlayerMove> playerStates_ = new pbc::RepeatedField<global::NeoSurvive.Network.Protocol.PlayerMove>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::NeoSurvive.Network.Protocol.PlayerMove> PlayerStates {
       get { return playerStates_; }
+    }
+
+    /// <summary>Field number for the "enemy_states" field.</summary>
+    public const int EnemyStatesFieldNumber = 4;
+    private static readonly pb::FieldCodec<global::NeoSurvive.Network.Protocol.EnemyState> _repeated_enemyStates_codec
+        = pb::FieldCodec.ForMessage(34, global::NeoSurvive.Network.Protocol.EnemyState.Parser);
+    private readonly pbc::RepeatedField<global::NeoSurvive.Network.Protocol.EnemyState> enemyStates_ = new pbc::RepeatedField<global::NeoSurvive.Network.Protocol.EnemyState>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::NeoSurvive.Network.Protocol.EnemyState> EnemyStates {
+      get { return enemyStates_; }
+    }
+
+    /// <summary>Field number for the "item_states" field.</summary>
+    public const int ItemStatesFieldNumber = 5;
+    private static readonly pb::FieldCodec<global::NeoSurvive.Network.Protocol.ItemState> _repeated_itemStates_codec
+        = pb::FieldCodec.ForMessage(42, global::NeoSurvive.Network.Protocol.ItemState.Parser);
+    private readonly pbc::RepeatedField<global::NeoSurvive.Network.Protocol.ItemState> itemStates_ = new pbc::RepeatedField<global::NeoSurvive.Network.Protocol.ItemState>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::NeoSurvive.Network.Protocol.ItemState> ItemStates {
+      get { return itemStates_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -435,7 +1690,10 @@ namespace NeoSurvive.Network.Protocol {
         return true;
       }
       if (Timestamp != other.Timestamp) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(GameTime, other.GameTime)) return false;
       if(!playerStates_.Equals(other.playerStates_)) return false;
+      if(!enemyStates_.Equals(other.enemyStates_)) return false;
+      if(!itemStates_.Equals(other.itemStates_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -444,7 +1702,10 @@ namespace NeoSurvive.Network.Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (Timestamp != 0L) hash ^= Timestamp.GetHashCode();
+      if (GameTime != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(GameTime);
       hash ^= playerStates_.GetHashCode();
+      hash ^= enemyStates_.GetHashCode();
+      hash ^= itemStates_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -467,7 +1728,13 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(8);
         output.WriteInt64(Timestamp);
       }
+      if (GameTime != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(GameTime);
+      }
       playerStates_.WriteTo(output, _repeated_playerStates_codec);
+      enemyStates_.WriteTo(output, _repeated_enemyStates_codec);
+      itemStates_.WriteTo(output, _repeated_itemStates_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -482,7 +1749,13 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(8);
         output.WriteInt64(Timestamp);
       }
+      if (GameTime != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(GameTime);
+      }
       playerStates_.WriteTo(ref output, _repeated_playerStates_codec);
+      enemyStates_.WriteTo(ref output, _repeated_enemyStates_codec);
+      itemStates_.WriteTo(ref output, _repeated_itemStates_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -496,7 +1769,12 @@ namespace NeoSurvive.Network.Protocol {
       if (Timestamp != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(Timestamp);
       }
+      if (GameTime != 0F) {
+        size += 1 + 4;
+      }
       size += playerStates_.CalculateSize(_repeated_playerStates_codec);
+      size += enemyStates_.CalculateSize(_repeated_enemyStates_codec);
+      size += itemStates_.CalculateSize(_repeated_itemStates_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -512,7 +1790,12 @@ namespace NeoSurvive.Network.Protocol {
       if (other.Timestamp != 0L) {
         Timestamp = other.Timestamp;
       }
+      if (other.GameTime != 0F) {
+        GameTime = other.GameTime;
+      }
       playerStates_.Add(other.playerStates_);
+      enemyStates_.Add(other.enemyStates_);
+      itemStates_.Add(other.itemStates_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -532,8 +1815,20 @@ namespace NeoSurvive.Network.Protocol {
             Timestamp = input.ReadInt64();
             break;
           }
-          case 18: {
+          case 21: {
+            GameTime = input.ReadFloat();
+            break;
+          }
+          case 26: {
             playerStates_.AddEntriesFrom(input, _repeated_playerStates_codec);
+            break;
+          }
+          case 34: {
+            enemyStates_.AddEntriesFrom(input, _repeated_enemyStates_codec);
+            break;
+          }
+          case 42: {
+            itemStates_.AddEntriesFrom(input, _repeated_itemStates_codec);
             break;
           }
         }
@@ -555,8 +1850,359 @@ namespace NeoSurvive.Network.Protocol {
             Timestamp = input.ReadInt64();
             break;
           }
-          case 18: {
+          case 21: {
+            GameTime = input.ReadFloat();
+            break;
+          }
+          case 26: {
             playerStates_.AddEntriesFrom(ref input, _repeated_playerStates_codec);
+            break;
+          }
+          case 34: {
+            enemyStates_.AddEntriesFrom(ref input, _repeated_enemyStates_codec);
+            break;
+          }
+          case 42: {
+            itemStates_.AddEntriesFrom(ref input, _repeated_itemStates_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class GamePacket : pb::IMessage<GamePacket>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<GamePacket> _parser = new pb::MessageParser<GamePacket>(() => new GamePacket());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<GamePacket> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket(GamePacket other) : this() {
+      switch (other.PayloadCase) {
+        case PayloadOneofCase.Move:
+          Move = other.Move.Clone();
+          break;
+        case PayloadOneofCase.Action:
+          Action = other.Action.Clone();
+          break;
+        case PayloadOneofCase.Snapshot:
+          Snapshot = other.Snapshot.Clone();
+          break;
+      }
+
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket Clone() {
+      return new GamePacket(this);
+    }
+
+    /// <summary>Field number for the "move" field.</summary>
+    public const int MoveFieldNumber = 1;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.PlayerMove Move {
+      get { return payloadCase_ == PayloadOneofCase.Move ? (global::NeoSurvive.Network.Protocol.PlayerMove) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Move;
+      }
+    }
+
+    /// <summary>Field number for the "action" field.</summary>
+    public const int ActionFieldNumber = 2;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.PlayerAction Action {
+      get { return payloadCase_ == PayloadOneofCase.Action ? (global::NeoSurvive.Network.Protocol.PlayerAction) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Action;
+      }
+    }
+
+    /// <summary>Field number for the "snapshot" field.</summary>
+    public const int SnapshotFieldNumber = 3;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.GameSnapshot Snapshot {
+      get { return payloadCase_ == PayloadOneofCase.Snapshot ? (global::NeoSurvive.Network.Protocol.GameSnapshot) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Snapshot;
+      }
+    }
+
+    private object payload_;
+    /// <summary>Enum of possible cases for the "payload" oneof.</summary>
+    public enum PayloadOneofCase {
+      None = 0,
+      Move = 1,
+      Action = 2,
+      Snapshot = 3,
+    }
+    private PayloadOneofCase payloadCase_ = PayloadOneofCase.None;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PayloadOneofCase PayloadCase {
+      get { return payloadCase_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearPayload() {
+      payloadCase_ = PayloadOneofCase.None;
+      payload_ = null;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as GamePacket);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(GamePacket other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(Move, other.Move)) return false;
+      if (!object.Equals(Action, other.Action)) return false;
+      if (!object.Equals(Snapshot, other.Snapshot)) return false;
+      if (PayloadCase != other.PayloadCase) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (payloadCase_ == PayloadOneofCase.Move) hash ^= Move.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.Action) hash ^= Action.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.Snapshot) hash ^= Snapshot.GetHashCode();
+      hash ^= (int) payloadCase_;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (payloadCase_ == PayloadOneofCase.Move) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Move);
+      }
+      if (payloadCase_ == PayloadOneofCase.Action) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Action);
+      }
+      if (payloadCase_ == PayloadOneofCase.Snapshot) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Snapshot);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (payloadCase_ == PayloadOneofCase.Move) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Move);
+      }
+      if (payloadCase_ == PayloadOneofCase.Action) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Action);
+      }
+      if (payloadCase_ == PayloadOneofCase.Snapshot) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Snapshot);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (payloadCase_ == PayloadOneofCase.Move) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Move);
+      }
+      if (payloadCase_ == PayloadOneofCase.Action) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Action);
+      }
+      if (payloadCase_ == PayloadOneofCase.Snapshot) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Snapshot);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(GamePacket other) {
+      if (other == null) {
+        return;
+      }
+      switch (other.PayloadCase) {
+        case PayloadOneofCase.Move:
+          if (Move == null) {
+            Move = new global::NeoSurvive.Network.Protocol.PlayerMove();
+          }
+          Move.MergeFrom(other.Move);
+          break;
+        case PayloadOneofCase.Action:
+          if (Action == null) {
+            Action = new global::NeoSurvive.Network.Protocol.PlayerAction();
+          }
+          Action.MergeFrom(other.Action);
+          break;
+        case PayloadOneofCase.Snapshot:
+          if (Snapshot == null) {
+            Snapshot = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+          }
+          Snapshot.MergeFrom(other.Snapshot);
+          break;
+      }
+
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
+            if (payloadCase_ == PayloadOneofCase.Move) {
+              subBuilder.MergeFrom(Move);
+            }
+            input.ReadMessage(subBuilder);
+            Move = subBuilder;
+            break;
+          }
+          case 18: {
+            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
+            if (payloadCase_ == PayloadOneofCase.Action) {
+              subBuilder.MergeFrom(Action);
+            }
+            input.ReadMessage(subBuilder);
+            Action = subBuilder;
+            break;
+          }
+          case 26: {
+            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+            if (payloadCase_ == PayloadOneofCase.Snapshot) {
+              subBuilder.MergeFrom(Snapshot);
+            }
+            input.ReadMessage(subBuilder);
+            Snapshot = subBuilder;
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
+            if (payloadCase_ == PayloadOneofCase.Move) {
+              subBuilder.MergeFrom(Move);
+            }
+            input.ReadMessage(subBuilder);
+            Move = subBuilder;
+            break;
+          }
+          case 18: {
+            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
+            if (payloadCase_ == PayloadOneofCase.Action) {
+              subBuilder.MergeFrom(Action);
+            }
+            input.ReadMessage(subBuilder);
+            Action = subBuilder;
+            break;
+          }
+          case 26: {
+            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+            if (payloadCase_ == PayloadOneofCase.Snapshot) {
+              subBuilder.MergeFrom(Snapshot);
+            }
+            input.ReadMessage(subBuilder);
+            Snapshot = subBuilder;
             break;
           }
         }

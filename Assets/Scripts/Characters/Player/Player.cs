@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
+using NeoSurvive.Network.Protocol;
+using NeoSurvive.Weapon;
 
 // Player 클래스는 플레이어 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
@@ -111,6 +113,9 @@ public class Player : Character
   // 현재 선택된 캐릭터 타입
   private CharacterType currentCharacterType = CharacterType.Hacker;
 
+  // [Coop] 로컬 플레이어 여부
+  public bool IsLocal { get; set; } = true; // 기본값은 true (싱글용)
+
   public void ApplyStatChange(StatType type, float flat, float percent)
   {
     switch (type)
@@ -220,6 +225,9 @@ public class Player : Character
 
   private void OnTriggerEnter2D(Collider2D other)
   {
+    // 로컬 플레이어만 아이템 획득 판정
+    if (!IsLocal) return;
+
     // Enemy가 만든 Exp Orb인지 확인
     if (!other.name.StartsWith("ExpOrb_")) return;
 
@@ -227,6 +235,12 @@ public class Player : Character
     if (amount <= 0) amount = 1;
 
     GainExperience(amount);
+
+    // [Coop] 서버에 아이템 획득 보고 (TargetID는 일단 해시 사용)
+    if (UDPClient.Instance != null)
+    {
+      UDPClient.Instance.SendAction(ActionType.ItemPickup, (uint)other.gameObject.GetInstanceID());
+    }
 
     Destroy(other.gameObject);
   }
@@ -244,10 +258,22 @@ public class Player : Character
   {
     UpdateInspectorStats();
 
-    // R키로 신경링크 발동
-    if (Input.GetKeyDown(KeyCode.R))
+    // R키로 신경링크 발동 (로컬 플레이어만)
+    if (IsLocal && Input.GetKeyDown(KeyCode.R))
     {
       ActivateNeuralLink();
+    }
+  }
+
+  /// <summary>
+  /// [Coop] 특정 무기의 공격을 실행 (원격 플레이어 동기화용)
+  /// </summary>
+  public void ExecuteAttack(int weaponIndex, Vector3 direction)
+  {
+    var weaponManager = GetComponent<WeaponManager>();
+    if (weaponManager != null)
+    {
+      weaponManager.ExecuteWeaponAttack(weaponIndex, direction);
     }
   }
 
@@ -529,6 +555,20 @@ public class Player : Character
       return;
     }
 
+    // 로컬 플레이어라면 서버로 전송
+    if (IsLocal && UDPClient.Instance != null)
+    {
+      UDPClient.Instance.SendAction(ActionType.NeuralLink);
+    }
+
+    ExecuteNeuralLink();
+  }
+
+  /// <summary>
+  /// 실제 신경링크 로직을 실행 (로컬/원격 공용)
+  /// </summary>
+  public void ExecuteNeuralLink()
+  {
     // 게이지 소모
     neuralLinkGauge = 0f;
     OnNeuralLinkGaugeChanged?.Invoke(neuralLinkGauge, 100f);

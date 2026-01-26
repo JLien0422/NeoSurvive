@@ -2,15 +2,74 @@ syntax = "proto3";
 
 option csharp_namespace = "NeoSurvive.Network.Protocol";
 
-// 게임 패킷 - UDP로 전송될 플레이어 위치 데이터
-message GamePacket {
-  uint32 player_id = 1;   // 문자열보다 정수 ID가 효율적
-  int64 timestamp = 2;    // 순서 보장을 위한 타임스탬프
+// --- 공용 열거형 ---
+
+enum ActionType {
+  ATTACK = 0;
+  SKILL = 1;
+  NEURAL_LINK = 2;
+  ITEM_PICKUP = 3;
+  DAMAGE = 4;
+  DEAD = 5;
+  LEVEL_UP = 6;
+}
+
+// --- 메시지 정의 ---
+
+// [Periodic] 플레이어 이동 데이터 (UDP 30Hz)
+message PlayerMove {
+  uint32 player_id = 1;
+  int64 timestamp = 2;
+  float pos_x = 3;
+  float pos_y = 4;
+  float vel_x = 5; // 추측 항법(Dead Reckoning)을 위한 속도
+  float vel_y = 6;
+}
+
+// [Event] 플레이어 액션 및 상호작용 (Event-based)
+message PlayerAction {
+  uint32 player_id = 1;
+  ActionType action_type = 2;
+  uint32 target_id = 3;      // 대상 ID (적, 아이템 등)
+  float pos_x = 4;           // 발생 위치
+  float pos_y = 5;
+  float dir_x = 6;           // 조준 방향
+  float dir_y = 7;
+  uint32 value = 8;          // 대미지, 스킬/아이템 고유 번호 등
+}
+
+// [Snapshot] 적(Enemy) 상태 정보
+message EnemyState {
+  uint32 enemy_id = 1;
+  uint32 type_id = 2;
+  float pos_x = 3;
+  float pos_y = 4;
+  uint32 current_hp = 5;
+}
+
+// [Snapshot] 드롭 아이템(Item/ExpOrb) 정보
+message ItemState {
+  uint32 item_id = 1;
+  uint32 type_id = 2;
   float pos_x = 3;
   float pos_y = 4;
 }
 
+// [Periodic] 월드 스냅샷 (서버 브로드캐스트)
 message GameSnapshot {
   int64 timestamp = 1;
-  repeated GamePacket player_states = 2;
+  float game_time = 2;       // 동기화된 게임 시간
+  repeated PlayerMove player_states = 3;
+  repeated EnemyState enemy_states = 4;
+  repeated ItemState item_states = 5;
+}
+
+// --- Wrapper 메시지 (메시지 구분용) ---
+
+message GamePacket {
+  oneof payload {
+    PlayerMove move = 1;
+    PlayerAction action = 2;
+    GameSnapshot snapshot = 3;
+  }
 }

@@ -58,6 +58,7 @@ public class UDPClient : MonoBehaviour
     if (!_allPlayers.ContainsKey(id))
     {
       _allPlayers[id] = player;
+      player.IsLocal = isLocal; // [추가] 로컬 여부 설정
       if (isLocal) _localPlayer = player;
       Debug.Log($"[UDP] 플레이어 등록 완료: ID {id}, Local: {isLocal}");
     }
@@ -189,7 +190,7 @@ public class UDPClient : MonoBehaviour
       int myId = DBManager.Instance?.PlayerId ?? 1;
 
       // 패킷 생성
-      GamePacket packet = new GamePacket
+      PlayerMove packet = new PlayerMove
       {
         PlayerId = (uint)myId,
         Timestamp = DateTimeOffset.UtcNow.Ticks,
@@ -197,14 +198,25 @@ public class UDPClient : MonoBehaviour
         PosY = _localPlayer.transform.position.y
       };
 
+      // 리지드바디가 있으면 속도 정보 추가 (추측 항법용)
+      var rb = _localPlayer.GetComponent<Rigidbody2D>();
+      if (rb != null)
+      {
+        packet.VelX = rb.velocity.x;
+        packet.VelY = rb.velocity.y;
+      }
+
+      // 최종 패킷 래핑
+      GamePacket gamePacket = new GamePacket { Move = packet };
+
       // 직렬화
-      byte[] sendData = packet.ToByteArray();
+      byte[] sendData = gamePacket.ToByteArray();
 
       // [중요] UDP 송신 주소 재확인 및 전송
       int sentBytes = client.Send(sendData, sendData.Length, serverEndpoint);
 
       if (showDebugLog)
-        Debug.Log($"[UDP] 패킷 송신 시도: {sentBytes} bytes -> {serverEndpoint.Address}:{serverEndpoint.Port}");
+        Debug.Log($"[UDP] 이동 패킷 송신: {sentBytes} bytes");
     }
     catch (Exception e)
     {
@@ -236,36 +248,17 @@ public class UDPClient : MonoBehaviour
           Debug.Log($"[UDP 수신] 원본 데이터: {receivedData.Length} bytes from {result.RemoteEndPoint}");
         }
 
-        // 수신된 데이터 처리
-        GameSnapshot snapshot = GameSnapshot.Parser.ParseFrom(receivedData);
+        // 수신된 데이터 처리 (래퍼 메시지)
+        GamePacket gamePacket = GamePacket.Parser.ParseFrom(receivedData);
 
-        // 모든 플레이어 상태 업데이트
-        foreach (var playerState in snapshot.PlayerStates)
+        switch (gamePacket.PayloadCase)
         {
-          uint playerId = playerState.PlayerId;
-
-          // 원격 플레이어 데이터 업데이트
-          if (!remotePlayerData.ContainsKey(playerId))
-          {
-            remotePlayerData[playerId] = new RemotePlayerData();
-            if (showDebugLog)
-            {
-              Debug.Log($"[UDP] 새로운 원격 플레이어 등록: ID={playerId}");
-            }
-          }
-
-          remotePlayerData[playerId].targetPosition = new Vector2(playerState.PosX, playerState.PosY);
-          remotePlayerData[playerId].lastUpdateTime = playerState.Timestamp;
-
-          if (showDebugLog)
-          {
-            Debug.Log($"[UDP] Player {playerId}: Pos=({playerState.PosX:F2}, {playerState.PosY:F2}), Time={playerState.Timestamp}");
-          }
-        }
-
-        if (showDebugLog)
-        {
-          Debug.Log($"[UDP 스냅샷] TimeStamp={snapshot.Timestamp}, 플레이어 수={snapshot.PlayerStates.Count}");
+          case GamePacket.PayloadOneofCase.Snapshot:
+            HandleSnapshot(gamePacket.Snapshot);
+            break;
+          case GamePacket.PayloadOneofCase.Action:
+            HandleAction(gamePacket.Action);
+            break;
         }
       }
       catch (Exception e)
@@ -273,6 +266,85 @@ public class UDPClient : MonoBehaviour
         Debug.LogError($"[UDP] 수신 예외 발생: {e.Message}");
         isConnected = false;
       }
+    }
+  }
+
+  private void HandleSnapshot(GameSnapshot snapshot)
+  {
+    // 모든 플레이어 위치 업데이트
+    foreach (var playerState in snapshot.PlayerStates)
+    {
+      uint playerId = playerState.PlayerId;
+
+      if (!remotePlayerData.ContainsKey(playerId))
+      {
+        remotePlayerData[playerId] = new RemotePlayerData();
+      }
+
+      remotePlayerData[playerId].targetPosition = new Vector2(playerState.PosX, playerState.PosY);
+      remotePlayerData[playerId].lastUpdateTime = playerState.Timestamp;
+    }
+
+    if (showDebugLog)
+    {
+      Debug.Log($"[UDP 스냅샷] Time={snapshot.GameTime}, 플레이어={snapshot.PlayerStates.Count}");
+    }
+  }
+
+  private void HandleAction(PlayerAction action)
+  {
+    // 로컬 플레이어의 액션이 서버를 거쳐 돌아온 경우 무시 (보통 서버가 필터링해줌)
+    int myId = DBManager.Instance?.PlayerId ?? 1;
+    if (action.PlayerId == (uint)myId) return;
+
+    if (_allPlayers.TryGetValue((int)action.PlayerId, out Player player))
+    {
+      switch (action.ActionType)
+      {
+        case ActionType.NeuralLink:
+          player.ExecuteNeuralLink();
+          break;
+        case ActionType.Attack:
+          player.ExecuteAttack((int)action.Value, new Vector2(action.DirX, action.DirY));
+          break;
+          // 다른 액션(공격 등) 추가 가능
+      }
+    }
+  }
+
+  /// <summary>
+  /// 플레이어의 액션(공격, 스킬 등)을 서버로 전송 (이벤트 기반)
+  /// </summary>
+  public void SendAction(ActionType type, uint targetId = 0, Vector2 direction = default, uint value = 0)
+  {
+    if (!isConnected || client == null) return;
+
+    try
+    {
+      int myId = DBManager.Instance?.PlayerId ?? 1;
+
+      PlayerAction action = new PlayerAction
+      {
+        PlayerId = (uint)myId,
+        ActionType = type,
+        TargetId = targetId,
+        PosX = _localPlayer ? _localPlayer.transform.position.x : 0,
+        PosY = _localPlayer ? _localPlayer.transform.position.y : 0,
+        DirX = direction.x,
+        DirY = direction.y,
+        Value = value
+      };
+
+      GamePacket gamePacket = new GamePacket { Action = action };
+      byte[] sendData = gamePacket.ToByteArray();
+      client.Send(sendData, sendData.Length, serverEndpoint);
+
+      if (showDebugLog)
+        Debug.Log($"[UDP 액션] 전송: {type}, Target={targetId}");
+    }
+    catch (Exception e)
+    {
+      Debug.LogError($"[UDP 액션] 전송 실패: {e.Message}");
     }
   }
 

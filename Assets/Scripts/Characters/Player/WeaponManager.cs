@@ -82,6 +82,22 @@ namespace NeoSurvive.Weapon
         AddWeapon(allWeaponDatas[index]);
       }
     }
+    /// <summary>
+    /// [Coop] 특정 무기의 공격을 실행 (원격 동기화용)
+    /// </summary>
+    public void ExecuteWeaponAttack(int weaponIndex, Vector3 direction)
+    {
+      // 현재 예시에서는 allWeaponDatas의 인덱스를 무기 식별자로 사용
+      if (weaponIndex >= 0 && weaponIndex < allWeaponDatas.Count)
+      {
+        WeaponBase data = allWeaponDatas[weaponIndex];
+        if (spawnedWeapons.TryGetValue(data, out GameObject weaponObj))
+        {
+          weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
+        }
+      }
+    }
+
     void Update()
     {
       // 테스트용: allWeaponDatas 리스트의 인덱스를 사용하여 테스트

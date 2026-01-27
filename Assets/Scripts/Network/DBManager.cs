@@ -59,6 +59,13 @@ namespace NeoSurvive.Network
         PlayerPrefs.SetString("DeviceUID", uid);
         PlayerPrefs.Save();
       }
+
+      // [ParrelSync 지원] 클론 클라이언트인 경우 UID를 구분하여 중복 로그인 방지
+      if (Application.dataPath.Contains("_clone"))
+      {
+        uid += "_clone";
+      }
+
       return uid;
     }
 

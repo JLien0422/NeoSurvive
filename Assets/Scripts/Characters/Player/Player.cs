@@ -198,16 +198,72 @@ public class Player : Character
   // 플레이어에게 특화된 죽음 처리 로직을 구현합니다.
   protected override void Die()
   {
+    if (IsDead) return;
+    base.Die();
+
     Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
 
+    // [Coop] 로컬 플레이어인 경우 서버에 죽음 알림
+    if (IsLocal && UDPClient.Instance != null)
+    {
+      UDPClient.Instance.SendAction(ActionType.Dead);
+    }
+
     // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
-    if (GameManager.Instance != null)
+    if (GameManager.Instance != null && IsLocal)
     {
       GameManager.Instance.OnPlayerDeath();
     }
 
-    // 요청에 따라 게임 오브젝트를 파괴합니다.
-    Destroy(gameObject);
+    // 멀티플레이어인 경우 파괴하지 않고 비활성화 처리 (부활 가능성을 위해)
+    if (UDPClient.Instance != null)
+    {
+      // 시각적으로 죽었음을 표시 (투명도 조절)
+      var rb = GetComponent<Rigidbody2D>();
+      if (rb != null) rb.velocity = Vector2.zero;
+
+      var controller = GetComponent<PlayerController>();
+      if (controller != null) controller.enabled = false;
+
+      var sprite = GetComponentInChildren<SpriteRenderer>();
+      if (sprite != null)
+      {
+        Color c = sprite.color;
+        c.a = 0.3f;
+        sprite.color = c;
+      }
+    }
+    else
+    {
+      // 싱글플레이인 경우 요청에 따라 게임 오브젝트를 파괴합니다.
+      Destroy(gameObject);
+    }
+  }
+
+  /// <summary>
+  /// 플레이어를 부활시킵니다.
+  /// </summary>
+  public override void Revive(float healthRatio = 1.0f)
+  {
+    base.Revive(healthRatio);
+
+    // 컨트롤러 재활성화 (로컬인 경우만)
+    var controller = GetComponent<PlayerController>();
+    if (controller != null && IsLocal)
+    {
+      controller.enabled = true;
+    }
+
+    // 시각적 복구
+    var sprite = GetComponentInChildren<SpriteRenderer>();
+    if (sprite != null)
+    {
+      Color c = sprite.color;
+      c.a = 1.0f;
+      sprite.color = c;
+    }
+
+    Debug.Log($"[Player] {gameObject.name} 부활 완료 (HP Ratio: {healthRatio})");
   }
 
   // 플레이어가 경험치를 얻었을 때 호출되는 메서드입니다.

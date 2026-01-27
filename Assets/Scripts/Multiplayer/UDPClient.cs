@@ -119,7 +119,8 @@ public class UDPClient : MonoBehaviour
         PlayerId = (uint)myId,
         Timestamp = DateTimeOffset.UtcNow.Ticks,
         PosX = _localPlayer.transform.position.x,
-        PosY = _localPlayer.transform.position.y
+        PosY = _localPlayer.transform.position.y,
+        IsDead = _localPlayer.IsDead
       };
 
       var rb = _localPlayer.GetComponent<Rigidbody2D>();
@@ -130,7 +131,7 @@ public class UDPClient : MonoBehaviour
       }
 
       // Wrapper 사용
-      GamePacket packet = new GamePacket { Move = move };
+      GamePacket packet = new GamePacket { PlayerMove = move };
       byte[] sendData = packet.ToByteArray();
       client.Send(sendData, sendData.Length, serverEndpoint);
     }
@@ -162,13 +163,13 @@ public class UDPClient : MonoBehaviour
         GamePacket wrapper = GamePacket.Parser.ParseFrom(data);
         switch (wrapper.PayloadCase)
         {
-          case GamePacket.PayloadOneofCase.Snapshot:
-            HandleSnapshot(wrapper.Snapshot);
+          case GamePacket.PayloadOneofCase.GameSnapshot:
+            HandleSnapshot(wrapper.GameSnapshot);
             break;
-          case GamePacket.PayloadOneofCase.Action:
-            HandleAction(wrapper.Action);
+          case GamePacket.PayloadOneofCase.PlayerAction:
+            HandleAction(wrapper.PlayerAction);
             break;
-          case GamePacket.PayloadOneofCase.Move:
+          case GamePacket.PayloadOneofCase.PlayerMove:
             // 피어 간 직접 이동 정보 수신 시 (서버 로직에 따라 다름)
             break;
         }
@@ -195,8 +196,18 @@ public class UDPClient : MonoBehaviour
       remotePlayerData[playerId].targetPosition = new Vector2(pState.PosX, pState.PosY);
       remotePlayerData[playerId].lastUpdateTime = pState.Timestamp;
 
-      // 디버그 로그 (선택 사항)
-      // if (showDebugLog) Debug.Log($"[UDP] Player {playerId} 위치 수신");
+      // [Coop] 원격 플레이어 사망 상태 동기화
+      if (_allPlayers.TryGetValue((int)playerId, out Player player))
+      {
+        if (pState.IsDead && !player.IsDead)
+        {
+          player.SetHealth(0);
+        }
+        else if (!pState.IsDead && player.IsDead)
+        {
+          player.Revive();
+        }
+      }
     }
 
     // [Coop] 적(Enemy) 위치 동기화 추가
@@ -221,6 +232,12 @@ public class UDPClient : MonoBehaviour
         case ActionType.Attack:
           player.ExecuteAttack((int)action.Value, new Vector2(action.DirX, action.DirY));
           break;
+        case ActionType.Dead:
+          player.SetHealth(0);
+          break;
+        case ActionType.Revive:
+          player.Revive();
+          break;
       }
     }
   }
@@ -241,7 +258,7 @@ public class UDPClient : MonoBehaviour
         DirY = direction.y,
         Value = value
       };
-      GamePacket packet = new GamePacket { Action = action };
+      GamePacket packet = new GamePacket { PlayerAction = action };
       byte[] sendData = packet.ToByteArray();
       client.Send(sendData, sendData.Length, serverEndpoint);
     }

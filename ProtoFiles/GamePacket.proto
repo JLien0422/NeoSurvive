@@ -12,9 +12,21 @@ enum ActionType {
   DAMAGE = 4;
   DEAD = 5;
   LEVEL_UP = 6;
+  REVIVE = 7;
 }
 
 // --- 메시지 정의 ---
+
+// [Periodic] 메인 패킷 컨테이너 (클라이언트-서버 통신용)
+message GamePacket {
+  oneof payload {
+    PlayerMove player_move = 1;
+    PlayerAction player_action = 2;
+    GameSnapshot game_snapshot = 3;
+    EnemyState enemy_state = 4;
+    ItemState item_state = 5;
+  }
+}
 
 // [Periodic] 플레이어 이동 데이터 (UDP 30Hz)
 message PlayerMove {
@@ -24,6 +36,7 @@ message PlayerMove {
   float pos_y = 4;
   float vel_x = 5; // 추측 항법(Dead Reckoning)을 위한 속도
   float vel_y = 6;
+  bool is_dead = 7; // 사망 여부
 }
 
 // [Event] 플레이어 액션 및 상호작용 (Event-based)
@@ -62,14 +75,4 @@ message GameSnapshot {
   repeated PlayerMove player_states = 3;
   repeated EnemyState enemy_states = 4;
   repeated ItemState item_states = 5;
-}
-
-// --- Wrapper 메시지 (메시지 구분용) ---
-
-message GamePacket {
-  oneof payload {
-    PlayerMove move = 1;
-    PlayerAction action = 2;
-    GameSnapshot snapshot = 3;
-  }
 }

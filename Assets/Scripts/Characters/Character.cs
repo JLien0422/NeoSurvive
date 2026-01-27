@@ -39,8 +39,13 @@ public abstract class Character : MonoBehaviour
     OnHealthChanged?.Invoke(currentHealth, healthStat.GetValue());
   }
 
+  // 캐릭터의 사망 여부
+  public bool IsDead { get; protected set; } = false;
+
   public virtual void TakeDamage(float amount)
   {
+    if (IsDead) return;
+
     currentHealth -= amount;
 
     // 데미지 텍스트 표시
@@ -64,8 +69,38 @@ public abstract class Character : MonoBehaviour
   // 캐릭터가 죽었을 때 호출되는 가상 메서드입니다.
   protected virtual void Die()
   {
+    if (IsDead) return;
+    IsDead = true;
     Debug.Log($"{gameObject.name}이(가) 사망했습니다.");
-    // 여기에 기본적인 죽음 처리 로직을 구현합니다. (예: 게임 오브젝트 비활성화, 애니메이션 재생 등)
+  }
+
+  /// <summary>
+  /// 캐릭터를 부활시킵니다.
+  /// </summary>
+  public virtual void Revive(float healthRatio = 1.0f)
+  {
+    IsDead = false;
+    currentHealth = healthStat.GetValue() * healthRatio;
+    NotifyHealthChanged();
+    Debug.Log($"{gameObject.name}이(가) 부활했습니다.");
+  }
+
+  /// <summary>
+  /// 체력을 직접 설정합니다 (네트워크 동기화용)
+  /// </summary>
+  public virtual void SetHealth(float health)
+  {
+    currentHealth = health;
+    NotifyHealthChanged();
+
+    if (currentHealth <= 0 && !IsDead)
+    {
+      Die();
+    }
+    else if (currentHealth > 0 && IsDead)
+    {
+      Revive(currentHealth / healthStat.GetValue());
+    }
   }
 
   /// <summary>

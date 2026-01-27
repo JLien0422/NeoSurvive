@@ -59,6 +59,8 @@ public class GameManager : MonoBehaviour
     // GameServerAPI 초기화 대기 후 데이터 로드
     await LoadTotalGoldAsync();
 
+    startTime = Time.time;
+
     // 멀티플레이 환경인지 확인
     bool isMultiplayer = UDPClient.Instance != null;
 

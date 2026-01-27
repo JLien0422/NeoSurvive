@@ -88,6 +88,10 @@ namespace NeoSurvive.Network
         EnemyProxy proxy = obj.GetComponent<EnemyProxy>();
         if (proxy == null) proxy = obj.AddComponent<EnemyProxy>();
 
+        // [Coop] 기존 싱글용 AI 컨트롤러가 있다면 비활성화
+        EnemyController localAI = obj.GetComponent<EnemyController>();
+        if (localAI != null) localAI.enabled = false;
+
         proxy.Initialize(state.EnemyId);
         activeEnemies.Add(state.EnemyId, proxy);
       }

@@ -24,35 +24,38 @@ namespace NeoSurvive.Network.Protocol {
     static GamePacketReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChBHYW1lUGFja2V0LnByb3RvIm4KClBsYXllck1vdmUSEQoJcGxheWVyX2lk",
-            "GAEgASgNEhEKCXRpbWVzdGFtcBgCIAEoAxINCgVwb3NfeBgDIAEoAhINCgVw",
-            "b3NfeRgEIAEoAhINCgV2ZWxfeBgFIAEoAhINCgV2ZWxfeRgGIAEoAiKhAQoM",
-            "UGxheWVyQWN0aW9uEhEKCXBsYXllcl9pZBgBIAEoDRIgCgthY3Rpb25fdHlw",
-            "ZRgCIAEoDjILLkFjdGlvblR5cGUSEQoJdGFyZ2V0X2lkGAMgASgNEg0KBXBv",
-            "c194GAQgASgCEg0KBXBvc195GAUgASgCEg0KBWRpcl94GAYgASgCEg0KBWRp",
-            "cl95GAcgASgCEg0KBXZhbHVlGAggASgNImEKCkVuZW15U3RhdGUSEAoIZW5l",
-            "bXlfaWQYASABKA0SDwoHdHlwZV9pZBgCIAEoDRINCgVwb3NfeBgDIAEoAhIN",
-            "CgVwb3NfeRgEIAEoAhISCgpjdXJyZW50X2hwGAUgASgNIksKCUl0ZW1TdGF0",
-            "ZRIPCgdpdGVtX2lkGAEgASgNEg8KB3R5cGVfaWQYAiABKA0SDQoFcG9zX3gY",
-            "AyABKAISDQoFcG9zX3kYBCABKAIinAEKDEdhbWVTbmFwc2hvdBIRCgl0aW1l",
-            "c3RhbXAYASABKAMSEQoJZ2FtZV90aW1lGAIgASgCEiIKDXBsYXllcl9zdGF0",
-            "ZXMYAyADKAsyCy5QbGF5ZXJNb3ZlEiEKDGVuZW15X3N0YXRlcxgEIAMoCzIL",
-            "LkVuZW15U3RhdGUSHwoLaXRlbV9zdGF0ZXMYBSADKAsyCi5JdGVtU3RhdGUi",
-            "eAoKR2FtZVBhY2tldBIbCgRtb3ZlGAEgASgLMgsuUGxheWVyTW92ZUgAEh8K",
-            "BmFjdGlvbhgCIAEoCzINLlBsYXllckFjdGlvbkgAEiEKCHNuYXBzaG90GAMg",
-            "ASgLMg0uR2FtZVNuYXBzaG90SABCCQoHcGF5bG9hZCppCgpBY3Rpb25UeXBl",
-            "EgoKBkFUVEFDSxAAEgkKBVNLSUxMEAESDwoLTkVVUkFMX0xJTksQAhIPCgtJ",
-            "VEVNX1BJQ0tVUBADEgoKBkRBTUFHRRAEEggKBERFQUQQBRIMCghMRVZFTF9V",
-            "UBAGQh6qAhtOZW9TdXJ2aXZlLk5ldHdvcmsuUHJvdG9jb2xiBnByb3RvMw=="));
+            "ChBHYW1lUGFja2V0LnByb3RvItEBCgpHYW1lUGFja2V0EiIKC3BsYXllcl9t",
+            "b3ZlGAEgASgLMgsuUGxheWVyTW92ZUgAEiYKDXBsYXllcl9hY3Rpb24YAiAB",
+            "KAsyDS5QbGF5ZXJBY3Rpb25IABImCg1nYW1lX3NuYXBzaG90GAMgASgLMg0u",
+            "R2FtZVNuYXBzaG90SAASIgoLZW5lbXlfc3RhdGUYBCABKAsyCy5FbmVteVN0",
+            "YXRlSAASIAoKaXRlbV9zdGF0ZRgFIAEoCzIKLkl0ZW1TdGF0ZUgAQgkKB3Bh",
+            "eWxvYWQifwoKUGxheWVyTW92ZRIRCglwbGF5ZXJfaWQYASABKA0SEQoJdGlt",
+            "ZXN0YW1wGAIgASgDEg0KBXBvc194GAMgASgCEg0KBXBvc195GAQgASgCEg0K",
+            "BXZlbF94GAUgASgCEg0KBXZlbF95GAYgASgCEg8KB2lzX2RlYWQYByABKAgi",
+            "oQEKDFBsYXllckFjdGlvbhIRCglwbGF5ZXJfaWQYASABKA0SIAoLYWN0aW9u",
+            "X3R5cGUYAiABKA4yCy5BY3Rpb25UeXBlEhEKCXRhcmdldF9pZBgDIAEoDRIN",
+            "CgVwb3NfeBgEIAEoAhINCgVwb3NfeRgFIAEoAhINCgVkaXJfeBgGIAEoAhIN",
+            "CgVkaXJfeRgHIAEoAhINCgV2YWx1ZRgIIAEoDSJhCgpFbmVteVN0YXRlEhAK",
+            "CGVuZW15X2lkGAEgASgNEg8KB3R5cGVfaWQYAiABKA0SDQoFcG9zX3gYAyAB",
+            "KAISDQoFcG9zX3kYBCABKAISEgoKY3VycmVudF9ocBgFIAEoDSJLCglJdGVt",
+            "U3RhdGUSDwoHaXRlbV9pZBgBIAEoDRIPCgd0eXBlX2lkGAIgASgNEg0KBXBv",
+            "c194GAMgASgCEg0KBXBvc195GAQgASgCIpwBCgxHYW1lU25hcHNob3QSEQoJ",
+            "dGltZXN0YW1wGAEgASgDEhEKCWdhbWVfdGltZRgCIAEoAhIiCg1wbGF5ZXJf",
+            "c3RhdGVzGAMgAygLMgsuUGxheWVyTW92ZRIhCgxlbmVteV9zdGF0ZXMYBCAD",
+            "KAsyCy5FbmVteVN0YXRlEh8KC2l0ZW1fc3RhdGVzGAUgAygLMgouSXRlbVN0",
+            "YXRlKnUKCkFjdGlvblR5cGUSCgoGQVRUQUNLEAASCQoFU0tJTEwQARIPCgtO",
+            "RVVSQUxfTElOSxACEg8KC0lURU1fUElDS1VQEAMSCgoGREFNQUdFEAQSCAoE",
+            "REVBRBAFEgwKCExFVkVMX1VQEAYSCgoGUkVWSVZFEAdCHqoCG05lb1N1cnZp",
+            "dmUuTmV0d29yay5Qcm90b2NvbGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::NeoSurvive.Network.Protocol.ActionType), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerMove), global::NeoSurvive.Network.Protocol.PlayerMove.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY", "VelX", "VelY" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "PlayerMove", "PlayerAction", "GameSnapshot", "EnemyState", "ItemState" }, new[]{ "Payload" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerMove), global::NeoSurvive.Network.Protocol.PlayerMove.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY", "VelX", "VelY", "IsDead" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.EnemyState), global::NeoSurvive.Network.Protocol.EnemyState.Parser, new[]{ "EnemyId", "TypeId", "PosX", "PosY", "CurrentHp" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.ItemState), global::NeoSurvive.Network.Protocol.ItemState.Parser, new[]{ "ItemId", "TypeId", "PosX", "PosY" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "GameTime", "PlayerStates", "EnemyStates", "ItemStates" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "Move", "Action", "Snapshot" }, new[]{ "Payload" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "GameTime", "PlayerStates", "EnemyStates", "ItemStates" }, null, null, null, null)
           }));
     }
     #endregion
@@ -67,11 +70,460 @@ namespace NeoSurvive.Network.Protocol {
     [pbr::OriginalName("DAMAGE")] Damage = 4,
     [pbr::OriginalName("DEAD")] Dead = 5,
     [pbr::OriginalName("LEVEL_UP")] LevelUp = 6,
+    [pbr::OriginalName("REVIVE")] Revive = 7,
   }
 
   #endregion
 
   #region Messages
+  /// <summary>
+  /// [Periodic] 메인 패킷 컨테이너 (클라이언트-서버 통신용)
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class GamePacket : pb::IMessage<GamePacket>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<GamePacket> _parser = new pb::MessageParser<GamePacket>(() => new GamePacket());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<GamePacket> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket(GamePacket other) : this() {
+      switch (other.PayloadCase) {
+        case PayloadOneofCase.PlayerMove:
+          PlayerMove = other.PlayerMove.Clone();
+          break;
+        case PayloadOneofCase.PlayerAction:
+          PlayerAction = other.PlayerAction.Clone();
+          break;
+        case PayloadOneofCase.GameSnapshot:
+          GameSnapshot = other.GameSnapshot.Clone();
+          break;
+        case PayloadOneofCase.EnemyState:
+          EnemyState = other.EnemyState.Clone();
+          break;
+        case PayloadOneofCase.ItemState:
+          ItemState = other.ItemState.Clone();
+          break;
+      }
+
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public GamePacket Clone() {
+      return new GamePacket(this);
+    }
+
+    /// <summary>Field number for the "player_move" field.</summary>
+    public const int PlayerMoveFieldNumber = 1;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.PlayerMove PlayerMove {
+      get { return payloadCase_ == PayloadOneofCase.PlayerMove ? (global::NeoSurvive.Network.Protocol.PlayerMove) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.PlayerMove;
+      }
+    }
+
+    /// <summary>Field number for the "player_action" field.</summary>
+    public const int PlayerActionFieldNumber = 2;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.PlayerAction PlayerAction {
+      get { return payloadCase_ == PayloadOneofCase.PlayerAction ? (global::NeoSurvive.Network.Protocol.PlayerAction) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.PlayerAction;
+      }
+    }
+
+    /// <summary>Field number for the "game_snapshot" field.</summary>
+    public const int GameSnapshotFieldNumber = 3;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.GameSnapshot GameSnapshot {
+      get { return payloadCase_ == PayloadOneofCase.GameSnapshot ? (global::NeoSurvive.Network.Protocol.GameSnapshot) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.GameSnapshot;
+      }
+    }
+
+    /// <summary>Field number for the "enemy_state" field.</summary>
+    public const int EnemyStateFieldNumber = 4;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.EnemyState EnemyState {
+      get { return payloadCase_ == PayloadOneofCase.EnemyState ? (global::NeoSurvive.Network.Protocol.EnemyState) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.EnemyState;
+      }
+    }
+
+    /// <summary>Field number for the "item_state" field.</summary>
+    public const int ItemStateFieldNumber = 5;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.ItemState ItemState {
+      get { return payloadCase_ == PayloadOneofCase.ItemState ? (global::NeoSurvive.Network.Protocol.ItemState) payload_ : null; }
+      set {
+        payload_ = value;
+        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.ItemState;
+      }
+    }
+
+    private object payload_;
+    /// <summary>Enum of possible cases for the "payload" oneof.</summary>
+    public enum PayloadOneofCase {
+      None = 0,
+      PlayerMove = 1,
+      PlayerAction = 2,
+      GameSnapshot = 3,
+      EnemyState = 4,
+      ItemState = 5,
+    }
+    private PayloadOneofCase payloadCase_ = PayloadOneofCase.None;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PayloadOneofCase PayloadCase {
+      get { return payloadCase_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearPayload() {
+      payloadCase_ = PayloadOneofCase.None;
+      payload_ = null;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as GamePacket);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(GamePacket other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(PlayerMove, other.PlayerMove)) return false;
+      if (!object.Equals(PlayerAction, other.PlayerAction)) return false;
+      if (!object.Equals(GameSnapshot, other.GameSnapshot)) return false;
+      if (!object.Equals(EnemyState, other.EnemyState)) return false;
+      if (!object.Equals(ItemState, other.ItemState)) return false;
+      if (PayloadCase != other.PayloadCase) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (payloadCase_ == PayloadOneofCase.PlayerMove) hash ^= PlayerMove.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.PlayerAction) hash ^= PlayerAction.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.GameSnapshot) hash ^= GameSnapshot.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.EnemyState) hash ^= EnemyState.GetHashCode();
+      if (payloadCase_ == PayloadOneofCase.ItemState) hash ^= ItemState.GetHashCode();
+      hash ^= (int) payloadCase_;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (payloadCase_ == PayloadOneofCase.PlayerMove) {
+        output.WriteRawTag(10);
+        output.WriteMessage(PlayerMove);
+      }
+      if (payloadCase_ == PayloadOneofCase.PlayerAction) {
+        output.WriteRawTag(18);
+        output.WriteMessage(PlayerAction);
+      }
+      if (payloadCase_ == PayloadOneofCase.GameSnapshot) {
+        output.WriteRawTag(26);
+        output.WriteMessage(GameSnapshot);
+      }
+      if (payloadCase_ == PayloadOneofCase.EnemyState) {
+        output.WriteRawTag(34);
+        output.WriteMessage(EnemyState);
+      }
+      if (payloadCase_ == PayloadOneofCase.ItemState) {
+        output.WriteRawTag(42);
+        output.WriteMessage(ItemState);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (payloadCase_ == PayloadOneofCase.PlayerMove) {
+        output.WriteRawTag(10);
+        output.WriteMessage(PlayerMove);
+      }
+      if (payloadCase_ == PayloadOneofCase.PlayerAction) {
+        output.WriteRawTag(18);
+        output.WriteMessage(PlayerAction);
+      }
+      if (payloadCase_ == PayloadOneofCase.GameSnapshot) {
+        output.WriteRawTag(26);
+        output.WriteMessage(GameSnapshot);
+      }
+      if (payloadCase_ == PayloadOneofCase.EnemyState) {
+        output.WriteRawTag(34);
+        output.WriteMessage(EnemyState);
+      }
+      if (payloadCase_ == PayloadOneofCase.ItemState) {
+        output.WriteRawTag(42);
+        output.WriteMessage(ItemState);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (payloadCase_ == PayloadOneofCase.PlayerMove) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(PlayerMove);
+      }
+      if (payloadCase_ == PayloadOneofCase.PlayerAction) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(PlayerAction);
+      }
+      if (payloadCase_ == PayloadOneofCase.GameSnapshot) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(GameSnapshot);
+      }
+      if (payloadCase_ == PayloadOneofCase.EnemyState) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(EnemyState);
+      }
+      if (payloadCase_ == PayloadOneofCase.ItemState) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ItemState);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(GamePacket other) {
+      if (other == null) {
+        return;
+      }
+      switch (other.PayloadCase) {
+        case PayloadOneofCase.PlayerMove:
+          if (PlayerMove == null) {
+            PlayerMove = new global::NeoSurvive.Network.Protocol.PlayerMove();
+          }
+          PlayerMove.MergeFrom(other.PlayerMove);
+          break;
+        case PayloadOneofCase.PlayerAction:
+          if (PlayerAction == null) {
+            PlayerAction = new global::NeoSurvive.Network.Protocol.PlayerAction();
+          }
+          PlayerAction.MergeFrom(other.PlayerAction);
+          break;
+        case PayloadOneofCase.GameSnapshot:
+          if (GameSnapshot == null) {
+            GameSnapshot = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+          }
+          GameSnapshot.MergeFrom(other.GameSnapshot);
+          break;
+        case PayloadOneofCase.EnemyState:
+          if (EnemyState == null) {
+            EnemyState = new global::NeoSurvive.Network.Protocol.EnemyState();
+          }
+          EnemyState.MergeFrom(other.EnemyState);
+          break;
+        case PayloadOneofCase.ItemState:
+          if (ItemState == null) {
+            ItemState = new global::NeoSurvive.Network.Protocol.ItemState();
+          }
+          ItemState.MergeFrom(other.ItemState);
+          break;
+      }
+
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
+            if (payloadCase_ == PayloadOneofCase.PlayerMove) {
+              subBuilder.MergeFrom(PlayerMove);
+            }
+            input.ReadMessage(subBuilder);
+            PlayerMove = subBuilder;
+            break;
+          }
+          case 18: {
+            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
+            if (payloadCase_ == PayloadOneofCase.PlayerAction) {
+              subBuilder.MergeFrom(PlayerAction);
+            }
+            input.ReadMessage(subBuilder);
+            PlayerAction = subBuilder;
+            break;
+          }
+          case 26: {
+            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+            if (payloadCase_ == PayloadOneofCase.GameSnapshot) {
+              subBuilder.MergeFrom(GameSnapshot);
+            }
+            input.ReadMessage(subBuilder);
+            GameSnapshot = subBuilder;
+            break;
+          }
+          case 34: {
+            global::NeoSurvive.Network.Protocol.EnemyState subBuilder = new global::NeoSurvive.Network.Protocol.EnemyState();
+            if (payloadCase_ == PayloadOneofCase.EnemyState) {
+              subBuilder.MergeFrom(EnemyState);
+            }
+            input.ReadMessage(subBuilder);
+            EnemyState = subBuilder;
+            break;
+          }
+          case 42: {
+            global::NeoSurvive.Network.Protocol.ItemState subBuilder = new global::NeoSurvive.Network.Protocol.ItemState();
+            if (payloadCase_ == PayloadOneofCase.ItemState) {
+              subBuilder.MergeFrom(ItemState);
+            }
+            input.ReadMessage(subBuilder);
+            ItemState = subBuilder;
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
+            if (payloadCase_ == PayloadOneofCase.PlayerMove) {
+              subBuilder.MergeFrom(PlayerMove);
+            }
+            input.ReadMessage(subBuilder);
+            PlayerMove = subBuilder;
+            break;
+          }
+          case 18: {
+            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
+            if (payloadCase_ == PayloadOneofCase.PlayerAction) {
+              subBuilder.MergeFrom(PlayerAction);
+            }
+            input.ReadMessage(subBuilder);
+            PlayerAction = subBuilder;
+            break;
+          }
+          case 26: {
+            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
+            if (payloadCase_ == PayloadOneofCase.GameSnapshot) {
+              subBuilder.MergeFrom(GameSnapshot);
+            }
+            input.ReadMessage(subBuilder);
+            GameSnapshot = subBuilder;
+            break;
+          }
+          case 34: {
+            global::NeoSurvive.Network.Protocol.EnemyState subBuilder = new global::NeoSurvive.Network.Protocol.EnemyState();
+            if (payloadCase_ == PayloadOneofCase.EnemyState) {
+              subBuilder.MergeFrom(EnemyState);
+            }
+            input.ReadMessage(subBuilder);
+            EnemyState = subBuilder;
+            break;
+          }
+          case 42: {
+            global::NeoSurvive.Network.Protocol.ItemState subBuilder = new global::NeoSurvive.Network.Protocol.ItemState();
+            if (payloadCase_ == PayloadOneofCase.ItemState) {
+              subBuilder.MergeFrom(ItemState);
+            }
+            input.ReadMessage(subBuilder);
+            ItemState = subBuilder;
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   /// <summary>
   /// [Periodic] 플레이어 이동 데이터 (UDP 30Hz)
   /// </summary>
@@ -90,7 +542,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[0]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -116,6 +568,7 @@ namespace NeoSurvive.Network.Protocol {
       posY_ = other.posY_;
       velX_ = other.velX_;
       velY_ = other.velY_;
+      isDead_ = other.isDead_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -200,6 +653,21 @@ namespace NeoSurvive.Network.Protocol {
       }
     }
 
+    /// <summary>Field number for the "is_dead" field.</summary>
+    public const int IsDeadFieldNumber = 7;
+    private bool isDead_;
+    /// <summary>
+    /// 사망 여부
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsDead {
+      get { return isDead_; }
+      set {
+        isDead_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -221,6 +689,7 @@ namespace NeoSurvive.Network.Protocol {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PosY, other.PosY)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(VelX, other.VelX)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(VelY, other.VelY)) return false;
+      if (IsDead != other.IsDead) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -234,6 +703,7 @@ namespace NeoSurvive.Network.Protocol {
       if (PosY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PosY);
       if (VelX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(VelX);
       if (VelY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(VelY);
+      if (IsDead != false) hash ^= IsDead.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -276,6 +746,10 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(53);
         output.WriteFloat(VelY);
       }
+      if (IsDead != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(IsDead);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -310,6 +784,10 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(53);
         output.WriteFloat(VelY);
       }
+      if (IsDead != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(IsDead);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -337,6 +815,9 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (VelY != 0F) {
         size += 1 + 4;
+      }
+      if (IsDead != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -367,6 +848,9 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (other.VelY != 0F) {
         VelY = other.VelY;
+      }
+      if (other.IsDead != false) {
+        IsDead = other.IsDead;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -405,6 +889,10 @@ namespace NeoSurvive.Network.Protocol {
           }
           case 53: {
             VelY = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            IsDead = input.ReadBool();
             break;
           }
         }
@@ -446,6 +934,10 @@ namespace NeoSurvive.Network.Protocol {
             VelY = input.ReadFloat();
             break;
           }
+          case 56: {
+            IsDead = input.ReadBool();
+            break;
+          }
         }
       }
     }
@@ -471,7 +963,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[1]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -935,7 +1427,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[2]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1276,7 +1768,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[3]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1580,7 +2072,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[4]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1864,345 +2356,6 @@ namespace NeoSurvive.Network.Protocol {
           }
           case 42: {
             itemStates_.AddEntriesFrom(ref input, _repeated_itemStates_codec);
-            break;
-          }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
-  public sealed partial class GamePacket : pb::IMessage<GamePacket>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<GamePacket> _parser = new pb::MessageParser<GamePacket>(() => new GamePacket());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<GamePacket> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[5]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket(GamePacket other) : this() {
-      switch (other.PayloadCase) {
-        case PayloadOneofCase.Move:
-          Move = other.Move.Clone();
-          break;
-        case PayloadOneofCase.Action:
-          Action = other.Action.Clone();
-          break;
-        case PayloadOneofCase.Snapshot:
-          Snapshot = other.Snapshot.Clone();
-          break;
-      }
-
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public GamePacket Clone() {
-      return new GamePacket(this);
-    }
-
-    /// <summary>Field number for the "move" field.</summary>
-    public const int MoveFieldNumber = 1;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::NeoSurvive.Network.Protocol.PlayerMove Move {
-      get { return payloadCase_ == PayloadOneofCase.Move ? (global::NeoSurvive.Network.Protocol.PlayerMove) payload_ : null; }
-      set {
-        payload_ = value;
-        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Move;
-      }
-    }
-
-    /// <summary>Field number for the "action" field.</summary>
-    public const int ActionFieldNumber = 2;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::NeoSurvive.Network.Protocol.PlayerAction Action {
-      get { return payloadCase_ == PayloadOneofCase.Action ? (global::NeoSurvive.Network.Protocol.PlayerAction) payload_ : null; }
-      set {
-        payload_ = value;
-        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Action;
-      }
-    }
-
-    /// <summary>Field number for the "snapshot" field.</summary>
-    public const int SnapshotFieldNumber = 3;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::NeoSurvive.Network.Protocol.GameSnapshot Snapshot {
-      get { return payloadCase_ == PayloadOneofCase.Snapshot ? (global::NeoSurvive.Network.Protocol.GameSnapshot) payload_ : null; }
-      set {
-        payload_ = value;
-        payloadCase_ = value == null ? PayloadOneofCase.None : PayloadOneofCase.Snapshot;
-      }
-    }
-
-    private object payload_;
-    /// <summary>Enum of possible cases for the "payload" oneof.</summary>
-    public enum PayloadOneofCase {
-      None = 0,
-      Move = 1,
-      Action = 2,
-      Snapshot = 3,
-    }
-    private PayloadOneofCase payloadCase_ = PayloadOneofCase.None;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public PayloadOneofCase PayloadCase {
-      get { return payloadCase_; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearPayload() {
-      payloadCase_ = PayloadOneofCase.None;
-      payload_ = null;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as GamePacket);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(GamePacket other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (!object.Equals(Move, other.Move)) return false;
-      if (!object.Equals(Action, other.Action)) return false;
-      if (!object.Equals(Snapshot, other.Snapshot)) return false;
-      if (PayloadCase != other.PayloadCase) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (payloadCase_ == PayloadOneofCase.Move) hash ^= Move.GetHashCode();
-      if (payloadCase_ == PayloadOneofCase.Action) hash ^= Action.GetHashCode();
-      if (payloadCase_ == PayloadOneofCase.Snapshot) hash ^= Snapshot.GetHashCode();
-      hash ^= (int) payloadCase_;
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (payloadCase_ == PayloadOneofCase.Move) {
-        output.WriteRawTag(10);
-        output.WriteMessage(Move);
-      }
-      if (payloadCase_ == PayloadOneofCase.Action) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Action);
-      }
-      if (payloadCase_ == PayloadOneofCase.Snapshot) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Snapshot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (payloadCase_ == PayloadOneofCase.Move) {
-        output.WriteRawTag(10);
-        output.WriteMessage(Move);
-      }
-      if (payloadCase_ == PayloadOneofCase.Action) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Action);
-      }
-      if (payloadCase_ == PayloadOneofCase.Snapshot) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Snapshot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (payloadCase_ == PayloadOneofCase.Move) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Move);
-      }
-      if (payloadCase_ == PayloadOneofCase.Action) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Action);
-      }
-      if (payloadCase_ == PayloadOneofCase.Snapshot) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Snapshot);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(GamePacket other) {
-      if (other == null) {
-        return;
-      }
-      switch (other.PayloadCase) {
-        case PayloadOneofCase.Move:
-          if (Move == null) {
-            Move = new global::NeoSurvive.Network.Protocol.PlayerMove();
-          }
-          Move.MergeFrom(other.Move);
-          break;
-        case PayloadOneofCase.Action:
-          if (Action == null) {
-            Action = new global::NeoSurvive.Network.Protocol.PlayerAction();
-          }
-          Action.MergeFrom(other.Action);
-          break;
-        case PayloadOneofCase.Snapshot:
-          if (Snapshot == null) {
-            Snapshot = new global::NeoSurvive.Network.Protocol.GameSnapshot();
-          }
-          Snapshot.MergeFrom(other.Snapshot);
-          break;
-      }
-
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
-            if (payloadCase_ == PayloadOneofCase.Move) {
-              subBuilder.MergeFrom(Move);
-            }
-            input.ReadMessage(subBuilder);
-            Move = subBuilder;
-            break;
-          }
-          case 18: {
-            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
-            if (payloadCase_ == PayloadOneofCase.Action) {
-              subBuilder.MergeFrom(Action);
-            }
-            input.ReadMessage(subBuilder);
-            Action = subBuilder;
-            break;
-          }
-          case 26: {
-            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
-            if (payloadCase_ == PayloadOneofCase.Snapshot) {
-              subBuilder.MergeFrom(Snapshot);
-            }
-            input.ReadMessage(subBuilder);
-            Snapshot = subBuilder;
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            global::NeoSurvive.Network.Protocol.PlayerMove subBuilder = new global::NeoSurvive.Network.Protocol.PlayerMove();
-            if (payloadCase_ == PayloadOneofCase.Move) {
-              subBuilder.MergeFrom(Move);
-            }
-            input.ReadMessage(subBuilder);
-            Move = subBuilder;
-            break;
-          }
-          case 18: {
-            global::NeoSurvive.Network.Protocol.PlayerAction subBuilder = new global::NeoSurvive.Network.Protocol.PlayerAction();
-            if (payloadCase_ == PayloadOneofCase.Action) {
-              subBuilder.MergeFrom(Action);
-            }
-            input.ReadMessage(subBuilder);
-            Action = subBuilder;
-            break;
-          }
-          case 26: {
-            global::NeoSurvive.Network.Protocol.GameSnapshot subBuilder = new global::NeoSurvive.Network.Protocol.GameSnapshot();
-            if (payloadCase_ == PayloadOneofCase.Snapshot) {
-              subBuilder.MergeFrom(Snapshot);
-            }
-            input.ReadMessage(subBuilder);
-            Snapshot = subBuilder;
             break;
           }
         }

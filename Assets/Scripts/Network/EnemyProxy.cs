@@ -34,8 +34,12 @@ namespace NeoSurvive.Network
         isFirstUpdate = false;
       }
 
-      // HP 정보 등 수신 시 갱신 로직 추가 가능
-      // ex) ui.SetHP(state.CurrentHp);
+      // HP 정보 갱신
+      Enemy enemy = GetComponent<Enemy>();
+      if (enemy != null)
+      {
+        enemy.SetHealth(state.CurrentHp);
+      }
     }
 
     private void Update()

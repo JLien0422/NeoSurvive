@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:44bb0509f13358837290b83355325c5889cd229858f8f5f3105fb60f4d2b5e96
-size 627
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: BlastBreath
+  m_EditorClassIdentifier: 
+  weaponName: "\uBE14\uB798\uC2A4\uD2B8 \uBE14\uB9AC\uC2A4"
+  weaponIcon: {fileID: 0}
+  description: 
+  weaponPrefab: {fileID: 3246525789668707929, guid: ced2c2a8485911349ac38e6c0e1f47af, type: 3}
+  level: 1
+  isIndependent: 0

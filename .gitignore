@@ -42,7 +42,6 @@ ExportedObj/
 ._*
 .Spotlight-V100
 .Trashes
-Icon?
 ehthumbs.db
 Thumbs.db
 
@@ -55,7 +54,63 @@ Thumbs.db
 # 아래 파일들은 절대 제외하면 안 됩니다! (참고용으로 적어둠)
 # !*.meta  <- 이런 식으로 제외 방지 설정을 하기도 함
 
+# --- [ VSCode 관련 ] ---
+.vscode
+*.code-workspace
+
+# --- [ JetBrains Rider 관련 ] ---
+.idea/
+*.iml
+.idea_modules/
+
 # --- [ 빌드 결과물 ] ---
 *.apk
 *.unitypackage
 *.app
+*.aab
+*.ipa
+/[Dd]ist/
+/[Rr]elease/
+
+# --- [ 임시 분석 파일 (작업 중 생성된 파일) ] ---
+*.tmp.txt
+*_temp.txt
+*_backup.*
+
+# --- [ 개인 메모 / TODO (선택사항 - 팀 공유 시 주석 처리) ] ---
+# Project_Memo.txt
+# 내가해야할것.txt
+
+# --- [ Unity 추가 캐시 / 임시 파일 ] ---
+*.stackdump
+**/.mdb
+**/.pdb.meta
+*.log
+sysinfo.txt
+crashlytics-build.properties
+
+# --- [ 프로토콜 컴파일러 (바이너리 - 선택사항) ] ---
+# protoc_compiler/
+# 팀원이 동일한 컴파일러를 사용해야 한다면 포함하거나, 
+# 설치 가이드를 README에 작성하고 제외 권장
+
+# --- [ NuGet 패키지 폴더 ] ---
+packages/
+!packages/repositories.config
+
+# --- [ 기타 Unity 관련 ] ---
+/.vs/
+/*.csproj
+/*.sln
+/*.suo
+*.pidb.meta
+*.pdb.meta
+
+# --- [ Plastic SCM (이미 활성화됨) ] ---
+# .plastic/ 은 위에서 이미 처리됨
+
+# 메모
+기획서.txt
+내가해야할것.txt
+Project_Memo.txt
+.docs

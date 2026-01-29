@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:58833da735aa344ac32a2f8d426a7389ddf3ac41faf792b35b58ed76fa410537
-size 836
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: LinkPistol
+  m_EditorClassIdentifier: 
+  weaponName: "\uB9C1\uD06C \uD53C\uC2A4\uD1A8"
+  weaponIcon: {fileID: 21300000, guid: 94037a04ce3786c4ca5c4269dad1589f, type: 3}
+  description: "\uC801\uC911 \uC2DC \uD45C\uC2DD\uC744 \uB0A8\uACA8 \uC801\uC744
+    \uD3EC\uCEE4\uC2F1 \uD558\uB294 \uD574\uCEE4\uC758 \uAE30\uBCF8 \uBB34\uAE30\uC785\uB2C8\uB2E4."
+  weaponPrefab: {fileID: 3802149021545454062, guid: b21e7737bf3b4f349bc26049aa49584a, type: 3}
+  level: 1
+  isIndependent: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NeoSurvive.Buff; // (추가)
 
 // Character 클래스는 플레이어와 적 등 모든 캐릭터의 기반이 되는 추상 클래스입니다.
 // MonoBehaviour를 상속받아 유니티 게임 오브젝트에 컴포넌트로 붙일 수 있습니다.
@@ -24,6 +25,8 @@ public abstract class Character : MonoBehaviour
   // 체력 변경 알림 이벤트 (현재 체력, 최대 체력)
   public event System.Action<float, float> OnHealthChanged;
 
+  private StatusFlags _baseFlags; // (추가)
+
   protected virtual void Awake()
   {
     if (healthStat == null)
@@ -31,6 +34,9 @@ public abstract class Character : MonoBehaviour
       healthStat = new Stat(100f);
     }
     currentHealth = healthStat.GetValue();
+
+    _baseFlags = GetComponent<StatusFlags>(); // (추가)
+    if (_baseFlags == null) _baseFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
   }
 
   protected virtual void Start()
@@ -41,6 +47,10 @@ public abstract class Character : MonoBehaviour
 
   public virtual void TakeDamage(float amount)
   {
+    // (추가) 받는 피해 배율(데미지 2배 디버프 등) 적용
+    if (_baseFlags == null) _baseFlags = GetComponent<StatusFlags>(); // (추가)
+    if (_baseFlags != null) amount *= _baseFlags.incomingDamageMul;   // (추가)
+
     currentHealth -= amount;
 
     // 데미지 텍스트 표시

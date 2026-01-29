@@ -3,50 +3,31 @@ using System;
 
 public class ChestPickup : MonoBehaviour
 {
-    public static event Action OnChestOpened; // 이벤트 선언
+    public static event Action OnChestOpened; // UIManager가 구독하는 이벤트
 
-    public float holdSeconds = 1.5f;
-
-    private float timer = 0f;
-    private bool inRange = false;
     private bool opened = false;
 
-    private void Update()
+    private void OnEnable()
     {
-        if (opened || !inRange) return;
-
-        timer += Time.deltaTime;
-
-        if (timer >= holdSeconds)
-        {
-            opened = true;
-            Open();
-        }
+        Debug.Log("[ChestPickup] OnEnable");
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log($"[ChestPickup] Enter: {other.name}, tag={other.tag}");
+
+        if (opened) return;
         if (!other.CompareTag("Player")) return;
 
-        timer = 0f;
-        inRange = true;
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (!other.CompareTag("Player")) return;
-
-        timer = 0f;
-        inRange = false;
+        opened = true;
+        Open();
     }
 
     private void Open()
     {
         Debug.Log("🎁 Chest Opened!");
 
-        OnChestOpened?.Invoke(); // 이벤트 호출
-
-        Destroy(gameObject);
+        OnChestOpened?.Invoke();   // UIManager로 이벤트 전달
+        Destroy(gameObject);       // 즉시 사라짐 (ExpOrb 느낌)
     }
 }
-

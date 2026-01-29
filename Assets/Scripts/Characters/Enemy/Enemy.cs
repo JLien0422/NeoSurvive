@@ -1,9 +1,33 @@
 using UnityEngine;
+using NeoSurvive.Buff; // (추가)
 
 // Enemy 클래스는 적 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Enemy : Character
 {
+    //************************버프/디버프 관련 헬퍼************************//
+    private StatusFlags _enemyFlags; // (추가)
+
+    // (추가) 외부(AI/무기/피해처리)에서 참조하기 쉬운 헬퍼
+    public StatusFlags Status => _enemyFlags != null ? _enemyFlags : (_enemyFlags = GetComponent<StatusFlags>() ?? gameObject.AddComponent<StatusFlags>()); // (추가)
+    public bool CanMove => !Status.moveBlocked;   // (추가)
+    public bool CanAttack => !Status.attackBlocked; // (추가)
+    public bool IsBlinded => Status.blinded;      // (추가)
+    public bool IsFrenzy => Status.frenzy;        // (추가)
+
+    // (추가) 받는 피해 배율 적용(데미지 2배 디버프 등)
+    public float ApplyIncomingDamage(float damage) => damage * Status.incomingDamageMul; // (추가)
+
+    private void Awake() // (추가)
+    {
+        base.Awake();
+        // StatusFlags 캐싱 (추가)
+        _enemyFlags = GetComponent<StatusFlags>();
+        if (_enemyFlags == null) _enemyFlags = gameObject.AddComponent<StatusFlags>();
+    }
+
+    //************************여기까지 버프/디버프************************//
+
     [Header("경험치 보상")]
     // 적이 죽었을 때 플레이어에게 줄 총 경험치입니다.
     [SerializeField]

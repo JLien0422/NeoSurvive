@@ -34,6 +34,7 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public void AddWeapon(WeaponBase weaponData)
     {
+      Debug.Log($"[WeaponManager] AddWeapon called. weaponName={weaponData.weaponName}, prefab={(weaponData.weaponPrefab ? weaponData.weaponPrefab.name : "NULL")}");
       // 이미 보유 중인 무기인지 확인
       if (activeWeapons.Contains(weaponData))
       {
@@ -82,6 +83,8 @@ namespace NeoSurvive.Weapon
         AddWeapon(allWeaponDatas[index]);
       }
     }
+
+    
     void Update()
     {
       // 테스트용: allWeaponDatas 리스트의 인덱스를 사용하여 테스트
@@ -119,6 +122,7 @@ namespace NeoSurvive.Weapon
       }
       if (Input.GetKeyDown(KeyCode.F9))
       {
+        Debug.Log("[WeaponManager] F9 pressed -> AddWeapon(8)");
         AddWeapon(8);
       }
       if (Input.GetKeyDown(KeyCode.F10))

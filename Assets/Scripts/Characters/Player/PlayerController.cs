@@ -1,4 +1,5 @@
 using UnityEngine;
+using NeoSurvive.Buff; // (추가)
 
 // PlayerController 클래스는 플레이어의 입력을 받아 움직임을 처리합니다.
 // 이 컴포넌트는 Player 컴포넌트가 있는 게임 오브젝트에 추가되어야 합니다.
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour
     // 해킹 중 고정 상태 (이동 불가)
     private bool isLockedDown = false;
     public bool IsLockedDown => isLockedDown;
+    private StatusFlags statusFlags; // (추가)
 
     /// <summary>
     /// 고정 상태 설정 (해킹 중 이동/입력 불가)
@@ -42,11 +44,22 @@ public class PlayerController : MonoBehaviour
             rb = gameObject.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0; // 2D 탑다운 게임에서는 중력이 필요 없습니다.
         }
+
+        // 버프/디버프 관련 초기화
+        statusFlags = GetComponent<StatusFlags>(); // (추가)
+        if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
     }
 
     // 매 프레임마다 호출됩니다. 입력 처리에 적합합니다.
     private void Update()
     {
+        // (추가) 버프/디버프: 이동 불가(속박/기절 등)면 입력 자체를 막음
+        if (statusFlags != null && statusFlags.moveBlocked)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
         // 고정 상태면 입력 무시
         if (isLockedDown)
         {
@@ -106,6 +119,13 @@ public class PlayerController : MonoBehaviour
     // 고정된 시간 간격으로 호출됩니다. 물리 계산에 적합합니다.
     private void FixedUpdate()
     {
+        // (추가) 이동 불가면 즉시 정지
+        if (statusFlags != null && statusFlags.moveBlocked)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            return;
+        }
+
         // Rigidbody의 속도를 변경하여 플레이어를 움직입니다.
         // 이제 Player 스크립트에 있는 최종 계산된 이동 속도(CurrentMoveSpeed)를 사용합니다.
         if (rb != null && player != null)

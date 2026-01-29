@@ -1,11 +1,66 @@
 using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
+using NeoSurvive.Buff; // (추가)
 
 // Player 클래스는 플레이어 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
 {
+  //************************버프/디버프 관련 헬퍼************************//
+  private StatusFlags _playerFlags; // (추가)
+
+  // (추가) 다른 스크립트들이 쉽게 참조하도록
+   public StatusFlags Status => _playerFlags != null
+    ? _playerFlags
+    : (_playerFlags = GetComponent<StatusFlags>() ?? gameObject.AddComponent<StatusFlags>()); // (추가)
+  public bool CanMove => !Status.moveBlocked;   // (추가)
+  public bool CanAttack => !Status.attackBlocked; // (추가)
+
+  // (추가) "받는 피해 배율"을 적용해주는 헬퍼 (실제 데미지 계산 위치에서 이걸 써주면 됨)
+  public float ApplyIncomingDamage(float damage) => damage * Status.incomingDamageMul; // (추가)
+
+  // (추가) StatusFlags 배율을 Stat에 반영하기 위한 캐시
+  private float lastMoveSpeedMul = 1f;      // (추가)
+  private float lastOutgoingDamageMul = 1f; // (추가)
+
+  // (추가) StatusFlags의 배율을 Stat 퍼센트 모디파이어로 적용/해제(델타 방식)
+  private void SyncBuffMultipliersToStats() // (추가)
+  {
+    // StatusFlags 없으면 붙이고 진행
+    var f = Status;
+
+    // 1) 이동속도 배율(moveSpeedMul) -> moveSpeed Stat percent modifier로 반영
+    if (!Mathf.Approximately(f.moveSpeedMul, lastMoveSpeedMul))
+    {
+      // Stat의 AddPercentModifier는 "0.25f = +25%" 방식이므로
+      // 배율 1.2 -> +0.2, 0.7 -> -0.3 이 되도록 변환해서 "델타"만큼 추가
+      float newPercent = f.moveSpeedMul - 1f;
+      float oldPercent = lastMoveSpeedMul - 1f;
+      float delta = newPercent - oldPercent;
+
+      moveSpeed.AddPercentModifier(delta);
+      lastMoveSpeedMul = f.moveSpeedMul;
+    }
+
+    // 2) 가하는 데미지 배율(outgoingDamageMul) -> attackDamage Stat percent modifier로 반영
+    if (!Mathf.Approximately(f.outgoingDamageMul, lastOutgoingDamageMul))
+    {
+      float newPercent = f.outgoingDamageMul - 1f;
+      float oldPercent = lastOutgoingDamageMul - 1f;
+      float delta = newPercent - oldPercent;
+
+      attackDamage.AddPercentModifier(delta);
+      lastOutgoingDamageMul = f.outgoingDamageMul;
+    }
+
+    // ⚠ moveBlocked/attackBlocked는 여기서 Stat로 “강제 0” 처리하지 않음.
+    // 이유: 기존 이동/공격 로직을 깨지 않기 위해.
+    // 대신 CanMove/CanAttack를 추가했으니, 이동/공격 쪽에서 참조하면 CC가 완성됨.
+  }
+  //************************여기까지 버프/디버프************************//
+
+
   // 플레이어의 경험치를 저장하는 변수입니다.
   [SerializeField]
   private int experience = 0;
@@ -242,6 +297,8 @@ public class Player : Character
   // 매 프레임마다 인스펙터 표시용 값 업데이트 및 입력 처리
   private void Update()
   {
+    SyncBuffMultipliersToStats(); // (추가) 
+
     UpdateInspectorStats();
 
     // R키로 신경링크 발동

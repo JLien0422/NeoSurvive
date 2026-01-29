@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: LaserSword
+  m_EditorClassIdentifier: 
+  weaponName: LaserSword
+  weaponIcon: {fileID: 21300000, guid: 980f394eb81533243a5eb56e331afd53, type: 3}
+  description: "\uB808\uC774\uC800\uC18C\uB4DC"
+  weaponPrefab: {fileID: 2544833515744044033, guid: e1ad768643ff8ed48aeb1b130d79ae8b, type: 3}
+  level: 1
+  isIndependent: 0

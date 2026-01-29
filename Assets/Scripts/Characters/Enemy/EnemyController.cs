@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using NeoSurvive.Buff; // (추가)
 
 // EnemyController 클래스는 적 캐릭터의 인공지능(AI)과 움직임을 처리합니다.
 // 이 컴포넌트는 Enemy 컴포넌트가 있는 게임 오브젝트에 추가되어야 합니다.
@@ -39,6 +40,8 @@ public class EnemyController : MonoBehaviour
 
   private float searchTimer;
 
+  private StatusFlags statusFlags; // (추가)
+
   // 컴포넌트가 처음 활성화될 때 호출됩니다.
   private void Awake()
   {
@@ -50,6 +53,9 @@ public class EnemyController : MonoBehaviour
       rb = gameObject.AddComponent<Rigidbody2D>();
       rb.gravityScale = 0;
     }
+
+    statusFlags = GetComponent<StatusFlags>(); // (추가)
+    if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
 
     UpdateTarget();
     InitializeMechanism();
@@ -124,6 +130,27 @@ public class EnemyController : MonoBehaviour
 
   private void UpdateTarget()
   {
+    // (추가) 광란이면 "플레이어/디코이" 대신 "가장 가까운 Enemy"를 타겟으로
+    if (statusFlags != null && statusFlags.frenzy)
+    {
+      target = FindClosestEnemyTarget();
+      if (currentMechanism != null)
+        currentMechanism.SetTarget(target);
+      return;
+    }
+
+    // (추가) 실명(Blind) 상태면 가끔 타겟을 못 찾게(간단 버전)
+    if (statusFlags != null && statusFlags.blinded)
+    {
+      // 50% 확률로 타겟을 놓침 (원하면 수치 조정)
+      if (Random.value < 0.5f)
+      {
+        target = null;
+        if (currentMechanism != null) currentMechanism.SetTarget(target);
+        return;
+      }
+    }
+
     GameObject playerObj = GameObject.FindWithTag("Player");
     GameObject[] decoys = GameObject.FindGameObjectsWithTag("Decoy");
 
@@ -162,6 +189,28 @@ public class EnemyController : MonoBehaviour
     {
       currentMechanism.SetTarget(target);
     }
+  }
+
+  // (추가) 광란용: 가장 가까운 적(Enemy) 찾기
+  private Transform FindClosestEnemyTarget() // (추가)
+  {
+    GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+    Transform closest = null;
+    float closestDist = float.MaxValue;
+
+    foreach (var e in enemies)
+    {
+      if (e == null) continue;
+      if (e == gameObject) continue; // 자기 자신 제외
+
+      float d = Vector2.Distance(transform.position, e.transform.position);
+      if (d < closestDist)
+      {
+        closestDist = d;
+        closest = e.transform;
+      }
+    }
+    return closest;
   }
 
   // 외부에서 이속 제어 (슬로우 효과)
@@ -208,7 +257,9 @@ public class EnemyController : MonoBehaviour
   /// </summary>
   public float GetMoveSpeed()
   {
-    return moveSpeed;
+    // (추가) 슬로우/이속 버프 시스템 배율 반영
+    float mul = (statusFlags != null) ? statusFlags.moveSpeedMul : 1f;
+    return moveSpeed * mul;
   }
 
   /// <summary>
@@ -242,6 +293,11 @@ public class EnemyController : MonoBehaviour
     {
       yield return new WaitForSeconds(attackInterval);
 
+      // (추가) 기절 등으로 공격 불가면 패스
+      if (statusFlags != null && statusFlags.attackBlocked)
+        continue;
+
+
       if (target != null)
       {
         float distanceToTarget = Vector2.Distance(transform.position, target.position);
@@ -251,6 +307,10 @@ public class EnemyController : MonoBehaviour
           // 대상이 Character(Player, Enemy, Decoy)인지 확인
           if (target.TryGetComponent<Character>(out var character))
           {
+            // (추가) 데미지 버프/디버프(가하는 피해) 적용
+            float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
+            float finalDamage = attackDamage * outMul;
+
             character.TakeDamage(attackDamage);
           }
         }
@@ -261,9 +321,17 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
+    // (추가) 속박/기절 등 이동 불가면 즉시 정지
+    if (statusFlags != null && statusFlags.moveBlocked)
+    {
+      if (rb != null) rb.velocity = Vector2.zero;
+      return;
+    }
+
     // 메커니즘이 있으면 메커니즘의 이동 로직 사용
     if (currentMechanism != null)
     {
+      // (추가) 메커니즘이 EnemyController.GetMoveSpeed()를 사용한다면 배율이 자동 반영됨.
       currentMechanism.UpdateMovement();
     }
     else

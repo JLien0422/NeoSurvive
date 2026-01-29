@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3246525789668707929
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7025330092140550850}
+  - component: {fileID: -4315742687912966545}
+  m_Layer: 0
+  m_Name: BlastBreath
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7025330092140550850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3246525789668707929}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.519271, y: -2.3225765, z: -2.080745}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4315742687912966545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3246525789668707929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0721a2b92d1b9f14fb2233d348c77ea2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  breathAreaPrefab: {fileID: 7298700397245030376, guid: 4db68faff4fb90347ae4b10d9a991e9e, type: 3}
+  firePoint: {fileID: 0}
+  damagePerTick: 4
+  range: 4.5
+  width: 2.2
+  tickInterval: 0.25
+  areaDuration: 0.8
+  fireRate: 1.1
+  damagePerLevel: 0.18
+  rangePerLevel: 0.12
+  widthPerLevel: 0.1
+  enableMaster: 1
+  masterColdMode: 1
+  debugLog: 0

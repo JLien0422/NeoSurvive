@@ -137,7 +137,7 @@ namespace NeoSurvive.UI.Map
       viewDistanceX = Mathf.CeilToInt((worldWidth / actualTileSize) * 0.5f) + 2;
       viewDistanceY = Mathf.CeilToInt((worldHeight / actualTileSize) * 0.5f) + 2;
 
-      Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
+     // Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
     }
 
     private void UpdateTiles(int currentX, int currentY)

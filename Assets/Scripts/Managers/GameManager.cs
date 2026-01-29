@@ -46,7 +46,8 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 파괴되지 않도록 설정
+            // Managers가 루트가 아닌 경우 부모(Managers)를 유지시킴
+            DontDestroyOnLoad(transform.root.gameObject);
         }
         else
         {

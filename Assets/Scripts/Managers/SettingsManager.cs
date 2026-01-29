@@ -9,7 +9,7 @@ public class SettingsManager : MonoBehaviour
     public static SettingsManager Instance { get; private set; }
 
     // 설정값 저장을 위한 Easy Save 키
-    private const string KEY_RESOLUTION = "Settings_ResolutionIndex";
+    private const string KEY_RESOLUTION = "Settings_ResolutionIndex"; 
     private const string KEY_FULLSCREEN = "Settings_Fullscreen";
     private const string KEY_QUALITY = "Settings_QualityIndex";
     private const string KEY_VSYNC = "Settings_VSync";
@@ -27,9 +27,9 @@ public class SettingsManager : MonoBehaviour
 
     // 설정값 변수
     // 비디오
-    public int resolutionIndex;
-    public bool isFullscreen; // 전체화면 
-    public int qualityIndex; // 그래픽 품질 
+    public int resolutionIndex; // 해상도 선택
+    public bool isFullscreen; // 전체화면
+    public int qualityIndex; // 그래픽품질
     public bool vSyncEnabled; // 수직동기화
     public int targetFPS = 60; // 포그라운드 프레임 제한
     public int backgroundFPS = 30; // 백그라운드 프레임 제한
@@ -57,7 +57,8 @@ public class SettingsManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // Managers가 루트가 아닌 경우 부모(Managers)를 유지시킴
+            DontDestroyOnLoad(transform.root.gameObject);
             
             // 중복을 제거하고 해상도 목록을 가져옵니다.
             resolutions = Screen.resolutions.Select(resolution => new Resolution { width = resolution.width, height = resolution.height }).Distinct().ToArray();

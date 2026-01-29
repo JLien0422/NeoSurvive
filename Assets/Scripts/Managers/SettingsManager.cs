@@ -27,11 +27,11 @@ public class SettingsManager : MonoBehaviour
 
   // 설정값 변수
   // 비디오
-  public int resolutionIndex;
-  public bool isFullscreen; // 전체화면 
-  public int qualityIndex; // 그래픽 품질 
+  public int resolutionIndex; // 해상도 선택
+  public bool isFullscreen; // 전체화면
+  public int qualityIndex; // 그래픽품질
   public bool vSyncEnabled; // 수직동기화
-  public int targetFPS = 300; // 포그라운드 프레임 제한
+  public int targetFPS = 60; // 포그라운드 프레임 제한
   public int backgroundFPS = 30; // 백그라운드 프레임 제한
   public bool postProcessingEnabled = true; // 포스트 프로세싱
   public bool showDamageNumbers = true; // 데미지 숫자 표시

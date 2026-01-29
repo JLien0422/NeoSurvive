@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour
     {
       Instance = this;
       if (Application.isPlaying)
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(transform.root.gameObject);
     }
     else
     {
@@ -91,7 +91,200 @@ public class UIManager : MonoBehaviour
   private void Start()
   {
     // Start logic moved to Awake for singleton initialization, keeping Start empty or for other delayed init
+    
+    // UI 요소가 null이면 자동 생성
+    AutoCreateMissingUI();
   }
+
+  /// <summary>
+  /// 누락된 UI 요소들을 자동으로 생성합니다.
+  /// </summary>
+  private void AutoCreateMissingUI()
+  {
+    // Canvas 찾기
+    Canvas canvas = FindObjectOfType<Canvas>();
+    if (canvas == null)
+    {
+      Debug.LogError("[UIManager] Canvas를 찾을 수 없습니다!");
+      return;
+    }
+
+    // 사이코 잠식도 UI 생성
+    if (psychoCorruptionSlider == null || psychoCorruptionText == null)
+    {
+      CreatePsychoCorruptionUI(canvas.transform);
+    }
+
+    // 신경링크 UI 생성
+    if (neuralLinkSlider == null || neuralLinkText == null)
+    {
+      CreateNeuralLinkUI(canvas.transform);
+    }
+
+    // 화면 노이즈 오버레이 생성
+    if (screenNoiseOverlay == null)
+    {
+      CreateScreenNoiseOverlay(canvas.transform);
+    }
+
+    Debug.Log("[UIManager] 누락된 UI 요소 자동 생성 완료");
+  }
+
+  /// <summary>
+  /// 사이코 잠식도 UI 생성
+  /// </summary>
+  private void CreatePsychoCorruptionUI(Transform parent)
+  {
+    // Slider 생성
+    if (psychoCorruptionSlider == null)
+    {
+      GameObject sliderObj = new GameObject("PsychoCorruptionSlider");
+      sliderObj.transform.SetParent(parent, false);
+      
+      RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
+      sliderRect.anchorMin = new Vector2(1, 0);
+      sliderRect.anchorMax = new Vector2(1, 0);
+      sliderRect.anchoredPosition = new Vector2(-300, 80);
+      sliderRect.sizeDelta = new Vector2(600, 60);
+      
+      psychoCorruptionSlider = sliderObj.AddComponent<Slider>();
+      
+      // Background 생성
+      GameObject bgObj = new GameObject("Background");
+      bgObj.transform.SetParent(sliderObj.transform, false);
+      RectTransform bgRect = bgObj.AddComponent<RectTransform>();
+      bgRect.anchorMin = Vector2.zero;
+      bgRect.anchorMax = Vector2.one;
+      bgRect.sizeDelta = Vector2.zero;
+      Image bgImg = bgObj.AddComponent<Image>();
+      bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+      psychoCorruptionSlider.targetGraphic = bgImg;
+      
+      // Fill Area 생성
+      GameObject fillAreaObj = new GameObject("Fill Area");
+      fillAreaObj.transform.SetParent(sliderObj.transform, false);
+      RectTransform fillAreaRect = fillAreaObj.AddComponent<RectTransform>();
+      fillAreaRect.anchorMin = Vector2.zero;
+      fillAreaRect.anchorMax = Vector2.one;
+      fillAreaRect.sizeDelta = Vector2.zero;
+      
+      // Fill 생성
+      GameObject fillObj = new GameObject("Fill");
+      fillObj.transform.SetParent(fillAreaObj.transform, false);
+      RectTransform fillRect = fillObj.AddComponent<RectTransform>();
+      fillRect.sizeDelta = Vector2.zero;
+      Image fillImg = fillObj.AddComponent<Image>();
+      fillImg.color = new Color(1f, 0.2f, 0.2f, 1f);
+      psychoCorruptionSlider.fillRect = fillRect;
+    }
+
+    // Text 생성
+    if (psychoCorruptionText == null)
+    {
+      GameObject textObj = new GameObject("PsychoCorruptionText");
+      textObj.transform.SetParent(parent, false);
+      
+      RectTransform textRect = textObj.AddComponent<RectTransform>();
+      textRect.anchorMin = new Vector2(1, 0);
+      textRect.anchorMax = new Vector2(1, 0);
+      textRect.anchoredPosition = new Vector2(-300, 120);
+      textRect.sizeDelta = new Vector2(600, 60);
+      
+      psychoCorruptionText = textObj.AddComponent<TextMeshProUGUI>();
+      psychoCorruptionText.text = "Psycho Corruption: 0%";
+      psychoCorruptionText.fontSize = 32;
+      psychoCorruptionText.alignment = TextAlignmentOptions.Left;
+    }
+  }
+
+  /// <summary>
+  /// 신경링크 UI 생성
+  /// </summary>
+  private void CreateNeuralLinkUI(Transform parent)
+  {
+    // Slider 생성
+    if (neuralLinkSlider == null)
+    {
+      GameObject sliderObj = new GameObject("NeuralLinkSlider");
+      sliderObj.transform.SetParent(parent, false);
+      
+      RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
+      sliderRect.anchorMin = new Vector2(1, 0);
+      sliderRect.anchorMax = new Vector2(1, 0);
+      sliderRect.anchoredPosition = new Vector2(-300, 20);
+      sliderRect.sizeDelta = new Vector2(600, 60);
+      
+      neuralLinkSlider = sliderObj.AddComponent<Slider>();
+      
+      // Background 생성
+      GameObject bgObj = new GameObject("Background");
+      bgObj.transform.SetParent(sliderObj.transform, false);
+      RectTransform bgRect = bgObj.AddComponent<RectTransform>();
+      bgRect.anchorMin = Vector2.zero;
+      bgRect.anchorMax = Vector2.one;
+      bgRect.sizeDelta = Vector2.zero;
+      Image bgImg = bgObj.AddComponent<Image>();
+      bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+      neuralLinkSlider.targetGraphic = bgImg;
+      
+      // Fill Area 생성
+      GameObject fillAreaObj = new GameObject("Fill Area");
+      fillAreaObj.transform.SetParent(sliderObj.transform, false);
+      RectTransform fillAreaRect = fillAreaObj.AddComponent<RectTransform>();
+      fillAreaRect.anchorMin = Vector2.zero;
+      fillAreaRect.anchorMax = Vector2.one;
+      fillAreaRect.sizeDelta = Vector2.zero;
+      
+      // Fill 생성
+      GameObject fillObj = new GameObject("Fill");
+      fillObj.transform.SetParent(fillAreaObj.transform, false);
+      RectTransform fillRect = fillObj.AddComponent<RectTransform>();
+      fillRect.sizeDelta = Vector2.zero;
+      Image fillImg = fillObj.AddComponent<Image>();
+      fillImg.color = new Color(0.2f, 0.6f, 1f, 1f);
+      neuralLinkSlider.fillRect = fillRect;
+    }
+
+    // Text 생성
+    if (neuralLinkText == null)
+    {
+      GameObject textObj = new GameObject("NeuralLinkText");
+      textObj.transform.SetParent(parent, false);
+      
+      RectTransform textRect = textObj.AddComponent<RectTransform>();
+      textRect.anchorMin = new Vector2(1, 0);
+      textRect.anchorMax = new Vector2(1, 0);
+      textRect.anchoredPosition = new Vector2(-300, 60);
+      textRect.sizeDelta = new Vector2(600, 60);
+      
+      neuralLinkText = textObj.AddComponent<TextMeshProUGUI>();
+      neuralLinkText.text = "Neural Link: 0%";
+      neuralLinkText.fontSize = 32;
+      neuralLinkText.alignment = TextAlignmentOptions.Left;
+    }
+  }
+
+  /// <summary>
+  /// 화면 노이즈 오버레이 생성
+  /// </summary>
+  private void CreateScreenNoiseOverlay(Transform parent)
+  {
+    GameObject overlayObj = new GameObject("ScreenNoiseOverlay");
+    overlayObj.transform.SetParent(parent, false);
+    
+    RectTransform overlayRect = overlayObj.AddComponent<RectTransform>();
+    overlayRect.anchorMin = Vector2.zero;
+    overlayRect.anchorMax = Vector2.one;
+    overlayRect.sizeDelta = Vector2.zero;
+    overlayRect.anchoredPosition = Vector2.zero;
+    
+    Image overlayImg = overlayObj.AddComponent<Image>();
+    overlayImg.color = new Color(1f, 0f, 0f, 0.1f); // 빨간색 반투명
+    
+    screenNoiseOverlay = overlayObj;
+    screenNoiseOverlay.SetActive(false); // 초기에는 비활성화
+  }
+
 
   private void OnEnable()
   {

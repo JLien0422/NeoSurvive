@@ -37,7 +37,6 @@ MonoBehaviour:
     assemblyNames:
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
-    - Domain_Reload
     - endel.nativewebsocket
     - MCPForUnity.Runtime
     showAdvancedSettings: 0

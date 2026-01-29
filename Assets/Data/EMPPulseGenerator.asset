@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:545d276985082365abe7f4b84d30bfb74ed4afe42ee0c132c93e614d2389cbeb
-size 718
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: EMPPulseGenerator
+  m_EditorClassIdentifier: 
+  weaponName: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
+  weaponIcon: {fileID: 21300000, guid: edc9e549dbf9ecd40b80290d5c3f6858, type: 3}
+  description: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
+  weaponPrefab: {fileID: 4312614672909416783, guid: 404086b1bed71e0468d44900519eab58, type: 3}
+  level: 1
+  isIndependent: 0

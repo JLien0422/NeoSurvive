@@ -238,6 +238,12 @@ public class UDPClient : MonoBehaviour
         case ActionType.Revive:
           player.Revive();
           break;
+        case ActionType.WeaponEquip:
+          player.SyncWeaponEquip((int)action.Value);
+          break;
+        case ActionType.WeaponAttack:
+          player.ExecuteAttack((int)action.WeaponId, new Vector2(action.DirX, action.DirY));
+          break;
       }
     }
   }

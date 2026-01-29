@@ -32,27 +32,28 @@ namespace NeoSurvive.Network.Protocol {
             "eWxvYWQifwoKUGxheWVyTW92ZRIRCglwbGF5ZXJfaWQYASABKA0SEQoJdGlt",
             "ZXN0YW1wGAIgASgDEg0KBXBvc194GAMgASgCEg0KBXBvc195GAQgASgCEg0K",
             "BXZlbF94GAUgASgCEg0KBXZlbF95GAYgASgCEg8KB2lzX2RlYWQYByABKAgi",
-            "oQEKDFBsYXllckFjdGlvbhIRCglwbGF5ZXJfaWQYASABKA0SIAoLYWN0aW9u",
+            "tAEKDFBsYXllckFjdGlvbhIRCglwbGF5ZXJfaWQYASABKA0SIAoLYWN0aW9u",
             "X3R5cGUYAiABKA4yCy5BY3Rpb25UeXBlEhEKCXRhcmdldF9pZBgDIAEoDRIN",
             "CgVwb3NfeBgEIAEoAhINCgVwb3NfeRgFIAEoAhINCgVkaXJfeBgGIAEoAhIN",
-            "CgVkaXJfeRgHIAEoAhINCgV2YWx1ZRgIIAEoDSJhCgpFbmVteVN0YXRlEhAK",
-            "CGVuZW15X2lkGAEgASgNEg8KB3R5cGVfaWQYAiABKA0SDQoFcG9zX3gYAyAB",
-            "KAISDQoFcG9zX3kYBCABKAISEgoKY3VycmVudF9ocBgFIAEoDSJLCglJdGVt",
-            "U3RhdGUSDwoHaXRlbV9pZBgBIAEoDRIPCgd0eXBlX2lkGAIgASgNEg0KBXBv",
-            "c194GAMgASgCEg0KBXBvc195GAQgASgCIpwBCgxHYW1lU25hcHNob3QSEQoJ",
-            "dGltZXN0YW1wGAEgASgDEhEKCWdhbWVfdGltZRgCIAEoAhIiCg1wbGF5ZXJf",
-            "c3RhdGVzGAMgAygLMgsuUGxheWVyTW92ZRIhCgxlbmVteV9zdGF0ZXMYBCAD",
-            "KAsyCy5FbmVteVN0YXRlEh8KC2l0ZW1fc3RhdGVzGAUgAygLMgouSXRlbVN0",
-            "YXRlKnUKCkFjdGlvblR5cGUSCgoGQVRUQUNLEAASCQoFU0tJTEwQARIPCgtO",
-            "RVVSQUxfTElOSxACEg8KC0lURU1fUElDS1VQEAMSCgoGREFNQUdFEAQSCAoE",
-            "REVBRBAFEgwKCExFVkVMX1VQEAYSCgoGUkVWSVZFEAdCHqoCG05lb1N1cnZp",
-            "dmUuTmV0d29yay5Qcm90b2NvbGIGcHJvdG8z"));
+            "CgVkaXJfeRgHIAEoAhINCgV2YWx1ZRgIIAEoDRIRCgl3ZWFwb25faWQYCSAB",
+            "KA0iYQoKRW5lbXlTdGF0ZRIQCghlbmVteV9pZBgBIAEoDRIPCgd0eXBlX2lk",
+            "GAIgASgNEg0KBXBvc194GAMgASgCEg0KBXBvc195GAQgASgCEhIKCmN1cnJl",
+            "bnRfaHAYBSABKA0iSwoJSXRlbVN0YXRlEg8KB2l0ZW1faWQYASABKA0SDwoH",
+            "dHlwZV9pZBgCIAEoDRINCgVwb3NfeBgDIAEoAhINCgVwb3NfeRgEIAEoAiKc",
+            "AQoMR2FtZVNuYXBzaG90EhEKCXRpbWVzdGFtcBgBIAEoAxIRCglnYW1lX3Rp",
+            "bWUYAiABKAISIgoNcGxheWVyX3N0YXRlcxgDIAMoCzILLlBsYXllck1vdmUS",
+            "IQoMZW5lbXlfc3RhdGVzGAQgAygLMgsuRW5lbXlTdGF0ZRIfCgtpdGVtX3N0",
+            "YXRlcxgFIAMoCzIKLkl0ZW1TdGF0ZSqaAQoKQWN0aW9uVHlwZRIKCgZBVFRB",
+            "Q0sQABIJCgVTS0lMTBABEg8KC05FVVJBTF9MSU5LEAISDwoLSVRFTV9QSUNL",
+            "VVAQAxIKCgZEQU1BR0UQBBIICgRERUFEEAUSDAoITEVWRUxfVVAQBhIKCgZS",
+            "RVZJVkUQBxIQCgxXRUFQT05fRVFVSVAQCBIRCg1XRUFQT05fQVRUQUNLEAlC",
+            "HqoCG05lb1N1cnZpdmUuTmV0d29yay5Qcm90b2NvbGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::NeoSurvive.Network.Protocol.ActionType), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "PlayerMove", "PlayerAction", "GameSnapshot", "EnemyState", "ItemState" }, new[]{ "Payload" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerMove), global::NeoSurvive.Network.Protocol.PlayerMove.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY", "VelX", "VelY", "IsDead" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value", "WeaponId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.EnemyState), global::NeoSurvive.Network.Protocol.EnemyState.Parser, new[]{ "EnemyId", "TypeId", "PosX", "PosY", "CurrentHp" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.ItemState), global::NeoSurvive.Network.Protocol.ItemState.Parser, new[]{ "ItemId", "TypeId", "PosX", "PosY" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "GameTime", "PlayerStates", "EnemyStates", "ItemStates" }, null, null, null, null)
@@ -71,6 +72,14 @@ namespace NeoSurvive.Network.Protocol {
     [pbr::OriginalName("DEAD")] Dead = 5,
     [pbr::OriginalName("LEVEL_UP")] LevelUp = 6,
     [pbr::OriginalName("REVIVE")] Revive = 7,
+    /// <summary>
+    /// 무기 장착
+    /// </summary>
+    [pbr::OriginalName("WEAPON_EQUIP")] WeaponEquip = 8,
+    /// <summary>
+    /// 무기 공격
+    /// </summary>
+    [pbr::OriginalName("WEAPON_ATTACK")] WeaponAttack = 9,
   }
 
   #endregion
@@ -991,6 +1000,7 @@ namespace NeoSurvive.Network.Protocol {
       dirX_ = other.dirX_;
       dirY_ = other.dirY_;
       value_ = other.value_;
+      weaponId_ = other.weaponId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1108,6 +1118,21 @@ namespace NeoSurvive.Network.Protocol {
       }
     }
 
+    /// <summary>Field number for the "weapon_id" field.</summary>
+    public const int WeaponIdFieldNumber = 9;
+    private uint weaponId_;
+    /// <summary>
+    /// 무기 ID (무기 장착/공격 시 사용)
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint WeaponId {
+      get { return weaponId_; }
+      set {
+        weaponId_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1131,6 +1156,7 @@ namespace NeoSurvive.Network.Protocol {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirX, other.DirX)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
       if (Value != other.Value) return false;
+      if (WeaponId != other.WeaponId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1146,6 +1172,7 @@ namespace NeoSurvive.Network.Protocol {
       if (DirX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirX);
       if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
       if (Value != 0) hash ^= Value.GetHashCode();
+      if (WeaponId != 0) hash ^= WeaponId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1196,6 +1223,10 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(64);
         output.WriteUInt32(Value);
       }
+      if (WeaponId != 0) {
+        output.WriteRawTag(72);
+        output.WriteUInt32(WeaponId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1238,6 +1269,10 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(64);
         output.WriteUInt32(Value);
       }
+      if (WeaponId != 0) {
+        output.WriteRawTag(72);
+        output.WriteUInt32(WeaponId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1271,6 +1306,9 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (Value != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Value);
+      }
+      if (WeaponId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeaponId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1307,6 +1345,9 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (other.Value != 0) {
         Value = other.Value;
+      }
+      if (other.WeaponId != 0) {
+        WeaponId = other.WeaponId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1355,6 +1396,10 @@ namespace NeoSurvive.Network.Protocol {
             Value = input.ReadUInt32();
             break;
           }
+          case 72: {
+            WeaponId = input.ReadUInt32();
+            break;
+          }
         }
       }
     #endif
@@ -1400,6 +1445,10 @@ namespace NeoSurvive.Network.Protocol {
           }
           case 64: {
             Value = input.ReadUInt32();
+            break;
+          }
+          case 72: {
+            WeaponId = input.ReadUInt32();
             break;
           }
         }

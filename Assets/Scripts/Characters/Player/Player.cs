@@ -333,6 +333,18 @@ public class Player : Character
     }
   }
 
+  /// <summary>
+  /// [Coop] 원격 플레이어의 무기 장착 동기화
+  /// </summary>
+  public void SyncWeaponEquip(int weaponIndex)
+  {
+    var weaponManager = GetComponent<WeaponManager>();
+    if (weaponManager != null)
+    {
+      weaponManager.SyncWeaponEquip(weaponIndex);
+    }
+  }
+
   // 게임 시작 시 캐릭터 타입 가져오기
   protected override void Start()
   {

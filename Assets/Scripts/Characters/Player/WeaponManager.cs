@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NeoSurvive.Network.Protocol;
 
 public enum WeaponType
 {
@@ -29,10 +30,13 @@ namespace NeoSurvive.Weapon
 
     public static event System.Action<List<WeaponBase>> OnWeaponChanged;
 
+    // [Coop] Player 참조
+    private Player player;
+
     /// <summary>
     /// 새로운 무기 추가 또는 레벨업
     /// </summary>
-    public void AddWeapon(WeaponBase weaponData)
+    public void AddWeapon(WeaponBase weaponData, bool sendToServer = true)
     {
       // 이미 보유 중인 무기인지 확인
       if (activeWeapons.Contains(weaponData))
@@ -72,15 +76,38 @@ namespace NeoSurvive.Weapon
       }
 
       OnWeaponChanged?.Invoke(activeWeapons);
+
+      // [Coop] 로컬 플레이어인 경우 서버에 무기 장착 알림
+      if (sendToServer)
+      {
+        if (player == null) player = GetComponent<Player>();
+        if (player != null && player.IsLocal && UDPClient.Instance != null)
+        {
+          int weaponIndex = allWeaponDatas.IndexOf(weaponData);
+          if (weaponIndex >= 0)
+          {
+            UDPClient.Instance.SendAction(ActionType.WeaponEquip, 0, Vector2.zero, (uint)weaponIndex);
+          }
+        }
+      }
     }
 
     // 기존 호환성을 위한 오버로드 (필요시)
-    public void AddWeapon(int index)
+    public void AddWeapon(int index, bool sendToServer = true)
     {
       if (index >= 0 && index < allWeaponDatas.Count)
       {
-        AddWeapon(allWeaponDatas[index]);
+        AddWeapon(allWeaponDatas[index], sendToServer);
       }
+    }
+
+    /// <summary>
+    /// [Coop] 원격 플레이어의 무기 장착 동기화
+    /// </summary>
+    public void SyncWeaponEquip(int weaponIndex)
+    {
+      // 서버에 재전송하지 않음
+      AddWeapon(weaponIndex, sendToServer: false);
     }
     /// <summary>
     /// [Coop] 특정 무기의 공격을 실행 (원격 동기화용)
@@ -95,6 +122,23 @@ namespace NeoSurvive.Weapon
         {
           weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
         }
+      }
+    }
+
+    /// <summary>
+    /// [Coop] 무기 공격을 서버로 전송 (로컬 플레이어용)
+    /// </summary>
+    public void SendWeaponAttack(int weaponIndex, Vector3 direction)
+    {
+      if (player == null) player = GetComponent<Player>();
+      if (player != null && player.IsLocal && UDPClient.Instance != null)
+      {
+        UDPClient.Instance.SendAction(
+          ActionType.WeaponAttack,
+          0,
+          new Vector2(direction.x, direction.y),
+          (uint)weaponIndex
+        );
       }
     }
 

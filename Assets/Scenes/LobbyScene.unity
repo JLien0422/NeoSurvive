@@ -4125,7 +4125,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1057523994
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6417,8 +6417,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Neo Survive
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e7d858be6b7af0548a472048a9056274, type: 2}
-  m_sharedMaterial: {fileID: -367055782425989523, guid: e7d858be6b7af0548a472048a9056274, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 99d38a94428b1e949b557e4b8fd4d018, type: 2}
+  m_sharedMaterial: {fileID: 6234109634000449638, guid: 99d38a94428b1e949b557e4b8fd4d018, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6442,8 +6442,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 80
-  m_fontSizeBase: 80
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

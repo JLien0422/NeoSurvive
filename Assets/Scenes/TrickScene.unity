@@ -4060,6 +4060,10 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7581988356183243723, guid: 3d560479b107f184cb9d6ccf69b517b9, type: 3}
+      propertyPath: activeWeapons.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7581988356183243723, guid: 3d560479b107f184cb9d6ccf69b517b9, type: 3}
       propertyPath: allWeaponDatas.Array.size
       value: 11
       objectReference: {fileID: 0}

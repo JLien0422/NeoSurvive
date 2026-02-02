@@ -13,8 +13,10 @@ enum ActionType {
   DEAD = 5;
   LEVEL_UP = 6;
   REVIVE = 7;
-  WEAPON_EQUIP = 8;    // 무기 장착
-  WEAPON_ATTACK = 9;    // 무기 공격
+  WEAPON_EQUIP = 8;
+  WEAPON_USE = 9;
+  ENEMY_HIT = 10;
+  ENEMY_DEAD = 11;
 }
 
 // --- 메시지 정의 ---
@@ -51,7 +53,6 @@ message PlayerAction {
   float dir_x = 6;           // 조준 방향
   float dir_y = 7;
   uint32 value = 8;          // 대미지, 스킬/아이템 고유 번호 등
-  uint32 weapon_id = 9;      // 무기 ID (무기 장착/공격 시 사용)
 }
 
 // [Snapshot] 적(Enemy) 상태 정보

@@ -135,7 +135,7 @@ namespace NeoSurvive.Weapon
       if (player != null && player.IsLocal && UDPClient.Instance != null)
       {
         UDPClient.Instance.SendAction(
-          ActionType.WeaponAttack,
+          ActionType.WeaponUse,
           0,
           new Vector2(direction.x, direction.y),
           (uint)weaponIndex

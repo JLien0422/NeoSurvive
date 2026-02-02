@@ -220,29 +220,51 @@ public class UDPClient : MonoBehaviour
   private void HandleAction(PlayerAction action)
   {
     int myId = DBManager.Instance?.PlayerId ?? 1;
-    if (action.PlayerId == (uint)myId) return;
+    bool isLocalAction = action.PlayerId == (uint)myId;
+
+    switch (action.ActionType)
+    {
+      case ActionType.EnemyHit:
+        if (EnemyManager.Instance != null)
+        {
+          EnemyManager.Instance.ApplyEnemyHit(action.TargetId, action.Value);
+        }
+        return;
+      case ActionType.EnemyDead:
+        if (EnemyManager.Instance != null)
+        {
+          EnemyManager.Instance.ApplyEnemyDead(action.TargetId);
+        }
+        return;
+    }
 
     if (_allPlayers.TryGetValue((int)action.PlayerId, out Player player))
     {
       switch (action.ActionType)
       {
         case ActionType.NeuralLink:
+          if (isLocalAction) return;
           player.ExecuteNeuralLink();
           break;
         case ActionType.Attack:
+          if (isLocalAction) return;
           player.ExecuteAttack((int)action.Value, new Vector2(action.DirX, action.DirY));
           break;
         case ActionType.Dead:
+          if (isLocalAction) return;
           player.SetHealth(0);
           break;
         case ActionType.Revive:
+          if (isLocalAction) return;
           player.Revive();
           break;
         case ActionType.WeaponEquip:
+          if (isLocalAction) return;
           player.SyncWeaponEquip((int)action.Value);
           break;
-        case ActionType.WeaponAttack:
-          player.ExecuteAttack((int)action.WeaponId, new Vector2(action.DirX, action.DirY));
+        case ActionType.WeaponUse:
+          if (isLocalAction) return;
+          player.ExecuteAttack((int)action.Value, new Vector2(action.DirX, action.DirY));
           break;
       }
     }

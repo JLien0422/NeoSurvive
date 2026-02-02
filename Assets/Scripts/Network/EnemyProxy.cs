@@ -42,6 +42,31 @@ namespace NeoSurvive.Network
       }
     }
 
+    /// <summary>
+    /// 서버 이벤트 기반 피격 처리
+    /// </summary>
+    public void ApplyDamage(float damage)
+    {
+      if (damage <= 0) return;
+      Enemy enemy = GetComponent<Enemy>();
+      if (enemy != null)
+      {
+        enemy.TakeDamage(damage);
+      }
+    }
+
+    /// <summary>
+    /// 서버 이벤트 기반 즉시 사망 처리
+    /// </summary>
+    public void ForceDead()
+    {
+      Enemy enemy = GetComponent<Enemy>();
+      if (enemy != null)
+      {
+        enemy.SetHealth(0);
+      }
+    }
+
     private void Update()
     {
       if (isFirstUpdate) return;

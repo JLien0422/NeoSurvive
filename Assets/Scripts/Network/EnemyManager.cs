@@ -77,6 +77,28 @@ namespace NeoSurvive.Network
       }
     }
 
+    /// <summary>
+    /// 서버 이벤트 기반 적 피격 처리
+    /// </summary>
+    public void ApplyEnemyHit(uint enemyId, uint damage)
+    {
+      if (activeEnemies.TryGetValue(enemyId, out EnemyProxy proxy) && proxy != null)
+      {
+        proxy.ApplyDamage(damage);
+      }
+    }
+
+    /// <summary>
+    /// 서버 이벤트 기반 적 사망 처리
+    /// </summary>
+    public void ApplyEnemyDead(uint enemyId)
+    {
+      if (activeEnemies.TryGetValue(enemyId, out EnemyProxy proxy) && proxy != null)
+      {
+        proxy.ForceDead();
+      }
+    }
+
     private void SpawnEnemyProxy(Protocol.EnemyState state)
     {
       if (prefabTable.TryGetValue(state.TypeId, out GameObject prefab))

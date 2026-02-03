@@ -260,17 +260,27 @@ public class UDPClient : MonoBehaviour
           break;
         case ActionType.WeaponEquip:
           if (isLocalAction) return;
-          player.SyncWeaponEquip((int)action.Value);
+          player.SyncWeaponEquip(GetWeaponIdFromAction(action));
           break;
         case ActionType.WeaponUse:
           if (isLocalAction) return;
-          player.ExecuteAttack((int)action.Value, new Vector2(action.DirX, action.DirY));
+          player.ExecuteAttack(GetWeaponIdFromAction(action), new Vector2(action.DirX, action.DirY));
           break;
       }
     }
   }
 
-  public void SendAction(ActionType type, uint targetId = 0, Vector2 direction = default, uint value = 0)
+  private int GetWeaponIdFromAction(PlayerAction action)
+  {
+    if (action.WeaponType != NeoSurvive.Network.Protocol.WeaponType.WeaponUnspecified)
+    {
+      return (int)action.WeaponType;
+    }
+
+    return (int)action.Value;
+  }
+
+  public void SendAction(ActionType type, uint targetId = 0, Vector2 direction = default, uint value = 0, int weaponTypeId = 0)
   {
     if (!isConnected || _localPlayer == null) return;
     try
@@ -284,7 +294,8 @@ public class UDPClient : MonoBehaviour
         PosY = _localPlayer.transform.position.y,
         DirX = direction.x,
         DirY = direction.y,
-        Value = value
+        Value = value,
+        WeaponType = (NeoSurvive.Network.Protocol.WeaponType)weaponTypeId
       };
       GamePacket packet = new GamePacket { PlayerAction = action };
       byte[] sendData = packet.ToByteArray();

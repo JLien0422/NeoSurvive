@@ -9,6 +9,10 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public class WeaponBase : ScriptableObject
     {
+        [Header("Weapon ID")]
+        [Min(1)]
+        public int weaponId;
+
         [Header("Weapon Settings")]
         public string weaponName;
 

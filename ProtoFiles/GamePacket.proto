@@ -19,6 +19,13 @@ enum ActionType {
   ENEMY_DEAD = 11;
 }
 
+// --- 장비/무기 열거형 ---
+enum WeaponType {
+  WEAPON_UNSPECIFIED = 0;
+  WEAPON_1 = 1;
+  WEAPON_2 = 2;
+}
+
 // --- 메시지 정의 ---
 
 // [Periodic] 메인 패킷 컨테이너 (클라이언트-서버 통신용)
@@ -53,6 +60,7 @@ message PlayerAction {
   float dir_x = 6;           // 조준 방향
   float dir_y = 7;
   uint32 value = 8;          // 대미지, 스킬/아이템 고유 번호 등
+  WeaponType weapon_type = 9; // 장비/무기 구분
 }
 
 // [Snapshot] 적(Enemy) 상태 정보

@@ -381,24 +381,24 @@ public class Player : Character
   /// <summary>
   /// [Coop] 특정 무기의 공격을 실행 (원격 플레이어 동기화용)
   /// </summary>
-  public void ExecuteAttack(int weaponIndex, Vector3 direction)
+  public void ExecuteAttack(int weaponId, Vector3 direction)
   {
     var weaponManager = GetComponent<WeaponManager>();
     if (weaponManager != null)
     {
-      weaponManager.ExecuteWeaponAttack(weaponIndex, direction);
+      weaponManager.ExecuteWeaponAttack(weaponId, direction);
     }
   }
 
   /// <summary>
   /// [Coop] 원격 플레이어의 무기 장착 동기화
   /// </summary>
-  public void SyncWeaponEquip(int weaponIndex)
+  public void SyncWeaponEquip(int weaponId)
   {
     var weaponManager = GetComponent<WeaponManager>();
     if (weaponManager != null)
     {
-      weaponManager.SyncWeaponEquip(weaponIndex);
+      weaponManager.SyncWeaponEquip(weaponId);
     }
   }
 

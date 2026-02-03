@@ -33,6 +33,11 @@ namespace NeoSurvive.Weapon
     // [Coop] Player 참조
     private Player player;
 
+    private WeaponBase FindWeaponById(int weaponId)
+    {
+      return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId);
+    }
+
     /// <summary>
     /// 새로운 무기 추가 또는 레벨업
     /// </summary>
@@ -84,11 +89,13 @@ namespace NeoSurvive.Weapon
         if (player == null) player = GetComponent<Player>();
         if (player != null && player.IsLocal && UDPClient.Instance != null)
         {
-          int weaponIndex = allWeaponDatas.IndexOf(weaponData);
-          if (weaponIndex >= 0)
-          {
-            UDPClient.Instance.SendAction(ActionType.WeaponEquip, 0, Vector2.zero, (uint)weaponIndex);
-          }
+          UDPClient.Instance.SendAction(
+            ActionType.WeaponEquip,
+            0,
+            Vector2.zero,
+            (uint)weaponData.weaponId,
+            weaponData.weaponId
+          );
         }
       }
     }
@@ -102,34 +109,44 @@ namespace NeoSurvive.Weapon
       }
     }
 
+    public void AddWeaponById(int weaponId, bool sendToServer = true)
+    {
+      var weapon = FindWeaponById(weaponId);
+      if (weapon != null)
+      {
+        AddWeapon(weapon, sendToServer);
+      }
+    }
+
     /// <summary>
     /// [Coop] 원격 플레이어의 무기 장착 동기화
     /// </summary>
-    public void SyncWeaponEquip(int weaponIndex)
+    public void SyncWeaponEquip(int weaponId)
     {
       // 서버에 재전송하지 않음
-      AddWeapon(weaponIndex, sendToServer: false);
+      AddWeaponById(weaponId, sendToServer: false);
     }
     /// <summary>
     /// [Coop] 특정 무기의 공격을 실행 (원격 동기화용)
     /// </summary>
-    public void ExecuteWeaponAttack(int weaponIndex, Vector3 direction)
+    public void ExecuteWeaponAttack(int weaponId, Vector3 direction)
     {
-      // 현재 예시에서는 allWeaponDatas의 인덱스를 무기 식별자로 사용
-      if (weaponIndex >= 0 && weaponIndex < allWeaponDatas.Count)
+      WeaponBase data = FindWeaponById(weaponId);
+      if (data == null && weaponId >= 0 && weaponId < allWeaponDatas.Count)
       {
-        WeaponBase data = allWeaponDatas[weaponIndex];
-        if (spawnedWeapons.TryGetValue(data, out GameObject weaponObj))
-        {
-          weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
-        }
+        data = allWeaponDatas[weaponId];
+      }
+
+      if (data != null && spawnedWeapons.TryGetValue(data, out GameObject weaponObj))
+      {
+        weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
       }
     }
 
     /// <summary>
     /// [Coop] 무기 공격을 서버로 전송 (로컬 플레이어용)
     /// </summary>
-    public void SendWeaponAttack(int weaponIndex, Vector3 direction)
+    public void SendWeaponAttack(int weaponId, Vector3 direction)
     {
       if (player == null) player = GetComponent<Player>();
       if (player != null && player.IsLocal && UDPClient.Instance != null)
@@ -138,7 +155,8 @@ namespace NeoSurvive.Weapon
           ActionType.WeaponUse,
           0,
           new Vector2(direction.x, direction.y),
-          (uint)weaponIndex
+          (uint)weaponId,
+          weaponId
         );
       }
     }

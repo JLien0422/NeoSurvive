@@ -259,7 +259,6 @@ public class UDPClient : MonoBehaviour
           player.Revive();
           break;
         case ActionType.WeaponEquip:
-          if (isLocalAction) return;
           player.SyncWeaponEquip(GetWeaponIdFromAction(action));
           break;
         case ActionType.WeaponUse:
@@ -302,6 +301,33 @@ public class UDPClient : MonoBehaviour
       client.Send(sendData, sendData.Length, serverEndpoint);
     }
     catch (Exception e) { Debug.LogWarning($"[UDP 액션 실패] {e.Message}"); }
+  }
+
+  public void SendWeaponAction(ActionType type, int weaponId, Vector2 direction, Vector2 position, Action<PlayerAction> setPayload)
+  {
+    if (!isConnected || _localPlayer == null) return;
+    try
+    {
+      PlayerAction action = new PlayerAction
+      {
+        PlayerId = (uint)(DBManager.Instance?.PlayerId ?? 1),
+        ActionType = type,
+        TargetId = 0,
+        PosX = position.x,
+        PosY = position.y,
+        DirX = direction.x,
+        DirY = direction.y,
+        Value = 0,
+        WeaponType = (NeoSurvive.Network.Protocol.WeaponType)weaponId
+      };
+
+      setPayload?.Invoke(action);
+
+      GamePacket packet = new GamePacket { PlayerAction = action };
+      byte[] sendData = packet.ToByteArray();
+      client.Send(sendData, sendData.Length, serverEndpoint);
+    }
+    catch (Exception e) { Debug.LogWarning($"[UDP 무기 액션 실패] {e.Message}"); }
   }
 
   private void OnApplicationQuit() { Close(); }

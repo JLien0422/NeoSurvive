@@ -52,6 +52,21 @@ public class PlasmaRifle : MonoBehaviour
 
     Vector3 dir = (target.transform.position - transform.position).normalized;
 
+    // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
+    var runtimeInfo = GetComponent<NeoSurvive.Weapon.WeaponRuntimeInfo>();
+    if (runtimeInfo != null)
+    {
+      float duration = 0f;
+      float speed = 0f;
+      if (lazerPrefab != null && lazerPrefab.TryGetComponent<PlasmaLazer>(out var lazerInfo))
+      {
+        duration = lazerInfo.duration;
+        speed = lazerInfo.bulletSpeed;
+      }
+
+      runtimeInfo.ReportBeam(transform.position, dir, duration, speed, currentPenetration);
+    }
+
     GameObject obj = Instantiate(lazerPrefab, transform.position, Quaternion.identity);
     obj.SetActive(true);
 

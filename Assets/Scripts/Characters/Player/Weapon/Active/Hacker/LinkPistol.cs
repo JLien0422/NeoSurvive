@@ -64,10 +64,10 @@ namespace NeoSurvive.Weapon
       Vector3 dir = (target.transform.position - transform.position).normalized;
 
       // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
-      if (owner != null && owner.IsLocal && UDPClient.Instance != null)
+      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
+      if (runtimeInfo != null)
       {
-        // 8번은 LinkPistol의 임시 타입 인덱스로 사용 (Value 필드 활용 가능)
-        UDPClient.Instance.SendAction(NeoSurvive.Network.Protocol.ActionType.Attack, 0, new Vector2(dir.x, dir.y), 8);
+        runtimeInfo.ReportProjectile(transform.position, dir, bulletSpeed, range, 0, 0);
       }
 
       ExecuteAttack(dir);

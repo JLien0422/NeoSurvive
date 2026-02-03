@@ -45,6 +45,12 @@ namespace NeoSurvive.Weapon
             if (nanoWirePrefab == null) return;
 
             // 현재 위치에 설치
+            var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
+            if (runtimeInfo != null)
+            {
+                runtimeInfo.ReportTrap(transform.position, duration, 1.0f, 0.2f, 0.5f);
+            }
+
             GameObject obj = Instantiate(nanoWirePrefab, transform.position, Quaternion.identity);
             
              // 회전 조절? (진행 방향에 수직 등) - 일단은 기본(Identity)

@@ -32,31 +32,62 @@ namespace NeoSurvive.Network.Protocol {
             "eWxvYWQifwoKUGxheWVyTW92ZRIRCglwbGF5ZXJfaWQYASABKA0SEQoJdGlt",
             "ZXN0YW1wGAIgASgDEg0KBXBvc194GAMgASgCEg0KBXBvc195GAQgASgCEg0K",
             "BXZlbF94GAUgASgCEg0KBXZlbF95GAYgASgCEg8KB2lzX2RlYWQYByABKAgi",
-            "wwEKDFBsYXllckFjdGlvbhIRCglwbGF5ZXJfaWQYASABKA0SIAoLYWN0aW9u",
+            "5wMKDFBsYXllckFjdGlvbhIRCglwbGF5ZXJfaWQYASABKA0SIAoLYWN0aW9u",
             "X3R5cGUYAiABKA4yCy5BY3Rpb25UeXBlEhEKCXRhcmdldF9pZBgDIAEoDRIN",
             "CgVwb3NfeBgEIAEoAhINCgVwb3NfeRgFIAEoAhINCgVkaXJfeBgGIAEoAhIN",
             "CgVkaXJfeRgHIAEoAhINCgV2YWx1ZRgIIAEoDRIgCgt3ZWFwb25fdHlwZRgJ",
-            "IAEoDjILLldlYXBvblR5cGUiYQoKRW5lbXlTdGF0ZRIQCghlbmVteV9pZBgB",
-            "IAEoDRIPCgd0eXBlX2lkGAIgASgNEg0KBXBvc194GAMgASgCEg0KBXBvc195",
-            "GAQgASgCEhIKCmN1cnJlbnRfaHAYBSABKA0iSwoJSXRlbVN0YXRlEg8KB2l0",
-            "ZW1faWQYASABKA0SDwoHdHlwZV9pZBgCIAEoDRINCgVwb3NfeBgDIAEoAhIN",
-            "CgVwb3NfeRgEIAEoAiKcAQoMR2FtZVNuYXBzaG90EhEKCXRpbWVzdGFtcBgB",
-            "IAEoAxIRCglnYW1lX3RpbWUYAiABKAISIgoNcGxheWVyX3N0YXRlcxgDIAMo",
-            "CzILLlBsYXllck1vdmUSIQoMZW5lbXlfc3RhdGVzGAQgAygLMgsuRW5lbXlT",
-            "dGF0ZRIfCgtpdGVtX3N0YXRlcxgFIAMoCzIKLkl0ZW1TdGF0ZSq2AQoKQWN0",
-            "aW9uVHlwZRIKCgZBVFRBQ0sQABIJCgVTS0lMTBABEg8KC05FVVJBTF9MSU5L",
-            "EAISDwoLSVRFTV9QSUNLVVAQAxIKCgZEQU1BR0UQBBIICgRERUFEEAUSDAoI",
-            "TEVWRUxfVVAQBhIKCgZSRVZJVkUQBxIQCgxXRUFQT05fRVFVSVAQCBIOCgpX",
-            "RUFQT05fVVNFEAkSDQoJRU5FTVlfSElUEAoSDgoKRU5FTVlfREVBRBALKkAK",
-            "CldlYXBvblR5cGUSFgoSV0VBUE9OX1VOU1BFQ0lGSUVEEAASDAoIV0VBUE9O",
-            "XzEQARIMCghXRUFQT05fMhACQh6qAhtOZW9TdXJ2aXZlLk5ldHdvcmsuUHJv",
-            "dG9jb2xiBnByb3RvMw=="));
+            "IAEoDjILLldlYXBvblR5cGUSNQoRd2VhcG9uX3Byb2plY3RpbGUYCiABKAsy",
+            "GC5XZWFwb25Qcm9qZWN0aWxlUGF5bG9hZEgAEikKC3dlYXBvbl9iZWFtGAsg",
+            "ASgLMhIuV2VhcG9uQmVhbVBheWxvYWRIABIpCgt3ZWFwb25fY29uZRgMIAEo",
+            "CzISLldlYXBvbkNvbmVQYXlsb2FkSAASKQoLd2VhcG9uX2FyZWEYDSABKAsy",
+            "Ei5XZWFwb25BcmVhUGF5bG9hZEgAEi0KDXdlYXBvbl9zdW1tb24YDiABKAsy",
+            "FC5XZWFwb25TdW1tb25QYXlsb2FkSAASKQoLd2VhcG9uX3RyYXAYDyABKAsy",
+            "Ei5XZWFwb25UcmFwUGF5bG9hZEgAQhAKDndlYXBvbl9wYXlsb2FkIp8BChdX",
+            "ZWFwb25Qcm9qZWN0aWxlUGF5bG9hZBIPCgdzcGF3bl94GAEgASgCEg8KB3Nw",
+            "YXduX3kYAiABKAISDQoFZGlyX3gYAyABKAISDQoFZGlyX3kYBCABKAISDQoF",
+            "c3BlZWQYBSABKAISDQoFcmFuZ2UYBiABKAISEwoLcGVuZXRyYXRpb24YByAB",
+            "KA0SEQoJdGFyZ2V0X2lkGAggASgNIokBChFXZWFwb25CZWFtUGF5bG9hZBIP",
+            "CgdzdGFydF94GAEgASgCEg8KB3N0YXJ0X3kYAiABKAISDQoFZGlyX3gYAyAB",
+            "KAISDQoFZGlyX3kYBCABKAISEAoIZHVyYXRpb24YBSABKAISDQoFc3BlZWQY",
+            "BiABKAISEwoLcGVuZXRyYXRpb24YByABKA0ijAEKEVdlYXBvbkNvbmVQYXls",
+            "b2FkEhAKCG9yaWdpbl94GAEgASgCEhAKCG9yaWdpbl95GAIgASgCEg0KBWRp",
+            "cl94GAMgASgCEg0KBWRpcl95GAQgASgCEg0KBWFuZ2xlGAUgASgCEg0KBXJh",
+            "bmdlGAYgASgCEhcKD3N0YXR1c19kdXJhdGlvbhgHIAEoAiKJAQoRV2VhcG9u",
+            "QXJlYVBheWxvYWQSEAoIY2VudGVyX3gYASABKAISEAoIY2VudGVyX3kYAiAB",
+            "KAISDgoGcmFkaXVzGAMgASgCEhAKCGR1cmF0aW9uGAQgASgCEhEKCXRpY2tf",
+            "cmF0ZRgFIAEoAhIbChNkZXN0cm95X3Byb2plY3RpbGVzGAYgASgIIoQBChNX",
+            "ZWFwb25TdW1tb25QYXlsb2FkEg8KB3NwYXduX3gYASABKAISDwoHc3Bhd25f",
+            "eRgCIAEoAhIQCghkdXJhdGlvbhgDIAEoAhIKCgJocBgEIAEoAhIUCgxzcGF3",
+            "bl9wcmlzb24YBSABKAgSFwoPcHJpc29uX2R1cmF0aW9uGAYgASgCIoQBChFX",
+            "ZWFwb25UcmFwUGF5bG9hZBIPCgdzcGF3bl94GAEgASgCEg8KB3NwYXduX3kY",
+            "AiABKAISEAoIZHVyYXRpb24YAyABKAISGAoQYWN0aXZhdGlvbl9kZWxheRgE",
+            "IAEoAhIRCgl0aWNrX3JhdGUYBSABKAISDgoGcmFkaXVzGAYgASgCImEKCkVu",
+            "ZW15U3RhdGUSEAoIZW5lbXlfaWQYASABKA0SDwoHdHlwZV9pZBgCIAEoDRIN",
+            "CgVwb3NfeBgDIAEoAhINCgVwb3NfeRgEIAEoAhISCgpjdXJyZW50X2hwGAUg",
+            "ASgNIksKCUl0ZW1TdGF0ZRIPCgdpdGVtX2lkGAEgASgNEg8KB3R5cGVfaWQY",
+            "AiABKA0SDQoFcG9zX3gYAyABKAISDQoFcG9zX3kYBCABKAIinAEKDEdhbWVT",
+            "bmFwc2hvdBIRCgl0aW1lc3RhbXAYASABKAMSEQoJZ2FtZV90aW1lGAIgASgC",
+            "EiIKDXBsYXllcl9zdGF0ZXMYAyADKAsyCy5QbGF5ZXJNb3ZlEiEKDGVuZW15",
+            "X3N0YXRlcxgEIAMoCzILLkVuZW15U3RhdGUSHwoLaXRlbV9zdGF0ZXMYBSAD",
+            "KAsyCi5JdGVtU3RhdGUqtgEKCkFjdGlvblR5cGUSCgoGQVRUQUNLEAASCQoF",
+            "U0tJTEwQARIPCgtORVVSQUxfTElOSxACEg8KC0lURU1fUElDS1VQEAMSCgoG",
+            "REFNQUdFEAQSCAoEREVBRBAFEgwKCExFVkVMX1VQEAYSCgoGUkVWSVZFEAcS",
+            "EAoMV0VBUE9OX0VRVUlQEAgSDgoKV0VBUE9OX1VTRRAJEg0KCUVORU1ZX0hJ",
+            "VBAKEg4KCkVORU1ZX0RFQUQQCypACgpXZWFwb25UeXBlEhYKEldFQVBPTl9V",
+            "TlNQRUNJRklFRBAAEgwKCFdFQVBPTl8xEAESDAoIV0VBUE9OXzIQAkIeqgIb",
+            "TmVvU3Vydml2ZS5OZXR3b3JrLlByb3RvY29sYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::NeoSurvive.Network.Protocol.ActionType), typeof(global::NeoSurvive.Network.Protocol.WeaponType), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GamePacket), global::NeoSurvive.Network.Protocol.GamePacket.Parser, new[]{ "PlayerMove", "PlayerAction", "GameSnapshot", "EnemyState", "ItemState" }, new[]{ "Payload" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerMove), global::NeoSurvive.Network.Protocol.PlayerMove.Parser, new[]{ "PlayerId", "Timestamp", "PosX", "PosY", "VelX", "VelY", "IsDead" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value", "WeaponType" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.PlayerAction), global::NeoSurvive.Network.Protocol.PlayerAction.Parser, new[]{ "PlayerId", "ActionType", "TargetId", "PosX", "PosY", "DirX", "DirY", "Value", "WeaponType", "WeaponProjectile", "WeaponBeam", "WeaponCone", "WeaponArea", "WeaponSummon", "WeaponTrap" }, new[]{ "WeaponPayload" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponProjectilePayload), global::NeoSurvive.Network.Protocol.WeaponProjectilePayload.Parser, new[]{ "SpawnX", "SpawnY", "DirX", "DirY", "Speed", "Range", "Penetration", "TargetId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponBeamPayload), global::NeoSurvive.Network.Protocol.WeaponBeamPayload.Parser, new[]{ "StartX", "StartY", "DirX", "DirY", "Duration", "Speed", "Penetration" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponConePayload), global::NeoSurvive.Network.Protocol.WeaponConePayload.Parser, new[]{ "OriginX", "OriginY", "DirX", "DirY", "Angle", "Range", "StatusDuration" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponAreaPayload), global::NeoSurvive.Network.Protocol.WeaponAreaPayload.Parser, new[]{ "CenterX", "CenterY", "Radius", "Duration", "TickRate", "DestroyProjectiles" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponSummonPayload), global::NeoSurvive.Network.Protocol.WeaponSummonPayload.Parser, new[]{ "SpawnX", "SpawnY", "Duration", "Hp", "SpawnPrison", "PrisonDuration" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.WeaponTrapPayload), global::NeoSurvive.Network.Protocol.WeaponTrapPayload.Parser, new[]{ "SpawnX", "SpawnY", "Duration", "ActivationDelay", "TickRate", "Radius" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.EnemyState), global::NeoSurvive.Network.Protocol.EnemyState.Parser, new[]{ "EnemyId", "TypeId", "PosX", "PosY", "CurrentHp" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.ItemState), global::NeoSurvive.Network.Protocol.ItemState.Parser, new[]{ "ItemId", "TypeId", "PosX", "PosY" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::NeoSurvive.Network.Protocol.GameSnapshot), global::NeoSurvive.Network.Protocol.GameSnapshot.Parser, new[]{ "Timestamp", "GameTime", "PlayerStates", "EnemyStates", "ItemStates" }, null, null, null, null)
@@ -1009,6 +1040,27 @@ namespace NeoSurvive.Network.Protocol {
       dirY_ = other.dirY_;
       value_ = other.value_;
       weaponType_ = other.weaponType_;
+      switch (other.WeaponPayloadCase) {
+        case WeaponPayloadOneofCase.WeaponProjectile:
+          WeaponProjectile = other.WeaponProjectile.Clone();
+          break;
+        case WeaponPayloadOneofCase.WeaponBeam:
+          WeaponBeam = other.WeaponBeam.Clone();
+          break;
+        case WeaponPayloadOneofCase.WeaponCone:
+          WeaponCone = other.WeaponCone.Clone();
+          break;
+        case WeaponPayloadOneofCase.WeaponArea:
+          WeaponArea = other.WeaponArea.Clone();
+          break;
+        case WeaponPayloadOneofCase.WeaponSummon:
+          WeaponSummon = other.WeaponSummon.Clone();
+          break;
+        case WeaponPayloadOneofCase.WeaponTrap:
+          WeaponTrap = other.WeaponTrap.Clone();
+          break;
+      }
+
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1141,6 +1193,103 @@ namespace NeoSurvive.Network.Protocol {
       }
     }
 
+    /// <summary>Field number for the "weapon_projectile" field.</summary>
+    public const int WeaponProjectileFieldNumber = 10;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponProjectilePayload WeaponProjectile {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile ? (global::NeoSurvive.Network.Protocol.WeaponProjectilePayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponProjectile;
+      }
+    }
+
+    /// <summary>Field number for the "weapon_beam" field.</summary>
+    public const int WeaponBeamFieldNumber = 11;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponBeamPayload WeaponBeam {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam ? (global::NeoSurvive.Network.Protocol.WeaponBeamPayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponBeam;
+      }
+    }
+
+    /// <summary>Field number for the "weapon_cone" field.</summary>
+    public const int WeaponConeFieldNumber = 12;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponConePayload WeaponCone {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone ? (global::NeoSurvive.Network.Protocol.WeaponConePayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponCone;
+      }
+    }
+
+    /// <summary>Field number for the "weapon_area" field.</summary>
+    public const int WeaponAreaFieldNumber = 13;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponAreaPayload WeaponArea {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea ? (global::NeoSurvive.Network.Protocol.WeaponAreaPayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponArea;
+      }
+    }
+
+    /// <summary>Field number for the "weapon_summon" field.</summary>
+    public const int WeaponSummonFieldNumber = 14;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponSummonPayload WeaponSummon {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon ? (global::NeoSurvive.Network.Protocol.WeaponSummonPayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponSummon;
+      }
+    }
+
+    /// <summary>Field number for the "weapon_trap" field.</summary>
+    public const int WeaponTrapFieldNumber = 15;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::NeoSurvive.Network.Protocol.WeaponTrapPayload WeaponTrap {
+      get { return weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap ? (global::NeoSurvive.Network.Protocol.WeaponTrapPayload) weaponPayload_ : null; }
+      set {
+        weaponPayload_ = value;
+        weaponPayloadCase_ = value == null ? WeaponPayloadOneofCase.None : WeaponPayloadOneofCase.WeaponTrap;
+      }
+    }
+
+    private object weaponPayload_;
+    /// <summary>Enum of possible cases for the "weapon_payload" oneof.</summary>
+    public enum WeaponPayloadOneofCase {
+      None = 0,
+      WeaponProjectile = 10,
+      WeaponBeam = 11,
+      WeaponCone = 12,
+      WeaponArea = 13,
+      WeaponSummon = 14,
+      WeaponTrap = 15,
+    }
+    private WeaponPayloadOneofCase weaponPayloadCase_ = WeaponPayloadOneofCase.None;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponPayloadOneofCase WeaponPayloadCase {
+      get { return weaponPayloadCase_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearWeaponPayload() {
+      weaponPayloadCase_ = WeaponPayloadOneofCase.None;
+      weaponPayload_ = null;
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1165,6 +1314,13 @@ namespace NeoSurvive.Network.Protocol {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
       if (Value != other.Value) return false;
       if (WeaponType != other.WeaponType) return false;
+      if (!object.Equals(WeaponProjectile, other.WeaponProjectile)) return false;
+      if (!object.Equals(WeaponBeam, other.WeaponBeam)) return false;
+      if (!object.Equals(WeaponCone, other.WeaponCone)) return false;
+      if (!object.Equals(WeaponArea, other.WeaponArea)) return false;
+      if (!object.Equals(WeaponSummon, other.WeaponSummon)) return false;
+      if (!object.Equals(WeaponTrap, other.WeaponTrap)) return false;
+      if (WeaponPayloadCase != other.WeaponPayloadCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1181,6 +1337,13 @@ namespace NeoSurvive.Network.Protocol {
       if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
       if (Value != 0) hash ^= Value.GetHashCode();
       if (WeaponType != global::NeoSurvive.Network.Protocol.WeaponType.WeaponUnspecified) hash ^= WeaponType.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) hash ^= WeaponProjectile.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) hash ^= WeaponBeam.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) hash ^= WeaponCone.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) hash ^= WeaponArea.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) hash ^= WeaponSummon.GetHashCode();
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) hash ^= WeaponTrap.GetHashCode();
+      hash ^= (int) weaponPayloadCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1235,6 +1398,30 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(72);
         output.WriteEnum((int) WeaponType);
       }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) {
+        output.WriteRawTag(82);
+        output.WriteMessage(WeaponProjectile);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) {
+        output.WriteRawTag(90);
+        output.WriteMessage(WeaponBeam);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) {
+        output.WriteRawTag(98);
+        output.WriteMessage(WeaponCone);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) {
+        output.WriteRawTag(106);
+        output.WriteMessage(WeaponArea);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) {
+        output.WriteRawTag(114);
+        output.WriteMessage(WeaponSummon);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) {
+        output.WriteRawTag(122);
+        output.WriteMessage(WeaponTrap);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1281,6 +1468,30 @@ namespace NeoSurvive.Network.Protocol {
         output.WriteRawTag(72);
         output.WriteEnum((int) WeaponType);
       }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) {
+        output.WriteRawTag(82);
+        output.WriteMessage(WeaponProjectile);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) {
+        output.WriteRawTag(90);
+        output.WriteMessage(WeaponBeam);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) {
+        output.WriteRawTag(98);
+        output.WriteMessage(WeaponCone);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) {
+        output.WriteRawTag(106);
+        output.WriteMessage(WeaponArea);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) {
+        output.WriteRawTag(114);
+        output.WriteMessage(WeaponSummon);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) {
+        output.WriteRawTag(122);
+        output.WriteMessage(WeaponTrap);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1317,6 +1528,24 @@ namespace NeoSurvive.Network.Protocol {
       }
       if (WeaponType != global::NeoSurvive.Network.Protocol.WeaponType.WeaponUnspecified) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) WeaponType);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponProjectile);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponBeam);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponCone);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponArea);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponSummon);
+      }
+      if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(WeaponTrap);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1357,6 +1586,45 @@ namespace NeoSurvive.Network.Protocol {
       if (other.WeaponType != global::NeoSurvive.Network.Protocol.WeaponType.WeaponUnspecified) {
         WeaponType = other.WeaponType;
       }
+      switch (other.WeaponPayloadCase) {
+        case WeaponPayloadOneofCase.WeaponProjectile:
+          if (WeaponProjectile == null) {
+            WeaponProjectile = new global::NeoSurvive.Network.Protocol.WeaponProjectilePayload();
+          }
+          WeaponProjectile.MergeFrom(other.WeaponProjectile);
+          break;
+        case WeaponPayloadOneofCase.WeaponBeam:
+          if (WeaponBeam == null) {
+            WeaponBeam = new global::NeoSurvive.Network.Protocol.WeaponBeamPayload();
+          }
+          WeaponBeam.MergeFrom(other.WeaponBeam);
+          break;
+        case WeaponPayloadOneofCase.WeaponCone:
+          if (WeaponCone == null) {
+            WeaponCone = new global::NeoSurvive.Network.Protocol.WeaponConePayload();
+          }
+          WeaponCone.MergeFrom(other.WeaponCone);
+          break;
+        case WeaponPayloadOneofCase.WeaponArea:
+          if (WeaponArea == null) {
+            WeaponArea = new global::NeoSurvive.Network.Protocol.WeaponAreaPayload();
+          }
+          WeaponArea.MergeFrom(other.WeaponArea);
+          break;
+        case WeaponPayloadOneofCase.WeaponSummon:
+          if (WeaponSummon == null) {
+            WeaponSummon = new global::NeoSurvive.Network.Protocol.WeaponSummonPayload();
+          }
+          WeaponSummon.MergeFrom(other.WeaponSummon);
+          break;
+        case WeaponPayloadOneofCase.WeaponTrap:
+          if (WeaponTrap == null) {
+            WeaponTrap = new global::NeoSurvive.Network.Protocol.WeaponTrapPayload();
+          }
+          WeaponTrap.MergeFrom(other.WeaponTrap);
+          break;
+      }
+
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1406,6 +1674,60 @@ namespace NeoSurvive.Network.Protocol {
           }
           case 72: {
             WeaponType = (global::NeoSurvive.Network.Protocol.WeaponType) input.ReadEnum();
+            break;
+          }
+          case 82: {
+            global::NeoSurvive.Network.Protocol.WeaponProjectilePayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponProjectilePayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) {
+              subBuilder.MergeFrom(WeaponProjectile);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponProjectile = subBuilder;
+            break;
+          }
+          case 90: {
+            global::NeoSurvive.Network.Protocol.WeaponBeamPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponBeamPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) {
+              subBuilder.MergeFrom(WeaponBeam);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponBeam = subBuilder;
+            break;
+          }
+          case 98: {
+            global::NeoSurvive.Network.Protocol.WeaponConePayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponConePayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) {
+              subBuilder.MergeFrom(WeaponCone);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponCone = subBuilder;
+            break;
+          }
+          case 106: {
+            global::NeoSurvive.Network.Protocol.WeaponAreaPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponAreaPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) {
+              subBuilder.MergeFrom(WeaponArea);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponArea = subBuilder;
+            break;
+          }
+          case 114: {
+            global::NeoSurvive.Network.Protocol.WeaponSummonPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponSummonPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) {
+              subBuilder.MergeFrom(WeaponSummon);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponSummon = subBuilder;
+            break;
+          }
+          case 122: {
+            global::NeoSurvive.Network.Protocol.WeaponTrapPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponTrapPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) {
+              subBuilder.MergeFrom(WeaponTrap);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponTrap = subBuilder;
             break;
           }
         }
@@ -1459,6 +1781,2461 @@ namespace NeoSurvive.Network.Protocol {
             WeaponType = (global::NeoSurvive.Network.Protocol.WeaponType) input.ReadEnum();
             break;
           }
+          case 82: {
+            global::NeoSurvive.Network.Protocol.WeaponProjectilePayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponProjectilePayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponProjectile) {
+              subBuilder.MergeFrom(WeaponProjectile);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponProjectile = subBuilder;
+            break;
+          }
+          case 90: {
+            global::NeoSurvive.Network.Protocol.WeaponBeamPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponBeamPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponBeam) {
+              subBuilder.MergeFrom(WeaponBeam);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponBeam = subBuilder;
+            break;
+          }
+          case 98: {
+            global::NeoSurvive.Network.Protocol.WeaponConePayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponConePayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponCone) {
+              subBuilder.MergeFrom(WeaponCone);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponCone = subBuilder;
+            break;
+          }
+          case 106: {
+            global::NeoSurvive.Network.Protocol.WeaponAreaPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponAreaPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponArea) {
+              subBuilder.MergeFrom(WeaponArea);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponArea = subBuilder;
+            break;
+          }
+          case 114: {
+            global::NeoSurvive.Network.Protocol.WeaponSummonPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponSummonPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponSummon) {
+              subBuilder.MergeFrom(WeaponSummon);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponSummon = subBuilder;
+            break;
+          }
+          case 122: {
+            global::NeoSurvive.Network.Protocol.WeaponTrapPayload subBuilder = new global::NeoSurvive.Network.Protocol.WeaponTrapPayload();
+            if (weaponPayloadCase_ == WeaponPayloadOneofCase.WeaponTrap) {
+              subBuilder.MergeFrom(WeaponTrap);
+            }
+            input.ReadMessage(subBuilder);
+            WeaponTrap = subBuilder;
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// --- 무기 공격 페이로드 ---
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponProjectilePayload : pb::IMessage<WeaponProjectilePayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponProjectilePayload> _parser = new pb::MessageParser<WeaponProjectilePayload>(() => new WeaponProjectilePayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponProjectilePayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponProjectilePayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponProjectilePayload(WeaponProjectilePayload other) : this() {
+      spawnX_ = other.spawnX_;
+      spawnY_ = other.spawnY_;
+      dirX_ = other.dirX_;
+      dirY_ = other.dirY_;
+      speed_ = other.speed_;
+      range_ = other.range_;
+      penetration_ = other.penetration_;
+      targetId_ = other.targetId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponProjectilePayload Clone() {
+      return new WeaponProjectilePayload(this);
+    }
+
+    /// <summary>Field number for the "spawn_x" field.</summary>
+    public const int SpawnXFieldNumber = 1;
+    private float spawnX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnX {
+      get { return spawnX_; }
+      set {
+        spawnX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "spawn_y" field.</summary>
+    public const int SpawnYFieldNumber = 2;
+    private float spawnY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnY {
+      get { return spawnY_; }
+      set {
+        spawnY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_x" field.</summary>
+    public const int DirXFieldNumber = 3;
+    private float dirX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirX {
+      get { return dirX_; }
+      set {
+        dirX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_y" field.</summary>
+    public const int DirYFieldNumber = 4;
+    private float dirY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirY {
+      get { return dirY_; }
+      set {
+        dirY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "speed" field.</summary>
+    public const int SpeedFieldNumber = 5;
+    private float speed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Speed {
+      get { return speed_; }
+      set {
+        speed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "range" field.</summary>
+    public const int RangeFieldNumber = 6;
+    private float range_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Range {
+      get { return range_; }
+      set {
+        range_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "penetration" field.</summary>
+    public const int PenetrationFieldNumber = 7;
+    private uint penetration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Penetration {
+      get { return penetration_; }
+      set {
+        penetration_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "target_id" field.</summary>
+    public const int TargetIdFieldNumber = 8;
+    private uint targetId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint TargetId {
+      get { return targetId_; }
+      set {
+        targetId_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponProjectilePayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponProjectilePayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnX, other.SpawnX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnY, other.SpawnY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirX, other.DirX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Speed, other.Speed)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Range, other.Range)) return false;
+      if (Penetration != other.Penetration) return false;
+      if (TargetId != other.TargetId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (SpawnX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnX);
+      if (SpawnY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnY);
+      if (DirX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirX);
+      if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
+      if (Speed != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Speed);
+      if (Range != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Range);
+      if (Penetration != 0) hash ^= Penetration.GetHashCode();
+      if (TargetId != 0) hash ^= TargetId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Speed != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Speed);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Range);
+      }
+      if (Penetration != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Penetration);
+      }
+      if (TargetId != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(TargetId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Speed != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Speed);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Range);
+      }
+      if (Penetration != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Penetration);
+      }
+      if (TargetId != 0) {
+        output.WriteRawTag(64);
+        output.WriteUInt32(TargetId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (SpawnX != 0F) {
+        size += 1 + 4;
+      }
+      if (SpawnY != 0F) {
+        size += 1 + 4;
+      }
+      if (DirX != 0F) {
+        size += 1 + 4;
+      }
+      if (DirY != 0F) {
+        size += 1 + 4;
+      }
+      if (Speed != 0F) {
+        size += 1 + 4;
+      }
+      if (Range != 0F) {
+        size += 1 + 4;
+      }
+      if (Penetration != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Penetration);
+      }
+      if (TargetId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TargetId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponProjectilePayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.SpawnX != 0F) {
+        SpawnX = other.SpawnX;
+      }
+      if (other.SpawnY != 0F) {
+        SpawnY = other.SpawnY;
+      }
+      if (other.DirX != 0F) {
+        DirX = other.DirX;
+      }
+      if (other.DirY != 0F) {
+        DirY = other.DirY;
+      }
+      if (other.Speed != 0F) {
+        Speed = other.Speed;
+      }
+      if (other.Range != 0F) {
+        Range = other.Range;
+      }
+      if (other.Penetration != 0) {
+        Penetration = other.Penetration;
+      }
+      if (other.TargetId != 0) {
+        TargetId = other.TargetId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Speed = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            Penetration = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            TargetId = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Speed = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            Penetration = input.ReadUInt32();
+            break;
+          }
+          case 64: {
+            TargetId = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponBeamPayload : pb::IMessage<WeaponBeamPayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponBeamPayload> _parser = new pb::MessageParser<WeaponBeamPayload>(() => new WeaponBeamPayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponBeamPayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponBeamPayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponBeamPayload(WeaponBeamPayload other) : this() {
+      startX_ = other.startX_;
+      startY_ = other.startY_;
+      dirX_ = other.dirX_;
+      dirY_ = other.dirY_;
+      duration_ = other.duration_;
+      speed_ = other.speed_;
+      penetration_ = other.penetration_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponBeamPayload Clone() {
+      return new WeaponBeamPayload(this);
+    }
+
+    /// <summary>Field number for the "start_x" field.</summary>
+    public const int StartXFieldNumber = 1;
+    private float startX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float StartX {
+      get { return startX_; }
+      set {
+        startX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "start_y" field.</summary>
+    public const int StartYFieldNumber = 2;
+    private float startY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float StartY {
+      get { return startY_; }
+      set {
+        startY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_x" field.</summary>
+    public const int DirXFieldNumber = 3;
+    private float dirX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirX {
+      get { return dirX_; }
+      set {
+        dirX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_y" field.</summary>
+    public const int DirYFieldNumber = 4;
+    private float dirY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirY {
+      get { return dirY_; }
+      set {
+        dirY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duration" field.</summary>
+    public const int DurationFieldNumber = 5;
+    private float duration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Duration {
+      get { return duration_; }
+      set {
+        duration_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "speed" field.</summary>
+    public const int SpeedFieldNumber = 6;
+    private float speed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Speed {
+      get { return speed_; }
+      set {
+        speed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "penetration" field.</summary>
+    public const int PenetrationFieldNumber = 7;
+    private uint penetration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Penetration {
+      get { return penetration_; }
+      set {
+        penetration_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponBeamPayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponBeamPayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(StartX, other.StartX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(StartY, other.StartY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirX, other.DirX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Duration, other.Duration)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Speed, other.Speed)) return false;
+      if (Penetration != other.Penetration) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (StartX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(StartX);
+      if (StartY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(StartY);
+      if (DirX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirX);
+      if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
+      if (Duration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Duration);
+      if (Speed != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Speed);
+      if (Penetration != 0) hash ^= Penetration.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (StartX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(StartX);
+      }
+      if (StartY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(StartY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Duration);
+      }
+      if (Speed != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Speed);
+      }
+      if (Penetration != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Penetration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (StartX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(StartX);
+      }
+      if (StartY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(StartY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Duration);
+      }
+      if (Speed != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Speed);
+      }
+      if (Penetration != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(Penetration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (StartX != 0F) {
+        size += 1 + 4;
+      }
+      if (StartY != 0F) {
+        size += 1 + 4;
+      }
+      if (DirX != 0F) {
+        size += 1 + 4;
+      }
+      if (DirY != 0F) {
+        size += 1 + 4;
+      }
+      if (Duration != 0F) {
+        size += 1 + 4;
+      }
+      if (Speed != 0F) {
+        size += 1 + 4;
+      }
+      if (Penetration != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Penetration);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponBeamPayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.StartX != 0F) {
+        StartX = other.StartX;
+      }
+      if (other.StartY != 0F) {
+        StartY = other.StartY;
+      }
+      if (other.DirX != 0F) {
+        DirX = other.DirX;
+      }
+      if (other.DirY != 0F) {
+        DirY = other.DirY;
+      }
+      if (other.Duration != 0F) {
+        Duration = other.Duration;
+      }
+      if (other.Speed != 0F) {
+        Speed = other.Speed;
+      }
+      if (other.Penetration != 0) {
+        Penetration = other.Penetration;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            StartX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            StartY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Speed = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            Penetration = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            StartX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            StartY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Speed = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            Penetration = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponConePayload : pb::IMessage<WeaponConePayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponConePayload> _parser = new pb::MessageParser<WeaponConePayload>(() => new WeaponConePayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponConePayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponConePayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponConePayload(WeaponConePayload other) : this() {
+      originX_ = other.originX_;
+      originY_ = other.originY_;
+      dirX_ = other.dirX_;
+      dirY_ = other.dirY_;
+      angle_ = other.angle_;
+      range_ = other.range_;
+      statusDuration_ = other.statusDuration_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponConePayload Clone() {
+      return new WeaponConePayload(this);
+    }
+
+    /// <summary>Field number for the "origin_x" field.</summary>
+    public const int OriginXFieldNumber = 1;
+    private float originX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float OriginX {
+      get { return originX_; }
+      set {
+        originX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "origin_y" field.</summary>
+    public const int OriginYFieldNumber = 2;
+    private float originY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float OriginY {
+      get { return originY_; }
+      set {
+        originY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_x" field.</summary>
+    public const int DirXFieldNumber = 3;
+    private float dirX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirX {
+      get { return dirX_; }
+      set {
+        dirX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "dir_y" field.</summary>
+    public const int DirYFieldNumber = 4;
+    private float dirY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DirY {
+      get { return dirY_; }
+      set {
+        dirY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "angle" field.</summary>
+    public const int AngleFieldNumber = 5;
+    private float angle_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Angle {
+      get { return angle_; }
+      set {
+        angle_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "range" field.</summary>
+    public const int RangeFieldNumber = 6;
+    private float range_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Range {
+      get { return range_; }
+      set {
+        range_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "status_duration" field.</summary>
+    public const int StatusDurationFieldNumber = 7;
+    private float statusDuration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float StatusDuration {
+      get { return statusDuration_; }
+      set {
+        statusDuration_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponConePayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponConePayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OriginX, other.OriginX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OriginY, other.OriginY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirX, other.DirX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DirY, other.DirY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Angle, other.Angle)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Range, other.Range)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(StatusDuration, other.StatusDuration)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (OriginX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OriginX);
+      if (OriginY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OriginY);
+      if (DirX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirX);
+      if (DirY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DirY);
+      if (Angle != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Angle);
+      if (Range != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Range);
+      if (StatusDuration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(StatusDuration);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (OriginX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(OriginX);
+      }
+      if (OriginY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(OriginY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Angle != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Angle);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Range);
+      }
+      if (StatusDuration != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(StatusDuration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (OriginX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(OriginX);
+      }
+      if (OriginY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(OriginY);
+      }
+      if (DirX != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(DirX);
+      }
+      if (DirY != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(DirY);
+      }
+      if (Angle != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Angle);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Range);
+      }
+      if (StatusDuration != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(StatusDuration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (OriginX != 0F) {
+        size += 1 + 4;
+      }
+      if (OriginY != 0F) {
+        size += 1 + 4;
+      }
+      if (DirX != 0F) {
+        size += 1 + 4;
+      }
+      if (DirY != 0F) {
+        size += 1 + 4;
+      }
+      if (Angle != 0F) {
+        size += 1 + 4;
+      }
+      if (Range != 0F) {
+        size += 1 + 4;
+      }
+      if (StatusDuration != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponConePayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.OriginX != 0F) {
+        OriginX = other.OriginX;
+      }
+      if (other.OriginY != 0F) {
+        OriginY = other.OriginY;
+      }
+      if (other.DirX != 0F) {
+        DirX = other.DirX;
+      }
+      if (other.DirY != 0F) {
+        DirY = other.DirY;
+      }
+      if (other.Angle != 0F) {
+        Angle = other.Angle;
+      }
+      if (other.Range != 0F) {
+        Range = other.Range;
+      }
+      if (other.StatusDuration != 0F) {
+        StatusDuration = other.StatusDuration;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            OriginX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            OriginY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Angle = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            StatusDuration = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            OriginX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            OriginY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            DirX = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            DirY = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Angle = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            StatusDuration = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponAreaPayload : pb::IMessage<WeaponAreaPayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponAreaPayload> _parser = new pb::MessageParser<WeaponAreaPayload>(() => new WeaponAreaPayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponAreaPayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponAreaPayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponAreaPayload(WeaponAreaPayload other) : this() {
+      centerX_ = other.centerX_;
+      centerY_ = other.centerY_;
+      radius_ = other.radius_;
+      duration_ = other.duration_;
+      tickRate_ = other.tickRate_;
+      destroyProjectiles_ = other.destroyProjectiles_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponAreaPayload Clone() {
+      return new WeaponAreaPayload(this);
+    }
+
+    /// <summary>Field number for the "center_x" field.</summary>
+    public const int CenterXFieldNumber = 1;
+    private float centerX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float CenterX {
+      get { return centerX_; }
+      set {
+        centerX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "center_y" field.</summary>
+    public const int CenterYFieldNumber = 2;
+    private float centerY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float CenterY {
+      get { return centerY_; }
+      set {
+        centerY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "radius" field.</summary>
+    public const int RadiusFieldNumber = 3;
+    private float radius_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Radius {
+      get { return radius_; }
+      set {
+        radius_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duration" field.</summary>
+    public const int DurationFieldNumber = 4;
+    private float duration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Duration {
+      get { return duration_; }
+      set {
+        duration_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "tick_rate" field.</summary>
+    public const int TickRateFieldNumber = 5;
+    private float tickRate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float TickRate {
+      get { return tickRate_; }
+      set {
+        tickRate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "destroy_projectiles" field.</summary>
+    public const int DestroyProjectilesFieldNumber = 6;
+    private bool destroyProjectiles_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool DestroyProjectiles {
+      get { return destroyProjectiles_; }
+      set {
+        destroyProjectiles_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponAreaPayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponAreaPayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CenterX, other.CenterX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CenterY, other.CenterY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Radius, other.Radius)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Duration, other.Duration)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(TickRate, other.TickRate)) return false;
+      if (DestroyProjectiles != other.DestroyProjectiles) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (CenterX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CenterX);
+      if (CenterY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CenterY);
+      if (Radius != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Radius);
+      if (Duration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Duration);
+      if (TickRate != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(TickRate);
+      if (DestroyProjectiles != false) hash ^= DestroyProjectiles.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (CenterX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(CenterX);
+      }
+      if (CenterY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(CenterY);
+      }
+      if (Radius != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Radius);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Duration);
+      }
+      if (TickRate != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(TickRate);
+      }
+      if (DestroyProjectiles != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(DestroyProjectiles);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (CenterX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(CenterX);
+      }
+      if (CenterY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(CenterY);
+      }
+      if (Radius != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Radius);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Duration);
+      }
+      if (TickRate != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(TickRate);
+      }
+      if (DestroyProjectiles != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(DestroyProjectiles);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (CenterX != 0F) {
+        size += 1 + 4;
+      }
+      if (CenterY != 0F) {
+        size += 1 + 4;
+      }
+      if (Radius != 0F) {
+        size += 1 + 4;
+      }
+      if (Duration != 0F) {
+        size += 1 + 4;
+      }
+      if (TickRate != 0F) {
+        size += 1 + 4;
+      }
+      if (DestroyProjectiles != false) {
+        size += 1 + 1;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponAreaPayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.CenterX != 0F) {
+        CenterX = other.CenterX;
+      }
+      if (other.CenterY != 0F) {
+        CenterY = other.CenterY;
+      }
+      if (other.Radius != 0F) {
+        Radius = other.Radius;
+      }
+      if (other.Duration != 0F) {
+        Duration = other.Duration;
+      }
+      if (other.TickRate != 0F) {
+        TickRate = other.TickRate;
+      }
+      if (other.DestroyProjectiles != false) {
+        DestroyProjectiles = other.DestroyProjectiles;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            CenterX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            CenterY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Radius = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            TickRate = input.ReadFloat();
+            break;
+          }
+          case 48: {
+            DestroyProjectiles = input.ReadBool();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            CenterX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            CenterY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Radius = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            TickRate = input.ReadFloat();
+            break;
+          }
+          case 48: {
+            DestroyProjectiles = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponSummonPayload : pb::IMessage<WeaponSummonPayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponSummonPayload> _parser = new pb::MessageParser<WeaponSummonPayload>(() => new WeaponSummonPayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponSummonPayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponSummonPayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponSummonPayload(WeaponSummonPayload other) : this() {
+      spawnX_ = other.spawnX_;
+      spawnY_ = other.spawnY_;
+      duration_ = other.duration_;
+      hp_ = other.hp_;
+      spawnPrison_ = other.spawnPrison_;
+      prisonDuration_ = other.prisonDuration_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponSummonPayload Clone() {
+      return new WeaponSummonPayload(this);
+    }
+
+    /// <summary>Field number for the "spawn_x" field.</summary>
+    public const int SpawnXFieldNumber = 1;
+    private float spawnX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnX {
+      get { return spawnX_; }
+      set {
+        spawnX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "spawn_y" field.</summary>
+    public const int SpawnYFieldNumber = 2;
+    private float spawnY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnY {
+      get { return spawnY_; }
+      set {
+        spawnY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duration" field.</summary>
+    public const int DurationFieldNumber = 3;
+    private float duration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Duration {
+      get { return duration_; }
+      set {
+        duration_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hp" field.</summary>
+    public const int HpFieldNumber = 4;
+    private float hp_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Hp {
+      get { return hp_; }
+      set {
+        hp_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "spawn_prison" field.</summary>
+    public const int SpawnPrisonFieldNumber = 5;
+    private bool spawnPrison_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool SpawnPrison {
+      get { return spawnPrison_; }
+      set {
+        spawnPrison_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "prison_duration" field.</summary>
+    public const int PrisonDurationFieldNumber = 6;
+    private float prisonDuration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float PrisonDuration {
+      get { return prisonDuration_; }
+      set {
+        prisonDuration_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponSummonPayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponSummonPayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnX, other.SpawnX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnY, other.SpawnY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Duration, other.Duration)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Hp, other.Hp)) return false;
+      if (SpawnPrison != other.SpawnPrison) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(PrisonDuration, other.PrisonDuration)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (SpawnX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnX);
+      if (SpawnY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnY);
+      if (Duration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Duration);
+      if (Hp != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Hp);
+      if (SpawnPrison != false) hash ^= SpawnPrison.GetHashCode();
+      if (PrisonDuration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(PrisonDuration);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Duration);
+      }
+      if (Hp != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Hp);
+      }
+      if (SpawnPrison != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(SpawnPrison);
+      }
+      if (PrisonDuration != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(PrisonDuration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Duration);
+      }
+      if (Hp != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Hp);
+      }
+      if (SpawnPrison != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(SpawnPrison);
+      }
+      if (PrisonDuration != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(PrisonDuration);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (SpawnX != 0F) {
+        size += 1 + 4;
+      }
+      if (SpawnY != 0F) {
+        size += 1 + 4;
+      }
+      if (Duration != 0F) {
+        size += 1 + 4;
+      }
+      if (Hp != 0F) {
+        size += 1 + 4;
+      }
+      if (SpawnPrison != false) {
+        size += 1 + 1;
+      }
+      if (PrisonDuration != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponSummonPayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.SpawnX != 0F) {
+        SpawnX = other.SpawnX;
+      }
+      if (other.SpawnY != 0F) {
+        SpawnY = other.SpawnY;
+      }
+      if (other.Duration != 0F) {
+        Duration = other.Duration;
+      }
+      if (other.Hp != 0F) {
+        Hp = other.Hp;
+      }
+      if (other.SpawnPrison != false) {
+        SpawnPrison = other.SpawnPrison;
+      }
+      if (other.PrisonDuration != 0F) {
+        PrisonDuration = other.PrisonDuration;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Hp = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            SpawnPrison = input.ReadBool();
+            break;
+          }
+          case 53: {
+            PrisonDuration = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Hp = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            SpawnPrison = input.ReadBool();
+            break;
+          }
+          case 53: {
+            PrisonDuration = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class WeaponTrapPayload : pb::IMessage<WeaponTrapPayload>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<WeaponTrapPayload> _parser = new pb::MessageParser<WeaponTrapPayload>(() => new WeaponTrapPayload());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<WeaponTrapPayload> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[8]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponTrapPayload() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponTrapPayload(WeaponTrapPayload other) : this() {
+      spawnX_ = other.spawnX_;
+      spawnY_ = other.spawnY_;
+      duration_ = other.duration_;
+      activationDelay_ = other.activationDelay_;
+      tickRate_ = other.tickRate_;
+      radius_ = other.radius_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public WeaponTrapPayload Clone() {
+      return new WeaponTrapPayload(this);
+    }
+
+    /// <summary>Field number for the "spawn_x" field.</summary>
+    public const int SpawnXFieldNumber = 1;
+    private float spawnX_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnX {
+      get { return spawnX_; }
+      set {
+        spawnX_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "spawn_y" field.</summary>
+    public const int SpawnYFieldNumber = 2;
+    private float spawnY_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float SpawnY {
+      get { return spawnY_; }
+      set {
+        spawnY_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "duration" field.</summary>
+    public const int DurationFieldNumber = 3;
+    private float duration_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Duration {
+      get { return duration_; }
+      set {
+        duration_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "activation_delay" field.</summary>
+    public const int ActivationDelayFieldNumber = 4;
+    private float activationDelay_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float ActivationDelay {
+      get { return activationDelay_; }
+      set {
+        activationDelay_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "tick_rate" field.</summary>
+    public const int TickRateFieldNumber = 5;
+    private float tickRate_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float TickRate {
+      get { return tickRate_; }
+      set {
+        tickRate_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "radius" field.</summary>
+    public const int RadiusFieldNumber = 6;
+    private float radius_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Radius {
+      get { return radius_; }
+      set {
+        radius_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as WeaponTrapPayload);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(WeaponTrapPayload other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnX, other.SpawnX)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(SpawnY, other.SpawnY)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Duration, other.Duration)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(ActivationDelay, other.ActivationDelay)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(TickRate, other.TickRate)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Radius, other.Radius)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (SpawnX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnX);
+      if (SpawnY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(SpawnY);
+      if (Duration != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Duration);
+      if (ActivationDelay != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(ActivationDelay);
+      if (TickRate != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(TickRate);
+      if (Radius != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Radius);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Duration);
+      }
+      if (ActivationDelay != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(ActivationDelay);
+      }
+      if (TickRate != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(TickRate);
+      }
+      if (Radius != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Radius);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (SpawnX != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(SpawnX);
+      }
+      if (SpawnY != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(SpawnY);
+      }
+      if (Duration != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Duration);
+      }
+      if (ActivationDelay != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(ActivationDelay);
+      }
+      if (TickRate != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(TickRate);
+      }
+      if (Radius != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Radius);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (SpawnX != 0F) {
+        size += 1 + 4;
+      }
+      if (SpawnY != 0F) {
+        size += 1 + 4;
+      }
+      if (Duration != 0F) {
+        size += 1 + 4;
+      }
+      if (ActivationDelay != 0F) {
+        size += 1 + 4;
+      }
+      if (TickRate != 0F) {
+        size += 1 + 4;
+      }
+      if (Radius != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(WeaponTrapPayload other) {
+      if (other == null) {
+        return;
+      }
+      if (other.SpawnX != 0F) {
+        SpawnX = other.SpawnX;
+      }
+      if (other.SpawnY != 0F) {
+        SpawnY = other.SpawnY;
+      }
+      if (other.Duration != 0F) {
+        Duration = other.Duration;
+      }
+      if (other.ActivationDelay != 0F) {
+        ActivationDelay = other.ActivationDelay;
+      }
+      if (other.TickRate != 0F) {
+        TickRate = other.TickRate;
+      }
+      if (other.Radius != 0F) {
+        Radius = other.Radius;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            ActivationDelay = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            TickRate = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Radius = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 13: {
+            SpawnX = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            SpawnY = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Duration = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            ActivationDelay = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            TickRate = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Radius = input.ReadFloat();
+            break;
+          }
         }
       }
     }
@@ -1484,7 +4261,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[3]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1825,7 +4602,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[4]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2129,7 +4906,7 @@ namespace NeoSurvive.Network.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[5]; }
+      get { return global::NeoSurvive.Network.Protocol.GamePacketReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

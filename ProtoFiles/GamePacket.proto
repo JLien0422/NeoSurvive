@@ -61,6 +61,73 @@ message PlayerAction {
   float dir_y = 7;
   uint32 value = 8;          // 대미지, 스킬/아이템 고유 번호 등
   WeaponType weapon_type = 9; // 장비/무기 구분
+  oneof weapon_payload {
+    WeaponProjectilePayload weapon_projectile = 10;
+    WeaponBeamPayload weapon_beam = 11;
+    WeaponConePayload weapon_cone = 12;
+    WeaponAreaPayload weapon_area = 13;
+    WeaponSummonPayload weapon_summon = 14;
+    WeaponTrapPayload weapon_trap = 15;
+  }
+}
+
+// --- 무기 공격 페이로드 ---
+message WeaponProjectilePayload {
+  float spawn_x = 1;
+  float spawn_y = 2;
+  float dir_x = 3;
+  float dir_y = 4;
+  float speed = 5;
+  float range = 6;
+  uint32 penetration = 7;
+  uint32 target_id = 8;
+}
+
+message WeaponBeamPayload {
+  float start_x = 1;
+  float start_y = 2;
+  float dir_x = 3;
+  float dir_y = 4;
+  float duration = 5;
+  float speed = 6;
+  uint32 penetration = 7;
+}
+
+message WeaponConePayload {
+  float origin_x = 1;
+  float origin_y = 2;
+  float dir_x = 3;
+  float dir_y = 4;
+  float angle = 5;
+  float range = 6;
+  float status_duration = 7;
+}
+
+message WeaponAreaPayload {
+  float center_x = 1;
+  float center_y = 2;
+  float radius = 3;
+  float duration = 4;
+  float tick_rate = 5;
+  bool destroy_projectiles = 6;
+}
+
+message WeaponSummonPayload {
+  float spawn_x = 1;
+  float spawn_y = 2;
+  float duration = 3;
+  float hp = 4;
+  bool spawn_prison = 5;
+  float prison_duration = 6;
+}
+
+message WeaponTrapPayload {
+  float spawn_x = 1;
+  float spawn_y = 2;
+  float duration = 3;
+  float activation_delay = 4;
+  float tick_rate = 5;
+  float radius = 6;
 }
 
 // [Snapshot] 적(Enemy) 상태 정보

@@ -88,6 +88,13 @@ namespace NeoSurvive.Weapon
 
       Vector2 randomOffset = Random.insideUnitCircle * 0.5f;
 
+      // [Coop] 서버에 소환 보고 (로컬 플레이어일 때만)
+      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
+      if (runtimeInfo != null)
+      {
+        runtimeInfo.ReportSummon(transform.position + (Vector3)randomOffset, lifeTime, 0f, false, 0f);
+      }
+
       GameObject drone = Instantiate(dronePrefab, transform.position + (Vector3)randomOffset, Quaternion.identity);
       DeployedTurret deployedTurret = drone.GetComponent<DeployedTurret>();
       deployedTurret.Initialize(damage, range, fireRate, lifeTime, projectilePrefab);

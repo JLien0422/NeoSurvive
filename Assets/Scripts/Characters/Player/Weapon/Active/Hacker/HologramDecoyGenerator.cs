@@ -50,6 +50,13 @@ namespace NeoSurvive.Weapon
             if (decoyPrefab == null) return;
 
             // 플레이어 위치에 소환
+            var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
+            if (runtimeInfo != null)
+            {
+                bool spawnPrison = (currentLevel >= 5);
+                runtimeInfo.ReportSummon(transform.position, 0f, hp, spawnPrison, prisonDuration);
+            }
+
             GameObject obj = Instantiate(decoyPrefab, transform.position, Quaternion.identity);
             
             if (obj.TryGetComponent<HologramDecoy>(out var decoy))

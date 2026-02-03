@@ -77,6 +77,14 @@ namespace NeoSurvive.Weapon
         }
         spawnedWeapons.Add(weaponData, weaponObj);
 
+        if (player == null) player = GetComponent<Player>();
+        if (player != null)
+        {
+          var runtimeInfo = weaponObj.GetComponent<WeaponRuntimeInfo>();
+          if (runtimeInfo == null) runtimeInfo = weaponObj.AddComponent<WeaponRuntimeInfo>();
+          runtimeInfo.Initialize(weaponData.weaponId, player, this);
+        }
+
         // 초기화 알림
         weaponObj.SendMessage("OnLevelUp", 1, SendMessageOptions.DontRequireReceiver);
       }

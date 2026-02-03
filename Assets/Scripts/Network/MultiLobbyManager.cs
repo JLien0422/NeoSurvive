@@ -328,6 +328,17 @@ namespace NeoSurvive.Network
       websocketManager.SendWebSocketMessage(ES3SerializationHelper.SerializeToJson(msg));
     }
 
+    public void UpdateLocalCharacterType(NeoSurvive.Characters.CharacterType characterType)
+    {
+      int myId = DBManager.Instance.PlayerId;
+      var player = lobbyPlayers.FirstOrDefault(p => p.playerId == myId);
+      if (player != null)
+      {
+        player.characterType = characterType.ToString();
+        OnPlayerJoined?.Invoke(player);
+      }
+    }
+
     #endregion
 
     public PlayerState[] GetLobbyPlayers() => lobbyPlayers;

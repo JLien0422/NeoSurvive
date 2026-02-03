@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,8 +34,6 @@ namespace NeoSurvive.UI.Multiplayer
     [SerializeField] private Button leaveRoomButton;
     [SerializeField] private TextMeshProUGUI readyButtonText;
 
-    [Header("Character Selection")]
-    [SerializeField] private TMP_Dropdown characterDropdown;
 
     private bool isReady = false;
     private bool isHost = false;
@@ -213,13 +212,9 @@ namespace NeoSurvive.UI.Multiplayer
 
     private CharacterType GetSelectedCharacter()
     {
-      if (characterDropdown != null)
-      {
-        int index = characterDropdown.value;
-        return (CharacterType)index;
-      }
-
-      return CharacterType.Hacker; // 기본값
+      return GameManager.Instance != null
+        ? GameManager.Instance.GetSelectedCharacter()
+        : CharacterType.Hacker; // 기본값
     }
 
     private IEnumerator CreateRoom(CharacterType characterType)
@@ -372,12 +367,12 @@ namespace NeoSurvive.UI.Multiplayer
           string displayName = isMe ? $"{player.nickname} (Me)" : player.nickname;
 
           // 방장 여부와 준비 상태를 반영하여 아이콘 표시
-          CreatePlayerItem(displayName, (isMe && isHost), player.isReady);
+          CreatePlayerItem(displayName, (isMe && isHost), player.isReady, player.characterType, isMe);
         }
       }
     }
 
-    private void CreatePlayerItem(string playerName, bool isHostPlayer, bool isPlayerReady)
+    private void CreatePlayerItem(string playerName, bool isHostPlayer, bool isPlayerReady, string characterType, bool isMe)
     {
       if (playerListContainer == null || playerItemPrefab == null)
         return;
@@ -395,11 +390,55 @@ namespace NeoSurvive.UI.Multiplayer
         nameText.text = isHostPlayer ? $"<color=yellow>[Host]</color> {playerName}" : playerName;
       }
 
+      SetupCharacterDropdown(playerItem, characterType, isMe);
+
       // 준비 상태 표시
       Transform readyIconTransform = playerItem.transform.Find("ReadyIcon");
       if (readyIconTransform != null)
       {
         readyIconTransform.gameObject.SetActive(isPlayerReady || isHostPlayer); // 방장은 항상 준비 상태로 표시
+      }
+    }
+
+    private void SetupCharacterDropdown(GameObject playerItem, string characterType, bool isMe)
+    {
+      TMP_Dropdown dropdown = playerItem.GetComponentInChildren<TMP_Dropdown>();
+      if (dropdown == null)
+      {
+        dropdown = playerItem.transform.Find("CharacterDropdown")?.GetComponent<TMP_Dropdown>();
+      }
+
+      if (dropdown == null) return;
+
+      dropdown.onValueChanged.RemoveAllListeners();
+
+      if (dropdown.options == null || dropdown.options.Count == 0)
+      {
+        dropdown.options = new List<TMP_Dropdown.OptionData>
+        {
+          new TMP_Dropdown.OptionData("Hacker"),
+          new TMP_Dropdown.OptionData("Cyborg")
+        };
+      }
+
+      int value = 0;
+      if (!string.IsNullOrEmpty(characterType) && characterType.Equals("Cyborg", StringComparison.OrdinalIgnoreCase))
+      {
+        value = 1;
+      }
+
+      dropdown.value = value;
+      dropdown.RefreshShownValue();
+      dropdown.interactable = isMe;
+
+      if (isMe)
+      {
+        dropdown.onValueChanged.AddListener(index =>
+        {
+          CharacterType selected = (CharacterType)index;
+          GameManager.Instance?.SetSelectedCharacter(selected);
+          NetworkManager.Instance?.Lobby?.UpdateLocalCharacterType(selected);
+        });
       }
     }
 

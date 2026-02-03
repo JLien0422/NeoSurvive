@@ -12,10 +12,10 @@ namespace NeoSurvive.Weapon
     {
         [Header("Stats")]
         public GameObject decoyPrefab; // HologramDecoy 스크립트가 붙은 프리팹
-        
+
         public float hp = 50f;
-        public float cooldown = 15f; 
-        
+        public float cooldown = 15f;
+
         // 데이터 감옥 지속 시간 (Lv.5 이상)
         public float prisonDuration = 3f;
 
@@ -30,9 +30,9 @@ namespace NeoSurvive.Weapon
         {
             baseHp = hp;
             baseCooldown = cooldown;
-            
+
             // 시작 시 즉시 쿨타임 완료 상태로 시작? 
-            timer = cooldown; 
+            timer = cooldown;
         }
 
         private void Update()
@@ -58,7 +58,7 @@ namespace NeoSurvive.Weapon
             }
 
             GameObject obj = Instantiate(decoyPrefab, transform.position, Quaternion.identity);
-            
+
             if (obj.TryGetComponent<HologramDecoy>(out var decoy))
             {
                 bool spawnPrison = (currentLevel >= 5);
@@ -71,10 +71,10 @@ namespace NeoSurvive.Weapon
             currentLevel = level;
             if (baseHp == 0 && hp > 0) baseHp = hp;
             if (baseCooldown == 0 && cooldown > 0) baseCooldown = cooldown;
-            
+
             // 레벨업: 체력 20% 증가, 쿨타임 10% 감소
             hp = baseHp * (1f + (level - 1) * 0.2f);
-            
+
             // 쿨타임 감소는 점감법 적용 (10%씩 계속 까면 0됨. 복리 or 단순 합?)
             // 기획: "쿨감". 단순하게 10%씩 감소로. (최대 50% 제한 등 두면 좋음).
             // 여기선 base * (1 - 0.05 * level) 정도로 완만하게.

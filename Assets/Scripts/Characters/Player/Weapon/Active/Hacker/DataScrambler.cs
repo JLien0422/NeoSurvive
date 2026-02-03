@@ -37,7 +37,7 @@ namespace NeoSurvive.Weapon
       // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
       var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
       if (runtimeInfo != null)
-      fireTimer += Time.deltaTime;
+        fireTimer += Time.deltaTime;
       if (fireTimer >= fireRate)
       {
         Attack();

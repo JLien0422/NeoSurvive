@@ -10,18 +10,18 @@ namespace NeoSurvive.Weapon
     {
         [Header("Stats")]
         public GameObject nanoWirePrefab; // NanoWire 스크립트 필요
-        
+
         public float damage = 15f;
         public float duration = 4f;       // 전선 유지 시간
         public float spawnDistance = 1.0f; // 이만큼 이동할 때마다 설치
 
         private Vector3 lastSpawnPos;
         private int currentLevel = 1;
-        
+
         // Base Stats
         private float baseDamage;
         private float baseDuration;
-        
+
         private void Start()
         {
             baseDamage = damage;
@@ -52,9 +52,9 @@ namespace NeoSurvive.Weapon
             }
 
             GameObject obj = Instantiate(nanoWirePrefab, transform.position, Quaternion.identity);
-            
-             // 회전 조절? (진행 방향에 수직 등) - 일단은 기본(Identity)
-            
+
+            // 회전 조절? (진행 방향에 수직 등) - 일단은 기본(Identity)
+
             if (obj.TryGetComponent<NanoWire>(out var wire))
             {
                 wire.Initialize(damage, duration);
@@ -66,11 +66,11 @@ namespace NeoSurvive.Weapon
             currentLevel = level;
             if (baseDamage == 0 && damage > 0) baseDamage = damage;
             if (baseDuration == 0 && duration > 0) baseDuration = duration;
-            
+
             // 레벨업: 데미지 20% 증가, 지속시간 10% 증가
             damage = baseDamage * (1f + (level - 1) * 0.2f);
             duration = baseDuration * (1f + (level - 1) * 0.1f);
-            
+
             Debug.Log($"[NanoWire] Lv.{level} : Dmg {damage}, Duration {duration}");
         }
     }

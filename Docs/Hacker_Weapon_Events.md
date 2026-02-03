@@ -26,10 +26,12 @@
 ---
 
 ## 1) LinkPistol
+
 - 타입: **투사체형**
 - payload: `weapon_projectile`
 
 필드:
+
 - `spawn_x`, `spawn_y` : 총알 생성 위치 (현재 무기 위치)
 - `dir_x`, `dir_y` : 발사 방향
 - `speed` : `bulletSpeed`
@@ -40,10 +42,12 @@
 ---
 
 ## 2) PlasmaRifle
+
 - 타입: **빔형**
 - payload: `weapon_beam`
 
 필드:
+
 - `start_x`, `start_y` : 레이저 시작 위치
 - `dir_x`, `dir_y` : 레이저 방향
 - `duration` : `PlasmaLazer.duration`
@@ -53,10 +57,12 @@
 ---
 
 ## 3) AIDrone
+
 - 타입: **투사체형** (드론이 발사)
 - payload: `weapon_projectile`
 
 필드:
+
 - `spawn_x`, `spawn_y` : 드론 발사 위치
 - `dir_x`, `dir_y` : 드론 → 타깃 방향
 - `speed` : 20
@@ -67,10 +73,12 @@
 ---
 
 ## 4) AutoTurret
+
 - 타입: **소환형** (터렛 생성기 → DeployedTurret)
 - payload: `weapon_summon`
 
 필드:
+
 - `spawn_x`, `spawn_y` : 터렛 생성 위치
 - `duration` : `lifeTime`
 - `hp` : 0 (터렛 체력 미사용)
@@ -80,10 +88,12 @@
 ---
 
 ## 5) DataScrambler
+
 - 타입: **부채꼴 범위형**
 - payload: `weapon_cone`
 
 필드:
+
 - `origin_x`, `origin_y` : 시전자 위치
 - `dir_x`, `dir_y` : 공격 방향
 - `angle` : `angle`
@@ -93,10 +103,12 @@
 ---
 
 ## 6) EMPPulseGenerator
+
 - 타입: **장판형**
 - payload: `weapon_area`
 
 필드:
+
 - `center_x`, `center_y` : 장판 중심
 - `radius` : `areaSize`
 - `duration` : `duration`
@@ -106,10 +118,12 @@
 ---
 
 ## 7) HologramDecoyGenerator
+
 - 타입: **소환형** (디코이 생성)
 - payload: `weapon_summon`
 
 필드:
+
 - `spawn_x`, `spawn_y` : 소환 위치
 - `duration` : 0 (디코이는 체력 기반)
 - `hp` : `hp`
@@ -119,10 +133,12 @@
 ---
 
 ## 8) NanoWireGenerator
+
 - 타입: **트랩형**
 - payload: `weapon_trap`
 
 필드:
+
 - `spawn_x`, `spawn_y` : 설치 위치
 - `duration` : `duration`
 - `activation_delay` : 1.0

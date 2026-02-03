@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: SurgeBlade
   m_EditorClassIdentifier: 
+  weaponId: 12
   weaponName: "\uC11C\uC9C0\uBE14\uB808\uC774\uB4DC"
   weaponIcon: {fileID: 21300000, guid: dbd5a7031c778224fb7b2385f8828782, type: 3}
   description: "\uC11C\uC9C0\uBE14\uB808\uC774\uB4DC"

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: TacticalTurret
   m_EditorClassIdentifier: 
+  weaponId: 5
   weaponName: "\uC790\uB3D9 \uD3EC\uD0D1"
   weaponIcon: {fileID: 21300000, guid: a78aad688ff2848489c67b6f51f1ecc1, type: 3}
   description: "\uC790\uB3D9 \uACF5\uACA9 \uD558\uB294 \uD130\uB81B\uC744 \uC8FC\uAE30\uC801\uC73C\uB85C

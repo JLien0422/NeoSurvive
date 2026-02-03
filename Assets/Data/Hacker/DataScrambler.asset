@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: DataScrambler
   m_EditorClassIdentifier: 
+  weaponId: 3
   weaponName: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"
   weaponIcon: {fileID: 21300000, guid: 2f4cfaf950cdea441966ce6234f8bd6b, type: 3}
   description: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: PlasmaRifle
   m_EditorClassIdentifier: 
+  weaponId: 2
   weaponName: "\uD50C\uB77C\uC988\uB9C8 \uB77C\uC774\uD50C"
   weaponIcon: {fileID: 21300000, guid: e6ceff12767f19845990055c6dee6e4e, type: 3}
   description: "\uD50C\uB77C\uC988\uB9C8 \uB77C\uC774\uD50C"

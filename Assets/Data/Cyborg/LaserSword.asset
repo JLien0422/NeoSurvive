@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: LaserSword
   m_EditorClassIdentifier: 
+  weaponId: 11
   weaponName: LaserSword
   weaponIcon: {fileID: 21300000, guid: 980f394eb81533243a5eb56e331afd53, type: 3}
   description: "\uB808\uC774\uC800\uC18C\uB4DC"

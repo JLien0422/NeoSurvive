@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: NanoWire
   m_EditorClassIdentifier: 
+  weaponId: 8
   weaponName: "\uB098\uB178 \uC640\uC774\uC5B4"
   weaponIcon: {fileID: -1837814042, guid: 0c86f1cbfffc21147baab3bc426cf859, type: 3}
   description: "\uB098\uB178 \uC640\uC774\uC5B4"

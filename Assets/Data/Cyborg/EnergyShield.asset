@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: EnergyShield
   m_EditorClassIdentifier: 
+  weaponId: 13
   weaponName: "\uC5D0\uB108\uC9C0\uC274\uB4DC"
   weaponIcon: {fileID: 0}
   description: "\uD50C\uB808\uC774\uC5B4 \uC8FC\uC704 \uB3CC\uBA74\uC11C \uD50C\uB808\uC774\uC5B4

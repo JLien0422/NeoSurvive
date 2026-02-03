@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: LinkPistol
   m_EditorClassIdentifier: 
+  weaponId: 1
   weaponName: "\uB9C1\uD06C \uD53C\uC2A4\uD1A8"
   weaponIcon: {fileID: 21300000, guid: 94037a04ce3786c4ca5c4269dad1589f, type: 3}
   description: "\uC801\uC911 \uC2DC \uD45C\uC2DD\uC744 \uB0A8\uACA8 \uC801\uC744

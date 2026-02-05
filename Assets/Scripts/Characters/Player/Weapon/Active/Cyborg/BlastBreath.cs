@@ -4,23 +4,23 @@ namespace NeoSurvive.Weapon
 {
   /// <summary>
   /// 10번 무기: 블래스트 브레스
-  /// - 전방에 고열 화염 방사(지속 영역 생성)
-  /// - Lv.Up: 방사 거리(=range), 지속딜 증가(=damage)
-  /// - Lv.5 마스터(임시): 브레스가 "냉기"로 강화(슬로우 훅/빙결 훅)
+  /// - 플레이어 앞에서 발사
+  /// - 가장 가까운 적을 향해 자동 조준
+  /// - Lv5 마스터: 냉기 브레스로 전환
   /// </summary>
   public class BlastBreath : MonoBehaviour
   {
     [Header("Breath Prefab")]
-    public GameObject breathAreaPrefab;     // BreathArea가 붙은 프리팹(필수)
-    public Transform firePoint;             // 없으면 transform.position
+    public GameObject breathAreaPrefab;   // BreathArea가 붙은 프리팹
+    public Transform firePoint;           // 선택: 총구 위치
 
     [Header("Stats")]
     public float damagePerTick = 4f;
-    public float range = 4.5f;              // 전방 길이(거리)
-    public float width = 2.2f;              // 폭(부채꼴 느낌을 직사각+둥근 가장자리로 근사)
-    public float tickInterval = 0.25f;      // 지속딜 틱 간격
-    public float areaDuration = 0.8f;       // 한 번 방사 영역 유지 시간
-    public float fireRate = 1.1f;           // 방사 주기
+    public float range = 4.5f;
+    public float width = 2.2f;
+    public float tickInterval = 0.25f;
+    public float areaDuration = 0.8f;
+    public float fireRate = 1.1f;
 
     [Header("Level Scaling")]
     public float damagePerLevel = 0.18f;
@@ -29,14 +29,15 @@ namespace NeoSurvive.Weapon
 
     [Header("Master (Lv5)")]
     public bool enableMaster = true;
-    public bool masterColdMode = true;      // Lv5에서 냉기 모드로 전환(시각/효과 훅)
+    public bool masterColdMode = true;
 
-    [Header("Debug")]
-    public bool debugLog = false;
+    [Header("Targeting")]
+    public float aimRange = 8f;
+    public LayerMask enemyMask;
 
     private float timer;
 
-    // base
+    // base stat cache
     private float baseDamage;
     private float baseRange;
     private float baseWidth;
@@ -65,8 +66,6 @@ namespace NeoSurvive.Weapon
     public void OnLevelUp(int level)
     {
       ApplyLevel(level);
-      if (debugLog)
-        Debug.Log($"[BlastBreath] Lv.{currentLevel} dmgTick={damagePerTick} range={range} width={width}");
     }
 
     private void ApplyLevel(int level)
@@ -78,22 +77,32 @@ namespace NeoSurvive.Weapon
       width = baseWidth * (1f + (currentLevel - 1) * widthPerLevel);
     }
 
+    /// <summary>
+    /// 브레스 발사
+    /// </summary>
     private void EmitBreath()
     {
       if (breathAreaPrefab == null) return;
 
+      // 1️⃣ 시작 위치
       Vector3 origin = firePoint ? firePoint.position : transform.position;
 
-      // 기본 방향: 플레이어 오른쪽(방향 시스템 있으면 교체)
-      Vector3 forward = transform.right;
+      // 2️⃣ 가장 가까운 적 찾기
+      Transform target = FindClosestEnemy(origin);
 
-      // 영역 위치: 전방 range/2 지점
+      // 3️⃣ 방향 결정
+      Vector3 forward = target != null
+        ? (target.position - origin).normalized
+        : transform.right;
+
+      // 4️⃣ 브레스 영역 중심
       Vector3 center = origin + forward * (range * 0.5f);
 
-      // 회전: forward를 바라보도록
+      // 5️⃣ 회전
       float angleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
       Quaternion rot = Quaternion.Euler(0, 0, angleZ);
 
+      // 6️⃣ 생성
       GameObject obj = Instantiate(breathAreaPrefab, center, rot);
 
       var area = obj.GetComponent<BreathArea>();
@@ -104,6 +113,32 @@ namespace NeoSurvive.Weapon
       }
 
       Destroy(obj, areaDuration + 0.05f);
+    }
+
+    /// <summary>
+    /// 가장 가까운 적 탐색
+    /// </summary>
+    private Transform FindClosestEnemy(Vector3 origin)
+    {
+      Collider2D[] hits =
+        Physics2D.OverlapCircleAll(origin, aimRange, enemyMask);
+
+      Transform closest = null;
+      float minDist = float.MaxValue;
+
+      foreach (var h in hits)
+      {
+        if (!h.CompareTag("Enemy")) continue;
+
+        float d = Vector2.Distance(origin, h.transform.position);
+        if (d < minDist)
+        {
+          minDist = d;
+          closest = h.transform;
+        }
+      }
+
+      return closest;
     }
   }
 }

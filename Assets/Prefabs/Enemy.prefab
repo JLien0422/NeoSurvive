@@ -101,11 +101,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthStat:
-    baseValue: 5
+    baseValue: 50
   currentHealth: 0
   experienceToGive: 10
+  expOrbPrefab: {fileID: 0}
+  dropCount: 1
+  scatterRadius: 0.5
   goldDropChance: 25
   goldPrefab: {fileID: 8560961096412293643, guid: 988189dfb50114a4fbae0c1abcc43162, type: 3}
+  psychoCorruptionDropChance: 5
+  psychoCorruptionItemPrefab: {fileID: 0}
+  dataChipDropChance: 10
+  dataChipPrefab: {fileID: 0}
 --- !u!114 &8102142045787582437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,10 +126,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
-  detectionRange: 7
   attackDamage: 1
   attackRange: 1.5
   showGizmos: 1
+  mechanismType: 0
 --- !u!70 &8070923657707883514
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

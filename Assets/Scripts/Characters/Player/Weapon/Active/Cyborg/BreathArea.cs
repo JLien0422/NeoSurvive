@@ -103,8 +103,7 @@ namespace NeoSurvive.Weapon
         if (enemy == null) continue;
 
         // 1) 데미지
-        var src = GetComponentInParent<WeaponSource>();
-        enemy.TakeDamage(damagePerTick, src != null ? src.weaponData : null);
+        enemy.TakeDamage(damagePerTick);
 
         // 2) Lv5 냉기 모드: 닿는 즉시 빙결 (추가)
         if (coldMode)

@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthStat:
-    baseValue: 15
+    baseValue: 50
   currentHealth: 0
   experienceToGive: 10
   expOrbPrefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}

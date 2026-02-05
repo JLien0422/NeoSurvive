@@ -5,40 +5,41 @@ using NeoSurvive.Core;
 namespace NeoSurvive.Weapon
 {
   /// <summary>
-  /// 5번 무기: 중력 해머
-  /// - 기본: 지면 강타 후 충격파(부채꼴)로 피해 + 넉백
-  /// - Lv.Up: 넉백 거리(힘), 강타 범위 증가
-  /// - Lv.5 마스터: 타격 지점 중앙에 소형 블랙홀(2초 흡입) 생성
+  /// 5번 무기: GravityHammer
+  /// - 기본: 전방(부채꼴) 강타 + 넉백
+  /// - Lv.Up: 데미지/범위/넉백 증가
+  /// - Lv5 마스터: 블랙홀 생성(흡입)
+  /// - LaserSword.cs 스타일(팀원 방식)로 통일
   /// </summary>
   public class GravityHammer : MonoBehaviour
   {
     [Header("Stats")]
     public float damage = 18f;
-    public float range = 4.5f;      // 부채꼴 반경
-    public float angle = 70f;       // 부채꼴 전체 각도
-    public float fireRate = 1.6f;   // 강타 주기
+    public float range = 4.5f;
+    public float angle = 70f;
+    public float fireRate = 1.6f;
 
     [Header("Knockback")]
     public float knockbackForce = 6f;
-    public float knockbackRadiusBonus = 0f; // 필요하면 확장
 
-    [Header("Filter")]
-    public LayerMask hitMask;
+    [Header("Target / Hit")]
+    public LayerMask hitMask;          // Enemy 레이어 권장
     public string enemyTag = "Enemy";
 
     [Header("Level Scaling")]
     public float damagePerLevel = 0.15f;
-    public float rangePerLevel = 0.12f;        // 강타 범위 증가
-    public float knockbackPerLevel = 0.15f;    // 넉백 증가(비율)
+    public float rangePerLevel = 0.12f;
+    public float knockbackPerLevel = 0.15f;
 
     [Header("Master (Lv5) - Blackhole")]
     public bool enableMaster = true;
-    public GameObject blackholePrefab;   // 선택: 있으면 프리팹 생성
+    public GameObject blackholePrefab;   // 시각효과용(선택)
     public float blackholeDuration = 2f;
     public float blackholePullRadius = 2.5f;
     public float blackholePullForce = 10f;
 
     [Header("Debug")]
+    public bool debugLog = false;
     public bool debugDraw = true;
 
     private float timer;
@@ -50,6 +51,7 @@ namespace NeoSurvive.Weapon
     private float baseFireRate;
 
     private int currentLevel = 1;
+    private Coroutine blackholeRoutine;
 
     private void Start()
     {
@@ -57,6 +59,9 @@ namespace NeoSurvive.Weapon
       baseRange = range;
       baseKnockback = knockbackForce;
       baseFireRate = fireRate;
+
+      // LaserSword처럼 플레이어와 겹침 방지(앞으로 살짝)
+      transform.localPosition = Vector3.right * 0.5f;
 
       ApplyLevel(1);
     }
@@ -71,10 +76,19 @@ namespace NeoSurvive.Weapon
       }
     }
 
+    // WeaponManager.SendMessage("OnLevelUp", level) 호환
     public void OnLevelUp(int level)
     {
+      // LaserSword와 동일한 안전장치
+      if (baseDamage <= 0f && damage > 0f) baseDamage = damage;
+      if (baseRange <= 0f && range > 0f) baseRange = range;
+      if (baseKnockback <= 0f && knockbackForce > 0f) baseKnockback = knockbackForce;
+      if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
+
       ApplyLevel(level);
-      Debug.Log($"[GravityHammer] Lv.{currentLevel} dmg={damage} range={range} kb={knockbackForce}");
+
+      if (debugLog)
+        Debug.Log($"[GravityHammer] Lv.{currentLevel} Dmg={damage}, Range={range}, KB={knockbackForce}, Rate={fireRate}");
     }
 
     private void ApplyLevel(int level)
@@ -84,137 +98,170 @@ namespace NeoSurvive.Weapon
       damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
       range  = baseRange  * (1f + (currentLevel - 1) * rangePerLevel);
       knockbackForce = baseKnockback * (1f + (currentLevel - 1) * knockbackPerLevel);
-      fireRate = baseFireRate; // 고정(원하면 레벨에 따라 감소 가능)
+      fireRate = baseFireRate; // 원하면 레벨업 시 감소도 가능
     }
 
     private void Slam()
     {
-      // 가까운 적 방향(없으면 오른쪽)
-      Transform target = FindClosestEnemy(range * 1.5f);
-      Vector3 forward = transform.right;
-      if (target != null) forward = (target.position - transform.position).normalized;
+      if (debugLog) Debug.Log("[GravityHammer] Slam!");
 
-      // 타격 지점(앞쪽)
-      Vector3 impactPoint = transform.position + forward * Mathf.Min(range, 2.2f);
+      // Player 방향 기준 (LaserSword와 동일)
+      Transform target = FindClosestEnemy();
+      Vector3 forward = transform.parent != null ? transform.parent.right : transform.right;
 
+      if (target != null)
+        forward = (target.position - transform.position).normalized;
+
+      // 디버그: 공격 방향
       if (debugDraw)
       {
-        Debug.DrawRay(transform.position, forward * range, Color.yellow, 0.2f);
+        Debug.DrawRay(transform.position, forward * range, Color.red, 0.2f);
         Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, angle * 0.5f) * forward * range, Color.magenta, 0.2f);
         Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, -angle * 0.5f) * forward * range, Color.magenta, 0.2f);
-        Debug.DrawLine(transform.position, impactPoint, Color.white, 0.2f);
       }
 
-      // 범위 내 후보
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range + knockbackRadiusBonus, hitMask);
+      // ✅ LaserSword와 동일하게 OverlapCircleAll 사용
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range, hitMask);
+
+      if (debugLog) Debug.Log($"[GravityHammer] hits={hits.Length}");
 
       foreach (var col in hits)
       {
         if (col == null) continue;
 
-        // 태그(자식 콜라이더 구조 고려)
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
+        // Tag는 부모까지 체크 (LaserSword 방식)
+        if (!string.IsNullOrEmpty(enemyTag))
         {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
-            continue;
+          bool okTag =
+            col.CompareTag(enemyTag) ||
+            (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
+
+          if (!okTag) continue;
         }
 
+        // 부채꼴 판정
         Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
         if (Vector3.Angle(forward, dirToEnemy) > angle * 0.5f) continue;
 
+        // Enemy는 부모에서 찾는다
         Enemy enemy = col.GetComponentInParent<Enemy>();
         if (enemy == null) continue;
 
         var src = GetComponent<WeaponSource>();
         enemy.TakeDamage(damage, src != null ? src.weaponData : null);
 
-        // 넉백(가능한 경우만)
-        ApplyKnockback(col.transform, forward, impactPoint);
+        // 넉백
+        ApplyKnockback(col.transform, forward);
       }
 
-      // Lv5 마스터: 블랙홀 생성(선택)
+      // Lv5 마스터: 블랙홀
       if (enableMaster && currentLevel >= 5)
       {
-        SpawnBlackhole(impactPoint);
+        Vector3 center = transform.position + forward * Mathf.Min(range, 2.2f);
+        SpawnBlackhole(center);
       }
     }
 
-    private void ApplyKnockback(Transform enemyTransform, Vector3 forward, Vector3 impactPoint)
+    private void ApplyKnockback(Transform hitTransform, Vector3 forward)
     {
-      // Rigidbody2D가 있으면 힘으로 넉백
-      Rigidbody2D rb = enemyTransform.GetComponentInParent<Rigidbody2D>();
-      if (rb != null)
+      // 적 루트의 Rigidbody2D 찾기
+      Rigidbody2D rb = hitTransform.GetComponentInParent<Rigidbody2D>();
+
+      // 밀리는 방향: 플레이어->적 방향 우선
+      Vector2 dir = (hitTransform.position - transform.position);
+      if (dir.sqrMagnitude < 0.001f) dir = forward;
+      dir.Normalize();
+
+      if (rb != null && rb.bodyType == RigidbodyType2D.Dynamic)
       {
-        Vector2 dir = (enemyTransform.position - impactPoint).normalized;
-        if (dir.sqrMagnitude < 0.001f) dir = forward;
         rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
       }
-      // Rigidbody2D가 없으면 그냥 패스(팀 Enemy 구조에 따라 결정)
+      else
+      {
+        // Dynamic이 아니면 강제 이동 넉백(체감용)
+        hitTransform.position = Vector3.MoveTowards(
+          hitTransform.position,
+          hitTransform.position + (Vector3)(dir * 1.2f),
+          (knockbackForce * 0.08f) * Time.deltaTime
+        );
+      }
     }
 
     private void SpawnBlackhole(Vector3 pos)
     {
-      // 방법 A) 프리팹 있으면 생성 (시각효과/콜라이더/스크립트 자유)
       if (blackholePrefab != null)
       {
         GameObject obj = Instantiate(blackholePrefab, pos, Quaternion.identity);
         Destroy(obj, blackholeDuration);
       }
 
-      // 방법 B) 프리팹 없어도 동작하게: 이 오브젝트에서 코루틴으로 흡입 처리
-      StartCoroutine(BlackholePullRoutine(pos, blackholeDuration));
+      if (blackholeRoutine != null) StopCoroutine(blackholeRoutine);
+      blackholeRoutine = StartCoroutine(BlackholePullRoutine(pos, blackholeDuration));
     }
 
     private IEnumerator BlackholePullRoutine(Vector3 center, float duration)
     {
       float t = 0f;
+
       while (t < duration)
       {
         Collider2D[] hits = Physics2D.OverlapCircleAll(center, blackholePullRadius, hitMask);
+
         foreach (var col in hits)
         {
           if (col == null) continue;
 
-          if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
+          if (!string.IsNullOrEmpty(enemyTag))
           {
-            if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
-              continue;
+            bool okTag =
+              col.CompareTag(enemyTag) ||
+              (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
+
+            if (!okTag) continue;
           }
 
           Rigidbody2D rb = col.GetComponentInParent<Rigidbody2D>();
-          if (rb != null)
+          if (rb != null && rb.bodyType == RigidbodyType2D.Dynamic)
           {
             Vector2 dir = (center - rb.transform.position);
             rb.AddForce(dir.normalized * blackholePullForce * Time.deltaTime, ForceMode2D.Force);
           }
           else
           {
-            // Rigidbody2D가 없는 경우: 강제로 당기기(원하면 사용)
-            col.transform.position = Vector3.MoveTowards(col.transform.position, center, (blackholePullForce * 0.05f) * Time.deltaTime);
+            // Dynamic이 아니면 강제 당김(선택)
+            col.transform.position = Vector3.MoveTowards(
+              col.transform.position,
+              center,
+              (blackholePullForce * 0.05f) * Time.deltaTime
+            );
           }
         }
 
         t += Time.deltaTime;
         yield return null;
       }
+
+      blackholeRoutine = null;
     }
 
-    private Transform FindClosestEnemy(float searchRange)
+    private Transform FindClosestEnemy()
     {
       GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-      GameObject closest = null;
-      float minDist = searchRange > 0 ? searchRange : 10f;
+      Transform closest = null;
+      float closestDist = range > 0 ? range * 1.5f : 10f;
 
-      foreach (GameObject e in enemies)
+      foreach (var e in enemies)
       {
+        if (e == null) continue;
         float d = Vector3.Distance(transform.position, e.transform.position);
-        if (d < minDist)
+        if (d < closestDist)
         {
-          minDist = d;
-          closest = e;
+          closestDist = d;
+          closest = e.transform;
         }
       }
-      return closest ? closest.transform : null;
+
+      return closest;
     }
 
     private void OnDrawGizmosSelected()

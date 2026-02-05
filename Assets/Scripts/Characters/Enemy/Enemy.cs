@@ -18,7 +18,8 @@ public class Enemy : Character
   // (추가) 받는 피해 배율 적용(데미지 2배 디버프 등)
   public float ApplyIncomingDamage(float damage) => damage * Status.incomingDamageMul; // (추가)
 
-  private void Awake() // (추가)
+  // Character.Awake를 재정의하여 StatusFlags를 초기화합니다. (경고 CS0114 해결)
+  protected override void Awake() // (추가)
   {
     base.Awake();
     // StatusFlags 캐싱 (추가)

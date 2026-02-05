@@ -96,6 +96,25 @@ public abstract class Character : MonoBehaviour
   }
 
   /// <summary>
+  /// 최대 체력을 동기화합니다 (네트워크용)
+  /// </summary>
+  public virtual void SetMaxHealth(float maxHealth, bool keepRatio = true)
+  {
+    float prevMax = healthStat.GetValue();
+    float ratio = prevMax > 0f ? currentHealth / prevMax : 1f;
+
+    healthStat.BaseValue = maxHealth;
+
+    if (keepRatio)
+    {
+      currentHealth = maxHealth * ratio;
+    }
+
+    currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+    NotifyHealthChanged();
+  }
+
+  /// <summary>
   /// 체력을 직접 설정합니다 (네트워크 동기화용)
   /// </summary>
   public virtual void SetHealth(float health)

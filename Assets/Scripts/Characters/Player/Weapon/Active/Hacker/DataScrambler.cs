@@ -20,12 +20,13 @@ namespace NeoSurvive.Weapon
     private float fireTimer;
 
     // 레벨업 기준 스탯
-    private float baseDamage;
-    private float baseRange;
-    private float baseDuration;
+    private float baseDamage = 10f;
+    private float baseRange = 5f;
+    private float baseDuration = 3f;
 
     private void Start()
     {
+      Debug.Log("[DataScrambler] Initialized");
       baseDamage = damage;
       baseRange = range;
       baseDuration = duration;
@@ -104,7 +105,7 @@ namespace NeoSurvive.Weapon
       if (baseDamage == 0 && damage > 0) baseDamage = damage;
 
       // 레벨업: 범위, 지속 시간 증가 (기획서 반영) + 데미지도 10%씩 증가
-      range = baseRange * (1f + (level - 1) * 0.15f);
+      range = baseRange * (1f + level * 0.15f);
       duration = baseDuration * (1f + (level - 1) * 0.2f);
       damage = baseDamage * (1f + (level - 1) * 0.1f);
 

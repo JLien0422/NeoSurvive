@@ -35,7 +35,7 @@ namespace NeoSurvive.Weapon
         new Vector2(spawnPos.x, spawnPos.y),
         action =>
         {
-          action.WeaponProjectile = new NeoSurvive.Network.Protocol.WeaponProjectilePayload
+          action.WeaponProjectile = new NeoSurvive.Network.Protocol.WeaponProjectile
           {
             SpawnX = spawnPos.x,
             SpawnY = spawnPos.y,
@@ -62,7 +62,7 @@ namespace NeoSurvive.Weapon
         new Vector2(startPos.x, startPos.y),
         action =>
         {
-          action.WeaponBeam = new NeoSurvive.Network.Protocol.WeaponBeamPayload
+          action.WeaponBeam = new NeoSurvive.Network.Protocol.WeaponBeam
           {
             StartX = startPos.x,
             StartY = startPos.y,
@@ -88,7 +88,7 @@ namespace NeoSurvive.Weapon
         new Vector2(origin.x, origin.y),
         action =>
         {
-          action.WeaponCone = new NeoSurvive.Network.Protocol.WeaponConePayload
+          action.WeaponCone = new NeoSurvive.Network.Protocol.WeaponCone
           {
             OriginX = origin.x,
             OriginY = origin.y,
@@ -114,7 +114,7 @@ namespace NeoSurvive.Weapon
         new Vector2(center.x, center.y),
         action =>
         {
-          action.WeaponArea = new NeoSurvive.Network.Protocol.WeaponAreaPayload
+          action.WeaponArea = new NeoSurvive.Network.Protocol.WeaponArea
           {
             CenterX = center.x,
             CenterY = center.y,
@@ -139,12 +139,12 @@ namespace NeoSurvive.Weapon
         new Vector2(spawnPos.x, spawnPos.y),
         action =>
         {
-          action.WeaponSummon = new NeoSurvive.Network.Protocol.WeaponSummonPayload
+          action.WeaponSummon = new NeoSurvive.Network.Protocol.WeaponSummon
           {
             SpawnX = spawnPos.x,
             SpawnY = spawnPos.y,
             Duration = duration,
-            Hp = hp,
+            Hp = (uint)Mathf.Max(0f, hp),
             SpawnPrison = spawnPrison,
             PrisonDuration = prisonDuration
           };
@@ -164,7 +164,7 @@ namespace NeoSurvive.Weapon
         new Vector2(spawnPos.x, spawnPos.y),
         action =>
         {
-          action.WeaponTrap = new NeoSurvive.Network.Protocol.WeaponTrapPayload
+          action.WeaponTrap = new NeoSurvive.Network.Protocol.WeaponTrap
           {
             SpawnX = spawnPos.x,
             SpawnY = spawnPos.y,

@@ -129,6 +129,15 @@ public class GameManager : MonoBehaviour
     return Time.time - startTime;
   }
 
+  /// <summary>
+  /// 서버 game_time 기준으로 로컬 타이머를 동기화합니다.
+  /// </summary>
+  public void SyncGameTime(float serverGameTime)
+  {
+    if (serverGameTime < 0f) serverGameTime = 0f;
+    startTime = Time.time - serverGameTime;
+  }
+
   public void AddKill()
   {
     killCount++;

@@ -1,4 +1,6 @@
 using UnityEngine;
+using NeoSurvive.Network;
+using NeoSurvive.Network.Protocol;
 
 // 이 스크립트는 플레이어가 수집할 수 있는 골드 아이템을 처리합니다.
 // 이 스크립트가 붙은 오브젝트에는 반드시 isTrigger가 활성화된 Collider2D가 있어야 합니다.
@@ -15,6 +17,16 @@ public class GoldPickup : MonoBehaviour
         // 충돌한 오브젝트의 태그가 "Player"인지 확인합니다.
         if (other.CompareTag("Player"))
         {
+            Player player = other.GetComponent<Player>();
+            if (player != null && player.IsLocal && UDPClient.Instance != null)
+            {
+                var networkItem = GetComponent<NetworkItem>();
+                if (networkItem != null)
+                {
+                    UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
+                }
+            }
+
             // GameManager의 인스턴스를 통해 골드를 추가합니다.
             if (GameManager.Instance != null)
             {

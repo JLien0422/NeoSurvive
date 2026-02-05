@@ -8,13 +8,78 @@ namespace NeoSurvive.Buff
     /// </summary>
     public class BuffHandler : MonoBehaviour
     {
-        private List<IBuff> activeBuffs = new List<IBuff>();
-        private List<float> buffTimers = new List<float>();
+        private class BuffEntry
+        {
+            public IBuff Buff;
+            public float RemainingTime;
+            public uint? BuffId;
+            public uint Stacks;
+        }
+
+        private readonly List<BuffEntry> activeBuffs = new List<BuffEntry>();
 
         public void AddBuff(IBuff buff)
         {
-            activeBuffs.Add(buff);
-            buffTimers.Add(buff.Duration);
+            AddBuffInternal(buff, null, 1, buff != null ? buff.Duration : 0f);
+        }
+
+        public void AddBuffWithId(uint buffId, IBuff buff, uint stacks = 1, float? durationOverride = null, bool refreshIfExists = true)
+        {
+            if (buff == null) return;
+
+            if (refreshIfExists)
+            {
+                RemoveBuffById(buffId);
+            }
+
+            AddBuffInternal(buff, buffId, stacks, durationOverride ?? buff.Duration);
+        }
+
+        public void SetOrRefreshNetworkBuff(uint buffId, IBuff buff, float remainingTime, uint stacks = 1)
+        {
+            if (buff == null) return;
+
+            RemoveBuffById(buffId);
+            AddBuffInternal(buff, buffId, stacks, remainingTime > 0f ? remainingTime : buff.Duration);
+        }
+
+        public void RemoveBuffById(uint buffId)
+        {
+            for (int i = activeBuffs.Count - 1; i >= 0; i--)
+            {
+                if (activeBuffs[i].BuffId.HasValue && activeBuffs[i].BuffId.Value == buffId)
+                {
+                    activeBuffs[i].Buff.Remove(gameObject);
+                    activeBuffs.RemoveAt(i);
+                }
+            }
+        }
+
+        public HashSet<uint> GetActiveNetworkBuffIds()
+        {
+            HashSet<uint> ids = new HashSet<uint>();
+            foreach (var entry in activeBuffs)
+            {
+                if (entry.BuffId.HasValue)
+                {
+                    ids.Add(entry.BuffId.Value);
+                }
+            }
+            return ids;
+        }
+
+        private void AddBuffInternal(IBuff buff, uint? buffId, uint stacks, float duration)
+        {
+            if (buff == null) return;
+
+            activeBuffs.Add(new BuffEntry
+            {
+                Buff = buff,
+                RemainingTime = duration,
+                BuffId = buffId,
+                Stacks = stacks
+            });
+
             buff.Apply(gameObject);
         }
 
@@ -22,14 +87,14 @@ namespace NeoSurvive.Buff
         {
             for (int i = activeBuffs.Count - 1; i >= 0; i--)
             {
-                buffTimers[i] -= Time.deltaTime;
-                activeBuffs[i].Tick(gameObject, Time.deltaTime);
+                BuffEntry entry = activeBuffs[i];
+                entry.RemainingTime -= Time.deltaTime;
+                entry.Buff.Tick(gameObject, Time.deltaTime);
 
-                if (buffTimers[i] <= 0)
+                if (entry.RemainingTime <= 0f)
                 {
-                    activeBuffs[i].Remove(gameObject);
+                    entry.Buff.Remove(gameObject);
                     activeBuffs.RemoveAt(i);
-                    buffTimers.RemoveAt(i);
                 }
             }
         }

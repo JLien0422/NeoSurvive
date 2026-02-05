@@ -1,4 +1,6 @@
 using UnityEngine;
+using NeoSurvive.Network;
+using NeoSurvive.Network.Protocol;
 
 /// <summary>
 /// 데이터칩 아이템
@@ -20,6 +22,15 @@ public class DataChip : MonoBehaviour
             Player player = other.GetComponent<Player>();
             if (player != null)
             {
+                if (player.IsLocal && UDPClient.Instance != null)
+                {
+                    var networkItem = GetComponent<NetworkItem>();
+                    if (networkItem != null)
+                    {
+                        UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
+                    }
+                }
+
                 player.AddNeuralLinkGauge(gaugeAmount);
                 Destroy(gameObject);
             }

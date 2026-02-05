@@ -1,5 +1,7 @@
 using UnityEngine;
 using System;
+using NeoSurvive.Network;
+using NeoSurvive.Network.Protocol;
 
 public class ChestPickup : MonoBehaviour
 {
@@ -18,6 +20,16 @@ public class ChestPickup : MonoBehaviour
 
         if (opened) return;
         if (!other.CompareTag("Player")) return;
+
+        Player player = other.GetComponent<Player>();
+        if (player != null && player.IsLocal && UDPClient.Instance != null)
+        {
+            var networkItem = GetComponent<NetworkItem>();
+            if (networkItem != null)
+            {
+                UDPClient.Instance.SendAction(ActionType.ObjectInteract, networkItem.ItemId);
+            }
+        }
 
         opened = true;
         Open();

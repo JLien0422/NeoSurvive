@@ -57,7 +57,8 @@ public class SettingsManager : MonoBehaviour
     if (Instance == null)
     {
       Instance = this;
-      DontDestroyOnLoad(gameObject);
+      // Managers가 루트가 아닌 경우 부모(Managers)를 유지시킴
+      DontDestroyOnLoad(transform.root.gameObject);
 
       // 중복을 제거하고 해상도 목록을 가져옵니다.
       resolutions = Screen.resolutions.Select(resolution => new Resolution { width = resolution.width, height = resolution.height }).Distinct().ToArray();
@@ -68,6 +69,26 @@ public class SettingsManager : MonoBehaviour
     {
       Destroy(gameObject);
     }
+  }
+
+  private void Start()
+  {
+    // FPS 설정이 첫 프레임에서 제대로 안 먹히는 경우가 있어서
+    // Start()에서 한 번 더 강제 적용
+    if (Instance == this)
+    {
+      StartCoroutine(ReapplyFPSSettings());
+    }
+  }
+
+  /// <summary>
+  /// FPS 설정을 한 프레임 지연 후 다시 적용 (초기화 버그 방지)
+  /// </summary>
+  private System.Collections.IEnumerator ReapplyFPSSettings()
+  {
+    yield return null; // 1프레임 대기
+    Application.targetFrameRate = targetFPS;
+    Debug.Log($"[SettingsManager] FPS 재적용 완료: {targetFPS}");
   }
 
   // 설정을 불러오고 즉시 적용하는 메서드
@@ -217,8 +238,22 @@ public class SettingsManager : MonoBehaviour
   public void SetPostProcessing(bool enabled)
   {
     postProcessingEnabled = enabled;
+    
     // PostProcessVolume 컴포넌트를 찾아서 활성화/비활성화
-    // UI에서 처리
+    #if UNITY_POST_PROCESSING_STACK_V2
+    UnityEngine.Rendering.PostProcessing.PostProcessVolume volume = FindObjectOfType<UnityEngine.Rendering.PostProcessing.PostProcessVolume>();
+    if (volume != null)
+    {
+      volume.enabled = enabled;
+      Debug.Log($"[SettingsManager] Post Processing {(enabled ? "활성화" : "비활성화")}");
+    }
+    else
+    {
+      Debug.LogWarning("[SettingsManager] PostProcessVolume을 찾을 수 없습니다. 씬에 추가해 주세요.");
+    }
+    #else
+    Debug.LogWarning("[SettingsManager] Post Processing Stack V2가 설치되지 않았습니다.");
+    #endif
   }
 
   public void SetShowDamageNumbers(bool show)

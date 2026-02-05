@@ -148,7 +148,8 @@ namespace NeoSurvive.Weapon
         Enemy enemy = col.GetComponentInParent<Enemy>();
         if (enemy == null) continue;
 
-        enemy.TakeDamage(useDamage); // ✅ 변경: 이번 공격 데미지 반영
+        var src = GetComponent<WeaponSource>();
+        enemy.TakeDamage(useDamage, src != null ? src.weaponData : null); // ✅ 변경: 이번 공격 데미지 반영
         damaged++;
 
         if (damaged >= currentMaxTargets) break;

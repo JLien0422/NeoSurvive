@@ -65,11 +65,17 @@ namespace NeoSurvive.Weapon
         if (weaponData.isIndependent)
         {
           weaponObj = Instantiate(weaponData.weaponPrefab, transform.position, Quaternion.identity);
+          var sourceIndep = weaponObj.GetComponent<WeaponSource>();
+          if (sourceIndep == null) sourceIndep = weaponObj.AddComponent<WeaponSource>();
+          sourceIndep.weaponData = weaponData;
         }
         else
         {
           weaponObj = Instantiate(weaponData.weaponPrefab, transform);
         }
+        var source = weaponObj.GetComponent<WeaponSource>();
+        if (source == null) source = weaponObj.AddComponent<WeaponSource>();
+        source.weaponData = weaponData;
         spawnedWeapons.Add(weaponData, weaponObj);
 
         // 초기화 알림

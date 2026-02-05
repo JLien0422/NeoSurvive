@@ -63,41 +63,55 @@ public class EnemyController : MonoBehaviour
 
   /// <summary>
   /// 메커니즘 초기화
+  /// 프리팹에 이미 해당 메커니즘이 붙어 있으면 그걸 재사용(인스펙터 값 유지), 없을 때만 AddComponent.
   /// </summary>
   private void InitializeMechanism()
   {
-    // 기존 메커니즘 제거
+    // 기존 메커니즘 제거 (단, 같은 타입이면 제거하지 않고 재사용)
     if (currentMechanism != null)
     {
-      Destroy(currentMechanism);
+      bool sameType = (mechanismType == EnemyMechanismType.Shooter && currentMechanism is ShooterMechanism)
+        || (mechanismType == EnemyMechanismType.Rusher && currentMechanism is RusherMechanism)
+        || (mechanismType == EnemyMechanismType.Bomber && currentMechanism is BomberMechanism)
+        || (mechanismType == EnemyMechanismType.Tanker && currentMechanism is TankerMechanism);
+      if (!sameType)
+        Destroy(currentMechanism);
+      else
+      {
+        currentMechanism.Initialize(enemy, this);
+        currentMechanism.SetTarget(target);
+        return;
+      }
     }
 
-    // 메커니즘 타입에 따라 컴포넌트 추가
+    // 메커니즘 타입에 따라 컴포넌트 추가 (이미 있으면 GetComponent로 재사용)
     switch (mechanismType)
     {
       case EnemyMechanismType.Basic:
-        // 일반형 메커니즘은 EnemyController 자체가 처리 (기본 추적)
         currentMechanism = null;
         break;
 
       case EnemyMechanismType.Shooter:
-        currentMechanism = gameObject.AddComponent<ShooterMechanism>();
+        currentMechanism = GetComponent<ShooterMechanism>();
+        if (currentMechanism == null) currentMechanism = gameObject.AddComponent<ShooterMechanism>();
         break;
 
       case EnemyMechanismType.Rusher:
-        currentMechanism = gameObject.AddComponent<RusherMechanism>();
+        currentMechanism = GetComponent<RusherMechanism>();
+        if (currentMechanism == null) currentMechanism = gameObject.AddComponent<RusherMechanism>();
         break;
 
       case EnemyMechanismType.Bomber:
-        currentMechanism = gameObject.AddComponent<BomberMechanism>();
+        currentMechanism = GetComponent<BomberMechanism>();
+        if (currentMechanism == null) currentMechanism = gameObject.AddComponent<BomberMechanism>();
         break;
 
       case EnemyMechanismType.Tanker:
-        currentMechanism = gameObject.AddComponent<TankerMechanism>();
+        currentMechanism = GetComponent<TankerMechanism>();
+        if (currentMechanism == null) currentMechanism = gameObject.AddComponent<TankerMechanism>();
         break;
     }
 
-    // 메커니즘 초기화
     if (currentMechanism != null)
     {
       currentMechanism.Initialize(enemy, this);

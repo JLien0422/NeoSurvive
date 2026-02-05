@@ -115,7 +115,12 @@ public class Enemy : Character
     }
 
     // 죽음 처리 후 적 오브젝트를 파괴합니다.
-    Destroy(gameObject);
+    // ⚠ BomberMechanism은 사망 후 일정 시간 뒤에 폭발해야 하므로
+    // 해당 메커니즘일 때는 BomberMechanism 쪽에서 Destroy를 호출하게 둡니다.
+    if (controller == null || controller.GetMechanismType() != EnemyMechanismType.Bomber)
+    {
+      Destroy(gameObject);
+    }
   }
 
   // 경험치 오브 드랍 메서드

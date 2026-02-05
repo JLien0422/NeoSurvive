@@ -76,7 +76,19 @@ public class ShooterMechanism : EnemyMechanismBase
 
     public override void UpdateAttack()
     {
-        if (target == null || projectilePrefab == null) return;
+        if (target == null)
+        {
+#if UNITY_EDITOR
+            Debug.Log("[ShooterMechanism] 공격 불가: target이 null입니다.", this);
+#endif
+            return;
+        }
+
+        if (projectilePrefab == null)
+        {
+            Debug.LogWarning("[ShooterMechanism] projectilePrefab이 비어 있어 투사체를 발사할 수 없습니다.", this);
+            return;
+        }
 
         float distanceToTarget = Vector2.Distance(transform.position, target.position);
 

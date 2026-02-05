@@ -37,7 +37,12 @@ public class BomberMechanism : EnemyMechanismBase
 
     public override void UpdateMovement()
     {
-        // 기본 이동은 EnemyController에서 처리
+        // 기본 Enemy처럼 플레이어를 향해 이동 (별도 패턴 없음)
+        if (target == null || rb == null) return;
+
+        Vector2 direction = (target.position - transform.position).normalized;
+        float moveSpeed = controller != null ? controller.GetMoveSpeed() : 3f;
+        rb.velocity = direction * moveSpeed;
     }
 
     public override void UpdateAttack()

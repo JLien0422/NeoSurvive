@@ -142,6 +142,8 @@ namespace NeoSurvive.Weapon
       {
         proj.Initialize(transform.right, damage, 20f);
         proj.SetTarget(target);
+        var src = GetComponent<WeaponSource>();
+        if (src != null) proj.SetSourceWeapon(src.weaponData);
       }
       anim.SetTrigger("doAttack");
     }

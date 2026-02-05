@@ -51,7 +51,12 @@ namespace NeoSurvive.Weapon
 
       Vector3 dir = (target.position - transform.position).normalized;
       GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-      if (obj.TryGetComponent<Projectile>(out var p)) p.Initialize(dir, damage, 20f);
+      if (obj.TryGetComponent<Projectile>(out var p))
+      {
+        p.Initialize(dir, damage, 20f);
+        var src = GetComponent<WeaponSource>();
+        if (src != null) p.SetSourceWeapon(src.weaponData);
+      }
     }
 
     private Transform FindClosestEnemy()

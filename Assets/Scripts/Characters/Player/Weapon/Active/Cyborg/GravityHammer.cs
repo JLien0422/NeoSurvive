@@ -125,7 +125,8 @@ namespace NeoSurvive.Weapon
         Enemy enemy = col.GetComponentInParent<Enemy>();
         if (enemy == null) continue;
 
-        enemy.TakeDamage(damage);
+        var src = GetComponent<WeaponSource>();
+        enemy.TakeDamage(damage, src != null ? src.weaponData : null);
 
         // 넉백(가능한 경우만)
         ApplyKnockback(col.transform, forward, impactPoint);

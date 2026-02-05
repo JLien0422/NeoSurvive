@@ -154,7 +154,8 @@ namespace NeoSurvive.Weapon
         return;
 
       lastHitTime[id] = now;
-      enemy.TakeDamage(damage);
+      var src = GetComponent<WeaponSource>();
+      enemy.TakeDamage(damage, src != null ? src.weaponData : null);
     }
   }
 }

@@ -36,11 +36,17 @@ namespace NeoSurvive.Weapon
 
         private Vector2 dir = Vector2.right;
         private float outgoingDamageMul = 1f; // 플레이어(또는 무기) 버프 반영용
+        private WeaponBase sourceWeapon;
 
         public void Init(Vector2 direction, float outgoingMul)
         {
             dir = direction.normalized;
             outgoingDamageMul = Mathf.Max(0.01f, outgoingMul);
+        }
+
+        public void SetSourceWeapon(WeaponBase weapon)
+        {
+            sourceWeapon = weapon;
         }
 
         private void Start()
@@ -71,7 +77,7 @@ namespace NeoSurvive.Weapon
             if (other.TryGetComponent<Character>(out var character))
             {
                 float finalDamage = baseDamage * outgoingDamageMul;
-                character.TakeDamage(finalDamage);
+                character.TakeDamage(finalDamage, sourceWeapon);
             }
 
             // 2) 디버프 적용(대상이 무엇이든 GameObject에 적용)

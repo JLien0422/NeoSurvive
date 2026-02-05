@@ -126,7 +126,8 @@ namespace NeoSurvive.Weapon
         Enemy enemy = col.GetComponentInParent<Enemy>();
         if (enemy != null)
         {
-          enemy.TakeDamage(auraDamage);
+          var src = GetComponent<WeaponSource>();
+          enemy.TakeDamage(auraDamage, src != null ? src.weaponData : null);
         }
       }
 
@@ -177,7 +178,8 @@ namespace NeoSurvive.Weapon
         if (enemy == null) continue;
 
         float dmg = auraDamage * lightningDamageFactor;
-        enemy.TakeDamage(dmg);
+        var src2 = GetComponent<WeaponSource>();
+        enemy.TakeDamage(dmg, src2 != null ? src2.weaponData : null);
 
         // 이펙트(선택)
         if (lightningPrefab != null)

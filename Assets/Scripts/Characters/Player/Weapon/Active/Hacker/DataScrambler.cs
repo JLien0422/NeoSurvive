@@ -68,7 +68,8 @@ namespace NeoSurvive.Weapon
             // 부채꼴 범위 안
             if (col.TryGetComponent<Enemy>(out var enemy))
             {
-              enemy.TakeDamage(damage); // 즉시 피해
+              var src = GetComponent<WeaponSource>();
+              enemy.TakeDamage(damage, src != null ? src.weaponData : null); // 즉시 피해
               ApplyConfusion(col.gameObject);
             }
           }
@@ -85,7 +86,8 @@ namespace NeoSurvive.Weapon
         confusion = enemyObj.AddComponent<ConfusionEffect>();
       }
       // 이미 있으면 시간/데미지 갱신
-      confusion.Initialize(damage, duration);
+      var src = GetComponent<WeaponSource>();
+      confusion.Initialize(damage, duration, src != null ? src.weaponData : null);
     }
 
     public void OnLevelUp(int level)
@@ -133,11 +135,13 @@ namespace NeoSurvive.Weapon
     private float damage;
     private float timer;
     private bool initialized = false;
+    private WeaponBase sourceWeapon;
 
-    public void Initialize(float dmg, float duration)
+    public void Initialize(float dmg, float duration, WeaponBase source = null)
     {
       this.damage = dmg;
       this.timer = duration;
+      this.sourceWeapon = source;
       this.initialized = true;
 
       // 시각 효과? (색상 변경 등)
@@ -165,7 +169,7 @@ namespace NeoSurvive.Weapon
         if (h.gameObject == gameObject) continue; // 나 자신 제외
         if (h.CompareTag("Enemy") && h.TryGetComponent<Enemy>(out var e))
         {
-          e.TakeDamage(damage); // 광역 피해
+          e.TakeDamage(damage, sourceWeapon); // 광역 피해
         }
       }
 

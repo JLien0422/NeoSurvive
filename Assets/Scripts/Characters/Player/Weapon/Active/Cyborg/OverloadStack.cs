@@ -10,6 +10,7 @@ namespace NeoSurvive.Weapon
   public class OverloadStack : MonoBehaviour
   {
     public int stacks = 0;
+    private WeaponBase damageSourceWeapon;
 
     // (선택) 스택 유지시간을 넣고 싶으면 여기서 타이머로 관리 가능
 
@@ -19,8 +20,10 @@ namespace NeoSurvive.Weapon
       float explosionRadius,
       float explosionDamage,
       LayerMask enemyMask,
-      string enemyTag)
+      string enemyTag,
+      WeaponBase sourceWeapon = null)
     {
+      damageSourceWeapon = sourceWeapon;
       stacks += amount;
 
       if (stacks >= stacksToExplode)
@@ -46,7 +49,7 @@ namespace NeoSurvive.Weapon
         Enemy e = col.GetComponentInParent<Enemy>();
         if (e != null)
         {
-          e.TakeDamage(damage);
+          e.TakeDamage(damage, damageSourceWeapon);
         }
       }
 

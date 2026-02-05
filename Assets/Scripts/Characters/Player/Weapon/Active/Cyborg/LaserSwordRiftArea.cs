@@ -17,8 +17,14 @@ namespace NeoSurvive.Weapon
     private float damageFactor;
     private LayerMask hitMask;
     private string enemyTag;
+    private WeaponBase sourceWeapon;
 
     private bool initialized = false;
+
+    public void SetSourceWeapon(WeaponBase weapon)
+    {
+      sourceWeapon = weapon;
+    }
 
     public void Initialize(
       float weaponDamage,
@@ -61,7 +67,7 @@ namespace NeoSurvive.Weapon
 
           if (h.TryGetComponent<Enemy>(out var e))
           {
-            e.TakeDamage(tickDamage);
+            e.TakeDamage(tickDamage, sourceWeapon);
           }
         }
 

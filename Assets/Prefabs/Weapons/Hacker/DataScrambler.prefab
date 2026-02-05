@@ -49,3 +49,7 @@ MonoBehaviour:
   angle: 60
   fireRate: 2
   duration: 3
+  enemyTag: Enemy
+  enableFrenzyAtLv5: 1
+  frenzyDuration: 3
+  debugLog: 1

@@ -1,6 +1,7 @@
 using UnityEngine;
 using NeoSurvive.Characters; 
 using System.Collections;
+using NeoSurvive.Buff; // ✅ (추가) BuffUtil, RootDebuff
 
 namespace NeoSurvive.Weapon
 {
@@ -70,7 +71,8 @@ namespace NeoSurvive.Weapon
             this.range = range;
             this.duration = duration;
             
-            StartCoroutine(PrisonRoutine());
+            // ✅ 생성 즉시 1회만 적용 (원샷형)
+            ApplySnareOnce();
             
             // 시각 효과 (반투명 파란 구체)
             var sr = gameObject.AddComponent<SpriteRenderer>();
@@ -81,43 +83,32 @@ namespace NeoSurvive.Weapon
             Destroy(gameObject, duration);
         }
 
-        private IEnumerator PrisonRoutine()
-        {
-             // 생성 즉시 범위 내 적 속박
-             ApplySnare();
-             
-             // 지속 시간 동안 반복 체크? (들어오는 적도 속박?)
-             // 기획: "주변 적을 3초간 가두는" -> 1회성일 수도 있고 장판일 수도 있음.
-             // 장판으로 구현 (매 프레임 체크)
-             float elapsed = 0f;
-             while(elapsed < duration)
-             {
-                 ApplySnare();
-                 yield return new WaitForSeconds(0.2f); // 0.2초마다 갱신
-                 elapsed += 0.2f;
-             }
-        }
-
-        private void ApplySnare()
+        private void ApplySnareOnce()
         {
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range);
+
             foreach (var hit in hits)
             {
-                if (hit.CompareTag("Enemy"))
-                {
-                    if (hit.TryGetComponent<EnemyController>(out var ai))
-                    {
-                        // 이동 속도를 0으로 (0.3초 지속 - 반복 갱신되므로 계속 멈춤)
-                        ai.ApplySlow(0f, 0.3f); 
-                    }
-                }
+                if (hit == null) continue;
+
+                // ✅ Enemy는 자식 콜라이더일 수 있으니 부모까지 탐색
+                Enemy enemy = hit.GetComponentInParent<Enemy>();
+                if (enemy == null) continue;
+
+                // ✅ 혹시 적이 아닌 오브젝트(다른 collider)까지 잡히면 태그로 한번 더 방어
+                if (!enemy.CompareTag("Enemy")) continue;
+
+                // ✅ BreathArea와 동일한 방식으로 Root(속박) 적용
+                BuffUtil.Apply(enemy.gameObject, new RootDebuff(duration));
             }
         }
 
-        private void OnDrawGizmos()
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(transform.position, range);
         }
+#endif
     }
 }

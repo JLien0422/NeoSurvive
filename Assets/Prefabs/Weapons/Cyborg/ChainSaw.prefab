@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.0028057, y: 2.5643466, z: -2.0975385}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -113,22 +113,23 @@ MonoBehaviour:
   hitCooldown: 0.2
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyTag: Enemy
   speed: 8
+  halfWidth: 7
+  halfHeight: 4
   lifetime: 8
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 0
   radiusScale: 1
+  hitRadius: 0.6
   damagePerLevel: 0.15
   speedPerLevel: 0.1
   sizePerLevel: 0.12
   cooldownMulPerLevel: 0.92
   lifetimePerLevel: 0.15
   enableMaster: 1
-  masterExtraDamage: 6
   masterSizeFactor: 1.25
+  debugDraw: 0
+  debugLog: 0
 --- !u!212 &189806787830236226
 SpriteRenderer:
   m_ObjectHideFlags: 0

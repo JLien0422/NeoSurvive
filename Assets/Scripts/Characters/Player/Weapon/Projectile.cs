@@ -1,5 +1,7 @@
 using UnityEngine;
 using NeoSurvive.UI;
+using NeoSurvive.Network;
+using NeoSurvive.Network.Protocol;
 
 namespace NeoSurvive.Weapon
 {
@@ -16,6 +18,7 @@ namespace NeoSurvive.Weapon
 
     private Transform target;
     private Vector3 destination;
+    private bool shouldReportDamage = true;
 
     public event System.Action OnHitEvent;
 
@@ -24,6 +27,7 @@ namespace NeoSurvive.Weapon
       direction = dir.normalized;
       damage = dmg;
       this.speed = speed;
+      shouldReportDamage = !NetworkDamageContext.IsRemoteAction;
       Destroy(gameObject, lifeTime);
     }
 
@@ -46,9 +50,24 @@ namespace NeoSurvive.Weapon
       if (enemy != null)
       {
         enemy.TakeDamage(damage);
+        ReportEnemyHitIfNeeded(enemy, damage);
         OnHitEvent?.Invoke();
         OnHit();
       }
+    }
+
+    private void ReportEnemyHitIfNeeded(Enemy enemy, float damageAmount)
+    {
+      if (!shouldReportDamage) return;
+      if (UDPClient.Instance == null) return;
+
+      var proxy = enemy.GetComponent<NeoSurvive.Network.EnemyProxy>();
+      if (proxy == null) return;
+
+      uint dmg = (uint)Mathf.Max(0, Mathf.RoundToInt(damageAmount));
+      if (dmg == 0) return;
+
+      UDPClient.Instance.SendAction(ActionType.Damage, proxy.EnemyId, Vector2.zero, dmg, 0);
     }
 
     protected virtual void OnHit()

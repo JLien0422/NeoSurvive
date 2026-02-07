@@ -147,7 +147,9 @@ namespace NeoSurvive.Weapon
 
       if (data != null && spawnedWeapons.TryGetValue(data, out GameObject weaponObj))
       {
+        NeoSurvive.Network.NetworkDamageContext.BeginRemoteAction();
         weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
+        NeoSurvive.Network.NetworkDamageContext.EndRemoteAction();
       }
     }
 

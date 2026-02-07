@@ -356,12 +356,17 @@ public class UDPClient : MonoBehaviour
 
   private int GetWeaponIdFromAction(PlayerAction action)
   {
+    if (action.Value != 0)
+    {
+      return (int)action.Value;
+    }
+
     if (action.WeaponType != NeoSurvive.Network.Protocol.WeaponType.WeaponUnspecified)
     {
       return (int)action.WeaponType;
     }
 
-    return (int)action.Value;
+    return 0;
   }
 
   private void ApplyPlayerHit(PlayerAction action)

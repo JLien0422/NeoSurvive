@@ -39,6 +39,7 @@ namespace NeoSurvive.UI.Multiplayer
     private bool isHost = false;
     private string currentRoomCode = "";
     private List<GameObject> playerItemInstances = new List<GameObject>();
+    private Coroutine loginCheckRoutine;
 
     private void OnEnable()
     {
@@ -47,6 +48,14 @@ namespace NeoSurvive.UI.Multiplayer
         NetworkManager.Instance.Lobby.OnPlayerJoined += HandlePlayerEvent;
         NetworkManager.Instance.Lobby.OnPlayerLeft += HandlePlayerLeftEvent;
       }
+
+      if (DBManager.Instance != null)
+      {
+        DBManager.Instance.OnLoginSuccess += HandleLoginSuccess;
+        DBManager.Instance.OnLoginFailed += HandleLoginFailed;
+      }
+
+      EnsurePlayerReady();
     }
 
     private void OnDisable()
@@ -55,6 +64,12 @@ namespace NeoSurvive.UI.Multiplayer
       {
         NetworkManager.Instance.Lobby.OnPlayerJoined -= HandlePlayerEvent;
         NetworkManager.Instance.Lobby.OnPlayerLeft -= HandlePlayerLeftEvent;
+      }
+
+      if (DBManager.Instance != null)
+      {
+        DBManager.Instance.OnLoginSuccess -= HandleLoginSuccess;
+        DBManager.Instance.OnLoginFailed -= HandleLoginFailed;
       }
     }
 
@@ -98,6 +113,16 @@ namespace NeoSurvive.UI.Multiplayer
       ShowRoomList();
     }
 
+    public void EnsurePlayerReady()
+    {
+      if (loginCheckRoutine != null)
+      {
+        StopCoroutine(loginCheckRoutine);
+      }
+
+      loginCheckRoutine = StartCoroutine(EnsureLoginReadyCoroutine());
+    }
+
     public void ShowRoomList()
     {
       if (roomListPanel != null)
@@ -105,6 +130,8 @@ namespace NeoSurvive.UI.Multiplayer
 
       if (roomPanel != null)
         roomPanel.SetActive(false);
+
+      EnsurePlayerReady();
     }
 
     public void ShowRoom()
@@ -120,6 +147,12 @@ namespace NeoSurvive.UI.Multiplayer
 
     private void OnCreateRoomClicked()
     {
+      if (!IsPlayerReadyForMultiplayer())
+      {
+        Debug.LogWarning("[MultiplayerRoomUI] 로그인/플레이어 생성 완료 후 방을 생성할 수 있습니다.");
+        return;
+      }
+
       Debug.Log("[MultiplayerRoomUI] 방 생성");
 
       CharacterType selectedCharacter = GetSelectedCharacter();
@@ -133,6 +166,12 @@ namespace NeoSurvive.UI.Multiplayer
     /// </summary>
     private void OnJoinRoomClicked()
     {
+      if (!IsPlayerReadyForMultiplayer())
+      {
+        Debug.LogWarning("[MultiplayerRoomUI] 로그인/플레이어 생성 완료 후 방에 참가할 수 있습니다.");
+        return;
+      }
+
       if (roomCodeInput == null || string.IsNullOrEmpty(roomCodeInput.text))
       {
         Debug.LogWarning("[MultiplayerRoomUI] 방 코드를 입력해주세요.");
@@ -370,6 +409,71 @@ namespace NeoSurvive.UI.Multiplayer
           CreatePlayerItem(displayName, (isMe && isHost), player.isReady, player.characterType, isMe);
         }
       }
+    }
+
+    private IEnumerator EnsureLoginReadyCoroutine()
+    {
+      UpdateCreateJoinInteractable(false);
+
+      if (DBManager.Instance == null)
+      {
+        Debug.LogError("[MultiplayerRoomUI] DBManager가 없습니다. 로그인 상태를 확인할 수 없습니다.");
+        yield break;
+      }
+
+      if (!DBManager.Instance.IsLoggedIn)
+      {
+        if (!DBManager.Instance.IsLoggingIn)
+        {
+          StartCoroutine(DBManager.Instance.Login());
+        }
+
+        float timeout = 10f;
+        float elapsed = 0f;
+        while (!DBManager.Instance.IsLoggedIn && DBManager.Instance.IsLoggingIn && elapsed < timeout)
+        {
+          elapsed += Time.unscaledDeltaTime;
+          yield return null;
+        }
+      }
+
+      if (DBManager.Instance.IsLoggedIn)
+      {
+        UpdateCreateJoinInteractable(true);
+        Debug.Log($"[MultiplayerRoomUI] 로그인 완료. PlayerId: {DBManager.Instance.PlayerId}");
+      }
+      else
+      {
+        UpdateCreateJoinInteractable(false);
+        Debug.LogError("[MultiplayerRoomUI] 로그인 실패 또는 시간 초과로 멀티플레이어 이용이 제한됩니다.");
+      }
+    }
+
+    private void UpdateCreateJoinInteractable(bool enabled)
+    {
+      if (createRoomButton != null)
+        createRoomButton.interactable = enabled;
+
+      if (joinRoomButton != null)
+        joinRoomButton.interactable = enabled;
+
+      if (roomCodeInput != null)
+        roomCodeInput.interactable = enabled;
+    }
+
+    private bool IsPlayerReadyForMultiplayer()
+    {
+      return DBManager.Instance != null && DBManager.Instance.IsLoggedIn;
+    }
+
+    private void HandleLoginSuccess(LoginResponse response)
+    {
+      UpdateCreateJoinInteractable(true);
+    }
+
+    private void HandleLoginFailed(string error)
+    {
+      UpdateCreateJoinInteractable(false);
     }
 
     private void CreatePlayerItem(string playerName, bool isHostPlayer, bool isPlayerReady, string characterType, bool isMe)

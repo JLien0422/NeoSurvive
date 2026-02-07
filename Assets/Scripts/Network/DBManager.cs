@@ -21,10 +21,13 @@ namespace NeoSurvive.Network
     private int playerId = -1;
     private string deviceUID;
     private string nickname;
+    private bool isLoggingIn;
 
     public int PlayerId => playerId;
     public string DeviceUID => deviceUID;
     public string Nickname => nickname;
+    public bool IsLoggingIn => isLoggingIn;
+    public bool IsLoggedIn => playerId >= 0 && !string.IsNullOrEmpty(nickname);
 
     public event Action<LoginResponse> OnLoginSuccess;
     public event Action<string> OnLoginFailed;
@@ -71,6 +74,13 @@ namespace NeoSurvive.Network
 
     public IEnumerator Login()
     {
+      if (isLoggingIn)
+      {
+        yield break;
+      }
+
+      isLoggingIn = true;
+
       var loginData = new { deviceUID = deviceUID };
       string json = JsonConvert.SerializeObject(loginData);
 
@@ -92,6 +102,8 @@ namespace NeoSurvive.Network
           OnLoginFailed?.Invoke(request.error);
         }
       }
+
+      isLoggingIn = false;
     }
 
     public UnityWebRequest CreatePostRequest(string endpoint, string json)

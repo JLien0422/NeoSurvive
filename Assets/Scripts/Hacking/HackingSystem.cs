@@ -4,38 +4,38 @@ using UnityEngine;
 using NeoSurvive.Characters;
 
 /// <summary>
-/// 해킹 시스템 관리자
-/// 해킹 미니게임을 관리하고 플레이어 상태를 제어합니다.
+/// 해킹 시스템 관리자 (미니게임 전용)
+/// - 미니게임 랜덤 선택/실행
+/// - 성공/실패 판정
+/// - 보상(오브젝트 효과)은 절대 여기서 처리하지 않음
 /// </summary>
 public class HackingSystem : MonoBehaviour
 {
     public static HackingSystem Instance { get; private set; }
 
+    // ✅ (추가) 미니게임 결과 이벤트 (오브젝트 보상과 분리)
+    public static event System.Action<HackableObject> OnHackSuccess;
+    public static event System.Action<HackableObject> OnHackFail;
+
     [Header("해킹 설정")]
     [SerializeField]
     [Tooltip("게이지 자동 충전 속도 (초당 %)")]
-    private float gaugeChargeSpeed = 20f; // 초당 20% 충전
+    private float gaugeChargeSpeed = 20f;
 
     [SerializeField]
     [Tooltip("사이보그 보안 영역 반지름")]
     private float securityFieldRadius = 3f;
 
     [Header("미니게임 설정")]
-    [SerializeField]
-    [Tooltip("사용 가능한 미니게임 목록 (체크된 것만 랜덤 선택됨)")]
-    private bool enableCommandBypass = true;
-    [SerializeField]
-    private bool enableNumberSequence = true;
-    [SerializeField]
-    private bool enableNetworkBridge = true;
-    [SerializeField]
-    private bool enableSynapseSync = true;
-    [SerializeField]
-    private bool enableFrequencyOverride = true;
+    [SerializeField] private bool enableCommandBypass = true;
+    [SerializeField] private bool enableNumberSequence = true;
+    [SerializeField] private bool enableNetworkBridge = true;
+    [SerializeField] private bool enableSynapseSync = true;
+    [SerializeField] private bool enableFrequencyOverride = true;
 
     [Header("미니게임 UI")]
     [SerializeField]
-    private GameObject hackingUIPanel; // 해킹 UI 패널 (정사각형 팝업창)
+    private GameObject hackingUIPanel;
 
     private Player currentPlayer = null;
     private HackableObject currentHackableObject = null;
@@ -43,19 +43,12 @@ public class HackingSystem : MonoBehaviour
     private float hackingGauge = 0f;
     private float maxGauge = 100f;
 
-    // 현재 진행 중인 미니게임
     private HackingMinigameBase currentMinigame = null;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     /// <summary>
@@ -63,7 +56,7 @@ public class HackingSystem : MonoBehaviour
     /// </summary>
     public void StartHacking(HackableObject hackableObject, Player player)
     {
-        if (isHacking) return; // 이미 해킹 중이면 무시
+        if (isHacking) return;
 
         currentPlayer = player;
         currentHackableObject = hackableObject;
@@ -85,29 +78,21 @@ public class HackingSystem : MonoBehaviour
         // 플레이어 고정 상태 (이동/공격 불가)
         SetPlayerLockdown(true);
 
-        // 사이보그 보안 영역 생성 (사이보그 플레이 시)
-        // TODO: 사이보그 AI가 보안 영역을 지키도록 구현
-
         // 미니게임 랜덤 선택 (인스펙터에서 활성화된 것만)
         List<HackingMinigameType> availableMinigames = new List<HackingMinigameType>();
-        
-        if (enableCommandBypass)
-            availableMinigames.Add(HackingMinigameType.CommandBypass);
-        if (enableNumberSequence)
-            availableMinigames.Add(HackingMinigameType.NumberSequence);
-        if (enableNetworkBridge)
-            availableMinigames.Add(HackingMinigameType.NetworkBridge);
-        if (enableSynapseSync)
-            availableMinigames.Add(HackingMinigameType.SynapseSync);
-        if (enableFrequencyOverride)
-            availableMinigames.Add(HackingMinigameType.FrequencyOverride);
-        
+
+        if (enableCommandBypass) availableMinigames.Add(HackingMinigameType.CommandBypass);
+        if (enableNumberSequence) availableMinigames.Add(HackingMinigameType.NumberSequence);
+        if (enableNetworkBridge) availableMinigames.Add(HackingMinigameType.NetworkBridge);
+        if (enableSynapseSync) availableMinigames.Add(HackingMinigameType.SynapseSync);
+        if (enableFrequencyOverride) availableMinigames.Add(HackingMinigameType.FrequencyOverride);
+
         if (availableMinigames.Count == 0)
         {
             Debug.LogError("[HackingSystem] 활성화된 미니게임이 없습니다! 기본값으로 넘버 시퀀스를 사용합니다.");
             availableMinigames.Add(HackingMinigameType.NumberSequence);
         }
-        
+
         HackingMinigameType selectedMinigame = availableMinigames[Random.Range(0, availableMinigames.Count)];
         Debug.Log($"[HackingSystem] 선택된 미니게임: {selectedMinigame}");
         StartMinigame(selectedMinigame);
@@ -140,7 +125,6 @@ public class HackingSystem : MonoBehaviour
         if (hackingUIPanel != null)
         {
             hackingUIPanel.SetActive(true);
-            Debug.Log($"[HackingSystem] UI 패널 활성화 완료");
         }
         else
         {
@@ -156,25 +140,23 @@ public class HackingSystem : MonoBehaviour
             case HackingMinigameType.CommandBypass:
                 currentMinigame = minigameObj.AddComponent<CommandBypassMinigame>();
                 break;
-                
+
             case HackingMinigameType.NumberSequence:
                 currentMinigame = minigameObj.AddComponent<NumberSequenceMinigame>();
-                // hackingUIPanel을 buttonParent로 전달 (Initialize 전에 설정)
                 if (currentMinigame is NumberSequenceMinigame numberSeq)
                 {
                     numberSeq.SetButtonParent(hackingUIPanel != null ? hackingUIPanel.transform : null);
-                    Debug.Log($"[HackingSystem] buttonParent 설정: {numberSeq.GetButtonParent() != null}");
                 }
                 break;
-                
+
             case HackingMinigameType.NetworkBridge:
                 currentMinigame = minigameObj.AddComponent<NetworkBridgeMinigame>();
                 break;
-                
+
             case HackingMinigameType.SynapseSync:
                 currentMinigame = minigameObj.AddComponent<SynapseSyncMinigame>();
                 break;
-                
+
             case HackingMinigameType.FrequencyOverride:
                 currentMinigame = minigameObj.AddComponent<FrequencyOverrideMinigame>();
                 break;
@@ -183,7 +165,6 @@ public class HackingSystem : MonoBehaviour
         if (currentMinigame != null)
         {
             currentMinigame.Initialize(OnMinigameSuccess, OnMinigameFailure);
-            Debug.Log("[HackingSystem] 미니게임 Initialize 완료");
         }
         else
         {
@@ -201,7 +182,6 @@ public class HackingSystem : MonoBehaviour
             hackingGauge += gaugeChargeSpeed * Time.deltaTime;
             hackingGauge = Mathf.Clamp(hackingGauge, 0f, maxGauge);
 
-            // 게이지가 가득 차면 즉시 실행
             if (hackingGauge >= maxGauge)
             {
                 OnGaugeFull();
@@ -211,85 +191,36 @@ public class HackingSystem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 게이지가 가득 찼을 때
-    /// </summary>
     private void OnGaugeFull()
     {
-        // 미니게임 성공 처리
         if (currentMinigame != null)
         {
             currentMinigame.OnSuccess();
         }
     }
 
-    /// <summary>
-    /// 미니게임 성공
-    /// </summary>
     private void OnMinigameSuccess()
     {
         Debug.Log("해킹 성공!");
-        
-        // 성공 보상 적용
-        ApplySuccessReward();
+
+        // ✅ 보상 처리 없음. 결과만 알림.
+        OnHackSuccess?.Invoke(currentHackableObject);
 
         EndHacking(true);
     }
 
-    /// <summary>
-    /// 미니게임 실패
-    /// </summary>
     private void OnMinigameFailure()
     {
         Debug.Log("해킹 실패!");
 
-        // 실패 패널티 적용
         ApplyFailurePenalty();
+
+        // ✅ 보상 처리 없음. 결과만 알림.
+        OnHackFail?.Invoke(currentHackableObject);
 
         EndHacking(false);
     }
 
-    /// <summary>
-    /// 성공 보상 적용
-    /// </summary>
-    private void ApplySuccessReward()
-    {
-        // 미니게임 타입에 따라 다른 보상 적용
-        if (currentHackableObject == null) return;
-
-        // 현재 미니게임 타입 확인
-        HackingMinigameType minigameType = GetCurrentMinigameType();
-        
-        // HackingRewardSystem에 보상 적용 요청
-        if (HackingRewardSystem.Instance != null)
-        {
-            HackingRewardSystem.Instance.ApplyHackingReward(currentHackableObject, minigameType);
-        }
-        else
-        {
-            Debug.LogWarning("[HackingSystem] HackingRewardSystem.Instance가 null입니다! 보상이 적용되지 않습니다.");
-        }
-    }
-    
-    /// <summary>
-    /// 현재 미니게임 타입 가져오기
-    /// </summary>
-    private HackingMinigameType GetCurrentMinigameType()
-    {
-        if (currentMinigame == null) return HackingMinigameType.NumberSequence;
-        
-        if (currentMinigame is CommandBypassMinigame) return HackingMinigameType.CommandBypass;
-        if (currentMinigame is NumberSequenceMinigame) return HackingMinigameType.NumberSequence;
-        if (currentMinigame is NetworkBridgeMinigame) return HackingMinigameType.NetworkBridge;
-        if (currentMinigame is SynapseSyncMinigame) return HackingMinigameType.SynapseSync;
-        if (currentMinigame is FrequencyOverrideMinigame) return HackingMinigameType.FrequencyOverride;
-        
-        return HackingMinigameType.NumberSequence;
-    }
-
-    /// <summary>
-    /// 실패 패널티 적용
-    /// </summary>
     private void ApplyFailurePenalty()
     {
         if (currentPlayer == null) return;
@@ -366,14 +297,12 @@ public class HackingSystem : MonoBehaviour
     {
         if (currentPlayer == null) return;
 
-        // 사이보그만 보안 영역이 있음
         if (GameManager.Instance != null)
         {
             CharacterType characterType = GameManager.Instance.GetSelectedCharacter();
             if (characterType != CharacterType.Cyborg) return;
         }
 
-        // 보안 영역 내 적 감지
         Collider2D[] enemies = Physics2D.OverlapCircleAll(
             currentPlayer.transform.position,
             securityFieldRadius
@@ -383,10 +312,8 @@ public class HackingSystem : MonoBehaviour
         {
             if (col.CompareTag("Enemy"))
             {
-                // 진척도 감소 또는 해킹 취소
                 hackingGauge = Mathf.Max(0f, hackingGauge - 10f * Time.deltaTime);
-                
-                // 게이지가 0이 되면 해킹 취소
+
                 if (hackingGauge <= 0f)
                 {
                     OnMinigameFailure();
@@ -408,7 +335,6 @@ public class HackingSystem : MonoBehaviour
     /// </summary>
     private void CreateHackingUIPanel()
     {
-        // Canvas 찾기 또는 생성
         Canvas canvas = FindObjectOfType<Canvas>();
         if (canvas == null)
         {
@@ -419,15 +345,10 @@ public class HackingSystem : MonoBehaviour
             canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             Debug.Log("[HackingSystem] Canvas 자동 생성");
         }
-        else
-        {
-            Debug.Log($"[HackingSystem] 기존 Canvas 사용: {canvas.name}");
-        }
 
-        // 해킹 UI 패널 생성
         GameObject panel = new GameObject("HackingUIPanel");
         panel.transform.SetParent(canvas.transform, false);
-        
+
         RectTransform panelRect = panel.AddComponent<RectTransform>();
         panelRect.sizeDelta = new Vector2(500, 500);
         panelRect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -435,25 +356,11 @@ public class HackingSystem : MonoBehaviour
         panelRect.anchoredPosition = Vector2.zero;
 
         UnityEngine.UI.Image panelImg = panel.AddComponent<UnityEngine.UI.Image>();
-        panelImg.color = new Color(0.1f, 0.1f, 0.1f, 0.95f); // 조금 더 밝게
+        panelImg.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
 
-        // Canvas의 Sort Order를 높여서 다른 UI 위에 표시
-        if (canvas != null)
-        {
-            canvas.sortingOrder = 100; // 높은 값으로 설정
-        }
+        canvas.sortingOrder = 100;
 
         hackingUIPanel = panel;
-        Debug.Log($"[HackingSystem] 해킹 UI 패널 생성 완료: {panel.name}, 위치: {panelRect.anchoredPosition}, 크기: {panelRect.sizeDelta}");
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (isHacking && currentPlayer != null)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(currentPlayer.transform.position, securityFieldRadius);
-        }
     }
 }
 
@@ -462,9 +369,9 @@ public class HackingSystem : MonoBehaviour
 /// </summary>
 public enum HackingMinigameType
 {
-    CommandBypass,      // 커맨드 바이패스
-    NumberSequence,     // 넘버 시퀀스
-    NetworkBridge,      // 네트워크 브릿지
-    SynapseSync,        // 시냅스 동기화
-    FrequencyOverride   // 주파수 오버라이드
+    CommandBypass,
+    NumberSequence,
+    NetworkBridge,
+    SynapseSync,
+    FrequencyOverride
 }

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4987506915578932178
+--- !u!1 &7431905698908282454
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,74 +8,54 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9223294179887634971}
-  - component: {fileID: 9156595008635673326}
-  - component: {fileID: 823038177023653416}
-  - component: {fileID: 6660331674339309251}
+  - component: {fileID: 4355287969418803810}
+  - component: {fileID: 5410124942836267874}
+  - component: {fileID: 343146100065111327}
+  - component: {fileID: 4032325537815935041}
   m_Layer: 0
-  m_Name: ShieldOrb
+  m_Name: Hackable_Synapse Overload
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9223294179887634971
+--- !u!4 &4355287969418803810
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4987506915578932178}
+  m_GameObject: {fileID: 7431905698908282454}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 394.57532, y: 388.82947, z: -3.6204147}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &9156595008635673326
-CircleCollider2D:
+--- !u!114 &5410124942836267874
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4987506915578932178}
+  m_GameObject: {fileID: 7431905698908282454}
   m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.5
---- !u!212 &823038177023653416
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f4b5013e01abc244b6c9722cea234e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hackableType: 3
+  hackRange: 2
+  canHack: 1
+--- !u!212 &343146100065111327
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4987506915578932178}
+  m_GameObject: {fileID: 7431905698908282454}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -110,26 +90,29 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 485402918, guid: e79b2d8ed913a834a9d31fbc78354689, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8aea2ab5bdb024d46a6037de48de2871, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.8, y: 0.96}
+  m_Size: {x: 0.34, y: 0.34}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6660331674339309251
+--- !u!114 &4032325537815935041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4987506915578932178}
+  m_GameObject: {fileID: 7431905698908282454}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c53a8cf799ed6e64eb25efcfa9583908, type: 3}
+  m_Script: {fileID: 11500000, guid: 26a1932dedde5bd4981f1e07b12b0e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotateSpeed: 90
+  pulseSpeed: 2.5
+  pulseScale: 0.08

@@ -16,22 +16,14 @@ public class GameManager : MonoBehaviour
   private int killCount = 0;
 
   [Header("골드 관리")]
-  // 이번 판에서 획득한 골드 (디버깅용으로 인스펙터에 표시)
-  [SerializeField]
-  private int currentRunGold = 0;
-
-  [SerializeField]
-  // 저장된 총 골드
-  private int totalGold = 0;
-  // UI 등에서 총 골드를 참조하기 위한 public 프로퍼티
+  [SerializeField] private int currentRunGold = 0;
+  [SerializeField] private int totalGold = 0;
   public int TotalGold => totalGold;
 
-  // 참조
   private Transform playerTransform;
-  private const string GOLD_SAVE_KEY = "TotalGold"; // Easy Save 키
+  private const string GOLD_SAVE_KEY = "TotalGold";
 
   [Header("캐릭터 선택")]
-  // 선택된 캐릭터 타입
   private CharacterType selectedCharacter = CharacterType.Hacker;
 
   [Header("서버 연동")]
@@ -39,36 +31,33 @@ public class GameManager : MonoBehaviour
 
   private float startTime = 0f;
 
-  // 컴포넌트가 처음 활성화될 때 호출됩니다.
   private void Awake()
   {
-    // 싱글톤 패턴 구현
     if (Instance == null)
     {
       Instance = this;
-      DontDestroyOnLoad(transform.root.gameObject); // 씬이 바뀌어도 파괴되지 않도록 설정
+      DontDestroyOnLoad(transform.root.gameObject);
     }
     else
     {
-      Destroy(gameObject); // 이미 인스턴스가 있다면 이 오브젝트는 파괴
+      Destroy(gameObject);
+      return;
     }
+
+    startTime = Time.time; // ***** 추가: async Start() 전에 기준 시간 먼저 잡기
   }
 
   private async void Start()
   {
-    // GameServerAPI 초기화 대기 후 데이터 로드
     await LoadTotalGoldAsync();
 
-    startTime = Time.time;
+    startTime = Time.time; // (기존) 여기서도 다시 잡힘 (유지)
 
-    // 멀티플레이 환경인지 확인
     bool isMultiplayer = UDPClient.Instance != null;
 
     if (isMultiplayer)
     {
       Debug.Log("[GameManager] 멀티플레이 모드: 카메라는 자동으로 LocalPlayer를 추적합니다");
-      // 멀티플레이에서는 CameraController가 자동으로 LocalPlayer를 추적합니다
-      // 별도의 설정이 필요 없습니다
     }
     else
     {
@@ -78,11 +67,9 @@ public class GameManager : MonoBehaviour
       {
         playerTransform = playerObject.transform;
 
-        // 카메라 타겟 설정 (싱글플레이용)
         CameraController cam = FindObjectOfType<CameraController>();
         if (cam != null) cam.SetTarget(playerTransform);
 
-        // 맵 매니저 타겟 설정 (싱글플레이용)
         var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
         if (mapManager != null) mapManager.SetTarget(playerTransform);
       }
@@ -93,33 +80,28 @@ public class GameManager : MonoBehaviour
     }
   }
 
-  // 골드를 추가하는 공용 메서드
   public void AddGold(int amount)
   {
     currentRunGold += amount;
     Debug.Log($"골드 {amount} 획득! 이번 판 총 골드: {currentRunGold}");
   }
 
-  // 플레이어가 죽었을 때 호출될 메서드
   public void OnPlayerDeath()
   {
     totalGold += currentRunGold;
     SaveTotalGold();
-    currentRunGold = 0; // 현재 판 골드 초기화
+    currentRunGold = 0;
     Debug.Log($"이번 판에 얻은 골드가 총 골드에 합산되었습니다. 현재 총 골드: {totalGold}");
   }
 
-  // 골드를 서버에 저장
   private void SaveTotalGold()
   {
     ServerSaveSystem.Save(GOLD_SAVE_KEY, totalGold);
     Debug.Log($"총 골드 {totalGold}를 서버에 저장했습니다.");
   }
 
-  // 서버에서 골드를 불러옴 (비동기)
   private async System.Threading.Tasks.Task LoadTotalGoldAsync()
   {
-    // "TotalGold" 키로 저장된 값이 있으면 불러오고, 없으면 0을 기본값으로 사용합니다.
     totalGold = await ServerSaveSystem.LoadAsync(GOLD_SAVE_KEY, 0);
     Debug.Log($"서버에서 총 골드 {totalGold}를 불러왔습니다.");
   }
@@ -135,20 +117,37 @@ public class GameManager : MonoBehaviour
     OnKillCountChanged?.Invoke(killCount);
   }
 
-  /// <summary>
-  /// 선택된 캐릭터를 설정합니다.
-  /// </summary>
   public void SetSelectedCharacter(CharacterType characterType)
   {
     selectedCharacter = characterType;
     Debug.Log($"GameManager: 캐릭터 선택됨 - {characterType}");
   }
 
-  /// <summary>
-  /// 선택된 캐릭터 타입을 반환합니다.
-  /// </summary>
   public CharacterType GetSelectedCharacter()
   {
     return selectedCharacter;
+  }
+
+  // ============================================================
+  // ***** 추가: 디버그/테스트용 시간 점프 API
+  // ============================================================
+
+  /// <summary>
+  /// "경과 시간"을 강제로 elapsedSeconds로 맞춥니다.
+  /// 예: 180을 넣으면 GetGameTime()이 즉시 180초 근처가 됩니다.
+  /// </summary>
+  public void DebugSetElapsedTime(float elapsedSeconds) // ***** 추가
+  {
+    startTime = Time.time - Mathf.Max(0f, elapsedSeconds);
+    Debug.Log($"[GameManager] DebugSetElapsedTime => elapsed={elapsedSeconds:F1}s");
+  }
+
+  /// <summary>
+  /// 현재 경과 시간에서 addSeconds만큼 앞으로 점프합니다.
+  /// </summary>
+  public void DebugAddTime(float addSeconds) // ***** 추가
+  {
+    startTime -= Mathf.Max(0f, addSeconds);
+    Debug.Log($"[GameManager] DebugAddTime => +{addSeconds:F1}s");
   }
 }

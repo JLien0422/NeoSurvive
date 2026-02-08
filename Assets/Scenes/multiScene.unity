@@ -1241,6 +1241,10 @@ GameObject:
   - component: {fileID: 1004926091}
   - component: {fileID: 1004926092}
   - component: {fileID: 1004926093}
+  - component: {fileID: 1004926097}
+  - component: {fileID: 1004926096}
+  - component: {fileID: 1004926095}
+  - component: {fileID: 1004926094}
   m_Layer: 0
   m_Name: multiplayManager
   m_TagString: Untagged
@@ -1295,6 +1299,78 @@ MonoBehaviour:
   serverPort: 5158
   showDebugLog: 1
   lerpSpeed: 10
+--- !u!114 &1004926094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004926090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3bc1331c23dd664a927fc573751fe56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverAddress: nasdac.kro.kr
+  serverPort: 5158
+  showDebugLog: 1
+  lerpSpeed: 10
+--- !u!114 &1004926095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004926090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f7cd4e58ff1f7249ad5a20585453bbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemPrefabs:
+  - itemType: 1
+    typeId: 0
+    prefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}
+  - itemType: 3
+    typeId: 0
+    prefab: {fileID: 3803576962990758274, guid: 46f1d8c40194faa4c96b7ff6f5f08283, type: 3}
+  - itemType: 4
+    typeId: 0
+    prefab: {fileID: 3578716422610288139, guid: c0ecf175a70ae3e45aef2d979af4ace8, type: 3}
+  - itemType: 5
+    typeId: 0
+    prefab: {fileID: 8560961096412293643, guid: 988189dfb50114a4fbae0c1abcc43162, type: 3}
+  - itemType: 6
+    typeId: 0
+    prefab: {fileID: 7376150064209060376, guid: fa3f81593e813d745aa1a3898c493fe1, type: 3}
+--- !u!114 &1004926096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004926090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4895d08d69d6d154d80039b0f8612d8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverUrl: http://nasdac.kro.kr:5157/api
+--- !u!114 &1004926097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004926090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1e33fe7e6291654d95def7d5eab2c6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dbManager: {fileID: 1004926096}
+  multiLobbyManager: {fileID: 0}
+  coopManager: {fileID: 0}
 --- !u!1 &1091626777
 GameObject:
   m_ObjectHideFlags: 0
@@ -1530,6 +1606,7 @@ Transform:
   - {fileID: 2018592942}
   - {fileID: 1004926091}
   - {fileID: 1601759287}
+  - {fileID: 1434861398}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1297347790
@@ -1875,12 +1952,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1434861396}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.41770932, y: -1.4076754, z: 0.063158065}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1193739107}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1462108666
 GameObject:
@@ -3084,6 +3161,5 @@ SceneRoots:
   - {fileID: 1192075462}
   - {fileID: 803238265}
   - {fileID: 1193739107}
-  - {fileID: 1434861398}
   - {fileID: 988415438}
   - {fileID: 1126111014}

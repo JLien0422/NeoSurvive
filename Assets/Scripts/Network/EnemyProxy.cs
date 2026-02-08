@@ -38,7 +38,16 @@ namespace NeoSurvive.Network
       Enemy enemy = GetComponent<Enemy>();
       if (enemy != null)
       {
-        enemy.SetHealth(state.CurrentHp);
+        if (state.IsDead || state.CurrentHp == 0)
+        {
+          enemy.SetHealth(0);
+          DisableVisuals();
+        }
+        else
+        {
+          EnableVisuals();
+          enemy.SetHealth(state.CurrentHp);
+        }
       }
     }
 
@@ -64,7 +73,29 @@ namespace NeoSurvive.Network
       if (enemy != null)
       {
         enemy.SetHealth(0);
+        DisableVisuals();
       }
+    }
+
+    private void DisableVisuals()
+    {
+      var col = GetComponent<Collider2D>();
+      if (col != null) col.enabled = false;
+
+      var rb = GetComponent<Rigidbody2D>();
+      if (rb != null) rb.velocity = Vector2.zero;
+
+      var renderer = GetComponentInChildren<SpriteRenderer>();
+      if (renderer != null) renderer.enabled = false;
+    }
+
+    private void EnableVisuals()
+    {
+      var col = GetComponent<Collider2D>();
+      if (col != null) col.enabled = true;
+
+      var renderer = GetComponentInChildren<SpriteRenderer>();
+      if (renderer != null) renderer.enabled = true;
     }
 
     private void Update()

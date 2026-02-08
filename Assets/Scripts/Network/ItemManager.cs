@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NeoSurvive.Exp;
 using Protocol = NeoSurvive.Network.Protocol;
 
 namespace NeoSurvive.Network
@@ -10,6 +11,8 @@ namespace NeoSurvive.Network
   public class ItemManager : MonoBehaviour
   {
     public static ItemManager Instance { get; private set; }
+
+    private static Sprite fallbackSprite;
 
     [Header("Prefab Settings")]
     [SerializeField] private List<ItemPrefabMapping> itemPrefabs;
@@ -131,7 +134,23 @@ namespace NeoSurvive.Network
       GameObject prefab = GetPrefab(state);
       if (prefab == null)
       {
-        Debug.LogWarning($"[ItemManager] 알 수 없는 아이템 타입: {state.ItemType}, typeId: {state.TypeId}");
+        Debug.LogWarning($"[ItemManager] 프리팹 없음. 폴백 생성: {state.ItemType}, typeId: {state.TypeId}");
+        GameObject fallback = CreateFallbackItem(state);
+        if (fallback == null)
+        {
+          Debug.LogWarning($"[ItemManager] 폴백 생성 실패: {state.ItemType}, typeId: {state.TypeId}");
+          return;
+        }
+
+        var networkItemFallback = fallback.GetComponent<NetworkItem>();
+        if (networkItemFallback == null) networkItemFallback = fallback.AddComponent<NetworkItem>();
+        networkItemFallback.Initialize(state);
+
+        var proxyFallback = fallback.GetComponent<ItemProxy>();
+        if (proxyFallback == null) proxyFallback = fallback.AddComponent<ItemProxy>();
+        proxyFallback.UpdateState(state);
+
+        activeItems[state.ItemId] = fallback;
         return;
       }
 
@@ -148,6 +167,98 @@ namespace NeoSurvive.Network
       proxy.UpdateState(state);
 
       activeItems[state.ItemId] = obj;
+    }
+
+    private GameObject CreateFallbackItem(Protocol.ItemState state)
+    {
+      if (state == null) return null;
+
+      GameObject obj = new GameObject($"Item_Fallback_{state.ItemId}");
+      obj.transform.position = new Vector3(state.PosX, state.PosY, 0f);
+
+      SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
+      sr.sprite = GetFallbackSprite();
+      sr.color = GetFallbackColor(state.ItemType);
+      sr.sortingOrder = 5;
+
+      switch (state.ItemType)
+      {
+        case Protocol.ItemType.ExpOrb:
+          AddTriggerCollider(obj, 0.25f);
+          var expOrb = obj.AddComponent<ExpOrb>();
+          expOrb.SetAmount((int)Mathf.Max(1, state.Quantity));
+          break;
+        case Protocol.ItemType.NeuralLinkItem:
+          AddTriggerCollider(obj, 0.25f);
+          obj.AddComponent<DataChip>();
+          break;
+        case Protocol.ItemType.PsychoInfectionItem:
+          AddTriggerCollider(obj, 0.25f);
+          obj.AddComponent<PsychoCorruptionItem>();
+          break;
+        case Protocol.ItemType.Gold:
+          AddTriggerCollider(obj, 0.25f);
+          obj.AddComponent<GoldPickup>();
+          break;
+        case Protocol.ItemType.Chest:
+          AddTriggerCollider(obj, 0.4f);
+          obj.AddComponent<ChestPickup>();
+          break;
+        case Protocol.ItemType.Projectile:
+          Rigidbody2D rb = obj.AddComponent<Rigidbody2D>();
+          rb.gravityScale = 0f;
+          rb.drag = 0f;
+          rb.angularDrag = 0f;
+          break;
+      }
+
+      float scale = GetFallbackScale(state.ItemType);
+      obj.transform.localScale = new Vector3(scale, scale, 1f);
+
+      return obj;
+    }
+
+    private void AddTriggerCollider(GameObject obj, float radius)
+    {
+      CircleCollider2D col = obj.AddComponent<CircleCollider2D>();
+      col.isTrigger = true;
+      col.radius = radius;
+    }
+
+    private Sprite GetFallbackSprite()
+    {
+      if (fallbackSprite != null) return fallbackSprite;
+
+      Texture2D tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+      tex.SetPixel(0, 0, Color.white);
+      tex.Apply();
+      fallbackSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+      return fallbackSprite;
+    }
+
+    private Color GetFallbackColor(Protocol.ItemType itemType)
+    {
+      switch (itemType)
+      {
+        case Protocol.ItemType.ExpOrb: return new Color(0.3f, 0.9f, 1f, 1f);
+        case Protocol.ItemType.Projectile: return new Color(1f, 0.5f, 0.1f, 1f);
+        case Protocol.ItemType.NeuralLinkItem: return new Color(0.6f, 0.3f, 1f, 1f);
+        case Protocol.ItemType.PsychoInfectionItem: return new Color(0.9f, 0.2f, 0.6f, 1f);
+        case Protocol.ItemType.Gold: return new Color(1f, 0.85f, 0.2f, 1f);
+        case Protocol.ItemType.Chest: return new Color(0.7f, 0.5f, 0.2f, 1f);
+        default: return Color.white;
+      }
+    }
+
+    private float GetFallbackScale(Protocol.ItemType itemType)
+    {
+      switch (itemType)
+      {
+        case Protocol.ItemType.Projectile: return 0.2f;
+        case Protocol.ItemType.ExpOrb: return 0.35f;
+        case Protocol.ItemType.Chest: return 0.6f;
+        default: return 0.4f;
+      }
     }
 
     private GameObject GetPrefab(Protocol.ItemState state)

@@ -30,13 +30,29 @@ public class NumberSequenceMinigame : HackingMinigameBase
     private float remainingTime = 0f;
     private bool isActive = false;
 
+    private Transform preMadeBtnGrid;   // 손으로 만든 BtnGrid
+    private bool usePreMadeUI = false;  // 손으로 만든 UI 사용 여부
+
     /// <summary>
     /// 버튼 부모 설정 (HackingSystem에서 호출)
     /// </summary>
     public void SetButtonParent(Transform parent)
     {
         buttonParent = parent;
+        usePreMadeUI = false;
         Debug.Log($"[NumberSequenceMinigame] SetButtonParent 호출: {parent != null}");
+    }
+
+    /// <summary>
+    /// 손으로 만든 UI 사용 (HackingSystem에서 호출)
+    /// </summary>
+    public void SetPreMadeUI(Transform btnGrid, TextMeshProUGUI status)
+    {
+        preMadeBtnGrid = btnGrid;
+        statusText = status;
+        usePreMadeUI = true;
+        buttonParent = btnGrid;
+        Debug.Log("[NumberSequenceMinigame] 손으로 만든 UI 사용");
     }
 
     /// <summary>
@@ -51,17 +67,91 @@ public class NumberSequenceMinigame : HackingMinigameBase
     {
         base.Initialize(onSuccessCallback, onFailureCallback);
         
-        Debug.Log($"[NumberSequenceMinigame] Initialize 시작, buttonParent: {buttonParent}");
+        Debug.Log($"[NumberSequenceMinigame] Initialize 시작, usePreMadeUI: " + usePreMadeUI);
         
-        // UI 부모가 없으면 자동 생성
-        if (buttonParent == null)
+        if (usePreMadeUI && preMadeBtnGrid != null)
         {
-            Debug.Log("[NumberSequenceMinigame] buttonParent가 null이므로 UI 부모 생성");
-            CreateUIParent();
+            // 손으로 만든 버튼 9개 사용
+            UsePreMadeButtons();
         }
-        
-        CreateNumberButtons();
+        else
+        {
+            // UI 부모가 없으면 자동 생성
+            if (buttonParent == null)
+            {
+                Debug.Log("[NumberSequenceMinigame] buttonParent가 null이므로 UI 부모 생성");
+                CreateUIParent();
+            }
+            CreateNumberButtons();
+        }
         ResetMinigame();
+    }
+
+    /// <summary>
+    /// 손으로 만든 버튼 9개를 사용 (BtnGrid의 자식 Button들)
+    /// 버튼 텍스트는 1~9로 이미 설정되어 있다고 가정. 위치만 랜덤으로 섞음.
+    /// </summary>
+    private void UsePreMadeButtons()
+    {
+        numberButtons.Clear();
+        var buttons = preMadeBtnGrid.GetComponentsInChildren<Button>(true);
+        if (buttons == null || buttons.Length < 9)
+        {
+            Debug.LogError("[NumberSequenceMinigame] BtnGrid에 버튼이 9개 이상 없습니다. 자동 생성으로 대체합니다.");
+            CreateNumberButtons();
+            return;
+        }
+
+        for (int i = 0; i < 9; i++)
+        {
+            Button btn = buttons[i];
+            GameObject btnObj = btn.gameObject;
+            int num = GetNumberFromButton(btnObj);
+            if (num < 1 || num > 9) num = i + 1; // 파싱 실패 시 인덱스+1 사용
+
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => OnNumberClicked(num));
+            btnObj.name = "NumberButton_" + num;
+            numberButtons.Add(btnObj);
+        }
+
+        // 버튼 위치만 랜덤으로 섞기 (자식 순서 섞기 → Grid Layout에서 위치 변경)
+        ShuffleSiblingOrder(preMadeBtnGrid);
+
+        Debug.Log("[NumberSequenceMinigame] 손으로 만든 버튼 9개 적용 완료 (텍스트 유지, 위치만 셔플)");
+    }
+
+    /// <summary>
+    /// 버튼 텍스트에서 숫자 파싱 (1~9)
+    /// </summary>
+    private int GetNumberFromButton(GameObject btnObj)
+    {
+        var tmp = btnObj.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null && int.TryParse(tmp.text.Trim(), out int n)) return n;
+        var legacyText = btnObj.GetComponentInChildren<UnityEngine.UI.Text>(true);
+        if (legacyText != null && int.TryParse(legacyText.text.Trim(), out n)) return n;
+        return -1;
+    }
+
+    /// <summary>
+    /// 자식 순서를 랜덤으로 섞기 (Grid Layout에서 위치가 바뀜)
+    /// </summary>
+    private void ShuffleSiblingOrder(Transform parent)
+    {
+        var children = new List<Transform>();
+        for (int i = 0; i < parent.childCount; i++)
+            children.Add(parent.GetChild(i));
+
+        for (int i = children.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            Transform temp = children[i];
+            children[i] = children[j];
+            children[j] = temp;
+        }
+
+        foreach (var child in children)
+            child.SetAsLastSibling();
     }
 
     /// <summary>

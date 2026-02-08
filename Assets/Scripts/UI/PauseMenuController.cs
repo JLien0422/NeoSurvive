@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 /// <summary>
 /// ESC 입력 시 일시정지 메뉴를 띄웁니다.
@@ -72,10 +75,16 @@ public class PauseMenuController : MonoBehaviour
 
         if (resumeButton != null)
             resumeButton.onClick.AddListener(OnResume);
+        else
+            Debug.LogWarning("[PauseMenu] Resume Button이 할당되지 않았거나 Button 컴포넌트가 없습니다. 해당 오브젝트에 Add Component → UI → Button 을 추가하세요.");
         if (settingsButton != null)
             settingsButton.onClick.AddListener(OnOpenSettings);
+        else
+            Debug.LogWarning("[PauseMenu] Settings Button이 할당되지 않았거나 Button 컴포넌트가 없습니다.");
         if (quitButton != null)
-            quitButton.onClick.AddListener(OnQuit);
+            quitButton.onClick.AddListener(DoQuit);
+        else
+            Debug.LogWarning("[PauseMenu] Quit Button이 할당되지 않았거나 Button 컴포넌트가 없습니다. QuitButton 오브젝트에 Add Component → UI → Button 을 추가한 뒤, PauseMenuController의 Quit Button 슬롯에 다시 할당하세요.");
     }
 
     private void Update()
@@ -195,12 +204,26 @@ public class PauseMenuController : MonoBehaviour
             settingsUI.OpenSettings();
     }
 
-    private void OnQuit()
+    /// <summary>
+    /// 종료 버튼에서 호출. public 이므로 인스펙터에서 Quit 버튼 OnClick에 이 메서드를 직접 연결해도 됨.
+    /// </summary>
+    public void DoQuit()
     {
         Time.timeScale = 1f;
         if (!string.IsNullOrEmpty(quitSceneName))
+        {
             SceneManager.LoadScene(quitSceneName);
-        else
-            Application.Quit();
+            return;
+        }
+
+#if UNITY_EDITOR
+        // 에디터에서는 Application.Quit()이 동작 안 함 → 한 프레임 뒤 플레이 모드 종료
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
+        };
+#else
+        Application.Quit();
+#endif
     }
 }

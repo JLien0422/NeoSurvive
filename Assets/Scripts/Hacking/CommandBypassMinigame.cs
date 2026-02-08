@@ -20,13 +20,21 @@ public class CommandBypassMinigame : HackingMinigameBase
     [SerializeField]
     private GameObject arrowPrefab; // 화살표 프리팹 (선택사항)
 
+    private Transform preMadeArrowContainer;  // 손으로 만든 화살표 컨테이너
+    private List<Component> preMadeArrowTexts = new List<Component>(); // 8칸 모드용
+    private Component singleArrowText;        // ArrowContainer에 Text 하나만 붙인 모드
+    private bool usePreMadeUI = false;
+
+    private Slider progressSlider;   // 진행도 게이지 (Slider)
+    private Image progressImage;     // 진행도 게이지 (Image Fill)
+
     private List<GameObject> commandArrows = new List<GameObject>();
     private List<KeyCode> currentSequence = new List<KeyCode>(); // 현재 입력해야 할 시퀀스
     private int currentInputIndex = 0; // 현재 입력해야 할 인덱스
-    private int totalSequences = 5; // 총 시퀀스 개수
-    private int completedSequences = 0;
+    private int totalCorrectKeysPressed = 0;  // 지금까지 맞춘 화살표 개수
+    private int totalKeysNeeded = 20;         // 기획: 10초 안에 20개 맞추면 성공
 
-    private float timeLimit = 20f; // 제한 시간 (초)
+    private float timeLimit = 10f; // 기획: 미니게임 10초 제한
     private float remainingTime = 0f;
     private bool isActive = false;
 
@@ -34,12 +42,65 @@ public class CommandBypassMinigame : HackingMinigameBase
     private KeyCode[] arrowKeys = { KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow };
     private string[] arrowSymbols = { "↑", "↓", "←", "→" };
 
+    /// <summary>
+    /// 손으로 만든 UI 사용 (HackingSystem에서 호출)
+    /// </summary>
+    public void SetPreMadeUI(Transform arrowContainer, TextMeshProUGUI status, Slider progress = null, Image progressFill = null)
+    {
+        preMadeArrowContainer = arrowContainer;
+        statusText = status;
+        progressSlider = progress;
+        progressImage = (progressFill != null && progressFill.type == Image.Type.Filled) ? progressFill : null;
+        singleArrowText = null;
+
+        if (arrowContainer == null) { commandParent = null; return; }
+        commandParent = arrowContainer;
+
+        // ArrowContainer에 Text/TMP 하나만 붙인 경우
+        var tmp = arrowContainer.GetComponent<TextMeshProUGUI>();
+        if (tmp != null) { singleArrowText = tmp; usePreMadeUI = true; return; }
+        var txt = arrowContainer.GetComponent<UnityEngine.UI.Text>();
+        if (txt != null) { singleArrowText = txt; usePreMadeUI = true; return; }
+        tmp = arrowContainer.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null) { singleArrowText = tmp; usePreMadeUI = true; return; }
+        txt = arrowContainer.GetComponentInChildren<UnityEngine.UI.Text>(true);
+        if (txt != null) { singleArrowText = txt; usePreMadeUI = true; return; }
+
+        // 자식 8개(Arrow_0~7) 모드
+        usePreMadeUI = arrowContainer.childCount >= 8;
+        if (usePreMadeUI) CachePreMadeArrowTexts();
+    }
+
+    /// <summary>
+    /// 손으로 만든 화살표 요소들의 Text/TextMeshProUGUI 캐싱
+    /// </summary>
+    private void CachePreMadeArrowTexts()
+    {
+        preMadeArrowTexts.Clear();
+        if (preMadeArrowContainer == null) return;
+        for (int i = 0; i < 8 && i < preMadeArrowContainer.childCount; i++)
+        {
+            Transform child = preMadeArrowContainer.GetChild(i);
+            var tmp = child.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (tmp != null) preMadeArrowTexts.Add(tmp);
+            else
+            {
+                var txt = child.GetComponentInChildren<UnityEngine.UI.Text>(true);
+                if (txt != null) preMadeArrowTexts.Add(txt);
+            }
+        }
+    }
+
     public override void Initialize(System.Action onSuccessCallback, System.Action onFailureCallback)
     {
         base.Initialize(onSuccessCallback, onFailureCallback);
 
-        // UI 부모가 없으면 자동 생성
-        if (commandParent == null)
+        if (usePreMadeUI && preMadeArrowContainer != null)
+        {
+            // 손으로 만든 UI 사용
+            commandParent = preMadeArrowContainer;
+        }
+        else if (commandParent == null)
         {
             CreateUIParent();
         }
@@ -98,13 +159,14 @@ public class CommandBypassMinigame : HackingMinigameBase
     /// </summary>
     private void ResetMinigame()
     {
-        completedSequences = 0;
+        totalCorrectKeysPressed = 0;
         currentInputIndex = 0;
         remainingTime = timeLimit;
         isActive = true;
 
         ClearCommandArrows();
         GenerateNewSequence();
+        UpdateProgressGauge();
     }
 
     /// <summary>
@@ -131,6 +193,12 @@ public class CommandBypassMinigame : HackingMinigameBase
     /// </summary>
     private void DisplaySequence()
     {
+        if (usePreMadeUI && preMadeArrowTexts.Count >= 8)
+        {
+            DisplaySequencePreMade();
+            return;
+        }
+
         ClearCommandArrows();
 
         float arrowSize = 60f;
@@ -162,10 +230,67 @@ public class CommandBypassMinigame : HackingMinigameBase
     }
 
     /// <summary>
+    /// 손으로 만든 화살표 요소로 시퀀스 표시
+    /// </summary>
+    private void DisplaySequencePreMade()
+    {
+        // ArrowContainer에 Text 하나만 붙인 경우: 시퀀스 전체를 한 문자열로
+        if (singleArrowText != null)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < currentSequence.Count; i++)
+            {
+                int idx = System.Array.IndexOf(arrowKeys, currentSequence[i]);
+                if (i > 0) sb.Append("  ");
+                sb.Append(arrowSymbols[idx]);
+            }
+            string s = sb.ToString();
+            if (singleArrowText is TextMeshProUGUI t) t.text = s;
+            else if (singleArrowText is UnityEngine.UI.Text u) u.text = s;
+            UpdateStatusText();
+            return;
+        }
+
+        // 자식 8칸(Arrow_0~7) 모드
+        int maxSlots = Mathf.Min(8, preMadeArrowContainer.childCount, preMadeArrowTexts.Count);
+        for (int i = 0; i < maxSlots; i++)
+        {
+            Transform child = preMadeArrowContainer.GetChild(i);
+            child.gameObject.SetActive(i < currentSequence.Count);
+
+            if (i < currentSequence.Count && i < preMadeArrowTexts.Count)
+            {
+                int keyIndex = System.Array.IndexOf(arrowKeys, currentSequence[i]);
+                string symbol = arrowSymbols[keyIndex];
+                Color c = i < currentInputIndex ? Color.green : Color.white;
+
+                var tmp = preMadeArrowTexts[i] as TextMeshProUGUI;
+                if (tmp != null) { tmp.text = symbol; tmp.color = c; }
+                else if (preMadeArrowTexts[i] is UnityEngine.UI.Text tx) { tx.text = symbol; tx.color = c; }
+            }
+        }
+        UpdateStatusText();
+    }
+
+    /// <summary>
     /// 커맨드 화살표 정리
     /// </summary>
     private void ClearCommandArrows()
     {
+        if (usePreMadeUI && preMadeArrowContainer != null)
+        {
+            if (singleArrowText != null)
+            {
+                if (singleArrowText is TextMeshProUGUI t) t.text = "";
+                else if (singleArrowText is UnityEngine.UI.Text u) u.text = "";
+            }
+            else
+            {
+                for (int i = 0; i < preMadeArrowContainer.childCount; i++)
+                    preMadeArrowContainer.GetChild(i).gameObject.SetActive(false);
+            }
+            return;
+        }
         foreach (var arrow in commandArrows)
         {
             if (arrow != null)
@@ -193,25 +318,21 @@ public class CommandBypassMinigame : HackingMinigameBase
             
             if (Input.GetKeyDown(expectedKey))
             {
-                // 올바른 입력
+                // 올바른 입력 → 화살표 한 개당 진행도 증가
                 currentInputIndex++;
+                totalCorrectKeysPressed++;
                 DisplaySequence();
 
-                // 시퀀스 완료
-                if (currentInputIndex >= currentSequence.Count)
+                // 목표 개수 도달 (10초 안에 20개)
+                if (totalCorrectKeysPressed >= totalKeysNeeded)
                 {
-                    completedSequences++;
-                    
-                    // 모든 시퀀스 완료
-                    if (completedSequences >= totalSequences)
-                    {
-                        OnSuccess();
-                        return;
-                    }
-
-                    // 다음 시퀀스 생성
-                    GenerateNewSequence();
+                    OnSuccess();
+                    return;
                 }
+
+                // 시퀀스 끝나면 다음 시퀀스
+                if (currentInputIndex >= currentSequence.Count)
+                    GenerateNewSequence();
             }
             else if (Input.anyKeyDown && !Input.GetKeyDown(KeyCode.Escape))
             {
@@ -240,29 +361,31 @@ public class CommandBypassMinigame : HackingMinigameBase
     /// </summary>
     private void UpdateStatusText()
     {
-        if (statusText != null)
-        {
-            statusText.text = $"시퀀스 {completedSequences + 1}/{totalSequences} - 다음: {arrowSymbols[System.Array.IndexOf(arrowKeys, currentSequence[currentInputIndex])]}";
-        }
+        if (statusText != null) statusText.text = ""; // 텍스트 없음, 게이지만 사용
+        UpdateProgressGauge();
+    }
+
+    /// <summary>
+    /// 진행도 게이지 업데이트 (0~1) - 화살표 한 개 맞출 때마다 1/totalKeysNeeded 씩 증가
+    /// </summary>
+    private void UpdateProgressGauge()
+    {
+        float progress = (float)totalCorrectKeysPressed / totalKeysNeeded;
+        if (progressSlider != null) progressSlider.value = progress;
+        if (progressImage != null) progressImage.fillAmount = progress;
     }
 
     public override void OnSuccess()
     {
         isActive = false;
-        if (statusText != null)
-        {
-            statusText.text = "성공!";
-        }
+        if (progressSlider != null) progressSlider.value = 1f;
+        if (progressImage != null) progressImage.fillAmount = 1f;
         base.OnSuccess();
     }
 
     public override void OnFailure()
     {
         isActive = false;
-        if (statusText != null)
-        {
-            statusText.text = "실패!";
-        }
         base.OnFailure();
     }
 }

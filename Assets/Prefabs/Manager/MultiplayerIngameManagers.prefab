@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6064408408379936154
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6779098777338561999}
+  - component: {fileID: 2658164039363045127}
+  - component: {fileID: 5155298964365855387}
+  - component: {fileID: 2359157140583823460}
+  - component: {fileID: 1778154718966412375}
+  m_Layer: 0
+  m_Name: MultiplayerIngameManagers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6779098777338561999
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064408408379936154}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2658164039363045127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064408408379936154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37daf8a67c6789840b34943d86b3acc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 5889866553219824149, guid: 3d560479b107f184cb9d6ccf69b517b9, type: 3}
+  spawnPoints: []
+--- !u!114 &5155298964365855387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064408408379936154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3bc1331c23dd664a927fc573751fe56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverAddress: nasdac.kro.kr
+  serverPort: 5158
+  showDebugLog: 1
+  lerpSpeed: 10
+--- !u!114 &2359157140583823460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064408408379936154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a78717c074310f1478e373d5455248b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyPrefabs:
+  - typeId: 0
+    prefab: {fileID: 149778303937110121, guid: ccc49cbe435de1049934d713842699be, type: 3}
+  - typeId: 1
+    prefab: {fileID: 149778303937110121, guid: 3e5cc0911af2943449ccad02bf645d92, type: 3}
+--- !u!114 &1778154718966412375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064408408379936154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f7cd4e58ff1f7249ad5a20585453bbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemPrefabs:
+  - itemType: 1
+    typeId: 0
+    prefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}
+  - itemType: 3
+    typeId: 0
+    prefab: {fileID: 3803576962990758274, guid: 46f1d8c40194faa4c96b7ff6f5f08283, type: 3}
+  - itemType: 4
+    typeId: 0
+    prefab: {fileID: 3578716422610288139, guid: c0ecf175a70ae3e45aef2d979af4ace8, type: 3}
+  - itemType: 5
+    typeId: 0
+    prefab: {fileID: 8560961096412293643, guid: 988189dfb50114a4fbae0c1abcc43162, type: 3}
+  - itemType: 6
+    typeId: 0
+    prefab: {fileID: 7376150064209060376, guid: fa3f81593e813d745aa1a3898c493fe1, type: 3}

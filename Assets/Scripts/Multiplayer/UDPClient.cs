@@ -247,6 +247,11 @@ public class UDPClient : MonoBehaviour
       {
         if (_allPlayers.TryGetValue((int)status.PlayerId, out Player player))
         {
+          if (status.MaxHp <= 0)
+          {
+            continue;
+          }
+
           player.SetMaxHealth(status.MaxHp, keepRatio: false);
           player.SetHealth(status.CurrentHp);
 

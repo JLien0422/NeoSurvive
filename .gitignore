@@ -1,5 +1,5 @@
 # --- [ Unity 공식 제외 항목 ] ---
-[Ll]ibrary/
+# [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/

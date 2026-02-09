@@ -5915,7 +5915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d8a26081347964fb7059e2f7567dd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: lhsScene
+  gameSceneName: JmgScene
   mainStartButton: {fileID: 351308494}
   multiplayerButton: {fileID: 651847889}
   exitButton: {fileID: 1571687695}
@@ -5953,7 +5953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7deadd4b3bfaa8c43971fea414b3a70f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: lhsScene
+  gameSceneName: JmgScene
   selectionPanel: {fileID: 871177865}
   hackerButton: {fileID: 2086482807}
   cyborgButton: {fileID: 946642199}

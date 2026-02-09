@@ -139,13 +139,69 @@ public class HackingSystem : MonoBehaviour
         {
             case HackingMinigameType.CommandBypass:
                 currentMinigame = minigameObj.AddComponent<CommandBypassMinigame>();
+                if (currentMinigame is CommandBypassMinigame cmdBypass && hackingUIPanel != null)
+                {
+                    Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
+                    if (nsRoot != null) nsRoot.gameObject.SetActive(false);
+
+                    Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
+                    if (cbRoot != null)
+                    {
+                        cbRoot.gameObject.SetActive(true);
+                        Transform arrowContainer = cbRoot.Find("ArrowContainer");
+                        Transform statusTrans = cbRoot.Find("StatusText");
+                        Transform progressTrans = cbRoot.Find("ProgressGauge");
+                        var statusText = statusTrans != null ? statusTrans.GetComponent<TMPro.TextMeshProUGUI>() : null;
+                        var progressSlider = progressTrans != null ? progressTrans.GetComponent<UnityEngine.UI.Slider>() : null;
+                        UnityEngine.UI.Image progressImage = null;
+                        if (progressTrans != null)
+                        {
+                            var img = progressTrans.GetComponent<UnityEngine.UI.Image>();
+                            if (img != null && img.type == UnityEngine.UI.Image.Type.Filled)
+                                progressImage = img;
+                            else
+                            {
+                                foreach (var c in progressTrans.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                                    if (c.type == UnityEngine.UI.Image.Type.Filled) { progressImage = c; break; }
+                            }
+                        }
+                        if (arrowContainer != null)
+                        {
+                            cmdBypass.SetPreMadeUI(arrowContainer, statusText, progressSlider, progressImage);
+                            Debug.Log("[HackingSystem] 손으로 만든 CommandBypass UI 사용");
+                        }
+                    }
+                }
                 break;
 
             case HackingMinigameType.NumberSequence:
                 currentMinigame = minigameObj.AddComponent<NumberSequenceMinigame>();
-                if (currentMinigame is NumberSequenceMinigame numberSeq)
+                if (currentMinigame is NumberSequenceMinigame numberSeq && hackingUIPanel != null)
                 {
-                    numberSeq.SetButtonParent(hackingUIPanel != null ? hackingUIPanel.transform : null);
+                    // 손으로 만든 NumberSequence_Root 사용 (있으면)
+                    Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
+                    Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
+                    if (cbRoot != null) cbRoot.gameObject.SetActive(false);
+                    if (nsRoot != null)
+                    {
+                        nsRoot.gameObject.SetActive(true);
+                        Transform btnGrid = nsRoot.Find("BtnGrid");
+                        Transform statusTrans = nsRoot.Find("StatusText");
+                        var statusText = statusTrans != null ? statusTrans.GetComponent<TMPro.TextMeshProUGUI>() : null;
+                        if (btnGrid != null && btnGrid.childCount >= 9)
+                        {
+                            numberSeq.SetPreMadeUI(btnGrid, statusText);
+                            Debug.Log("[HackingSystem] 손으로 만든 NumberSequence UI 사용");
+                        }
+                        else
+                        {
+                            numberSeq.SetButtonParent(hackingUIPanel.transform);
+                        }
+                    }
+                    else
+                    {
+                        numberSeq.SetButtonParent(hackingUIPanel.transform);
+                    }
                 }
                 break;
 
@@ -253,9 +309,13 @@ public class HackingSystem : MonoBehaviour
             currentMinigame = null;
         }
 
-        // UI 패널 비활성화
+        // UI 패널 비활성화 (미니게임 루트도 같이 꺼짐)
         if (hackingUIPanel != null)
         {
+            Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
+            if (nsRoot != null) nsRoot.gameObject.SetActive(false);
+            Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
+            if (cbRoot != null) cbRoot.gameObject.SetActive(false);
             hackingUIPanel.SetActive(false);
         }
 
@@ -331,36 +391,51 @@ public class HackingSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 해킹 UI 패널 자동 생성 (없을 경우)
+    /// 해킹 UI 패널 자동 생성 (없을 경우). 전체 화면에 보이도록 생성합니다.
     /// </summary>
     private void CreateHackingUIPanel()
     {
+        // 씬의 메인 Canvas 사용 (없으면 새로 생성)
         Canvas canvas = FindObjectOfType<Canvas>();
         if (canvas == null)
         {
             GameObject canvasObj = new GameObject("HackingCanvas");
             canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
+            var scaler = canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
+            scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
             canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+            canvas.sortingOrder = 100;
             Debug.Log("[HackingSystem] Canvas 자동 생성");
         }
 
+        // 해킹 UI 패널 = 전체 화면 덮기 (화면에 확실히 보이도록)
         GameObject panel = new GameObject("HackingUIPanel");
         panel.transform.SetParent(canvas.transform, false);
+        panel.transform.SetAsLastSibling(); // 다른 UI보다 위에 그리기
 
         RectTransform panelRect = panel.AddComponent<RectTransform>();
-        panelRect.sizeDelta = new Vector2(500, 500);
-        panelRect.anchorMin = new Vector2(0.5f, 0.5f);
-        panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-        panelRect.anchoredPosition = Vector2.zero;
+        panelRect.anchorMin = Vector2.zero;
+        panelRect.anchorMax = Vector2.one;
+        panelRect.offsetMin = Vector2.zero;
+        panelRect.offsetMax = Vector2.zero;
 
         UnityEngine.UI.Image panelImg = panel.AddComponent<UnityEngine.UI.Image>();
-        panelImg.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-
-        canvas.sortingOrder = 100;
+        panelImg.color = new Color(0.08f, 0.08f, 0.12f, 0.96f);
 
         hackingUIPanel = panel;
+        Debug.Log("[HackingSystem] 해킹 UI 패널 생성 완료 (전체 화면)");
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (isHacking && currentPlayer != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(currentPlayer.transform.position, securityFieldRadius);
+        }
     }
 }
 

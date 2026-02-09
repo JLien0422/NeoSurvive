@@ -307,7 +307,6 @@ GameObject:
   m_Component:
   - component: {fileID: 345991729}
   - component: {fileID: 345991728}
-  - component: {fileID: 345991730}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -345,23 +344,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1193739107}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &345991730
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 345991727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0163a5a41266d3043a0f850c5d53057f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTransform: {fileID: 0}
-  enemyPrefab: {fileID: 149778303937110121, guid: 3e5cc0911af2943449ccad02bf645d92, type: 3}
-  spawnInterval: 0.2
-  minSpawnRadius: 5
-  maxSpawnRadius: 10
 --- !u!1 &384367192
 GameObject:
   m_ObjectHideFlags: 0

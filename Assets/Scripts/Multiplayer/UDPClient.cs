@@ -252,6 +252,15 @@ public class UDPClient : MonoBehaviour
             continue;
           }
 
+          if (!status.IsDead && status.CurrentHp <= 0)
+          {
+            if (showDebugLog)
+            {
+              Debug.LogWarning($"[UDP] Invalid PlayerStatus ignored: id={status.PlayerId}, hp={status.CurrentHp}, maxHp={status.MaxHp}, isDead={status.IsDead}");
+            }
+            continue;
+          }
+
           player.SetMaxHealth(status.MaxHp, keepRatio: false);
           player.SetHealth(status.CurrentHp);
 

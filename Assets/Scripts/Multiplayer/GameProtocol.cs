@@ -86,15 +86,19 @@ namespace NeoSurvive.Network.Protocol {
             "UE9OX1VTRRAJEg0KCUVORU1ZX0hJVBAKEg4KCkVORU1ZX0RFQUQQCxIOCgpQ",
             "TEFZRVJfSElUEAwSEQoNUExBWUVSX1NUQVRVUxANEg4KCkJVRkZfQVBQTFkQ",
             "DhIPCgtCVUZGX1JFTU9WRRAPEhMKD09CSkVDVF9JTlRFUkFDVBAQEhAKDEVO",
-            "RU1ZX0FUVEFDSxARKsoBCgpXZWFwb25UeXBlEhYKEldFQVBPTl9VTlNQRUNJ",
+            "RU1ZX0FUVEFDSxARKoUDCgpXZWFwb25UeXBlEhYKEldFQVBPTl9VTlNQRUNJ",
             "RklFRBAAEg8KC0xJTktfUElTVE9MEAESEAoMUExBU01BX1JJRkxFEAISDAoI",
             "QUlfRFJPTkUQAxIPCgtBVVRPX1RVUlJFVBAEEhIKDkRBVEFfU0NSQU1CTEVS",
             "EAUSFwoTRU1QX1BVTFNFX0dFTkVSQVRPUhAGEhwKGEhPTE9HUkFNX0RFQ09Z",
-            "X0dFTkVSQVRPUhAHEhcKE05BTk9fV0lSRV9HRU5FUkFUT1IQCCqDAQoISXRl",
-            "bVR5cGUSFAoQSVRFTV9VTlNQRUNJRklFRBAAEgsKB0VYUF9PUkIQARIOCgpQ",
-            "Uk9KRUNUSUxFEAISFAoQTkVVUkFMX0xJTktfSVRFTRADEhkKFVBTWUNIT19J",
-            "TkZFQ1RJT05fSVRFTRAEEggKBEdPTEQQBRIJCgVDSEVTVBAGQh6qAhtOZW9T",
-            "dXJ2aXZlLk5ldHdvcmsuUHJvdG9jb2xiBnByb3RvMw=="));
+            "X0dFTkVSQVRPUhAHEhcKE05BTk9fV0lSRV9HRU5FUkFUT1IQCBIPCgtMQVNF",
+            "Ul9TV09SRBALEg8KC1NVUkdFX0JMQURFEAwSEQoNRU5FUkdZX1NISUVMRBAN",
+            "EhEKDVBMQVNNQV9QSE9UT04QDhISCg5HUkFWSVRZX0hBTU1FUhAPEhMKD0JP",
+            "T1NURVJfS05VQ0tMRRAQEhQKEFRFU0xBX0NPSUxfQVJNT1IQERIRCg1CT0xU",
+            "X0xBVU5DSEVSEBISDQoJQ0hBSU5fU0FXEBMSEAoMQkxBU1RfQlJFQVRIEBQq",
+            "gwEKCEl0ZW1UeXBlEhQKEElURU1fVU5TUEVDSUZJRUQQABILCgdFWFBfT1JC",
+            "EAESDgoKUFJPSkVDVElMRRACEhQKEE5FVVJBTF9MSU5LX0lURU0QAxIZChVQ",
+            "U1lDSE9fSU5GRUNUSU9OX0lURU0QBBIICgRHT0xEEAUSCQoFQ0hFU1QQBkIe",
+            "qgIbTmVvU3Vydml2ZS5OZXR3b3JrLlByb3RvY29sYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::NeoSurvive.Network.Protocol.ActionType), typeof(global::NeoSurvive.Network.Protocol.WeaponType), typeof(global::NeoSurvive.Network.Protocol.ItemType), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -152,6 +156,16 @@ namespace NeoSurvive.Network.Protocol {
     [pbr::OriginalName("EMP_PULSE_GENERATOR")] EmpPulseGenerator = 6,
     [pbr::OriginalName("HOLOGRAM_DECOY_GENERATOR")] HologramDecoyGenerator = 7,
     [pbr::OriginalName("NANO_WIRE_GENERATOR")] NanoWireGenerator = 8,
+    [pbr::OriginalName("LASER_SWORD")] LaserSword = 11,
+    [pbr::OriginalName("SURGE_BLADE")] SurgeBlade = 12,
+    [pbr::OriginalName("ENERGY_SHIELD")] EnergyShield = 13,
+    [pbr::OriginalName("PLASMA_PHOTON")] PlasmaPhoton = 14,
+    [pbr::OriginalName("GRAVITY_HAMMER")] GravityHammer = 15,
+    [pbr::OriginalName("BOOSTER_KNUCKLE")] BoosterKnuckle = 16,
+    [pbr::OriginalName("TESLA_COIL_ARMOR")] TeslaCoilArmor = 17,
+    [pbr::OriginalName("BOLT_LAUNCHER")] BoltLauncher = 18,
+    [pbr::OriginalName("CHAIN_SAW")] ChainSaw = 19,
+    [pbr::OriginalName("BLAST_BREATH")] BlastBreath = 20,
   }
 
   /// <summary>

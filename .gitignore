@@ -1,5 +1,5 @@
 # --- [ Unity 공식 제외 항목 ] ---
-# [Ll]ibrary/
+[Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
@@ -96,7 +96,7 @@ crashlytics-build.properties
 # 설치 가이드를 README에 작성하고 제외 권장
 
 # --- [ NuGet 패키지 폴더 ] ---
-packages/
+# packages/
 !packages/repositories.config
 
 # --- [ 기타 Unity 관련 ] ---

@@ -22,7 +22,7 @@ public class ManagerInitializer : MonoBehaviour
             settingsManagerObj = new GameObject("SettingsManager");
             Debug.Log("[ManagerInitializer] SettingsManager GameObject 생성");
         }
-        
+
         if (settingsManagerObj.GetComponent<SettingsManager>() == null)
         {
             settingsManagerObj.AddComponent<SettingsManager>();
@@ -36,7 +36,7 @@ public class ManagerInitializer : MonoBehaviour
             hackingSystemObj = new GameObject("HackingSystem");
             Debug.Log("[ManagerInitializer] HackingSystem GameObject 생성");
         }
-        
+
         if (hackingSystemObj.GetComponent<HackingSystem>() == null)
         {
             hackingSystemObj.AddComponent<HackingSystem>();
@@ -50,7 +50,7 @@ public class ManagerInitializer : MonoBehaviour
             dataManagerObj = new GameObject("DataManager");
             Debug.Log("[ManagerInitializer] DataManager GameObject 생성");
         }
-        
+
         if (dataManagerObj.GetComponent<DataManager>() == null)
         {
             dataManagerObj.AddComponent<DataManager>();

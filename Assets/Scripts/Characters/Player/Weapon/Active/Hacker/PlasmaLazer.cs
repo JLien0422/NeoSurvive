@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NeoSurvive.Weapon;
 
 public class PlasmaLazer : MonoBehaviour
 {
@@ -47,7 +48,8 @@ public class PlasmaLazer : MonoBehaviour
         int id = enemy.GetInstanceID();
         if (hitEnemyIds.Contains(id)) continue;
 
-        enemy.TakeDamage(damage);
+        var src = GetComponent<WeaponSource>();
+        enemy.TakeDamage(damage, src != null ? src.weaponData : null);
         hitEnemyIds.Add(id);
         currentHitCount++;
 

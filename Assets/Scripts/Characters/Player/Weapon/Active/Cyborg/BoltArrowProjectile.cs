@@ -26,6 +26,7 @@ namespace NeoSurvive.Weapon
     private float explosionDamageFactor;
 
     private Vector3 startPos;
+    private WeaponBase sourceWeapon;
 
     [Header("Collision")]
     public bool useTrigger = true;
@@ -58,6 +59,11 @@ namespace NeoSurvive.Weapon
       this.explosionDamageFactor = explosionDamageFactor;
 
       startPos = transform.position;
+    }
+
+    public void SetSourceWeapon(WeaponBase weapon)
+    {
+      sourceWeapon = weapon;
     }
 
     private void Update()
@@ -109,7 +115,7 @@ namespace NeoSurvive.Weapon
       if (enemy == null) return;
 
       // 기본 피해
-      enemy.TakeDamage(damage);
+      enemy.TakeDamage(damage, sourceWeapon);
 
       // 마스터: 과부하 스택
       if (master)
@@ -131,7 +137,8 @@ namespace NeoSurvive.Weapon
         explosionRadius,
         damage * explosionDamageFactor,
         enemyMask,
-        enemyTag
+        enemyTag,
+        sourceWeapon
       );
     }
 

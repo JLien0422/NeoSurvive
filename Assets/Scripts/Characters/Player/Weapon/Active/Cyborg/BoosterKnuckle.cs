@@ -109,6 +109,8 @@ namespace NeoSurvive.Weapon
         {
           bool master = enableMaster && currentLevel >= 5;
           proj.Initialize(dir, damage, speed, range, enemyMask, enemyTag, master);
+          var src = GetComponent<WeaponSource>();
+          if (src != null) proj.SetSourceWeapon(src.weaponData);
         }
       }
     }

@@ -83,7 +83,12 @@ namespace NeoSurvive.Weapon
       GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
       obj.SetActive(true);
       Projectile p = obj.GetComponent<Projectile>();
-      if (p != null) p.Initialize(direction, damage, bulletSpeed);
+      if (p != null)
+      {
+        p.Initialize(direction, damage, bulletSpeed);
+        var src = GetComponent<WeaponSource>();
+        if (src != null) p.SetSourceWeapon(src.weaponData);
+      }
     }
 
     private GameObject FindClosestEnemy()

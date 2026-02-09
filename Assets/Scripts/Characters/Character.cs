@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NeoSurvive.Buff;
+using NeoSurvive.Weapon;
 
 // Character 클래스는 플레이어와 적 등 모든 캐릭터의 기반이 되는 추상 클래스입니다.
 // MonoBehaviour를 상속받아 유니티 게임 오브젝트에 컴포넌트로 붙일 수 있습니다.
@@ -50,6 +51,11 @@ public abstract class Character : MonoBehaviour
 
   public virtual void TakeDamage(float amount)
   {
+    TakeDamage(amount, null);
+  }
+
+  public virtual void TakeDamage(float amount, WeaponBase sourceWeapon)
+  {
     if (IsDead) return;
 
     // (추가) 받는 피해 배율(데미지 2배 디버프 등) 적용
@@ -62,6 +68,12 @@ public abstract class Character : MonoBehaviour
     if (UIManager.Instance != null)
     {
       UIManager.Instance.ShowDamageText(transform.position, amount);
+    }
+
+    // 무기별 대미지 통계 기록 (플레이어 무기 소스일 때만)
+    if (sourceWeapon != null && WeaponDamageStats.Instance != null)
+    {
+      WeaponDamageStats.Instance.RecordDamage(sourceWeapon, amount);
     }
 
     // 체력 변경 알림

@@ -127,7 +127,8 @@ namespace NeoSurvive.Weapon
         Enemy enemy = col.GetComponentInParent<Enemy>();
         if (enemy != null)
         {
-          enemy.TakeDamage(damage);
+          var src = GetComponent<WeaponSource>();
+          enemy.TakeDamage(damage, src != null ? src.weaponData : null);
         }
       }
 
@@ -157,6 +158,8 @@ namespace NeoSurvive.Weapon
           hitMask,
           enemyTag
         );
+        var src = GetComponent<WeaponSource>();
+        if (src != null) rift.SetSourceWeapon(src.weaponData);
       }
     }
 

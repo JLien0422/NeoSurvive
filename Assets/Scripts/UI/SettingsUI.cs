@@ -51,6 +51,11 @@ public class SettingsUI : MonoBehaviour
     [Header("Settings Panel")]
     public GameObject settingsPanel; // 메인 설정 패널 (자동 생성됨)
 
+    [Header("공통 토글 크기 설정")]
+    [Tooltip("Start 시점에 SettingsPanel 하위 모든 Toggle의 크기를 이 값으로 맞춥니다.")]
+    [SerializeField] private bool applyToggleSizeOnStart = true;
+    [SerializeField] private Vector2 commonToggleSize = new Vector2(40f, 40f);
+
     private SettingsManager settingsManager;
     private bool isSettingsOpen = false;
 
@@ -59,7 +64,19 @@ public class SettingsUI : MonoBehaviour
         settingsManager = SettingsManager.Instance;
         if (settingsManager == null)
         {
-            Debug.LogError("[SettingsUI] SettingsManager를 찾을 수 없습니다!");
+            var existing = FindObjectOfType<SettingsManager>();
+            if (existing != null)
+                settingsManager = existing;
+            else
+            {
+                var go = GameObject.Find("SettingsManager");
+                if (go == null) go = new GameObject("SettingsManager");
+                if (go.GetComponent<SettingsManager>() == null)
+                    go.AddComponent<SettingsManager>();
+                settingsManager = SettingsManager.Instance;
+            }
+            if (settingsManager == null)
+                Debug.LogError("[SettingsUI] SettingsManager를 찾을 수 없습니다!");
         }
 
         // SettingsUI GameObject는 항상 활성화 (Update 실행을 위해)
@@ -90,6 +107,9 @@ public class SettingsUI : MonoBehaviour
         InitializeVideoSettings();
         InitializeAudioSettings();
         InitializeGameplaySettings();
+
+        // 토글 공통 크기 적용 (해상도 바뀌어도 클릭 영역이 충분히 크게)
+        ApplyCommonToggleSize();
         
         // 기본적으로 비디오 탭 표시
         ShowTab(0);
@@ -98,15 +118,34 @@ public class SettingsUI : MonoBehaviour
         // Update에서 처리
     }
 
-    private void Update()
+    /// <summary>
+    /// SettingsPanel 하위에 있는 모든 Toggle의 RectTransform 크기를 공통 값으로 맞춥니다.
+    /// </summary>
+    private void ApplyCommonToggleSize()
     {
-        // ESC 키로 설정 열기/닫기
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (!applyToggleSizeOnStart) return;
+        if (settingsPanel == null) return;
+
+        var toggles = settingsPanel.GetComponentsInChildren<Toggle>(true);
+        foreach (var t in toggles)
         {
-            Debug.Log("[SettingsUI] ESC 키 감지됨. ToggleSettings 호출.");
-            ToggleSettings();
+            var rt = t.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.sizeDelta = commonToggleSize;
+            }
         }
     }
+
+    private void Update()
+    {
+        // ESC는 PauseMenuController에서 처리 (재개/설정/종료 메뉴 → 설정 버튼으로만 설정 열기)
+    }
+
+    /// <summary>
+    /// 설정 패널이 현재 열려 있는지. PauseMenuController에서 ESC 처리 시 사용.
+    /// </summary>
+    public bool IsSettingsOpen() => isSettingsOpen;
 
     /// <summary>
     /// 설정 UI 열기/닫기
@@ -137,7 +176,14 @@ public class SettingsUI : MonoBehaviour
                 Debug.Log($"[SettingsUI] Canvas Sort Order를 {canvas.sortingOrder}로 설정했습니다.");
             }
         }
-        
+        else
+        {
+            // 설정을 버튼 등으로 닫을 때 일시정지 메뉴로 복귀 (ESC로 닫을 때는 PauseMenuController가 직접 ShowPauseMenu 호출)
+            var pauseMenu = FindObjectOfType<PauseMenuController>();
+            if (pauseMenu != null && !pauseMenu.IsPauseMenuOpen)
+                pauseMenu.ShowPauseMenu();
+        }
+
         // 설정이 열려있을 때 게임 일시정지
         if (isSettingsOpen)
         {

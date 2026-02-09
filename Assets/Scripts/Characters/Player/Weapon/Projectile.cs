@@ -19,6 +19,7 @@ namespace NeoSurvive.Weapon
     private Transform target;
     private Vector3 destination;
     private bool shouldReportDamage = true;
+    private WeaponBase sourceWeapon;
 
     public event System.Action OnHitEvent;
 
@@ -49,8 +50,8 @@ namespace NeoSurvive.Weapon
       collision.gameObject.TryGetComponent(out Enemy enemy);
       if (enemy != null)
       {
-        enemy.TakeDamage(damage);
         ReportEnemyHitIfNeeded(enemy, damage);
+        enemy.TakeDamage(damage, sourceWeapon);
         OnHitEvent?.Invoke();
         OnHit();
       }
@@ -86,6 +87,11 @@ namespace NeoSurvive.Weapon
     public void SetDestination(Vector3 dest)
     {
       destination = dest;
+    }
+
+    public void SetSourceWeapon(WeaponBase weapon)
+    {
+      sourceWeapon = weapon;
     }
   }
 }

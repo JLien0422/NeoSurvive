@@ -55,7 +55,7 @@ MonoBehaviour:
   maxOrbCount: 5
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyTag: Enemy
   blockProjectiles: 1
   projectileTag: Projectile

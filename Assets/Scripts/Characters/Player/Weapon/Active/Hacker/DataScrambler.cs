@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NeoSurvive.Core;
+using NeoSurvive.Buff; // (추가) FrenzyDebuff / BuffUtil
 
 namespace NeoSurvive.Weapon
 {
   /// <summary>
   /// 3번 무기: 데이터 스크램블러
   /// 부채꼴 범위에 교란 신호 방사. 혼란에 걸린 적은 일정 시간 후 폭발하여 광역 피해.
+  /// Lv5: 혼란 대상에게 Frenzy(광란) 디버프도 함께 적용
   /// </summary>
   public class DataScrambler : MonoBehaviour
   {
@@ -17,12 +19,19 @@ namespace NeoSurvive.Weapon
     public float fireRate = 2f;
     public float duration = 3f;    // 혼란 지속 시간
 
+    // (추가) Lv5 Frenzy 설정
+    [Header("Lv5 Frenzy (추가)")]
+    public bool enableFrenzyAtLv5 = true; // (추가)
+    public float frenzyDuration = 2.5f;   // (추가) 광란 지속 시간(원하는 값으로)
+
     private float fireTimer;
 
     // 레벨업 기준 스탯
     private float baseDamage = 10f;
     private float baseRange = 5f;
     private float baseDuration = 3f;
+
+    private int currentLevel = 1; // (추가) 현재 레벨 캐시
 
     private void Start()
     {
@@ -71,18 +80,26 @@ namespace NeoSurvive.Weapon
       Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range);
       foreach (var col in enemies)
       {
-        if (col.CompareTag("Enemy"))
+        if (col == null) continue; // (추가) 안전
+
+        // (변경) 자식 콜라이더 구조 대응:
+        // col이 Enemy 태그가 아닐 수 있으므로, 부모 태그도 허용
+        bool isEnemy =
+          col.CompareTag("Enemy") ||
+          (col.transform.parent != null && col.transform.parent.CompareTag("Enemy"));
+
+        if (!isEnemy) continue;
+
+        // 부채꼴 범위 체크
+        Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
+        if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
         {
-          Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
-          // 내적을 이용한 각도 계산보다 Vector3.Angle이 직관적
-          if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
+          // 부채꼴 범위 안
+          if (col.TryGetComponent<Enemy>(out var enemy))
           {
-            // 부채꼴 범위 안
-            if (col.TryGetComponent<Enemy>(out var enemy))
-            {
-              enemy.TakeDamage(damage); // 즉시 피해
-              ApplyConfusion(col.gameObject);
-            }
+            var src = GetComponent<WeaponSource>();
+            enemy.TakeDamage(damage, src != null ? src.weaponData : null); // 즉시 피해
+            ApplyConfusion(col.gameObject);
           }
         }
       }
@@ -96,30 +113,41 @@ namespace NeoSurvive.Weapon
       {
         confusion = enemyObj.AddComponent<ConfusionEffect>();
       }
+
       // 이미 있으면 시간/데미지 갱신
-      confusion.Initialize(damage, duration);
+      var src = GetComponent<WeaponSource>();
+      confusion.Initialize(damage, duration, src != null ? src.weaponData : null);
+
+      // (추가) Lv5일 때 FrenzyDebuff 같이 적용
+      if (enableFrenzyAtLv5 && currentLevel >= 5)
+      {
+        BuffUtil.Apply(enemyObj, new FrenzyDebuff(frenzyDuration)); // (추가)
+      }
     }
 
     public void OnLevelUp(int level)
     {
+      currentLevel = Mathf.Clamp(level, 1, 5); // (추가)
+
       if (baseDamage == 0 && damage > 0) baseDamage = damage;
 
-      // 레벨업: 범위, 지속 시간 증가 (기획서 반영) + 데미지도 10%씩 증가
-      range = baseRange * (1f + level * 0.15f);
-      duration = baseDuration * (1f + (level - 1) * 0.2f);
-      damage = baseDamage * (1f + (level - 1) * 0.1f);
+      // 레벨업: 범위, 지속 시간 증가 + 데미지 10%씩 증가
+      range = baseRange * (1f + (currentLevel - 1) * 0.15f);
+      duration = baseDuration * (1f + (currentLevel - 1) * 0.2f);
+      damage = baseDamage * (1f + (currentLevel - 1) * 0.1f);
 
-      Debug.Log($"[DataScrambler] Lv.{level} : Dmg {damage}, Range {range}, Duration {duration}");
+      Debug.Log($"[DataScrambler] Lv.{currentLevel} : Dmg {damage}, Range {range}, Duration {duration}");
     }
 
     private Transform FindClosestEnemy()
     {
       GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
       GameObject closest = null;
-      float closestDistance = range > 0 ? (range * 1.5f) : 10f; // 사거리보다 조금 더 멀리까지 탐색
+      float closestDistance = range > 0 ? (range * 1.5f) : 10f;
 
       foreach (GameObject enemy in enemies)
       {
+        if (enemy == null) continue;
         float distance = Vector3.Distance(transform.position, enemy.transform.position);
         if (distance < closestDistance)
         {
@@ -145,15 +173,17 @@ namespace NeoSurvive.Weapon
     private float damage;
     private float timer;
     private bool initialized = false;
+    private WeaponBase sourceWeapon;
 
-    public void Initialize(float dmg, float duration)
+    public void Initialize(float dmg, float duration, WeaponBase source = null)
     {
       this.damage = dmg;
       this.timer = duration;
+      this.sourceWeapon = source;
       this.initialized = true;
 
-      // 시각 효과? (색상 변경 등)
-      var sr = GetComponent<SpriteRenderer>();
+      // (변경) SpriteRenderer가 자식에 있을 수도 있으니 InChildren 사용
+      var sr = GetComponentInChildren<SpriteRenderer>();
       if (sr) sr.color = Color.magenta;
     }
 
@@ -170,26 +200,20 @@ namespace NeoSurvive.Weapon
 
     void Explode()
     {
-      // 폭발 범위 2.5f (고정)
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 2.5f);
       foreach (var h in hits)
       {
         if (h.gameObject == gameObject) continue; // 나 자신 제외
         if (h.CompareTag("Enemy") && h.TryGetComponent<Enemy>(out var e))
         {
-          e.TakeDamage(damage); // 광역 피해
+          e.TakeDamage(damage, sourceWeapon); // 광역 피해
         }
       }
 
-      // 효과 종료 (컴포넌트 제거 or 색상 복구)
-      var sr = GetComponent<SpriteRenderer>();
-      if (sr) sr.color = Color.white; // 원래대로 (Enemy 기본색이 흰색이라 가정)
+      var sr = GetComponentInChildren<SpriteRenderer>();
+      if (sr) sr.color = Color.white;
 
-      Destroy(this); // 효과 끝
+      Destroy(this);
     }
-
-    // 적이 죽을 때도 폭발하게 하려면 OnDestroy 활용?
-    // 하지만 Unity에서 Destroy(gameObject) 될 땐 OnDestroy가 불리지만, 
-    // 다른 로직과 꼬일 수 있으므로(이미 죽은 적을 또 죽임), 여기선 타이머 폭발만 구현.
   }
 }

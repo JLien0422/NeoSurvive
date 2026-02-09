@@ -6,6 +6,9 @@ using UnityEngine;
 /// </summary>
 public class HackableObject : MonoBehaviour
 {
+    [Header("해킹 오브젝트 타입(기획서 5종)")]
+    public HackableType hackableType;
+
     [Header("해킹 설정")]
     [SerializeField]
     [Tooltip("해킹 가능한 거리")]
@@ -18,24 +21,31 @@ public class HackableObject : MonoBehaviour
     private Player nearbyPlayer = null;
     private bool isHacking = false;
 
+    private void OnEnable()
+    {
+        // ✅ 미니게임 결과를 구독 (미니게임/오브젝트 완전 분리)
+        HackingSystem.OnHackSuccess += HandleHackSuccess;
+        HackingSystem.OnHackFail += HandleHackFail;
+    }
+
+    private void OnDisable()
+    {
+        HackingSystem.OnHackSuccess -= HandleHackSuccess;
+        HackingSystem.OnHackFail -= HandleHackFail;
+    }
+
     private void Update()
     {
-        // 해킹 중이면 입력 처리 안 함
         if (isHacking) return;
 
-        // 플레이어 감지
         CheckForPlayer();
 
-        // E키 입력 감지
         if (nearbyPlayer != null && Input.GetKeyDown(KeyCode.E))
         {
             StartHacking();
         }
     }
 
-    /// <summary>
-    /// 근처에 플레이어가 있는지 확인
-    /// </summary>
     private void CheckForPlayer()
     {
         GameObject playerObj = GameObject.FindWithTag("Player");
@@ -53,30 +63,48 @@ public class HackableObject : MonoBehaviour
         }
 
         float distance = Vector3.Distance(transform.position, playerObj.transform.position);
-        if (distance <= hackRange)
-        {
-            nearbyPlayer = player;
-        }
-        else
-        {
-            nearbyPlayer = null;
-        }
+        nearbyPlayer = (distance <= hackRange) ? player : null;
     }
 
-    /// <summary>
-    /// 해킹 시작
-    /// </summary>
     private void StartHacking()
     {
         if (!canHack || nearbyPlayer == null) return;
 
         isHacking = true;
 
-        // 해킹 시스템에 해킹 시작 알림
         if (HackingSystem.Instance != null)
         {
             HackingSystem.Instance.StartHacking(this, nearbyPlayer);
         }
+    }
+
+    /// <summary>
+    /// 미니게임 성공 이벤트 핸들러
+    /// </summary>
+    private void HandleHackSuccess(HackableObject obj)
+    {
+        // ✅ "나"가 해킹 성공한 경우만 처리
+        if (obj != this) return;
+
+        if (HackingObjectRewardSystem.Instance != null)
+        {
+            HackingObjectRewardSystem.Instance.ApplyObjectReward(this);
+        }
+        else
+        {
+            Debug.LogWarning("[HackableObject] HackingObjectRewardSystem이 씬에 없습니다!");
+        }
+    }
+
+    /// <summary>
+    /// 미니게임 실패 이벤트 핸들러
+    /// </summary>
+    private void HandleHackFail(HackableObject obj)
+    {
+        if (obj != this) return;
+
+        // 실패 시 오브젝트가 잠김/폭발/재시도 불가 같은 정책을 두고 싶으면 여기서 처리
+        // Debug.Log($"[HackableObject] 해킹 실패: {name}");
     }
 
     /// <summary>

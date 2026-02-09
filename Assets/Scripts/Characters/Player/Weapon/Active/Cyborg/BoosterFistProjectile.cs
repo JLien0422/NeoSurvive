@@ -32,6 +32,7 @@ namespace NeoSurvive.Weapon
     private Vector3 dir;
     private Vector3 startPos;
     private bool bounced = false;
+    private WeaponBase sourceWeapon;
 
     public void Initialize(Vector3 dir, float damage, float speed, float maxDistance,
       LayerMask enemyMask, string enemyTag, bool masterHoming)
@@ -45,6 +46,11 @@ namespace NeoSurvive.Weapon
       this.masterHoming = masterHoming;
 
       startPos = transform.position;
+    }
+
+    public void SetSourceWeapon(WeaponBase weapon)
+    {
+      sourceWeapon = weapon;
     }
 
     private void Update()
@@ -116,7 +122,7 @@ namespace NeoSurvive.Weapon
       Enemy enemy = other.GetComponentInParent<Enemy>();
       if (enemy != null)
       {
-        enemy.TakeDamage(damage);
+        enemy.TakeDamage(damage, sourceWeapon);
         Destroy(gameObject);
       }
     }

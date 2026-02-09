@@ -65,7 +65,8 @@ namespace NeoSurvive.Weapon
         {
           if (hit.TryGetComponent<Enemy>(out var enemy))
           {
-            enemy.TakeDamage(damage);
+            var src = GetComponent<WeaponSource>();
+            enemy.TakeDamage(damage, src != null ? src.weaponData : null);
           }
         }
       }

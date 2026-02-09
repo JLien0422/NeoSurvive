@@ -18,7 +18,8 @@ public class Enemy : Character
   // (추가) 받는 피해 배율 적용(데미지 2배 디버프 등)
   public float ApplyIncomingDamage(float damage) => damage * Status.incomingDamageMul; // (추가)
 
-  private void Awake() // (추가)
+  // Character.Awake를 재정의하여 StatusFlags를 초기화합니다. (경고 CS0114 해결)
+  protected override void Awake() // (추가)
   {
     base.Awake();
     // StatusFlags 캐싱 (추가)
@@ -115,7 +116,12 @@ public class Enemy : Character
     }
 
     // 죽음 처리 후 적 오브젝트를 파괴합니다.
-    Destroy(gameObject);
+    // ⚠ BomberMechanism은 사망 후 일정 시간 뒤에 폭발해야 하므로
+    // 해당 메커니즘일 때는 BomberMechanism 쪽에서 Destroy를 호출하게 둡니다.
+    if (controller == null || controller.GetMechanismType() != EnemyMechanismType.Bomber)
+    {
+      Destroy(gameObject);
+    }
   }
 
   // 경험치 오브 드랍 메서드

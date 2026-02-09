@@ -27,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 6192236778656128220}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.48841578, y: 1.2607397, z: -2.1110816}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -50,19 +50,19 @@ MonoBehaviour:
   angle: 70
   fireRate: 1.6
   knockbackForce: 6
-  knockbackRadiusBonus: 0
   hitMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   enemyTag: Enemy
   damagePerLevel: 0.15
   rangePerLevel: 0.12
   knockbackPerLevel: 0.15
   enableMaster: 1
-  blackholePrefab: {fileID: 0}
+  blackholePrefab: {fileID: 2017606884553233075, guid: 22118b666be0b7e4da8bb53dd70ae56b, type: 3}
   blackholeDuration: 2
-  blackholePullRadius: 2.5
-  blackholePullForce: 10
+  blackholePullRadius: 5
+  blackholePullForce: 60
+  debugLog: 1
   debugDraw: 1
 --- !u!212 &4641939556290637574
 SpriteRenderer:

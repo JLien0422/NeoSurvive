@@ -158,6 +158,7 @@ public class UIManager : MonoBehaviour
       bgRect.sizeDelta = Vector2.zero;
       Image bgImg = bgObj.AddComponent<Image>();
       bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+      bgImg.raycastTarget = false; // Raycast 무시
       psychoCorruptionSlider.targetGraphic = bgImg;
       
       // Fill Area 생성
@@ -175,6 +176,7 @@ public class UIManager : MonoBehaviour
       fillRect.sizeDelta = Vector2.zero;
       Image fillImg = fillObj.AddComponent<Image>();
       fillImg.color = new Color(1f, 0.2f, 0.2f, 1f);
+      fillImg.raycastTarget = false; // Raycast 무시
       psychoCorruptionSlider.fillRect = fillRect;
     }
 
@@ -225,6 +227,7 @@ public class UIManager : MonoBehaviour
       bgRect.sizeDelta = Vector2.zero;
       Image bgImg = bgObj.AddComponent<Image>();
       bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+      bgImg.raycastTarget = false; // Raycast 무시
       neuralLinkSlider.targetGraphic = bgImg;
       
       // Fill Area 생성
@@ -242,6 +245,7 @@ public class UIManager : MonoBehaviour
       fillRect.sizeDelta = Vector2.zero;
       Image fillImg = fillObj.AddComponent<Image>();
       fillImg.color = new Color(0.2f, 0.6f, 1f, 1f);
+      fillImg.raycastTarget = false; // Raycast 무시
       neuralLinkSlider.fillRect = fillRect;
     }
 
@@ -280,6 +284,7 @@ public class UIManager : MonoBehaviour
     
     Image overlayImg = overlayObj.AddComponent<Image>();
     overlayImg.color = new Color(1f, 0f, 0f, 0.1f); // 빨간색 반투명
+    overlayImg.raycastTarget = false; // 클릭 통과 (버튼/UI 가리지 않음)
     
     screenNoiseOverlay = overlayObj;
     screenNoiseOverlay.SetActive(false); // 초기에는 비활성화
@@ -471,6 +476,12 @@ public class UIManager : MonoBehaviour
 
   public void ShowDamageText(Vector3 position, float damage)
   {
+    // SettingsManager에서 데미지 숫자 표시 옵션 확인
+    if (SettingsManager.Instance != null && !SettingsManager.Instance.showDamageNumbers)
+    {
+      return; // 옵션이 꺼져 있으면 표시하지 않음
+    }
+    
     if (damageTextPrefab == null || weaponUIPanel == null) return;
 
     // 월드 좌표를 스크린 좌표로 변환
@@ -635,6 +646,8 @@ public class UIManager : MonoBehaviour
     if (screenNoiseOverlay != null)
     {
       screenNoiseOverlay.SetActive(active);
+      if (active && screenNoiseOverlay.TryGetComponent<Image>(out var img))
+        img.raycastTarget = false; // 클릭 통과
     }
   }
 

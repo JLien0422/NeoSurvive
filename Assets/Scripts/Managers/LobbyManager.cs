@@ -9,11 +9,9 @@ public class LobbyManager : MonoBehaviour
 {
   public static LobbyManager Instance { get; private set; }
 
-  [Header("Scene Settings")]
-  public string gameSceneName = "lhsScene"; // 이동할 게임 씬 이름
 
   [Header("UI References")]
-  public Button mainStartButton;
+  public Button singlePlayButton;
   public Button multiplayerButton;
   public Button settingButton;
   public Button exitButton;
@@ -58,10 +56,10 @@ public class LobbyManager : MonoBehaviour
     if (characterSelector == null) characterSelector = FindObjectOfType<CharacterSelector>(true);
 
     // 이벤트 연결
-    if (mainStartButton != null)
+    if (singlePlayButton != null)
     {
-      mainStartButton.onClick.RemoveAllListeners();
-      mainStartButton.onClick.AddListener(characterSelector.ShowCharacterSelection);
+      singlePlayButton.onClick.RemoveAllListeners();
+      singlePlayButton.onClick.AddListener(characterSelector.ShowCharacterSelection);
     }
 
     if (multiplayerButton != null)
@@ -91,12 +89,6 @@ public class LobbyManager : MonoBehaviour
 
     // 초기 상태: 로비 탭 표시
     ShowLobbyTab();
-  }
-
-  private void LoadGameScene()
-  {
-    Debug.Log($"Loading Game Scene: {gameSceneName}");
-    SceneManager.LoadScene(gameSceneName);
   }
 
   /// <summary>
@@ -167,7 +159,7 @@ public class LobbyManager : MonoBehaviour
     Debug.Log("Exit Button Clicked: Quitting Application...");
     Application.Quit();
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+    UnityEditor.EditorApplication.isPlaying = false;
 #endif
   }
 }

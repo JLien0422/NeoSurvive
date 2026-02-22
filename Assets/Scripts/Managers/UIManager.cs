@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
 
   [Header("UI Elements")]
   public GameObject damageTextPrefab;
+  public Transform canvas;
 
   [Header("Weapon UI")]
   public GameObject weaponUIPanel;
@@ -68,6 +69,7 @@ public class UIManager : MonoBehaviour
 
   private void Awake()
   {
+    Debug.Log("[UIManager] Awake called");
     if (Instance == null)
     {
       Instance = this;
@@ -135,17 +137,17 @@ public class UIManager : MonoBehaviour
   {
     GameObject overlayObj = new GameObject("ScreenNoiseOverlay");
     overlayObj.transform.SetParent(parent, false);
-    
+
     RectTransform overlayRect = overlayObj.AddComponent<RectTransform>();
     overlayRect.anchorMin = Vector2.zero;
     overlayRect.anchorMax = Vector2.one;
     overlayRect.sizeDelta = Vector2.zero;
     overlayRect.anchoredPosition = Vector2.zero;
-    
+
     Image overlayImg = overlayObj.AddComponent<Image>();
     overlayImg.color = new Color(1f, 0f, 0f, 0.1f); // 빨간색 반투명
     overlayImg.raycastTarget = false; // 클릭 통과 (버튼/UI 가리지 않음)
-    
+
     screenNoiseOverlay = overlayObj;
     screenNoiseOverlay.SetActive(false); // 초기에는 비활성화
   }
@@ -226,13 +228,13 @@ public class UIManager : MonoBehaviour
   {
     if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
 
-    if (weaponUIPanel == null)
-    {
-      GameObject found = GameObject.Find("WeaponUIPanel");
-      if (found == null) found = GameObject.Find("WeaponUI");
-      if (found == null) found = GameObject.Find("WeaponPanel");
-      weaponUIPanel = found;
-    }
+    // if (weaponUIPanel == null)
+    // {
+    //   GameObject found = GameObject.Find("WeaponUIPanel");
+    //   if (found == null) found = GameObject.Find("WeaponUI");
+    //   if (found == null) found = GameObject.Find("WeaponPanel");
+    //   weaponUIPanel = found;
+    // }
 
     if (expSlider == null) expSlider = FindSliderByNameContains("exp");
     if (playerHealthSlider == null) playerHealthSlider = FindSliderByNameContains("health");
@@ -502,14 +504,14 @@ public class UIManager : MonoBehaviour
     {
       return; // 옵션이 꺼져 있으면 표시하지 않음
     }
-    
+
     if (damageTextPrefab == null || weaponUIPanel == null) return;
 
     // 월드 좌표를 스크린 좌표로 변환
     Vector2 screenPosition = Camera.main.WorldToScreenPoint(position);
 
     // Canvas 부모 하위에 생성 (weaponUIPanel의 부모인 Canvas를 쓰거나, 별도 레이어 사용 가능)
-    GameObject obj = Instantiate(damageTextPrefab, weaponUIPanel.transform.parent);
+    GameObject obj = Instantiate(damageTextPrefab, canvas);
 
     if (obj.TryGetComponent<RectTransform>(out var rect))
     {

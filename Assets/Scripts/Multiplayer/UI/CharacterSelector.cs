@@ -56,6 +56,7 @@ namespace NeoSurvive.UI
 
       if (startGameButton != null)
       {
+        Debug.Log("[CharacterSelector] Start Game Button found, adding listener");
         startGameButton.onClick.AddListener(StartGame);
       }
       // 캐릭터 선택 패널 초기화 (숨김)
@@ -106,8 +107,8 @@ namespace NeoSurvive.UI
           var guids = UnityEditor.AssetDatabase.FindAssets("HackerData t:CharacterData");
           if (guids.Length > 0)
           {
-              var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-              hackerData = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterData>(path);
+            var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+            hackerData = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterData>(path);
           }
 #endif
         }
@@ -122,8 +123,8 @@ namespace NeoSurvive.UI
           var guids = UnityEditor.AssetDatabase.FindAssets("CyborgData t:CharacterData");
           if (guids.Length > 0)
           {
-              var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-              cyborgData = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterData>(path);
+            var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+            cyborgData = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterData>(path);
           }
 #endif
         }
@@ -215,12 +216,7 @@ namespace NeoSurvive.UI
 
       OnGameStartRequested?.Invoke();
 
-      // 선택 패널 숨기기
-      if (selectionPanel != null)
-      {
-        selectionPanel.SetActive(false);
-        Time.timeScale = 1f; // 게임 시간 재개
-      }
+      Time.timeScale = 1f; // 게임 시간 재개
 
       Debug.Log($"게임 시작! 선택된 캐릭터: {selectedCharacter}");
       SceneManager.LoadScene(gameSceneName);

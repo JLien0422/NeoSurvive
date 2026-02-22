@@ -58,6 +58,7 @@ public class SettingsUI : MonoBehaviour
 
     private SettingsManager settingsManager;
     private bool isSettingsOpen = false;
+    public System.Action onSettingsClosed;
 
     private void Awake()
     {
@@ -182,6 +183,9 @@ public class SettingsUI : MonoBehaviour
             var pauseMenu = FindObjectOfType<PauseMenuController>();
             if (pauseMenu != null && !pauseMenu.IsPauseMenuOpen)
                 pauseMenu.ShowPauseMenu();
+
+            // 로비 등 외부에서 등록한 닫기 콜백 호출
+            onSettingsClosed?.Invoke();
         }
 
         // 설정이 열려있을 때 게임 일시정지

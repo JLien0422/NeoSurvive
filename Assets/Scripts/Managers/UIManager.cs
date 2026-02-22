@@ -7,6 +7,7 @@ using TMPro;
 using System;
 using UnityEngine.EventSystems;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -62,6 +63,7 @@ public class UIManager : MonoBehaviour
 
   // ===== 상자 보상 선택 저장용 (추가) ===== //
   private NeoSurvive.Weapon.WeaponBase[] currentChoices;
+  private bool eventsRegistered = false;
 
 
   private void Awake()
@@ -69,8 +71,6 @@ public class UIManager : MonoBehaviour
     if (Instance == null)
     {
       Instance = this;
-      if (Application.isPlaying)
-        DontDestroyOnLoad(transform.root.gameObject);
     }
     else
     {
@@ -91,9 +91,11 @@ public class UIManager : MonoBehaviour
   private void Start()
   {
     // Start logic moved to Awake for singleton initialization, keeping Start empty or for other delayed init
-    
+    RebindSceneReferences();
     // UI 요소가 null이면 자동 생성
     AutoCreateMissingUI();
+    ForceRefreshWeaponUI();
+    StartGameTimeCoroutineIfNeeded();
   }
 
   /// <summary>
@@ -109,16 +111,12 @@ public class UIManager : MonoBehaviour
       return;
     }
 
-    // 사이코 잠식도 UI 생성
-    if (psychoCorruptionSlider == null || psychoCorruptionText == null)
+    // 기존 화면 노이즈 오버레이가 있으면 먼저 재연결
+    if (screenNoiseOverlay == null)
     {
-      CreatePsychoCorruptionUI(canvas.transform);
-    }
-
-    // 신경링크 UI 생성
-    if (neuralLinkSlider == null || neuralLinkText == null)
-    {
-      CreateNeuralLinkUI(canvas.transform);
+      var existingOverlay = GameObject.Find("ScreenNoiseOverlay");
+      if (existingOverlay != null)
+        screenNoiseOverlay = existingOverlay;
     }
 
     // 화면 노이즈 오버레이 생성
@@ -128,144 +126,6 @@ public class UIManager : MonoBehaviour
     }
 
     Debug.Log("[UIManager] 누락된 UI 요소 자동 생성 완료");
-  }
-
-  /// <summary>
-  /// 사이코 잠식도 UI 생성
-  /// </summary>
-  private void CreatePsychoCorruptionUI(Transform parent)
-  {
-    // Slider 생성
-    if (psychoCorruptionSlider == null)
-    {
-      GameObject sliderObj = new GameObject("PsychoCorruptionSlider");
-      sliderObj.transform.SetParent(parent, false);
-      
-      RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
-      sliderRect.anchorMin = new Vector2(1, 0);
-      sliderRect.anchorMax = new Vector2(1, 0);
-      sliderRect.anchoredPosition = new Vector2(-300, 80);
-      sliderRect.sizeDelta = new Vector2(600, 60);
-      
-      psychoCorruptionSlider = sliderObj.AddComponent<Slider>();
-      
-      // Background 생성
-      GameObject bgObj = new GameObject("Background");
-      bgObj.transform.SetParent(sliderObj.transform, false);
-      RectTransform bgRect = bgObj.AddComponent<RectTransform>();
-      bgRect.anchorMin = Vector2.zero;
-      bgRect.anchorMax = Vector2.one;
-      bgRect.sizeDelta = Vector2.zero;
-      Image bgImg = bgObj.AddComponent<Image>();
-      bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-      bgImg.raycastTarget = false; // Raycast 무시
-      psychoCorruptionSlider.targetGraphic = bgImg;
-      
-      // Fill Area 생성
-      GameObject fillAreaObj = new GameObject("Fill Area");
-      fillAreaObj.transform.SetParent(sliderObj.transform, false);
-      RectTransform fillAreaRect = fillAreaObj.AddComponent<RectTransform>();
-      fillAreaRect.anchorMin = Vector2.zero;
-      fillAreaRect.anchorMax = Vector2.one;
-      fillAreaRect.sizeDelta = Vector2.zero;
-      
-      // Fill 생성
-      GameObject fillObj = new GameObject("Fill");
-      fillObj.transform.SetParent(fillAreaObj.transform, false);
-      RectTransform fillRect = fillObj.AddComponent<RectTransform>();
-      fillRect.sizeDelta = Vector2.zero;
-      Image fillImg = fillObj.AddComponent<Image>();
-      fillImg.color = new Color(1f, 0.2f, 0.2f, 1f);
-      fillImg.raycastTarget = false; // Raycast 무시
-      psychoCorruptionSlider.fillRect = fillRect;
-    }
-
-    // Text 생성
-    if (psychoCorruptionText == null)
-    {
-      GameObject textObj = new GameObject("PsychoCorruptionText");
-      textObj.transform.SetParent(parent, false);
-      
-      RectTransform textRect = textObj.AddComponent<RectTransform>();
-      textRect.anchorMin = new Vector2(1, 0);
-      textRect.anchorMax = new Vector2(1, 0);
-      textRect.anchoredPosition = new Vector2(-300, 120);
-      textRect.sizeDelta = new Vector2(600, 60);
-      
-      psychoCorruptionText = textObj.AddComponent<TextMeshProUGUI>();
-      psychoCorruptionText.text = "Psycho Corruption: 0%";
-      psychoCorruptionText.fontSize = 32;
-      psychoCorruptionText.alignment = TextAlignmentOptions.Left;
-    }
-  }
-
-  /// <summary>
-  /// 신경링크 UI 생성
-  /// </summary>
-  private void CreateNeuralLinkUI(Transform parent)
-  {
-    // Slider 생성
-    if (neuralLinkSlider == null)
-    {
-      GameObject sliderObj = new GameObject("NeuralLinkSlider");
-      sliderObj.transform.SetParent(parent, false);
-      
-      RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
-      sliderRect.anchorMin = new Vector2(1, 0);
-      sliderRect.anchorMax = new Vector2(1, 0);
-      sliderRect.anchoredPosition = new Vector2(-300, 20);
-      sliderRect.sizeDelta = new Vector2(600, 60);
-      
-      neuralLinkSlider = sliderObj.AddComponent<Slider>();
-      
-      // Background 생성
-      GameObject bgObj = new GameObject("Background");
-      bgObj.transform.SetParent(sliderObj.transform, false);
-      RectTransform bgRect = bgObj.AddComponent<RectTransform>();
-      bgRect.anchorMin = Vector2.zero;
-      bgRect.anchorMax = Vector2.one;
-      bgRect.sizeDelta = Vector2.zero;
-      Image bgImg = bgObj.AddComponent<Image>();
-      bgImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-      bgImg.raycastTarget = false; // Raycast 무시
-      neuralLinkSlider.targetGraphic = bgImg;
-      
-      // Fill Area 생성
-      GameObject fillAreaObj = new GameObject("Fill Area");
-      fillAreaObj.transform.SetParent(sliderObj.transform, false);
-      RectTransform fillAreaRect = fillAreaObj.AddComponent<RectTransform>();
-      fillAreaRect.anchorMin = Vector2.zero;
-      fillAreaRect.anchorMax = Vector2.one;
-      fillAreaRect.sizeDelta = Vector2.zero;
-      
-      // Fill 생성
-      GameObject fillObj = new GameObject("Fill");
-      fillObj.transform.SetParent(fillAreaObj.transform, false);
-      RectTransform fillRect = fillObj.AddComponent<RectTransform>();
-      fillRect.sizeDelta = Vector2.zero;
-      Image fillImg = fillObj.AddComponent<Image>();
-      fillImg.color = new Color(0.2f, 0.6f, 1f, 1f);
-      fillImg.raycastTarget = false; // Raycast 무시
-      neuralLinkSlider.fillRect = fillRect;
-    }
-
-    // Text 생성
-    if (neuralLinkText == null)
-    {
-      GameObject textObj = new GameObject("NeuralLinkText");
-      textObj.transform.SetParent(parent, false);
-      
-      RectTransform textRect = textObj.AddComponent<RectTransform>();
-      textRect.anchorMin = new Vector2(1, 0);
-      textRect.anchorMax = new Vector2(1, 0);
-      textRect.anchoredPosition = new Vector2(-300, 60);
-      textRect.sizeDelta = new Vector2(600, 60);
-      
-      neuralLinkText = textObj.AddComponent<TextMeshProUGUI>();
-      neuralLinkText.text = "Neural Link: 0%";
-      neuralLinkText.fontSize = 32;
-      neuralLinkText.alignment = TextAlignmentOptions.Left;
-    }
   }
 
   /// <summary>
@@ -293,6 +153,27 @@ public class UIManager : MonoBehaviour
 
   private void OnEnable()
   {
+    RegisterEvents();
+
+    // Coroutine을 사용하여 ShowGameTime을 호출
+    StartGameTimeCoroutineIfNeeded();
+
+  }
+
+  private void OnDisable()
+  {
+    UnregisterEvents();
+  }
+
+  private void OnDestroy()
+  {
+    UnregisterEvents();
+    if (Instance == this) Instance = null;
+  }
+
+  private void RegisterEvents()
+  {
+    if (eventsRegistered) return;
     WeaponManager.OnWeaponChanged += RefreshWeaponUI;
     Player.OnExpChanged += UpdateExpUI;
     Player.OnLevelUp += UpdateLevelUI;
@@ -302,15 +183,14 @@ public class UIManager : MonoBehaviour
     Player.OnBerserkEnded += OnBerserkEnded;
     Player.OnNeuralLinkGaugeChanged += UpdateNeuralLinkUI;
     Player.OnNeuralLinkActivated += OnNeuralLinkActivated;
-
-    ChestPickup.OnChestOpened += HandleChestOpened; // *** 상자 열림 이벤트 구독
-
-    // Coroutine을 사용하여 ShowGameTime을 호출
-    StartCoroutine(ShowGameTimeCoroutine());
+    ChestPickup.OnChestOpened += HandleChestOpened;
+    SceneManager.sceneLoaded += OnSceneLoaded;
+    eventsRegistered = true;
   }
 
-  private void OnDisable()
+  private void UnregisterEvents()
   {
+    if (!eventsRegistered) return;
     WeaponManager.OnWeaponChanged -= RefreshWeaponUI;
     Player.OnExpChanged -= UpdateExpUI;
     Player.OnLevelUp -= UpdateLevelUI;
@@ -320,7 +200,118 @@ public class UIManager : MonoBehaviour
     Player.OnBerserkEnded -= OnBerserkEnded;
     Player.OnNeuralLinkGaugeChanged -= UpdateNeuralLinkUI;
     Player.OnNeuralLinkActivated -= OnNeuralLinkActivated;
-    ChestPickup.OnChestOpened -= HandleChestOpened; // *** 상자 열림 이벤트 구독 해제
+    ChestPickup.OnChestOpened -= HandleChestOpened;
+    SceneManager.sceneLoaded -= OnSceneLoaded;
+    eventsRegistered = false;
+  }
+
+  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+  {
+    // 씬 전환 이후 참조가 끊기는 문제를 방지
+    Time.timeScale = 1f;
+    RebindSceneReferences();
+    AutoCreateMissingUI();
+    ForceRefreshWeaponUI();
+    ShowGameTime();
+  }
+
+  private void StartGameTimeCoroutineIfNeeded()
+  {
+    if (!isActiveAndEnabled) return;
+    StopCoroutine(nameof(ShowGameTimeCoroutine));
+    StartCoroutine(nameof(ShowGameTimeCoroutine));
+  }
+
+  private void RebindSceneReferences()
+  {
+    if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
+
+    if (weaponUIPanel == null)
+    {
+      GameObject found = GameObject.Find("WeaponUIPanel");
+      if (found == null) found = GameObject.Find("WeaponUI");
+      if (found == null) found = GameObject.Find("WeaponPanel");
+      weaponUIPanel = found;
+    }
+
+    if (expSlider == null) expSlider = FindSliderByNameContains("exp");
+    if (playerHealthSlider == null) playerHealthSlider = FindSliderByNameContains("health");
+    if (psychoCorruptionSlider == null)
+      psychoCorruptionSlider = FindSliderByNameContains("psycho", "overload", "corruption", "과부하");
+    if (neuralLinkSlider == null)
+      neuralLinkSlider = FindSliderByNameContains("neural", "link", "신경", "링크");
+
+    if (levelText == null) levelText = FindTMPByNameContains("level", "lv");
+    if (gameTimeText == null) gameTimeText = FindTMPByNameContains("time", "timer");
+    if (killCountText == null) killCountText = FindTMPByNameContains("kill", "count");
+    if (psychoCorruptionText == null) psychoCorruptionText = FindTMPByNameContains("psycho", "overload", "과부하");
+    if (neuralLinkText == null) neuralLinkText = FindTMPByNameContains("neural", "link", "신경", "링크");
+  }
+
+  private Slider FindSliderByNameContains(params string[] keywords)
+  {
+    var sliders = FindObjectsOfType<Slider>(true);
+    foreach (var s in sliders)
+    {
+      if (s == null) continue;
+      string n = s.gameObject.name.ToLowerInvariant();
+      foreach (var key in keywords)
+      {
+        if (!string.IsNullOrEmpty(key) && n.Contains(key.ToLowerInvariant()))
+          return s;
+      }
+    }
+    return null;
+  }
+
+  private TextMeshProUGUI FindTMPByNameContains(params string[] keywords)
+  {
+    var tmps = FindObjectsOfType<TextMeshProUGUI>(true);
+    foreach (var t in tmps)
+    {
+      if (t == null) continue;
+      string n = t.gameObject.name.ToLowerInvariant();
+      foreach (var key in keywords)
+      {
+        if (!string.IsNullOrEmpty(key) && n.Contains(key.ToLowerInvariant()))
+          return t;
+      }
+    }
+    return null;
+  }
+
+  private void ForceRefreshWeaponUI()
+  {
+    var wm = GetBestWeaponManager();
+    if (wm != null)
+    {
+      RefreshWeaponUI(wm.activeWeapons);
+    }
+  }
+
+  private NeoSurvive.Weapon.WeaponManager GetBestWeaponManager()
+  {
+    // 1) Player 태그 기준 우선
+    GameObject playerObj = GameObject.FindWithTag("Player");
+    if (playerObj != null)
+    {
+      var wmOnPlayer = playerObj.GetComponent<NeoSurvive.Weapon.WeaponManager>();
+      if (wmOnPlayer != null) return wmOnPlayer;
+    }
+
+    // 2) Local Player 우선
+    var players = FindObjectsOfType<Player>(true);
+    foreach (var p in players)
+    {
+      if (p != null && p.IsLocal)
+      {
+        var wm = p.GetComponent<NeoSurvive.Weapon.WeaponManager>();
+        if (wm != null) return wm;
+      }
+    }
+
+    // 3) 최후 fallback
+    return FindObjectOfType<NeoSurvive.Weapon.WeaponManager>();
   }
 
   // =========================
@@ -331,7 +322,7 @@ public class UIManager : MonoBehaviour
     Debug.Log("[UIManager] Chest opened → Weapon choice UI"); // ***
 
     // 씬에서 WeaponManager 찾기 // *****
-    var wm = FindObjectOfType<NeoSurvive.Weapon.WeaponManager>(); // *****
+    var wm = GetBestWeaponManager(); // *****
     if (wm == null) // *****
     {
       Debug.LogError("[UIManager] WeaponManager not found in scene!"); // *****
@@ -410,7 +401,7 @@ public class UIManager : MonoBehaviour
     while (true)
     {
       ShowGameTime();
-      yield return new WaitForSeconds(1f);
+      yield return new WaitForSecondsRealtime(0.2f);
     }
   }
 
@@ -433,7 +424,7 @@ public class UIManager : MonoBehaviour
 
   private void DrawWeapons(List<WeaponBase> weapons)
   {
-    if (weapons == null) return;
+    if (weapons == null || weaponUIPanel == null) return;
 
     Debug.Log($"[UIManager] DrawWeapons called with {weapons.Count} weapons");
 
@@ -442,7 +433,36 @@ public class UIManager : MonoBehaviour
     float x = padding;
     foreach (WeaponBase weapon in weapons)
     {
-      GameObject weaponIcon = Instantiate(weaponIconPrefab, weaponUIPanel.transform);
+      GameObject weaponIcon;
+      if (weaponIconPrefab != null)
+      {
+        weaponIcon = Instantiate(weaponIconPrefab, weaponUIPanel.transform);
+      }
+      else
+      {
+        // 프리팹이 비어있어도 UI가 완전히 사라지지 않도록 최소 아이콘 슬롯 생성
+        weaponIcon = new GameObject("WeaponIcon_Fallback");
+        weaponIcon.transform.SetParent(weaponUIPanel.transform, false);
+        var rt = weaponIcon.AddComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(64f, 64f);
+        var fallbackImg = weaponIcon.AddComponent<Image>();
+        fallbackImg.color = new Color(1f, 1f, 1f, 0.35f);
+
+        GameObject levelObj = new GameObject("LevelText");
+        levelObj.transform.SetParent(weaponIcon.transform, false);
+        var levelRt = levelObj.AddComponent<RectTransform>();
+        levelRt.anchorMin = Vector2.zero;
+        levelRt.anchorMax = Vector2.one;
+        levelRt.offsetMin = Vector2.zero;
+        levelRt.offsetMax = Vector2.zero;
+        var fallbackLevel = levelObj.AddComponent<TextMeshProUGUI>();
+        fallbackLevel.alignment = TextAlignmentOptions.BottomRight;
+        fallbackLevel.fontSize = 18;
+        fallbackLevel.color = Color.white;
+      }
+
+      weaponIcon.SetActive(true);
+      weaponIcon.transform.localScale = Vector3.one;
       // UI 요소이므로 RectTransform을 사용하는 것이 안전합니다.
       if (weaponIcon.TryGetComponent<RectTransform>(out var rect))
       {
@@ -466,6 +486,7 @@ public class UIManager : MonoBehaviour
 
   private void RefreshWeaponUI(List<WeaponBase> weapons)
   {
+    if (weaponUIPanel == null) return;
     Debug.Log("[UIManager] RefreshWeaponUI Event Received");
     foreach (Transform child in weaponUIPanel.transform)
     {

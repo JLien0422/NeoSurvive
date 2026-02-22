@@ -15,9 +15,13 @@ public class LobbyManager : MonoBehaviour
   [Header("UI References")]
   public Button mainStartButton;
   public Button multiplayerButton;
+  public Button settingButton;
   public Button exitButton;
   public Button upgradeButton;
   public GameObject mainMenuPanel; // 메인 버튼들을 포함하는 패널
+
+  [Header("설정 UI")]
+  public SettingsUI settingsUI;
 
   [Header("Tabs")]
   [SerializeField] private GameObject lobbyTab;
@@ -64,6 +68,13 @@ public class LobbyManager : MonoBehaviour
     {
       multiplayerButton.onClick.RemoveAllListeners();
       multiplayerButton.onClick.AddListener(ShowMultiplayerTab);
+    }
+
+    if (settingButton != null)
+    {
+      if (settingsUI == null) settingsUI = FindObjectOfType<SettingsUI>(true);
+      settingButton.onClick.RemoveAllListeners();
+      settingButton.onClick.AddListener(OnSettingButtonClicked);
     }
 
     if (exitButton != null)
@@ -123,6 +134,32 @@ public class LobbyManager : MonoBehaviour
       multiplayerRoomUI.ShowRoomList();
 
     Debug.Log("[LobbyManager] 멀티플레이어 탭 표시");
+  }
+
+  public void OnSettingButtonClicked()
+  {
+    if (settingsUI == null)
+    {
+      Debug.LogWarning("[LobbyManager] SettingsUI가 할당되지 않았습니다!");
+      return;
+    }
+
+    // 로비 메인 패널 숨기기
+    if (mainMenuPanel != null)
+      mainMenuPanel.SetActive(false);
+
+    // SettingUi 게임오브젝트 자체를 먼저 활성화
+    settingsUI.gameObject.SetActive(true);
+
+    // 설정이 닫힐 때: 로비 패널 보이기 + SettingUi 비활성화
+    settingsUI.onSettingsClosed = () =>
+    {
+      settingsUI.gameObject.SetActive(false);
+      if (mainMenuPanel != null)
+        mainMenuPanel.SetActive(true);
+    };
+
+    settingsUI.OpenSettings();
   }
 
   public void OnExitButtonClicked()

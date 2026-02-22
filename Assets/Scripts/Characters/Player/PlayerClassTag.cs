@@ -1,16 +1,18 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum PlayerClassType
 {
-  Cyborg,
-  Hacker
+    Cyborg,
+    Hacker
 }
 
 /// <summary>
-/// ì´ Player í”„ë¦¬íŒ¹ì´ Cyborgì¸ì§€ Hackerì¸ì§€ êµ¬ë¶„ë§Œ í•´ì£¼ëŠ” "í‘œì‹" ì»´í¬ë„ŒíŠ¸.
-/// ìŠ¤íƒ¯ ì°¨ì´ ì—†ë”ë¼ë„ ì‹œì‘ ë¬´ê¸° ë¶„ê¸° ë“±ì— ì‚¬ìš©.
+/// ÀÌ Player ÇÁ¸®ÆÕÀÌ CyborgÀÎÁö HackerÀÎÁö ±¸ºĞ¸¸ ÇØÁÖ´Â "Ç¥½Ä" ÄÄÆ÷³ÍÆ®.
+/// ½ºÅÈ Â÷ÀÌ ¾ø´õ¶óµµ ½ÃÀÛ ¹«±â ºĞ±â µî¿¡ »ç¿ë.
 /// </summary>
 public class PlayerClassTag : MonoBehaviour
 {
-  public PlayerClassType classType = PlayerClassType.Cyborg;
-}
+    public PlayerClassType classType = PlayerClassType.Cyborg;
+}   

@@ -7270,8 +7270,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC2E0\uACBD \uB9C1\uD06C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 512dad613d428c7429121978ad8e3cbf, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: 512dad613d428c7429121978ad8e3cbf, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7852,8 +7852,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uACFC\uBD80\uD654"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 512dad613d428c7429121978ad8e3cbf, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: 512dad613d428c7429121978ad8e3cbf, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10229,14 +10229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce808fc5e48c9f47962364594bce39d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gaugeChargeSpeed: 20
-  securityFieldRadius: 3
-  enableCommandBypass: 1
-  enableNumberSequence: 1
-  enableNetworkBridge: 1
-  enableSynapseSync: 1
-  enableFrequencyOverride: 1
-  hackingUIPanel: {fileID: 0}
 --- !u!1 &1250663597
 GameObject:
   m_ObjectHideFlags: 0
@@ -18186,14 +18178,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce808fc5e48c9f47962364594bce39d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gaugeChargeSpeed: 20
-  securityFieldRadius: 3
-  enableCommandBypass: 1
-  enableNumberSequence: 1
-  enableNetworkBridge: 1
-  enableSynapseSync: 1
-  enableFrequencyOverride: 1
-  hackingUIPanel: {fileID: 0}
 --- !u!114 &2078993012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18258,31 +18242,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44741dd2b09ba5844a673f006b391344, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  securityTurretPrefab: {fileID: 8231011192012288842, guid: 5373a04edd0971440ae77c81adb6cfdf, type: 3}
-  turretBulletPrefab: {fileID: 2343077986613121609, guid: f4e933692492e3049a229d442bb27377, type: 3}
-  turretDuration: 8
-  turretRange: 12
-  turretFireRate: 0.15
-  turretDamage: 8
-  bulletSpeed: 18
-  bulletLifeTime: 2
-  electricFenceSegmentPrefab: {fileID: 4345228418071963140, guid: efc64ecbb63ff1846afc1dfa095b0eec, type: 3}
-  fenceHalfWidth: 8
-  fenceHalfHeight: 5
-  fenceDuration: 6
-  fenceDps: 25
-  fenceThickness: 0.6
-  satelliteRadius: 16
-  satelliteDuration: 3
-  satelliteTick: 0.12
-  satelliteDamage: 6
-  synapseRadius: 14
-  synapseConvertRatio: 0.5
-  synapseDuration: 8
-  magneticRadius: 25
-  magneticDuration: 1
-  magneticForce: 40
-  pullDirection: {x: 1, y: 0}
 --- !u!114 &2078993015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18295,19 +18254,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40775216744c1564cb1b9e82ffcc285b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hackablePrefabs:
-  - {fileID: 8231011192012288842, guid: 5373a04edd0971440ae77c81adb6cfdf, type: 3}
-  - {fileID: 899769881387810282, guid: cc1340d0da3b8114290dcd810ae66c4f, type: 3}
-  - {fileID: 1197773046042531436, guid: f781373ab8789af468db993b1eb0bdb2, type: 3}
-  - {fileID: 7431905698908282454, guid: f0c18a554b895af40b261f734b9af6e0, type: 3}
-  - {fileID: 3666438487110806349, guid: 9215ce9e5209bfc4e87dde1bf2e1697f, type: 3}
-  minRadius: 1.8
-  maxRadius: 3.5
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
-  overlapCheckRadius: 0.4
-  preventDuplicateWhileExists: 1
 --- !u!1 &2079492504
 GameObject:
   m_ObjectHideFlags: 0

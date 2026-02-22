@@ -30,6 +30,13 @@ namespace NeoSurvive.Weapon
 
     public static event System.Action<List<WeaponBase>> OnWeaponChanged;
 
+    private void RaiseWeaponChanged()
+    {
+      int listenerCount = OnWeaponChanged?.GetInvocationList().Length ?? 0;
+      Debug.Log($"[WeaponManager] OnWeaponChanged invoke, listeners={listenerCount}, activeWeapons={activeWeapons.Count}");
+      OnWeaponChanged?.Invoke(activeWeapons);
+    }
+
     // [Coop] Player 참조
     private Player player;
 
@@ -112,7 +119,7 @@ namespace NeoSurvive.Weapon
       {
         // 레벨업 로직
         weaponData.level++;
-        OnWeaponChanged?.Invoke(activeWeapons);
+        RaiseWeaponChanged();
 
         // 생성된 무기 오브젝트에 레벨업 알림
         if (spawnedWeapons.TryGetValue(weaponData, out GameObject existingWeapon))
@@ -160,7 +167,8 @@ namespace NeoSurvive.Weapon
         weaponObj.SendMessage("OnLevelUp", 1, SendMessageOptions.DontRequireReceiver);
       }
 
-      OnWeaponChanged?.Invoke(activeWeapons);
+      RaiseWeaponChanged();
+            Debug.Log(string.Join("," , activeWeapons));
 
       // [Coop] 로컬 플레이어인 경우 서버에 무기 장착 알림
       if (sendToServer)

@@ -217,11 +217,8 @@ public class PauseMenuController : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        // 에디터에서는 Application.Quit()이 동작 안 함 → 한 프레임 뒤 플레이 모드 종료
-        UnityEditor.EditorApplication.delayCall += () =>
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        };
+        // 에디터에서는 Application.Quit()이 동작 안 함
+        UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif

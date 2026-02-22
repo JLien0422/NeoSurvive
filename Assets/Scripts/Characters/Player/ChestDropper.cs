@@ -25,6 +25,11 @@ public class ChestDropper : MonoBehaviour
         Player.OnLevelUp -= HandleLevelUp;
     }
 
+    private void OnDestroy()
+    {
+        Player.OnLevelUp -= HandleLevelUp;
+    }
+
     private void HandleLevelUp(int newLevel)
     {
         Debug.Log($"[ChestDropper] HandleLevelUp called! newLevel={newLevel}");

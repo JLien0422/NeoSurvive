@@ -1,452 +1,344 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NeoSurvive.Characters;
+using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
-/// 해킹 시스템 관리자 (미니게임 전용)
-/// - 미니게임 랜덤 선택/실행
-/// - 성공/실패 판정
-/// - 보상(오브젝트 효과)은 절대 여기서 처리하지 않음
+/// 해킹 시스템 매니저
+/// - 패턴 발동 시 해킹오브젝트 생성
+/// - 미니게임 시작/종료 관리
+/// - 해커: 게임시간 정지 / 사이보그: 게임시간 유지
 /// </summary>
 public class HackingSystem : MonoBehaviour
 {
     public static HackingSystem Instance { get; private set; }
 
-    // ✅ (추가) 미니게임 결과 이벤트 (오브젝트 보상과 분리)
-    public static event System.Action<HackableObject> OnHackSuccess;
-    public static event System.Action<HackableObject> OnHackFail;
+    [Header("해킹 UI 패널")]
+    [SerializeField] private GameObject hackingUIPanel; // HackingUIPanel (Canvas 아래)
 
-    [Header("해킹 설정")]
-    [SerializeField]
-    [Tooltip("게이지 자동 충전 속도 (초당 %)")]
-    private float gaugeChargeSpeed = 20f;
+    [Header("해킹 오브젝트 프리팹 5종")]
+    [SerializeField] private GameObject securityTurretPrefab;    // 보안 터렛
+    [SerializeField] private GameObject electricFencePrefab;     // 전기 울타리
+    [SerializeField] private GameObject satelliteUplinkPrefab;   // 새틀라이트 통신기
+    [SerializeField] private GameObject synapseServerPrefab;     // 시냅스 과부하 서버
+    [SerializeField] private GameObject magneticBeaconPrefab;    // 마그네틱 비컨
 
-    [SerializeField]
-    [Tooltip("사이보그 보안 영역 반지름")]
-    private float securityFieldRadius = 3f;
+    [Header("설정")]
+    [SerializeField] private float spawnRadius = 3f; // 플레이어 주변 스폰 반경
 
-    [Header("미니게임 설정")]
-    [SerializeField] private bool enableCommandBypass = true;
-    [SerializeField] private bool enableNumberSequence = true;
-    [SerializeField] private bool enableNetworkBridge = true;
-    [SerializeField] private bool enableSynapseSync = true;
-    [SerializeField] private bool enableFrequencyOverride = true;
-
-    [Header("미니게임 UI")]
-    [SerializeField]
-    private GameObject hackingUIPanel;
-
-    private Player currentPlayer = null;
-    private HackableObject currentHackableObject = null;
+    // 현재 진행 중인 미니게임
+    private HackingMinigameBase currentMinigame;
     private bool isHacking = false;
-    private float hackingGauge = 0f;
-    private float maxGauge = 100f;
 
-    private HackingMinigameBase currentMinigame = null;
+    // 캐릭터 타입 (해커 vs 사이보그)
+    private bool isHacker = true;
+
+    // 각 미니게임 루트 (UI 패널 아래)
+    private Transform numberSequenceRoot;
+    private Transform commandBypassRoot;
+    private Transform synapseSyncRoot;
+    private Transform frequencyOverrideRoot;
+    private Transform networkBridgeRoot;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
     }
 
-    /// <summary>
-    /// 해킹 시작
-    /// </summary>
-    public void StartHacking(HackableObject hackableObject, Player player)
+    private void Start()
     {
-        if (isHacking) return;
-
-        currentPlayer = player;
-        currentHackableObject = hackableObject;
-        isHacking = true;
-        hackingGauge = 0f;
-
-        // 해커만 해킹 가능
-        if (GameManager.Instance != null)
-        {
-            CharacterType characterType = GameManager.Instance.GetSelectedCharacter();
-            if (characterType != CharacterType.Hacker)
-            {
-                Debug.Log("해커만 해킹할 수 있습니다!");
-                EndHacking(false);
-                return;
-            }
-        }
-
-        // 플레이어 고정 상태 (이동/공격 불가)
-        SetPlayerLockdown(true);
-
-        // 미니게임 랜덤 선택 (인스펙터에서 활성화된 것만)
-        List<HackingMinigameType> availableMinigames = new List<HackingMinigameType>();
-
-        if (enableCommandBypass) availableMinigames.Add(HackingMinigameType.CommandBypass);
-        if (enableNumberSequence) availableMinigames.Add(HackingMinigameType.NumberSequence);
-        if (enableNetworkBridge) availableMinigames.Add(HackingMinigameType.NetworkBridge);
-        if (enableSynapseSync) availableMinigames.Add(HackingMinigameType.SynapseSync);
-        if (enableFrequencyOverride) availableMinigames.Add(HackingMinigameType.FrequencyOverride);
-
-        if (availableMinigames.Count == 0)
-        {
-            Debug.LogError("[HackingSystem] 활성화된 미니게임이 없습니다! 기본값으로 넘버 시퀀스를 사용합니다.");
-            availableMinigames.Add(HackingMinigameType.NumberSequence);
-        }
-
-        HackingMinigameType selectedMinigame = availableMinigames[Random.Range(0, availableMinigames.Count)];
-        Debug.Log($"[HackingSystem] 선택된 미니게임: {selectedMinigame}");
-        StartMinigame(selectedMinigame);
-
-        // 게이지 자동 충전 시작
-        StartCoroutine(GaugeChargeCoroutine());
-
-        Debug.Log("해킹 시작!");
-    }
-
-    /// <summary>
-    /// 미니게임 시작
-    /// </summary>
-    private void StartMinigame(HackingMinigameType minigameType)
-    {
-        // 기존 미니게임 정리
-        if (currentMinigame != null)
-        {
-            Destroy(currentMinigame.gameObject);
-        }
-
-        // UI 패널이 없으면 자동 생성
         if (hackingUIPanel == null)
         {
-            CreateHackingUIPanel();
-            Debug.Log($"[HackingSystem] UI 패널 생성: {hackingUIPanel != null}");
+            Debug.LogError("[HackingSystem] hackingUIPanel이 인스펙터에 할당되지 않았습니다!");
+            return;
         }
+
+        // 패널을 잠깐 활성화해서 자식을 찾은 뒤 비활성화
+        bool wasActive = hackingUIPanel.activeSelf;
+        hackingUIPanel.SetActive(true);
+
+        numberSequenceRoot    = hackingUIPanel.transform.Find("NumberSequence_Root");
+        commandBypassRoot     = hackingUIPanel.transform.Find("CommandBypass_Root");
+        synapseSyncRoot       = hackingUIPanel.transform.Find("SynapseSync_Root");
+        frequencyOverrideRoot = hackingUIPanel.transform.Find("FrequencyOverride_Root");
+        networkBridgeRoot     = hackingUIPanel.transform.Find("NetworkBridge_Root");
+
+        Debug.Log($"[HackingSystem] 루트 탐색 결과:" +
+            $"\n NumberSequence={numberSequenceRoot != null}" +
+            $"\n CommandBypass={commandBypassRoot != null}" +
+            $"\n SynapseSync={synapseSyncRoot != null}" +
+            $"\n FrequencyOverride={frequencyOverrideRoot != null}" +
+            $"\n NetworkBridge={networkBridgeRoot != null}");
+
+        // 모든 루트 비활성화 후 패널도 비활성화
+        SetAllRootsInactive();
+        hackingUIPanel.SetActive(false);
+
+        // 캐릭터 타입 확인
+        if (GameManager.Instance != null)
+        {
+            isHacker = GameManager.Instance.GetSelectedCharacter() == NeoSurvive.Characters.CharacterType.Hacker;
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // 패턴 발동 시 호출 (GameManager에서 호출)
+    // ─────────────────────────────────────────────
+    /// <summary>
+    /// 포위 패턴 발동 시 랜덤 해킹오브젝트 1개 생성
+    /// </summary>
+    public void SpawnRandomHackableObject()
+    {
+        var player = FindObjectOfType<Player>();
+        if (player == null) return;
+
+        // 5종 중 랜덤 선택
+        GameObject[] prefabs = {
+            securityTurretPrefab,
+            electricFencePrefab,
+            satelliteUplinkPrefab,
+            synapseServerPrefab,
+            magneticBeaconPrefab
+        };
+
+        // null 제거 후 랜덤 선택
+        List<GameObject> validPrefabs = new List<GameObject>();
+        foreach (var p in prefabs)
+            if (p != null) validPrefabs.Add(p);
+
+        if (validPrefabs.Count == 0)
+        {
+            Debug.LogWarning("[HackingSystem] 해킹오브젝트 프리팹이 하나도 할당되지 않았습니다!");
+            return;
+        }
+
+        int idx = Random.Range(0, validPrefabs.Count);
+        Vector3 spawnPos = player.transform.position + (Vector3)Random.insideUnitCircle.normalized * spawnRadius;
+        Instantiate(validPrefabs[idx], spawnPos, Quaternion.identity);
+    }
+
+    // ─────────────────────────────────────────────
+    // 해킹 시작 (HackableObject에서 호출)
+    // ─────────────────────────────────────────────
+    /// <summary>
+    /// 해킹오브젝트 종류에 따라 미니게임 시작
+    /// </summary>
+    public void StartHacking(HackableObjectType objectType, System.Action onSuccess, System.Action onFailure)
+    {
+        if (isHacking) return;
+        isHacking = true;
+
+        // 해커: 게임시간 정지
+        if (isHacker)
+            Time.timeScale = 0f;
 
         // UI 패널 활성화
         if (hackingUIPanel != null)
-        {
             hackingUIPanel.SetActive(true);
-        }
-        else
+
+        // 오브젝트 종류에 따라 미니게임 선택 및 루트 활성화
+        StartMinigame(objectType, onSuccess, onFailure);
+    }
+
+    private void StartMinigame(HackableObjectType objectType, System.Action onSuccess, System.Action onFailure)
+    {
+        // 모든 루트 비활성화
+        SetAllRootsInactive();
+
+        System.Action wrappedSuccess = () => { EndHacking(); onSuccess?.Invoke(); };
+        System.Action wrappedFailure = () => { EndHacking(); onFailure?.Invoke(); };
+
+        switch (objectType)
         {
-            Debug.LogError("[HackingSystem] UI 패널이 null입니다!");
-        }
-
-        // 미니게임 생성
-        GameObject minigameObj = new GameObject("HackingMinigame");
-        minigameObj.transform.SetParent(hackingUIPanel != null ? hackingUIPanel.transform : transform);
-
-        switch (minigameType)
-        {
-            case HackingMinigameType.CommandBypass:
-                currentMinigame = minigameObj.AddComponent<CommandBypassMinigame>();
-                if (currentMinigame is CommandBypassMinigame cmdBypass && hackingUIPanel != null)
-                {
-                    Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
-                    if (nsRoot != null) nsRoot.gameObject.SetActive(false);
-
-                    Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
-                    if (cbRoot != null)
-                    {
-                        cbRoot.gameObject.SetActive(true);
-                        Transform arrowContainer = cbRoot.Find("ArrowContainer");
-                        Transform statusTrans = cbRoot.Find("StatusText");
-                        Transform progressTrans = cbRoot.Find("ProgressGauge");
-                        var statusText = statusTrans != null ? statusTrans.GetComponent<TMPro.TextMeshProUGUI>() : null;
-                        var progressSlider = progressTrans != null ? progressTrans.GetComponent<UnityEngine.UI.Slider>() : null;
-                        UnityEngine.UI.Image progressImage = null;
-                        if (progressTrans != null)
-                        {
-                            var img = progressTrans.GetComponent<UnityEngine.UI.Image>();
-                            if (img != null && img.type == UnityEngine.UI.Image.Type.Filled)
-                                progressImage = img;
-                            else
-                            {
-                                foreach (var c in progressTrans.GetComponentsInChildren<UnityEngine.UI.Image>(true))
-                                    if (c.type == UnityEngine.UI.Image.Type.Filled) { progressImage = c; break; }
-                            }
-                        }
-                        if (arrowContainer != null)
-                        {
-                            cmdBypass.SetPreMadeUI(arrowContainer, statusText, progressSlider, progressImage);
-                            Debug.Log("[HackingSystem] 손으로 만든 CommandBypass UI 사용");
-                        }
-                    }
-                }
+            case HackableObjectType.SecurityTurret:
+                StartNumberSequence(wrappedSuccess, wrappedFailure);
                 break;
-
-            case HackingMinigameType.NumberSequence:
-                currentMinigame = minigameObj.AddComponent<NumberSequenceMinigame>();
-                if (currentMinigame is NumberSequenceMinigame numberSeq && hackingUIPanel != null)
-                {
-                    // 손으로 만든 NumberSequence_Root 사용 (있으면)
-                    Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
-                    Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
-                    if (cbRoot != null) cbRoot.gameObject.SetActive(false);
-                    if (nsRoot != null)
-                    {
-                        nsRoot.gameObject.SetActive(true);
-                        Transform btnGrid = nsRoot.Find("BtnGrid");
-                        Transform statusTrans = nsRoot.Find("StatusText");
-                        var statusText = statusTrans != null ? statusTrans.GetComponent<TMPro.TextMeshProUGUI>() : null;
-                        if (btnGrid != null && btnGrid.childCount >= 9)
-                        {
-                            numberSeq.SetPreMadeUI(btnGrid, statusText);
-                            Debug.Log("[HackingSystem] 손으로 만든 NumberSequence UI 사용");
-                        }
-                        else
-                        {
-                            numberSeq.SetButtonParent(hackingUIPanel.transform);
-                        }
-                    }
-                    else
-                    {
-                        numberSeq.SetButtonParent(hackingUIPanel.transform);
-                    }
-                }
+            case HackableObjectType.ElectricFence:
+                StartCommandBypass(wrappedSuccess, wrappedFailure);
                 break;
-
-            case HackingMinigameType.NetworkBridge:
-                currentMinigame = minigameObj.AddComponent<NetworkBridgeMinigame>();
+            case HackableObjectType.SatelliteUplink:
+                StartNetworkBridge(wrappedSuccess, wrappedFailure);
                 break;
-
-            case HackingMinigameType.SynapseSync:
-                currentMinigame = minigameObj.AddComponent<SynapseSyncMinigame>();
+            case HackableObjectType.SynapseServer:
+                StartSynapseSync(wrappedSuccess, wrappedFailure);
                 break;
-
-            case HackingMinigameType.FrequencyOverride:
-                currentMinigame = minigameObj.AddComponent<FrequencyOverrideMinigame>();
+            case HackableObjectType.MagneticBeacon:
+                StartFrequencyOverride(wrappedSuccess, wrappedFailure);
                 break;
         }
-
-        if (currentMinigame != null)
-        {
-            currentMinigame.Initialize(OnMinigameSuccess, OnMinigameFailure);
-        }
-        else
-        {
-            Debug.LogError("[HackingSystem] 미니게임 생성 실패!");
-        }
     }
 
-    /// <summary>
-    /// 게이지 자동 충전 코루틴
-    /// </summary>
-    private IEnumerator GaugeChargeCoroutine()
+    // ─────────────────────────────────────────────
+    // 각 미니게임 시작 메서드
+    // ─────────────────────────────────────────────
+    private void StartNumberSequence(System.Action onSuccess, System.Action onFailure)
     {
-        while (isHacking && hackingGauge < maxGauge)
-        {
-            hackingGauge += gaugeChargeSpeed * Time.deltaTime;
-            hackingGauge = Mathf.Clamp(hackingGauge, 0f, maxGauge);
+        if (numberSequenceRoot == null) { Debug.LogWarning("[HackingSystem] NumberSequence_Root 없음!"); return; }
+        numberSequenceRoot.gameObject.SetActive(true);
 
-            if (hackingGauge >= maxGauge)
-            {
-                OnGaugeFull();
-            }
+        var minigame = GetOrAddMinigame<NumberSequenceMinigame>(numberSequenceRoot.gameObject);
+        currentMinigame = minigame;
 
-            yield return null;
-        }
+        Transform btnGrid   = numberSequenceRoot.Find("BtnGrid");
+        Slider timeGauge    = FindSlider(numberSequenceRoot, "TimeGauge");
+
+        minigame.SetPreMadeUI(btnGrid, timeGauge);
+        minigame.Initialize(onSuccess, onFailure);
     }
 
-    private void OnGaugeFull()
+    private void StartCommandBypass(System.Action onSuccess, System.Action onFailure)
     {
-        if (currentMinigame != null)
-        {
-            currentMinigame.OnSuccess();
-        }
+        if (commandBypassRoot == null) { Debug.LogWarning("[HackingSystem] CommandBypass_Root 없음!"); return; }
+        commandBypassRoot.gameObject.SetActive(true);
+
+        var minigame = GetOrAddMinigame<CommandBypassMinigame>(commandBypassRoot.gameObject);
+        currentMinigame = minigame;
+
+        Transform arrowContainer = commandBypassRoot.Find("ArrowContainer");
+        Slider progressGauge     = FindSlider(commandBypassRoot, "ProgressGauge");
+        Slider timeGauge         = FindSlider(commandBypassRoot, "TimeGauge");
+
+        minigame.SetPreMadeUI(arrowContainer, progressGauge, null, timeGauge);
+        minigame.Initialize(onSuccess, onFailure);
     }
 
-    private void OnMinigameSuccess()
+    private void StartSynapseSync(System.Action onSuccess, System.Action onFailure)
     {
-        Debug.Log("해킹 성공!");
+        if (synapseSyncRoot == null) { Debug.LogWarning("[HackingSystem] SynapseSync_Root 없음!"); return; }
+        synapseSyncRoot.gameObject.SetActive(true);
 
-        // ✅ 보상 처리 없음. 결과만 알림.
-        OnHackSuccess?.Invoke(currentHackableObject);
+        var minigame = GetOrAddMinigame<SynapseSyncMinigame>(synapseSyncRoot.gameObject);
+        currentMinigame = minigame;
 
-        EndHacking(true);
+        GameObject centerCircle = FindChild(synapseSyncRoot, "CenterCircle");
+        GameObject outerCircle  = FindChild(synapseSyncRoot, "OuterCircle");
+        Slider timeGauge        = FindSlider(synapseSyncRoot, "TimeGauge");
+        Slider successGauge     = FindSlider(synapseSyncRoot, "SuccessGauge");
+
+        minigame.SetPreMadeUI(centerCircle, outerCircle, timeGauge, successGauge);
+        minigame.Initialize(onSuccess, onFailure);
     }
 
-    private void OnMinigameFailure()
+    private void StartFrequencyOverride(System.Action onSuccess, System.Action onFailure)
     {
-        Debug.Log("해킹 실패!");
+        if (frequencyOverrideRoot == null) { Debug.LogWarning("[HackingSystem] FrequencyOverride_Root 없음!"); return; }
+        frequencyOverrideRoot.gameObject.SetActive(true);
 
-        ApplyFailurePenalty();
+        var minigame = GetOrAddMinigame<FrequencyOverrideMinigame>(frequencyOverrideRoot.gameObject);
+        currentMinigame = minigame;
 
-        // ✅ 보상 처리 없음. 결과만 알림.
-        OnHackFail?.Invoke(currentHackableObject);
+        GameObject targetWave = FindChild(frequencyOverrideRoot, "TargetWave");
+        GameObject playerWave = FindChild(frequencyOverrideRoot, "PlayerWave");
+        Slider timeGauge      = FindSlider(frequencyOverrideRoot, "TimeGauge");
+        Slider matchGauge     = FindSlider(frequencyOverrideRoot, "MatchGauge");
+        Slider holdGauge      = FindSlider(frequencyOverrideRoot, "HoldGauge");
 
-        EndHacking(false);
+        minigame.SetPreMadeUI(targetWave, playerWave, timeGauge, matchGauge, holdGauge);
+        minigame.Initialize(onSuccess, onFailure);
     }
 
-    private void ApplyFailurePenalty()
+    private void StartNetworkBridge(System.Action onSuccess, System.Action onFailure)
     {
-        if (currentPlayer == null) return;
+        if (networkBridgeRoot == null) { Debug.LogWarning("[HackingSystem] NetworkBridge_Root 없음!"); return; }
+        networkBridgeRoot.gameObject.SetActive(true);
 
-        // 체력 30% 감소
-        float healthLoss = currentPlayer.CurrentHealth * 0.3f;
-        currentPlayer.TakeDamage(healthLoss);
+        var minigame = GetOrAddMinigame<NetworkBridgeMinigame>(networkBridgeRoot.gameObject);
+        currentMinigame = minigame;
 
-        // 사이코잠식도 50% 증가
-        currentPlayer.AddPsychoCorruption(50f);
+        Transform leftContainer  = networkBridgeRoot.Find("LeftContainer");
+        Transform rightContainer = networkBridgeRoot.Find("RightContainer");
+        Transform linesContainer = networkBridgeRoot.Find("LinesContainer");
+        Slider timeGauge         = FindSlider(networkBridgeRoot, "TimeGauge");
+        Slider successGauge      = FindSlider(networkBridgeRoot, "SuccessGauge");
 
-        Debug.Log("해킹 실패 패널티: 체력 -30%, 사이코잠식도 +50%");
+        minigame.SetPreMadeUI(leftContainer, rightContainer, linesContainer, timeGauge, successGauge);
+        minigame.Initialize(onSuccess, onFailure);
     }
 
-    /// <summary>
-    /// 해킹 종료
-    /// </summary>
-    private void EndHacking(bool success)
+    // ─────────────────────────────────────────────
+    // 해킹 종료
+    // ─────────────────────────────────────────────
+    public void EndHacking()
     {
         isHacking = false;
-        hackingGauge = 0f;
 
-        // 플레이어 고정 해제
-        SetPlayerLockdown(false);
+        // 해커: 게임시간 재개
+        if (isHacker)
+            Time.timeScale = 1f;
 
-        // 미니게임 정리
-        if (currentMinigame != null)
-        {
-            Destroy(currentMinigame.gameObject);
-            currentMinigame = null;
-        }
+        // 모든 루트 비활성화
+        SetAllRootsInactive();
 
-        // UI 패널 비활성화 (미니게임 루트도 같이 꺼짐)
+        // UI 패널 비활성화
         if (hackingUIPanel != null)
-        {
-            Transform nsRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
-            if (nsRoot != null) nsRoot.gameObject.SetActive(false);
-            Transform cbRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
-            if (cbRoot != null) cbRoot.gameObject.SetActive(false);
             hackingUIPanel.SetActive(false);
-        }
 
-        // 해킹 가능 오브젝트에 종료 알림
-        if (currentHackableObject != null)
-        {
-            currentHackableObject.OnHackingEnded();
-        }
-
-        currentPlayer = null;
-        currentHackableObject = null;
+        currentMinigame = null;
     }
 
-    /// <summary>
-    /// 플레이어 고정 상태 설정
-    /// </summary>
-    private void SetPlayerLockdown(bool locked)
+    // ─────────────────────────────────────────────
+    // 유틸리티
+    // ─────────────────────────────────────────────
+    private void SetAllRootsInactive()
     {
-        if (currentPlayer == null) return;
-
-        PlayerController controller = currentPlayer.GetComponent<PlayerController>();
-        if (controller != null)
-        {
-            controller.SetLockdown(locked);
-        }
-
-        // 무기 공격도 비활성화
-        NeoSurvive.Weapon.WeaponManager weaponManager = currentPlayer.GetComponent<NeoSurvive.Weapon.WeaponManager>();
-        if (weaponManager != null)
-        {
-            weaponManager.enabled = !locked;
-        }
+        if (numberSequenceRoot != null)   numberSequenceRoot.gameObject.SetActive(false);
+        if (commandBypassRoot != null)    commandBypassRoot.gameObject.SetActive(false);
+        if (synapseSyncRoot != null)      synapseSyncRoot.gameObject.SetActive(false);
+        if (frequencyOverrideRoot != null) frequencyOverrideRoot.gameObject.SetActive(false);
+        if (networkBridgeRoot != null)    networkBridgeRoot.gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// 사이보그 보안 영역 체크 (적이 들어오면 진척도 감소)
-    /// </summary>
-    private void CheckSecurityField()
+    private T GetOrAddMinigame<T>(GameObject root) where T : HackingMinigameBase
     {
-        if (currentPlayer == null) return;
-
-        if (GameManager.Instance != null)
-        {
-            CharacterType characterType = GameManager.Instance.GetSelectedCharacter();
-            if (characterType != CharacterType.Cyborg) return;
-        }
-
-        Collider2D[] enemies = Physics2D.OverlapCircleAll(
-            currentPlayer.transform.position,
-            securityFieldRadius
-        );
-
-        foreach (var col in enemies)
-        {
-            if (col.CompareTag("Enemy"))
-            {
-                hackingGauge = Mathf.Max(0f, hackingGauge - 10f * Time.deltaTime);
-
-                if (hackingGauge <= 0f)
-                {
-                    OnMinigameFailure();
-                }
-            }
-        }
+        T minigame = root.GetComponent<T>();
+        if (minigame == null)
+            minigame = root.AddComponent<T>();
+        return minigame;
     }
 
-    private void Update()
+    private Slider FindSlider(Transform root, string name)
     {
-        if (isHacking)
+        // 직접 자식에서 먼저 찾기
+        Transform t = root.Find(name);
+        if (t != null)
         {
-            CheckSecurityField();
+            Slider s = t.GetComponent<Slider>();
+            if (s != null) return s;
         }
+
+        // 못 찾으면 모든 자손에서 이름으로 검색
+        foreach (var slider in root.GetComponentsInChildren<Slider>(true))
+        {
+            if (slider.gameObject.name == name)
+                return slider;
+        }
+
+        Debug.LogWarning($"[HackingSystem] '{name}' Slider를 찾을 수 없습니다! ({root.name} 아래 검색)");
+        return null;
     }
 
-    /// <summary>
-    /// 해킹 UI 패널 자동 생성 (없을 경우). 전체 화면에 보이도록 생성합니다.
-    /// </summary>
-    private void CreateHackingUIPanel()
+    private GameObject FindChild(Transform root, string name)
     {
-        // 씬의 메인 Canvas 사용 (없으면 새로 생성)
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if (canvas == null)
+        // 직접 자식에서 먼저 찾기
+        Transform t = root.Find(name);
+        if (t != null) return t.gameObject;
+
+        // 모든 자손에서 이름으로 검색
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
         {
-            GameObject canvasObj = new GameObject("HackingCanvas");
-            canvas = canvasObj.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
-            scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
-            canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
-            canvas.sortingOrder = 100;
-            Debug.Log("[HackingSystem] Canvas 자동 생성");
+            if (child.gameObject.name == name)
+                return child.gameObject;
         }
 
-        // 해킹 UI 패널 = 전체 화면 덮기 (화면에 확실히 보이도록)
-        GameObject panel = new GameObject("HackingUIPanel");
-        panel.transform.SetParent(canvas.transform, false);
-        panel.transform.SetAsLastSibling(); // 다른 UI보다 위에 그리기
-
-        RectTransform panelRect = panel.AddComponent<RectTransform>();
-        panelRect.anchorMin = Vector2.zero;
-        panelRect.anchorMax = Vector2.one;
-        panelRect.offsetMin = Vector2.zero;
-        panelRect.offsetMax = Vector2.zero;
-
-        UnityEngine.UI.Image panelImg = panel.AddComponent<UnityEngine.UI.Image>();
-        panelImg.color = new Color(0.08f, 0.08f, 0.12f, 0.96f);
-
-        hackingUIPanel = panel;
-        Debug.Log("[HackingSystem] 해킹 UI 패널 생성 완료 (전체 화면)");
+        Debug.LogWarning($"[HackingSystem] '{name}'을 찾을 수 없습니다! ({root.name} 아래 검색)");
+        return null;
     }
 
-    private void OnDrawGizmos()
-    {
-        if (isHacking && currentPlayer != null)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(currentPlayer.transform.position, securityFieldRadius);
-        }
-    }
-}
-
-/// <summary>
-/// 해킹 미니게임 타입
-/// </summary>
-public enum HackingMinigameType
-{
-    CommandBypass,
-    NumberSequence,
-    NetworkBridge,
-    SynapseSync,
-    FrequencyOverride
+    public bool IsHacking => isHacking;
 }

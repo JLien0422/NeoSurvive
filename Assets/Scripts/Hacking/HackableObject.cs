@@ -2,45 +2,28 @@ using UnityEngine;
 
 /// <summary>
 /// 해킹 가능한 오브젝트
-/// 플레이어가 근처에서 E키를 누르면 해킹 미니게임이 시작됩니다.
+/// - 플레이어가 범위 안에서 E키를 누르면 해킹 미니게임 시작
+/// - 오브젝트 종류에 따라 미니게임과 성공 효과가 다름
 /// </summary>
 public class HackableObject : MonoBehaviour
 {
-    [Header("해킹 오브젝트 타입(기획서 5종)")]
-    public HackableType hackableType;
+    [Header("설정")]
+    [SerializeField] private HackableObjectType objectType; // 이 오브젝트의 종류
+    [SerializeField] private float hackRange = 3f;          // 해킹 가능 범위
 
-    [Header("해킹 설정")]
-    [SerializeField]
-    [Tooltip("해킹 가능한 거리")]
-    private float hackRange = 2f;
+    [Header("사이코 잠식도")]
+    [SerializeField] private float psychoIncreaseOnFail = 50f; // 실패 시 잠식도 증가량
 
-    [SerializeField]
-    [Tooltip("해킹 가능 여부")]
-    private bool canHack = true;
-
-    private Player nearbyPlayer = null;
-    private bool isHacking = false;
-
-    private void OnEnable()
-    {
-        // ✅ 미니게임 결과를 구독 (미니게임/오브젝트 완전 분리)
-        HackingSystem.OnHackSuccess += HandleHackSuccess;
-        HackingSystem.OnHackFail += HandleHackFail;
-    }
-
-    private void OnDisable()
-    {
-        HackingSystem.OnHackSuccess -= HandleHackSuccess;
-        HackingSystem.OnHackFail -= HandleHackFail;
-    }
+    private bool canHack = false;    // 플레이어가 범위 안에 있는지
+    private bool isHacked = false;   // 이미 해킹 완료됐는지
 
     private void Update()
     {
-        if (isHacking) return;
+        if (isHacked) return;
 
         CheckForPlayer();
 
-        if (nearbyPlayer != null && Input.GetKeyDown(KeyCode.E))
+        if (canHack && Input.GetKeyDown(KeyCode.E))
         {
             StartHacking();
         }
@@ -48,76 +31,92 @@ public class HackableObject : MonoBehaviour
 
     private void CheckForPlayer()
     {
-        GameObject playerObj = GameObject.FindWithTag("Player");
-        if (playerObj == null)
-        {
-            nearbyPlayer = null;
-            return;
-        }
+        var player = FindObjectOfType<Player>();
+        if (player == null) { canHack = false; return; }
 
-        Player player = playerObj.GetComponent<Player>();
-        if (player == null)
-        {
-            nearbyPlayer = null;
-            return;
-        }
-
-        float distance = Vector3.Distance(transform.position, playerObj.transform.position);
-        nearbyPlayer = (distance <= hackRange) ? player : null;
+        float dist = Vector2.Distance(transform.position, player.transform.position);
+        canHack = dist <= hackRange;
     }
 
     private void StartHacking()
     {
-        if (!canHack || nearbyPlayer == null) return;
-
-        isHacking = true;
-
-        if (HackingSystem.Instance != null)
+        if (HackingSystem.Instance == null)
         {
-            HackingSystem.Instance.StartHacking(this, nearbyPlayer);
+            Debug.LogWarning("[HackableObject] HackingSystem 인스턴스가 없습니다!");
+            return;
         }
+
+        if (HackingSystem.Instance.IsHacking) return;
+
+        HackingSystem.Instance.StartHacking(
+            objectType,
+            OnHackingSuccess,
+            OnHackingFailed
+        );
+    }
+
+    private void OnHackingSuccess()
+    {
+        isHacked = true;
+        Debug.Log($"[HackableObject] {objectType} 해킹 성공! 효과 발동!");
+        ActivateEffect();
+    }
+
+    private void OnHackingFailed()
+    {
+        Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
+
+        var player = FindObjectOfType<Player>();
+        if (player != null)
+            player.AddPsychoCorruption(psychoIncreaseOnFail);
     }
 
     /// <summary>
-    /// 미니게임 성공 이벤트 핸들러
+    /// 오브젝트 종류별 성공 효과
     /// </summary>
-    private void HandleHackSuccess(HackableObject obj)
+    private void ActivateEffect()
     {
-        // ✅ "나"가 해킹 성공한 경우만 처리
-        if (obj != this) return;
-
-        if (HackingObjectRewardSystem.Instance != null)
+        switch (objectType)
         {
-            HackingObjectRewardSystem.Instance.ApplyObjectReward(this);
+            case HackableObjectType.SecurityTurret:
+                // 보안 터렛 활성화 → 가장 가까운 적 연사
+                Debug.Log("[Effect] 보안 터렛 활성화!");
+                // TODO: 터렛 활성화 로직 연결
+                break;
+
+            case HackableObjectType.ElectricFence:
+                // 전기 울타리 생성
+                Debug.Log("[Effect] 전기 울타리 생성!");
+                // TODO: 울타리 생성 로직 연결
+                break;
+
+            case HackableObjectType.SatelliteUplink:
+                // 레이저 빔 소사
+                Debug.Log("[Effect] 새틀라이트 레이저 발동!");
+                // TODO: 레이저 소사 로직 연결
+                break;
+
+            case HackableObjectType.SynapseServer:
+                // 적 절반 아군화
+                Debug.Log("[Effect] 적 절반 아군화!");
+                // TODO: 적 아군화 로직 연결
+                break;
+
+            case HackableObjectType.MagneticBeacon:
+                // 적 전체 우측으로 견인
+                Debug.Log("[Effect] 마그네틱 비컨 발동 - 적 견인!");
+                // TODO: 적 견인 로직 연결
+                break;
         }
-        else
-        {
-            Debug.LogWarning("[HackableObject] HackingObjectRewardSystem이 씬에 없습니다!");
-        }
+
+        // 오브젝트 제거 또는 비활성화
+        gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// 미니게임 실패 이벤트 핸들러
-    /// </summary>
-    private void HandleHackFail(HackableObject obj)
-    {
-        if (obj != this) return;
-
-        // 실패 시 오브젝트가 잠김/폭발/재시도 불가 같은 정책을 두고 싶으면 여기서 처리
-        // Debug.Log($"[HackableObject] 해킹 실패: {name}");
-    }
-
-    /// <summary>
-    /// 해킹 종료 (성공/실패 모두)
-    /// </summary>
-    public void OnHackingEnded()
-    {
-        isHacking = false;
-    }
-
+    // 에디터에서 범위 시각화
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, hackRange);
     }
 }

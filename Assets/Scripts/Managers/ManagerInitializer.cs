@@ -37,11 +37,11 @@ public class ManagerInitializer : MonoBehaviour
             Debug.Log("[ManagerInitializer] HackingSystem GameObject 생성");
         }
 
-        if (hackingSystemObj.GetComponent<HackingSystem>() == null)
+        /*if (hackingSystemObj.GetComponent<HackingSystem>() == null)
         {
             hackingSystemObj.AddComponent<HackingSystem>();
             Debug.Log("[ManagerInitializer] HackingSystem 컴포넌트 추가");
-        }
+        }*/
 
         // DataManager 찾기 또는 생성
         GameObject dataManagerObj = GameObject.Find("DataManager");

@@ -11,13 +11,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/lhsScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainScene.unity
     guid: 5e531615818f6d34aae6bcbe641e5047
   - enabled: 1
     path: Assets/Scenes/multiScene.unity
     guid: 1c81409446a072542945757d6569f0cf
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Trick2Scene.unity
     guid: 7bd5d323f0356cc4f99fa89238211862
   - enabled: 1

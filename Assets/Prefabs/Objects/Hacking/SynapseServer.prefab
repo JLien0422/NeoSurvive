@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1682296060489180762}
   - component: {fileID: 1344128876408612651}
   - component: {fileID: 2314476663573713900}
+  - component: {fileID: -194777118797684755}
   m_Layer: 0
   m_Name: SynapseServer
   m_TagString: Untagged
@@ -100,3 +101,16 @@ MonoBehaviour:
   objectType: 3
   hackRange: 3
   psychoIncreaseOnFail: 50
+--- !u!114 &-194777118797684755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7673452506235421434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8425b1523f5314bbacef83d89f3139, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frenzyDuration: 10

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1444267602562184458}
   - component: {fileID: 5990718726868602435}
   - component: {fileID: 7819028749397825287}
+  - component: {fileID: 3367926092177352855}
   m_Layer: 0
   m_Name: MagneticBeacon
   m_TagString: Untagged
@@ -100,3 +101,17 @@ MonoBehaviour:
   objectType: 4
   hackRange: 3
   psychoIncreaseOnFail: 50
+--- !u!114 &3367926092177352855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6535094812701155988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68d3fb30d5b14c8469aaa8c74655d962, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pullSpeed: 20
+  pullDuration: 3

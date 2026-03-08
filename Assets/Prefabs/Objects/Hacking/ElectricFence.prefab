@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9056082289683587538}
   - component: {fileID: 1036543103066905220}
   - component: {fileID: 5495711543161232812}
+  - component: {fileID: 3019452522130807443}
   m_Layer: 0
   m_Name: ElectricFence
   m_TagString: Untagged
@@ -100,3 +101,21 @@ MonoBehaviour:
   objectType: 1
   hackRange: 3
   psychoIncreaseOnFail: 50
+--- !u!114 &3019452522130807443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733874190501676579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8488efb1f3a39b49bac46e9cba39b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fenceSize: 6
+  fenceHeight: 0.3
+  duration: 8
+  damagePerSecond: 15
+  damageInterval: 0.5
+  fenceColor: {r: 0.2, g: 0.8, b: 1, a: 0.8}

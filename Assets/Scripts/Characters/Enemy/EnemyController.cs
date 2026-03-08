@@ -335,6 +335,13 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
+    // 마그네틱 비컨 등 외부 강제 견인 중이면 AI 이동 무시하고 pullVelocity 적용
+    if (statusFlags != null && statusFlags.isPulled)
+    {
+      if (rb != null) rb.velocity = statusFlags.pullVelocity;
+      return;
+    }
+
     // (추가) 속박/기절 등 이동 불가면 즉시 정지
     if (statusFlags != null && statusFlags.moveBlocked)
     {

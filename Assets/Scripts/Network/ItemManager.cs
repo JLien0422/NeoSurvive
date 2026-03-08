@@ -12,7 +12,8 @@ namespace NeoSurvive.Network
   {
     public static ItemManager Instance { get; private set; }
 
-    private static Sprite fallbackSprite;
+    // static이면 에디터 플레이 재시작 시 초기화가 안 되는 문제가 있으므로 인스턴스 필드로 선언
+    private Sprite fallbackSprite;
 
     [Header("Prefab Settings")]
     [SerializeField] private List<ItemPrefabMapping> itemPrefabs;

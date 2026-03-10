@@ -17,25 +17,60 @@ public class HackableObject : MonoBehaviour
     private bool canHack = false;    // 플레이어가 범위 안에 있는지
     private bool isHacked = false;   // 이미 해킹 완료됐는지
 
+    // 플레이어 캐시 (FindObjectOfType 매 프레임 호출 방지)
+    private Player cachedPlayer;
+    private float playerSearchTimer = 0f;
+    private const float PlayerSearchInterval = 1f; // 1초마다 재탐색
+
+    // 거리 검사 주기 타이머 (매 프레임 대신 0.1초마다)
+    private float checkTimer = 0f;
+    private const float CheckInterval = 0.1f;
+
     private void Update()
     {
         if (isHacked) return;
 
-        CheckForPlayer();
-
+        // E키 입력은 매 프레임 감지 (입력 누락 방지)
         if (canHack && Input.GetKeyDown(KeyCode.E))
         {
             StartHacking();
+            return;
         }
+
+        // 거리 검사는 0.1초마다만 수행
+        checkTimer += Time.deltaTime;
+        if (checkTimer < CheckInterval) return;
+        checkTimer = 0f;
+
+        CheckForPlayer();
     }
 
     private void CheckForPlayer()
     {
-        var player = FindObjectOfType<Player>();
-        if (player == null) { canHack = false; return; }
+        // 플레이어 캐시 갱신 (1초마다 또는 캐시가 없을 때)
+        playerSearchTimer += CheckInterval;
+        if (cachedPlayer == null || playerSearchTimer >= PlayerSearchInterval)
+        {
+            playerSearchTimer = 0f;
+            cachedPlayer = FindLocalPlayer();
+        }
 
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-        canHack = dist <= hackRange;
+        if (cachedPlayer == null) { canHack = false; return; }
+
+        // sqrMagnitude로 제곱근 연산 없이 거리 비교
+        float sqrDist = (transform.position - cachedPlayer.transform.position).sqrMagnitude;
+        canHack = sqrDist <= hackRange * hackRange;
+    }
+
+    /// <summary>
+    /// 로컬 플레이어를 찾습니다. (싱글플레이 또는 로컬 플레이어 우선)
+    /// </summary>
+    private Player FindLocalPlayer()
+    {
+        Player[] players = FindObjectsOfType<Player>();
+        foreach (var p in players)
+            if (p.IsLocal) return p;
+        return players.Length > 0 ? players[0] : null;
     }
 
     private void StartHacking()
@@ -68,7 +103,8 @@ public class HackableObject : MonoBehaviour
     {
         Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
 
-        var player = FindObjectOfType<Player>();
+        // 캐시된 플레이어 우선 사용, 없으면 재탐색
+        Player player = cachedPlayer != null ? cachedPlayer : FindLocalPlayer();
         if (player != null)
             player.AddPsychoCorruption(psychoIncreaseOnFail);
     }

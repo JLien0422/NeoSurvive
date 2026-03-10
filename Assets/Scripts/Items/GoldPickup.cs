@@ -2,52 +2,51 @@ using UnityEngine;
 using NeoSurvive.Network;
 using NeoSurvive.Network.Protocol;
 
-// 이 스크립트는 플레이어가 수집할 수 있는 골드 아이템을 처리합니다.
-// 이 스크립트가 붙은 오브젝트에는 반드시 isTrigger가 활성화된 Collider2D가 있어야 합니다.
-[RequireComponent(typeof(Collider2D))]
-public class GoldPickup : MonoBehaviour
+/// <summary>
+/// 골드 픽업 아이템
+/// OnTriggerEnter2D 대신 DistanceManager의 거리기반 픽업 시스템을 사용합니다.
+/// </summary>
+public class GoldPickup : MonoBehaviour, IPickupable
 {
-    // 이 골드 아이템이 담고 있는 골드의 양입니다.
-    [SerializeField]
-    private int goldAmount = 10;
+    [SerializeField] private int goldAmount = 10;
+    [SerializeField] private float pickupRange = 0.5f; // 픽업 판정 반경
 
-    // 이 오브젝트의 콜라이더에 다른 콜라이더가 들어왔을 때 호출되는 메서드입니다. (isTrigger 필요)
-    private void OnTriggerEnter2D(Collider2D other)
+    // IPickupable 구현
+    public Transform Transform => transform;
+    public float PickupRange => pickupRange;
+
+    private void OnEnable()
     {
-        // 충돌한 오브젝트의 태그가 "Player"인지 확인합니다.
-        if (other.CompareTag("Player"))
-        {
-            Player player = other.GetComponent<Player>();
-            if (player != null && player.IsLocal && UDPClient.Instance != null)
-            {
-                var networkItem = GetComponent<NetworkItem>();
-                if (networkItem != null)
-                {
-                    UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
-                }
-            }
-
-            // GameManager의 인스턴스를 통해 골드를 추가합니다.
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.AddGold(goldAmount);
-            }
-
-            // 골드를 획득했으므로, 이 게임 오브젝트를 파괴합니다.
-            Destroy(gameObject);
-        }
+        // 스폰 시 DistanceManager에 등록
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Register(this);
     }
 
-    // 컴포넌트가 추가되거나 리셋될 때 호출됩니다.
-    // 콜라이더가 isTrigger로 설정되도록 보장합니다.
-    private void Reset()
+    private void OnDisable()
     {
-        // 모든 Collider2D 타입의 컴포넌트를 가져옵니다.
-        Collider2D[] colliders = GetComponents<Collider2D>();
-        foreach (var col in colliders)
+        // 비활성화/소멸 시 등록 해제
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Unregister(this);
+    }
+
+    /// <summary>
+    /// DistanceManager가 범위 이내 진입 시 호출합니다.
+    /// </summary>
+    public void Pickup(Player player)
+    {
+        if (player == null) return;
+
+        // 멀티플레이: 로컬 플레이어만 서버에 픽업 전송
+        if (player.IsLocal && UDPClient.Instance != null)
         {
-            // isTrigger를 true로 설정합니다.
-            col.isTrigger = true;
+            var networkItem = GetComponent<NetworkItem>();
+            if (networkItem != null)
+                UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
         }
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.AddGold(goldAmount);
+
+        Destroy(gameObject);
     }
 }

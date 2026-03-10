@@ -11,8 +11,9 @@ using NeoSurvive.Buff;
 public class MagneticBeaconEffect : MonoBehaviour
 {
     [Header("견인 설정")]
-    [SerializeField] private float pullSpeed    = 20f;  // 적 견인 속도
-    [SerializeField] private float pullDuration = 3f;   // 견인 지속 시간 (초)
+    [SerializeField] private float pullSpeed     = 20f;  // 적 견인 속도
+    [SerializeField] private float pullDuration  = 3f;   // 견인 지속 시간 (초)
+    [SerializeField] private float gatherOffset  = 3f;   // 플레이어 기준 집결 지점 우측 거리
 
     /// <summary>
     /// 외부(HackableObject)에서 호출하여 효과를 시작합니다.
@@ -29,11 +30,8 @@ public class MagneticBeaconEffect : MonoBehaviour
     /// </summary>
     private IEnumerator PullAllEnemiesToRight()
     {
-        // 우측 끝 좌표 계산 (카메라 기준 화면 오른쪽 밖)
-        Camera cam = Camera.main;
-        float rightEdgeX = cam != null
-            ? cam.transform.position.x + cam.orthographicSize * cam.aspect + 2f
-            : 20f;
+        // 플레이어 찾기
+        Player player = FindObjectOfType<Player>();
 
         // 견인 시작 시점 스냅샷 + StatusFlags 수집
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -55,15 +53,20 @@ public class MagneticBeaconEffect : MonoBehaviour
         {
             elapsed += Time.deltaTime;
 
+            // 집결 지점: 플레이어 오른쪽 gatherOffset 거리의 한 점
+            // 플레이어가 없으면 이 오브젝트 위치 기준
+            Vector2 gatherPoint = player != null
+                ? (Vector2)player.transform.position + Vector2.right * gatherOffset
+                : (Vector2)transform.position + Vector2.right * gatherOffset;
+
             // 매 프레임 각 적의 pullVelocity를 갱신
+            // 모든 적이 동일한 한 점을 향해 이동 → 한곳에 뭉침
             for (int i = 0; i < enemies.Length; i++)
             {
                 GameObject enemy = enemies[i];
                 if (enemy == null) continue;
 
-                Vector2 targetPos = new Vector2(rightEdgeX, enemy.transform.position.y);
-                Vector2 direction = (targetPos - (Vector2)enemy.transform.position).normalized;
-
+                Vector2 direction = (gatherPoint - (Vector2)enemy.transform.position).normalized;
                 pulledFlags[i].pullVelocity = direction * pullSpeed;
             }
 

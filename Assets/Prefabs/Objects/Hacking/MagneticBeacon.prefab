@@ -113,5 +113,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68d3fb30d5b14c8469aaa8c74655d962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pullSpeed: 20
-  pullDuration: 3
+  pullSpeed: 10
+  pullDuration: 5
+  gatherOffset: 5

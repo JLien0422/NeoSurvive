@@ -60,10 +60,19 @@ public class RusherMechanism : EnemyMechanismBase
     {
         if (target == null || rb == null) return;
 
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        // sqrMagnitude로 제곱근 없이 범위 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        // 가속도 계산에 실제 거리가 필요하므로 sqrt는 isRushing일 때만 계산
+        float distanceToTarget = isRushing ? Mathf.Sqrt(sqrDist) : 0f;
+
+        if (sqrDist <= rushStartDistance * rushStartDistance && !isRushing)
+        {
+            // 돌진 시작 시 실제 거리 계산
+            distanceToTarget = Mathf.Sqrt(sqrDist);
+        }
 
         // 돌진 시작 거리 내에 들어오면 돌진 시작
-        if (distanceToTarget <= rushStartDistance && !isRushing)
+        if (sqrDist <= rushStartDistance * rushStartDistance && !isRushing)
         {
             isRushing = true;
             rushStartTime = Time.time;

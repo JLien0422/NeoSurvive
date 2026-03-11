@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8756004877401260071}
   - component: {fileID: 1344407613691239615}
   - component: {fileID: 7107651717142692319}
+  - component: {fileID: -3545826014329309355}
   m_Layer: 0
   m_Name: SatelliteUplink
   m_TagString: Untagged
@@ -100,3 +101,22 @@ MonoBehaviour:
   objectType: 2
   hackRange: 3
   psychoIncreaseOnFail: 50
+--- !u!114 &-3545826014329309355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7066193471567558125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c0d16972e5d200499a8a57d201556d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trackSpeed: 300
+  orbitRadius: 4
+  damagePerHit: 30
+  hitInterval: 0.1
+  duration: 10
+  laserWidth: 0.5
+  laserColor: {r: 0, g: 1, b: 1, a: 1}

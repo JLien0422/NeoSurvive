@@ -112,7 +112,7 @@ MonoBehaviour:
   goldPrefab: {fileID: 3685682062815620704, guid: 2baeafa9ce2c02845bdb279e1b8b119d, type: 3}
   psychoCorruptionDropChance: 0
   psychoCorruptionItemPrefab: {fileID: 3578716422610288139, guid: c0ecf175a70ae3e45aef2d979af4ace8, type: 3}
-  dataChipDropChance: 100
+  dataChipDropChance: 5
   dataChipPrefab: {fileID: 3803576962990758274, guid: 46f1d8c40194faa4c96b7ff6f5f08283, type: 3}
 --- !u!114 &7404905573131128288
 MonoBehaviour:

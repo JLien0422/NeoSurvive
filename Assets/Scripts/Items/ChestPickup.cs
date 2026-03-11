@@ -3,32 +3,49 @@ using System;
 using NeoSurvive.Network;
 using NeoSurvive.Network.Protocol;
 
-public class ChestPickup : MonoBehaviour
+/// <summary>
+/// 상자 픽업 - 획득 시 무기 선택 UI 표시
+/// OnTriggerEnter2D 대신 DistanceManager의 거리기반 픽업 시스템을 사용합니다.
+/// </summary>
+public class ChestPickup : MonoBehaviour, IPickupable
 {
     public static event Action OnChestOpened; // UIManager가 구독하는 이벤트
+
+    [SerializeField] private float pickupRange = 0.6f; // 상자는 픽업 범위 약간 크게
+
+    // IPickupable 구현
+    public Transform Transform => transform;
+    public float PickupRange => pickupRange;
 
     private bool opened = false;
 
     private void OnEnable()
     {
         Debug.Log("[ChestPickup] OnEnable");
+        // 스폰 시 DistanceManager에 등록
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Register(this);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnDisable()
     {
-        Debug.Log($"[ChestPickup] Enter: {other.name}, tag={other.tag}");
+        // 비활성화/소멸 시 등록 해제
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Unregister(this);
+    }
 
-        if (opened) return;
-        if (!other.CompareTag("Player")) return;
+    /// <summary>
+    /// DistanceManager가 범위 이내 진입 시 호출합니다.
+    /// </summary>
+    public void Pickup(Player player)
+    {
+        if (opened || player == null) return;
 
-        Player player = other.GetComponent<Player>();
-        if (player != null && player.IsLocal && UDPClient.Instance != null)
+        if (player.IsLocal && UDPClient.Instance != null)
         {
             var networkItem = GetComponent<NetworkItem>();
             if (networkItem != null)
-            {
                 UDPClient.Instance.SendAction(ActionType.ObjectInteract, networkItem.ItemId);
-            }
         }
 
         opened = true;
@@ -38,8 +55,7 @@ public class ChestPickup : MonoBehaviour
     private void Open()
     {
         Debug.Log("🎁 Chest Opened!");
-
-        OnChestOpened?.Invoke();   // UIManager로 이벤트 전달
-        Destroy(gameObject);       // 즉시 사라짐 (ExpOrb 느낌)
+        OnChestOpened?.Invoke();
+        Destroy(gameObject);
     }
 }

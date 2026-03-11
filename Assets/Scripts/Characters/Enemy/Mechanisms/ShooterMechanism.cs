@@ -55,13 +55,13 @@ public class ShooterMechanism : EnemyMechanismBase
 
     public override void UpdateMovement()
     {
-        // 일반 Enemy처럼 이동 (기본 이동 로직 사용)
         if (target == null || rb == null) return;
 
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        float sqrRange = extendedAttackRange * extendedAttackRange;
 
-        // 확장된 공격 범위 밖에 있으면 이동
-        if (distanceToTarget > extendedAttackRange)
+        if (sqrDist > sqrRange)
         {
             Vector2 direction = (target.position - transform.position).normalized;
             float moveSpeed = controller != null ? controller.GetMoveSpeed() : 3f;
@@ -69,7 +69,6 @@ public class ShooterMechanism : EnemyMechanismBase
         }
         else
         {
-            // 공격 범위 내에 있으면 정지
             rb.velocity = Vector2.zero;
         }
     }
@@ -90,10 +89,11 @@ public class ShooterMechanism : EnemyMechanismBase
             return;
         }
 
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        float sqrRange = extendedAttackRange * extendedAttackRange;
 
-        // 확장된 공격 범위 내에 있고, 공격 주기가 지났으면 투사체 발사
-        if (distanceToTarget <= extendedAttackRange && Time.time - lastAttackTime >= attackInterval)
+        if (sqrDist <= sqrRange && Time.time - lastAttackTime >= attackInterval)
         {
             Shoot();
             lastAttackTime = Time.time;

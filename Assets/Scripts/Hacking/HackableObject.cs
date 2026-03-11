@@ -17,25 +17,60 @@ public class HackableObject : MonoBehaviour
     private bool canHack = false;    // 플레이어가 범위 안에 있는지
     private bool isHacked = false;   // 이미 해킹 완료됐는지
 
+    // 플레이어 캐시 (FindObjectOfType 매 프레임 호출 방지)
+    private Player cachedPlayer;
+    private float playerSearchTimer = 0f;
+    private const float PlayerSearchInterval = 1f; // 1초마다 재탐색
+
+    // 거리 검사 주기 타이머 (매 프레임 대신 0.1초마다)
+    private float checkTimer = 0f;
+    private const float CheckInterval = 0.1f;
+
     private void Update()
     {
         if (isHacked) return;
 
-        CheckForPlayer();
-
+        // E키 입력은 매 프레임 감지 (입력 누락 방지)
         if (canHack && Input.GetKeyDown(KeyCode.E))
         {
             StartHacking();
+            return;
         }
+
+        // 거리 검사는 0.1초마다만 수행
+        checkTimer += Time.deltaTime;
+        if (checkTimer < CheckInterval) return;
+        checkTimer = 0f;
+
+        CheckForPlayer();
     }
 
     private void CheckForPlayer()
     {
-        var player = FindObjectOfType<Player>();
-        if (player == null) { canHack = false; return; }
+        // 플레이어 캐시 갱신 (1초마다 또는 캐시가 없을 때)
+        playerSearchTimer += CheckInterval;
+        if (cachedPlayer == null || playerSearchTimer >= PlayerSearchInterval)
+        {
+            playerSearchTimer = 0f;
+            cachedPlayer = FindLocalPlayer();
+        }
 
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-        canHack = dist <= hackRange;
+        if (cachedPlayer == null) { canHack = false; return; }
+
+        // sqrMagnitude로 제곱근 연산 없이 거리 비교
+        float sqrDist = (transform.position - cachedPlayer.transform.position).sqrMagnitude;
+        canHack = sqrDist <= hackRange * hackRange;
+    }
+
+    /// <summary>
+    /// 로컬 플레이어를 찾습니다. (싱글플레이 또는 로컬 플레이어 우선)
+    /// </summary>
+    private Player FindLocalPlayer()
+    {
+        Player[] players = FindObjectsOfType<Player>();
+        foreach (var p in players)
+            if (p.IsLocal) return p;
+        return players.Length > 0 ? players[0] : null;
     }
 
     private void StartHacking()
@@ -48,10 +83,12 @@ public class HackableObject : MonoBehaviour
 
         if (HackingSystem.Instance.IsHacking) return;
 
+        // 이 오브젝트의 월드 좌표를 전달하여 사이보그 수비 원 위치에 사용
         HackingSystem.Instance.StartHacking(
             objectType,
             OnHackingSuccess,
-            OnHackingFailed
+            OnHackingFailed,
+            transform.position
         );
     }
 
@@ -66,51 +103,103 @@ public class HackableObject : MonoBehaviour
     {
         Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
 
-        var player = FindObjectOfType<Player>();
+        // 캐시된 플레이어 우선 사용, 없으면 재탐색
+        Player player = cachedPlayer != null ? cachedPlayer : FindLocalPlayer();
         if (player != null)
             player.AddPsychoCorruption(psychoIncreaseOnFail);
     }
 
     /// <summary>
-    /// 오브젝트 종류별 성공 효과
+    /// 오브젝트 종류별 성공 효과 발동
+    ///
+    /// [프리팹 파라미터 편집 방법]
+    /// 각 HackableObject 프리팹에 해당하는 효과 스크립트를 직접 붙여두면
+    /// 인스펙터에서 duration, damage 등 파라미터를 바로 수정할 수 있습니다.
+    ///   - 전기울타리 프리팹  → ElectricFenceEffect 컴포넌트 추가
+    ///   - 위성통신 프리팹    → SatelliteUplinkEffect 컴포넌트 추가
+    ///   - 시냅스서버 프리팹  → SynapseServerEffect 컴포넌트 추가
+    ///   - 마그네틱비컨 프리팹→ MagneticBeaconEffect 컴포넌트 추가
+    ///   - 보안터렛 프리팹    → SecurityTurretEffect 컴포넌트 추가
+    ///
+    /// 컴포넌트가 없으면 기본값으로 자동 추가됩니다(하위 호환).
+    ///
+    /// GameObject.SetActive(false) 대신 시각 컴포넌트만 끄기 때문에
+    /// 효과 코루틴이 같은 GameObject 위에서 계속 실행됩니다.
     /// </summary>
     private void ActivateEffect()
     {
         switch (objectType)
         {
             case HackableObjectType.SecurityTurret:
-                // 보안 터렛 활성화 → 가장 가까운 적 연사
+            {
                 Debug.Log("[Effect] 보안 터렛 활성화!");
-                // TODO: 터렛 활성화 로직 연결
+                var turret = GetComponent<SecurityTurretEffect>()
+                             ?? gameObject.AddComponent<SecurityTurretEffect>();
+                turret.Activate();
                 break;
+            }
 
             case HackableObjectType.ElectricFence:
-                // 전기 울타리 생성
+            {
                 Debug.Log("[Effect] 전기 울타리 생성!");
-                // TODO: 울타리 생성 로직 연결
+                var fence = GetComponent<ElectricFenceEffect>()
+                            ?? gameObject.AddComponent<ElectricFenceEffect>();
+                fence.Activate();
                 break;
+            }
 
             case HackableObjectType.SatelliteUplink:
-                // 레이저 빔 소사
+            {
                 Debug.Log("[Effect] 새틀라이트 레이저 발동!");
-                // TODO: 레이저 소사 로직 연결
+                var satellite = GetComponent<SatelliteUplinkEffect>()
+                                ?? gameObject.AddComponent<SatelliteUplinkEffect>();
+                satellite.Activate();
                 break;
+            }
 
             case HackableObjectType.SynapseServer:
-                // 적 절반 아군화
+            {
                 Debug.Log("[Effect] 적 절반 아군화!");
-                // TODO: 적 아군화 로직 연결
+                var synapse = GetComponent<SynapseServerEffect>()
+                              ?? gameObject.AddComponent<SynapseServerEffect>();
+                synapse.Activate();
                 break;
+            }
 
             case HackableObjectType.MagneticBeacon:
-                // 적 전체 우측으로 견인
+            {
                 Debug.Log("[Effect] 마그네틱 비컨 발동 - 적 견인!");
-                // TODO: 적 견인 로직 연결
+                var beacon = GetComponent<MagneticBeaconEffect>()
+                             ?? gameObject.AddComponent<MagneticBeaconEffect>();
+                beacon.Activate();
                 break;
+            }
+
+            default:
+                return;
         }
 
-        // 오브젝트 제거 또는 비활성화
-        gameObject.SetActive(false);
+        // SetActive(false) 대신 시각/물리 컴포넌트만 비활성화
+        // → 효과 코루틴이 같은 GameObject에서 계속 실행됨
+        HideVisuals();
+    }
+
+    /// <summary>
+    /// 해킹 완료 후 오브젝트의 시각적 요소와 상호작용을 비활성화합니다.
+    /// GameObject 자체는 살려두어 효과 코루틴이 정상 동작하도록 합니다.
+    /// </summary>
+    private void HideVisuals()
+    {
+        // 스프라이트 숨김
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null) sr.enabled = false;
+
+        // 콜라이더 비활성화 (재해킹 방지)
+        foreach (var col in GetComponents<Collider2D>())
+            col.enabled = false;
+
+        // HackableObject 스크립트 자체 비활성화 (Update 중단)
+        this.enabled = false;
     }
 
     // 에디터에서 범위 시각화

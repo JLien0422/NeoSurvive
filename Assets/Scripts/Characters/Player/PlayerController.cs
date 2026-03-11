@@ -13,10 +13,17 @@ public class PlayerController : MonoBehaviour
     // 플레이어의 입력을 저장할 변수입니다.
     private Vector2 moveInput;
 
+    // 애니메이션 및 스프라이트 관련 컴포넌트
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
+    // Animator 파라미터 해시 (문자열 대신 해시 사용 → 성능 최적화)
+    private static readonly int IsMovingHash = Animator.StringToHash("isMoving");
+
     // 해킹 중 고정 상태 (이동 불가)
     private bool isLockedDown = false;
     public bool IsLockedDown => isLockedDown;
-    private StatusFlags statusFlags; // (추가)
+    private StatusFlags statusFlags;
 
     public Animator animator;
 
@@ -40,16 +47,19 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         // Rigidbody2D 컴포넌트가 없다면, 하나 추가해줍니다.
-        // 이는 물리 시스템과의 상호작용을 위해 필요합니다.
         if (rb == null)
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0; // 2D 탑다운 게임에서는 중력이 필요 없습니다.
         }
 
+        // 애니메이션 컴포넌트 초기화 (없어도 오류 없이 동작)
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
         // 버프/디버프 관련 초기화
-        statusFlags = GetComponent<StatusFlags>(); // (추가)
-        if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
+        statusFlags = GetComponent<StatusFlags>();
+        if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>();
     }
 
     // 매 프레임마다 호출됩니다. 입력 처리에 적합합니다.
@@ -95,6 +105,25 @@ public class PlayerController : MonoBehaviour
             // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.
             moveInput = new Vector2(moveX, moveY).normalized;
         }
+
+        // 이동 입력에 따라 애니메이션 및 스프라이트 방향 갱신
+        UpdateAnimation();
+    }
+
+    /// <summary>
+    /// 이동 상태에 따라 Animator 파라미터와 스프라이트 좌우 반전을 갱신합니다.
+    /// </summary>
+    private void UpdateAnimation()
+    {
+        bool isMoving = moveInput.sqrMagnitude > 0f;
+
+        // Animator가 있을 때만 파라미터 설정 (없어도 오류 없이 동작)
+        if (animator != null)
+            animator.SetBool(IsMovingHash, isMoving);
+
+        // 수평 입력이 있을 때만 flipX 갱신 (수직 이동만 할 때 방향 유지)
+        if (spriteRenderer != null && Mathf.Abs(moveInput.x) > 0.01f)
+            spriteRenderer.flipX = moveInput.x < 0f;
     }
 
     /// <summary>

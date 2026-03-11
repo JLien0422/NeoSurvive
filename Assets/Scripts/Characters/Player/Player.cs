@@ -100,9 +100,6 @@ public class Player : Character
   // 공격 범위
   [SerializeField]
   private Stat attackRange = new Stat(3f);
-  // 기본 공격 주기 (초)
-  [SerializeField]
-  private float baseAttackInterval = 1.0f;
   // 공격 속도 (1.0 = 100%)
   [SerializeField]
   private Stat attackSpeed = new Stat(1.0f);

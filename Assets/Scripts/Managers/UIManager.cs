@@ -505,6 +505,12 @@ public class UIManager : MonoBehaviour
       return; // 옵션이 꺼져 있으면 표시하지 않음
     }
 
+    // 해킹 미니게임 진행 중이면 데미지 텍스트를 표시하지 않음
+    if (HackingSystem.Instance != null && HackingSystem.Instance.IsHacking)
+    {
+      return;
+    }
+
     if (damageTextPrefab == null || weaponUIPanel == null) return;
 
     // 월드 좌표를 스크린 좌표로 변환

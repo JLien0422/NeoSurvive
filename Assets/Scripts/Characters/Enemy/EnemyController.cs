@@ -171,10 +171,10 @@ public class EnemyController : MonoBehaviour
     Transform closest = null;
     float closestDist = float.MaxValue;
 
-    // 플레이어 거리 체크
+    // 플레이어 거리 체크 (sqrMagnitude로 제곱근 없이 비교)
     if (playerObj != null)
     {
-      float d = Vector2.Distance(transform.position, playerObj.transform.position);
+      float d = (transform.position - playerObj.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -187,7 +187,7 @@ public class EnemyController : MonoBehaviour
     {
       foreach (var decoy in decoys)
       {
-        float d = Vector2.Distance(transform.position, decoy.transform.position);
+        float d = (transform.position - decoy.transform.position).sqrMagnitude;
         if (d < closestDist)
         {
           closestDist = d;
@@ -217,7 +217,7 @@ public class EnemyController : MonoBehaviour
       if (e == null) continue;
       if (e == gameObject) continue; // 자기 자신 제외
 
-      float d = Vector2.Distance(transform.position, e.transform.position);
+      float d = (transform.position - e.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -314,18 +314,16 @@ public class EnemyController : MonoBehaviour
 
       if (target != null)
       {
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
 
-        if (distanceToTarget <= attackRange)
+        if (sqrDist <= attackRange * attackRange)
         {
-          // 대상이 Character(Player, Enemy, Decoy)인지 확인
           if (target.TryGetComponent<Character>(out var character))
           {
-            // (추가) 데미지 버프/디버프(가하는 피해) 적용
             float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
             float finalDamage = attackDamage * outMul;
-
-            character.TakeDamage(attackDamage);
+            character.TakeDamage(finalDamage);
           }
         }
       }
@@ -335,6 +333,13 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
+    // 마그네틱 비컨 등 외부 강제 견인 중이면 AI 이동 무시하고 pullVelocity 적용
+    if (statusFlags != null && statusFlags.isPulled)
+    {
+      if (rb != null) rb.velocity = statusFlags.pullVelocity;
+      return;
+    }
+
     // (추가) 속박/기절 등 이동 불가면 즉시 정지
     if (statusFlags != null && statusFlags.moveBlocked)
     {
@@ -353,9 +358,10 @@ public class EnemyController : MonoBehaviour
       // 기본 이동 로직
       if (target != null)
       {
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
 
-        if (distanceToTarget > attackRange)
+        if (sqrDist > attackRange * attackRange)
         {
           Vector2 direction = (target.position - transform.position).normalized;
           rb.velocity = direction * moveSpeed;

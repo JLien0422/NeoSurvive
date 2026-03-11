@@ -16,7 +16,7 @@ public class TankerMechanism : EnemyMechanismBase
     private float healthMultiplier = 2f;
 
     [SerializeField]
-    [Tooltip("공격 범위 배율 (기본보다 넓음)")]
+    [Tooltip("공격 범위 배율 (기본보다 넓음) - EnemyController 공격 판정 시 적용 예정")]
     private float attackRangeMultiplier = 1.5f;
 
     private float baseMoveSpeed;
@@ -31,12 +31,13 @@ public class TankerMechanism : EnemyMechanismBase
         if (controller != null)
         {
             baseMoveSpeed = controller.GetMoveSpeed();
-            baseAttackRange = controller.GetAttackRange();
+            // 탱커 공격 범위는 기본 범위에 배율을 적용하여 계산
+            baseAttackRange = controller.GetAttackRange() * attackRangeMultiplier;
         }
         else
         {
-            baseMoveSpeed = 3f; // 기본값
-            baseAttackRange = 1.5f; // 기본값
+            baseMoveSpeed = 3f;
+            baseAttackRange = 1.5f * attackRangeMultiplier;
         }
         
         // 체력 증가

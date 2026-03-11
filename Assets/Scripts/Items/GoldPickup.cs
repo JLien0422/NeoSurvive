@@ -2,33 +2,50 @@ using UnityEngine;
 using NeoSurvive.Network;
 using NeoSurvive.Network.Protocol;
 
-// 거리 기반 베이스 Item을 상속해 골드 획득 동작만 구현합니다.
-public class GoldPickup : Item
+/// <summary>
+/// 골드 픽업 아이템
+/// OnTriggerEnter2D 대신 DistanceManager의 거리기반 픽업 시스템을 사용합니다.
+/// </summary>
+public class GoldPickup : MonoBehaviour, IPickupable
 {
-    // 이 골드 아이템이 담고 있는 골드의 양입니다.
-    [SerializeField]
-    private int goldAmount = 10;
+    [SerializeField] private int goldAmount = 10;
+    [SerializeField] private float pickupRange = 0.5f; // 픽업 판정 반경
 
-    protected override bool CanBePickedBy(Player player)
+    // IPickupable 구현
+    public Transform Transform => transform;
+    public float PickupRange => pickupRange;
+
+    private void OnEnable()
     {
-        return player != null && player.IsLocal;
+        // 스폰 시 DistanceManager에 등록
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Register(this);
     }
 
-    protected override void OnPicked(Player player)
+    private void OnDisable()
     {
-        if (UDPClient.Instance != null)
+        // 비활성화/소멸 시 등록 해제
+        if (DistanceManager.Instance != null)
+            DistanceManager.Instance.Unregister(this);
+    }
+
+    /// <summary>
+    /// DistanceManager가 범위 이내 진입 시 호출합니다.
+    /// </summary>
+    public void Pickup(Player player)
+    {
+        if (player == null) return;
+
+        // 멀티플레이: 로컬 플레이어만 서버에 픽업 전송
+        if (player.IsLocal && UDPClient.Instance != null)
         {
             var networkItem = GetComponent<NetworkItem>();
             if (networkItem != null)
-            {
                 UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
-            }
         }
 
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.AddGold(goldAmount);
-        }
 
         Destroy(gameObject);
     }

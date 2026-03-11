@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     public bool IsLockedDown => isLockedDown;
     private StatusFlags statusFlags; // (추가)
 
+    public Animator animator;
+
     /// <summary>
     /// 고정 상태 설정 (해킹 중 이동/입력 불가)
     /// </summary>
@@ -94,7 +96,7 @@ public class PlayerController : MonoBehaviour
             moveInput = new Vector2(moveX, moveY).normalized;
         }
     }
-    
+
     /// <summary>
     /// 가장 가까운 적을 찾습니다.
     /// </summary>
@@ -126,11 +128,24 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if (moveInput.x < 0)
+        {
+            // X축 크기를 -1로 만들어서 전체를 반전
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (moveInput.x > 0)
+        {
+            // X축 크기를 1로 만들어서 원상복구
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+
         // Rigidbody의 속도를 변경하여 플레이어를 움직입니다.
         // 이제 Player 스크립트에 있는 최종 계산된 이동 속도(CurrentMoveSpeed)를 사용합니다.
         if (rb != null && player != null)
         {
-            rb.velocity = moveInput * player.CurrentMoveSpeed;
+            Vector2 finalMoveSpeed = moveInput * player.CurrentMoveSpeed;
+            rb.velocity = finalMoveSpeed;
+            animator.SetFloat("moveSpeed", finalMoveSpeed.magnitude); // 애니메이션 속도 매개변수 설정
         }
     }
 }

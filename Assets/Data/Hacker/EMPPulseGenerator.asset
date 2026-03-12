@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponId: 6
   weaponName: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
-  weaponIcon: {fileID: 21300000, guid: edc9e549dbf9ecd40b80290d5c3f6858, type: 3}
+  weaponIcon: {fileID: 21300000, guid: 2345a0e2f51b1f241a862f640f793ac7, type: 3}
   description: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
   weaponPrefab: {fileID: 4312614672909416783, guid: 404086b1bed71e0468d44900519eab58, type: 3}
-  level: 1
+  level: 5
   isIndependent: 0

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9591e5166222aeb4980cd6f6c2a88899
+guid: 218ea8e63e921864d945f47570d063c5
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -45,10 +45,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -69,10 +69,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
+    maxTextureSize: 8192
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -97,127 +97,106 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Character_1p_run_WH32px_0
+      name: AIDrone_Spawn_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 60
+        height: 55
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1f5920f246a3b7f459a3d6bd53c9c88a
-      internalID: 976509669
+      spriteID: fea2172e060db094fa12a1a2f8e9efe2
+      internalID: 133088167
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Character_1p_run_WH32px_1
+      name: AIDrone_Spawn_1
       rect:
         serializedVersion: 2
-        x: 32
+        x: 60
         y: 0
-        width: 32
-        height: 32
+        width: 60
+        height: 55
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ca8f0e8daeeb4444da9feadc353ac3bc
-      internalID: 1065042820
+      spriteID: 732f2543e91490748aaa24ba76e7709f
+      internalID: -2128278974
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Character_1p_run_WH32px_2
+      name: AIDrone_Spawn_2
       rect:
         serializedVersion: 2
-        x: 64
+        x: 120
         y: 0
-        width: 32
-        height: 32
+        width: 60
+        height: 55
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 43980358f12bf784ea90bb10ad60a9b3
-      internalID: 1388140615
+      spriteID: ec970c223fa9c98449892da0cb0edd92
+      internalID: 1096279789
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Character_1p_run_WH32px_3
+      name: AIDrone_Spawn_3
       rect:
         serializedVersion: 2
-        x: 96
+        x: 180
         y: 0
-        width: 32
-        height: 32
+        width: 60
+        height: 55
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: eadb42f58633d8f4db943f8fecd7c4ec
-      internalID: 378630673
+      spriteID: 6035e8c88961c2849b551ed626fd4a51
+      internalID: 637678809
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Character_1p_run_WH32px_4
+      name: AIDrone_Spawn_4
       rect:
         serializedVersion: 2
-        x: 128
+        x: 240
         y: 0
-        width: 32
-        height: 32
+        width: 60
+        height: 55
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4cb074052f0b7514889487eff531b351
-      internalID: 1871520337
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Character_1p_run_WH32px_5
-      rect:
-        serializedVersion: 2
-        x: 160
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 15b47a25eccafdd43851f637ba9ce998
-      internalID: -1945565169
+      spriteID: 94669ef1cc753d54caa9b121c86232df
+      internalID: -2138807559
       vertices: []
       indices: 
       edges: []
@@ -233,12 +212,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Character_1p_run_WH32px_0: 976509669
-      Character_1p_run_WH32px_1: 1065042820
-      Character_1p_run_WH32px_2: 1388140615
-      Character_1p_run_WH32px_3: 378630673
-      Character_1p_run_WH32px_4: 1871520337
-      Character_1p_run_WH32px_5: -1945565169
+      AIDrone_Spawn_0: 133088167
+      AIDrone_Spawn_1: -2128278974
+      AIDrone_Spawn_2: 1096279789
+      AIDrone_Spawn_3: 637678809
+      AIDrone_Spawn_4: -2138807559
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

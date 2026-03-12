@@ -25,8 +25,6 @@ public class PlayerController : MonoBehaviour
     public bool IsLockedDown => isLockedDown;
     private StatusFlags statusFlags;
 
-    public Animator animator;
-
     /// <summary>
     /// 고정 상태 설정 (해킹 중 이동/입력 불가)
     /// </summary>
@@ -105,26 +103,8 @@ public class PlayerController : MonoBehaviour
             // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.
             moveInput = new Vector2(moveX, moveY).normalized;
         }
-
-        // 이동 입력에 따라 애니메이션 및 스프라이트 방향 갱신
-        UpdateAnimation();
     }
 
-    /// <summary>
-    /// 이동 상태에 따라 Animator 파라미터와 스프라이트 좌우 반전을 갱신합니다.
-    /// </summary>
-    private void UpdateAnimation()
-    {
-        bool isMoving = moveInput.sqrMagnitude > 0f;
-
-        // Animator가 있을 때만 파라미터 설정 (없어도 오류 없이 동작)
-        if (animator != null)
-            animator.SetBool(IsMovingHash, isMoving);
-
-        // 수평 입력이 있을 때만 flipX 갱신 (수직 이동만 할 때 방향 유지)
-        if (spriteRenderer != null && Mathf.Abs(moveInput.x) > 0.01f)
-            spriteRenderer.flipX = moveInput.x < 0f;
-    }
 
     /// <summary>
     /// 가장 가까운 적을 찾습니다.

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
-using NeoSurvive.Buff; // (추가)
+using NeoSurvive.Buff;
+using UnityEngine.Profiling; // (추가)
 
 // EnemyController 클래스는 적 캐릭터의 인공지능(AI)과 움직임을 처리합니다.
 // 이 컴포넌트는 Enemy 컴포넌트가 있는 게임 오브젝트에 추가되어야 합니다.
@@ -333,6 +334,7 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
+    Profiler.BeginSample("Enemy_FixedUpdate_Test"); // 프로파일러에 이 이름으로 표시됨
     // 마그네틱 비컨 등 외부 강제 견인 중이면 AI 이동 무시하고 pullVelocity 적용
     if (statusFlags != null && statusFlags.isPulled)
     {
@@ -376,18 +378,19 @@ public class EnemyController : MonoBehaviour
         rb.velocity = Vector2.zero;
       }
     }
+    Profiler.EndSample();
   }
 
 #if UNITY_EDITOR
-    // 에디터에서 감지 범위와 공격 범위를 시각적으로 보여줍니다.
-    private void OnDrawGizmos()
+  // 에디터에서 감지 범위와 공격 범위를 시각적으로 보여줍니다.
+  private void OnDrawGizmos()
+  {
+    if (showGizmos)
     {
-        if (showGizmos)
-        {
-            // 공격 범위 (노란색)
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, attackRange);
-        }
+      // 공격 범위 (노란색)
+      Gizmos.color = Color.yellow;
+      Gizmos.DrawWireSphere(transform.position, attackRange);
     }
+  }
 #endif
 }

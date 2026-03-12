@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponId: 3
   weaponName: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"
-  weaponIcon: {fileID: 21300000, guid: 2f4cfaf950cdea441966ce6234f8bd6b, type: 3}
+  weaponIcon: {fileID: 21300000, guid: 3147f15f68c81034b8e4313f7f1b8da4, type: 3}
   description: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"
   weaponPrefab: {fileID: 4091422144095359421, guid: 8aad8b6a5b94bd2478ae540ba9ad1b8e, type: 3}
-  level: 1
+  level: 5
   isIndependent: 0

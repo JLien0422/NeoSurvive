@@ -1,0 +1,139 @@
+{
+    "traits": [
+        {
+            "id": "hacker_t1_plasma_conduit",
+            "name": "플라즈마 강선",
+            "description": "공격 속도 증가 (무기, 설치류의 투사체 전부 포함)",
+            "tier": 1,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "AttackSpeed", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t1_computation_optimization",
+            "name": "연산 최적화",
+            "description": "쿨타임 감소 (무기의 공격 속도X, 투사체 등 설치 속도 O)",
+            "tier": 1,
+            "maxLevel": 2,
+            "prerequisites": [],
+            "effect": { "stat": "CooldownReduction", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t1_energy_overload",
+            "name": "에너지 과부하",
+            "description": "투사체 공격력 증가",
+            "tier": 1,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "ProjectileDamage", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t2_facility_augmentation",
+            "name": "설비 증강",
+            "description": "무기 유지시간 증가 (설치류 유지 시간 O)",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["hacker_t1_plasma_conduit_max_or_hacker_t1_computation_optimization_max"],
+            "effect": { "stat": "SummonDuration", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t2_radar",
+            "name": "레이더",
+            "description": "투사체 사거리 증가 (무기, 설치류 전부 포함)",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["hacker_t1_plasma_conduit_max_or_hacker_t1_energy_overload_max"],
+            "effect": { "stat": "ProjectileRange", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t2_exoskeleton",
+            "name": "외골격",
+            "description": "이동속도 증가",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["hacker_t1_any_max"],
+            "effect": { "stat": "MoveSpeed", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t2_aoe_expansion",
+            "name": "ㅇㅇ (투사체 크기 증가)",
+            "description": "투사체 크기 증가 (장판형)",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["hacker_t1_computation_optimization_max"],
+            "effect": { "stat": "ProjectileSize", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t3_ricochet",
+            "name": "도탄",
+            "description": "투사체 튕기는 횟수 +1",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": ["hacker_t2_radar_max", "hacker_t2_aoe_expansion_max"],
+            "effect": { "stat": "ProjectileBounce", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "hacker_t3_kinetic_charge",
+            "name": "관성 에너지 충전",
+            "description": "이동 속도에 비례해 공격 속도 증가 (1%당 1%)",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": ["hacker_t2_exoskeleton_max", "hacker_t2_radar_max"],
+            "effect": { "stat": "MoveSpeedToAttackSpeed", "value": 1, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t3_virus_dev",
+            "name": "바이러스 개발",
+            "description": "CC기에 맞은 대상 공격시 추가 피해",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "DamageToCCed", "value": 35, "type": "Percentage" }
+        },
+        {
+            "id": "hacker_t3_bandwidth_expansion",
+            "name": "대역폭 확장",
+            "description": "로봇 강화 (드론 최대량 +2, 포탑/디코이는 70% 효율 2개로 분열)",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "SummonEnhancement", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "hacker_t4_overload",
+            "name": "[네트워크 오버로드]",
+            "description": "타겟팅 프로토콜, 오버클럭 링크 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_NetworkOverload", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "hacker_t4_blackice",
+            "name": "[블랙아이스 아키텍트]",
+            "description": "그리드 확장, 열화상 과부하, 연쇄 논리 오류 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_BlackiceArchitect", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "hacker_t4_kinetic",
+            "name": "[키네틱 해커]",
+            "description": "탄성 계수 조작, 프랙탈 렌즈, 관성 에너지 충전(특수) 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_KineticHacker", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "hacker_t4_cracker",
+            "name": "[시스템 크래커]",
+            "description": "바이러스 전이, 백도어 패치, 피드백 루프 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_SystemCracker", "value": 1, "type": "Flat" }
+        }
+    ]
+}

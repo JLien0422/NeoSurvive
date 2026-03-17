@@ -1,0 +1,121 @@
+{
+    "traits": [
+        {
+            "id": "cyborg_t1_hydraulic_motor",
+            "name": "유압 모터 증폭",
+            "description": "무기 기본 공격력 증가 (물리, 에너지 전부 포함)",
+            "tier": 1,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "BaseDamage", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t1_nano_armor",
+            "name": "나노 장갑",
+            "description": "받는 피해 감소",
+            "tier": 1,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "DamageReduction", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t1_output_optimization",
+            "name": "출력 최적화",
+            "description": "공격 범위 증가",
+            "tier": 1,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "AttackRange", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t2_overcharge_battery",
+            "name": "과충전 배터리",
+            "description": "다단 히트 주기 감소",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["cyborg_t1_hydraulic_motor_max_or_cyborg_t1_output_optimization_max"],
+            "effect": { "stat": "DotTickSpeed", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t2_superconductor_circuit",
+            "name": "초전도 회로",
+            "description": "상태이상 지속 시간 및 효율 증가",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["cyborg_t1_output_optimization_max_or_cyborg_t1_nano_armor_max"],
+            "effect": { "stat": "StatusEffectUp", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t2_reactive_exoskeleton",
+            "name": "반응형 외골격",
+            "description": "피격 시 혹은 근접 공격 적중 시 주변에 충격파 발생",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["cyborg_t1_any_max"],
+            "effect": { "stat": "Thorns", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t2_inertial_frame",
+            "name": "관성 프레임",
+            "description": "넉백 저항 및 몹몰이 성능 증가",
+            "tier": 2,
+            "maxLevel": 3,
+            "prerequisites": ["cyborg_t1_hydraulic_motor_max"],
+            "effect": { "stat": "KnockbackResistance", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t3_critical_point",
+            "name": "임계점 돌파",
+            "description": "잃은 체력 1%당 타격 피해량 및 공격 범위 1% 증가",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": ["cyborg_t2_reactive_exoskeleton_max", "cyborg_t1_nano_armor_max"],
+            "effect": { "stat": "Berserk", "value": 1, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t3_chain_discharge",
+            "name": "연쇄 방전",
+            "description": "몹 처치 시 30% 확률로 주변 적에게 연쇄 번개 방출",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": ["cyborg_t2_overcharge_battery_max", "cyborg_t2_superconductor_circuit_max"],
+            "effect": { "stat": "ChainLightningOnKill", "value": 30, "type": "Percentage" }
+        },
+        {
+            "id": "cyborg_t3_core_fusion",
+            "name": "코어 융합",
+            "description": "장착한 모든 '근거리 무기'의 공격이 대시 시에 발동됨",
+            "tier": 3,
+            "maxLevel": 1,
+            "prerequisites": ["cyborg_t2_overcharge_battery_max", "cyborg_t2_reactive_exoskeleton_max"],
+            "effect": { "stat": "MeleeOnDash", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "cyborg_t4_grinder",
+            "name": "[초근접 분쇄기]",
+            "description": "CQC Grinder 빌드 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_CQCGrinder", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "cyborg_t4_highvoltage",
+            "name": "[하이 볼티지]",
+            "description": "High Voltage 빌드 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_HighVoltage", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "cyborg_t4_singularity",
+            "name": "[특이점 붕괴]",
+            "description": "Singularity Collapse 빌드 활성화",
+            "tier": 4,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "Build_SingularityCollapse", "value": 1, "type": "Flat" }
+        }
+    ]
+}

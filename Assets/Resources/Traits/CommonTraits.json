@@ -1,0 +1,148 @@
+{
+    "traits": [
+        {
+            "id": "common_survival_muscle_fiber",
+            "name": "합성 근육 섬유",
+            "description": "최대 체력 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "MaxHealth", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "common_survival_nanomachine_regen",
+            "name": "나노머신 재생",
+            "description": "초당 체력 자연 회복",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "HealthRegen", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "common_survival_energy_extraction",
+            "name": "생체 에너지 추출",
+            "description": "적 처치 시 최대 체력의 2% 즉시 회복",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "HealthOnKill", "value": 2, "type": "Percentage" }
+        },
+        {
+            "id": "common_survival_evasive_thruster",
+            "name": "회피 기동 스러스터",
+            "description": "피격 시 해당 데미지를 무시할 (회피) 확률",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "DodgeChance", "value": 3, "type": "Percentage" }
+        },
+        {
+            "id": "common_survival_backup_system",
+            "name": "긴급 백업 시스템",
+            "description": "사망 시 체력 50% 상태로 부활",
+            "tier": 0,
+            "maxLevel": 1,
+            "prerequisites": [],
+            "effect": { "stat": "ExtraLife", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "common_attack_optical_sensor",
+            "name": "광학 정밀 센서",
+            "description": "치명타 확률 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "CritChance", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "common_attack_weakness_analysis",
+            "name": "약점 분석 알고리즘",
+            "description": "치명타 피해량 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "CritDamage", "value": 15, "type": "Percentage" }
+        },
+        {
+            "id": "common_attack_overclock_tuning",
+            "name": "오버클럭 튜닝",
+            "description": "모든 무기의 기본 쿨타임(공격 주기) 감소",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "GlobalCooldownReduction", "value": 3, "type": "Percentage" }
+        },
+        {
+            "id": "common_utility_magnetic_module",
+            "name": "자기장 증폭 모듈",
+            "description": "경험치 칩 및 아이템 획득(자석) 범위 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "PickupRange", "value": 15, "type": "Percentage" }
+        },
+        {
+            "id": "common_utility_neural_uplink",
+            "name": "신경망 업링크",
+            "description": "적 처치 시 얻는 경험치 획득량 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "ExpGain", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "common_utility_blackmarket_protocol",
+            "name": "블랙마켓 프로토콜",
+            "description": "처치 시 드랍되는 크레딧 획득량 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "CreditGain", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "common_utility_path_optimization",
+            "name": "이동 경로 최적화",
+            "description": "맵 내의 이동 속도 증가",
+            "tier": 0,
+            "maxLevel": 5,
+            "prerequisites": [],
+            "effect": { "stat": "MoveSpeed", "value": 5, "type": "Percentage" }
+        },
+        {
+            "id": "common_dash_kinetic_charge",
+            "name": "운동 에너지 충전",
+            "description": "대시 재사용 대기시간(쿨타임) 감소",
+            "tier": 0,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "DashCooldown", "value": 10, "type": "Percentage" }
+        },
+        {
+            "id": "common_dash_compressed_propellant",
+            "name": "압축 추진제",
+            "description": "대시 이동 거리 및 속도 증가",
+            "tier": 0,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "DashDistance", "value": 15, "type": "Percentage" }
+        },
+        {
+            "id": "common_dash_multiphase_cylinder",
+            "name": "다중 위상 실린더",
+            "description": "대시 최대 충전(스택) 횟수 증가",
+            "tier": 0,
+            "maxLevel": 2,
+            "prerequisites": [],
+            "effect": { "stat": "DashCharges", "value": 1, "type": "Flat" }
+        },
+        {
+            "id": "common_dash_acceleration_overdrive",
+            "name": "가속 오버드라이브",
+            "description": "대시 사용시 피해량 증가",
+            "tier": 0,
+            "maxLevel": 3,
+            "prerequisites": [],
+            "effect": { "stat": "DamageOnDash", "value": 10, "type": "Percentage" }
+        }
+    ]
+}

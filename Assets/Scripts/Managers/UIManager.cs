@@ -426,74 +426,73 @@ public class UIManager : MonoBehaviour
 
   private void DrawWeapons(List<WeaponBase> weapons)
   {
-    if (weapons == null || weaponUIPanel == null) return;
+    if (weaponUIPanel == null) return;
 
-    Debug.Log($"[UIManager] DrawWeapons called with {weapons.Count} weapons");
-
-    float gap = 80f;
-    float padding = 20f;
-    float x = padding;
-    foreach (WeaponBase weapon in weapons)
+    int slotCount = Mathf.Min(6, weaponUIPanel.transform.childCount);
+    if (slotCount == 0)
     {
-      GameObject weaponIcon;
-      if (weaponIconPrefab != null)
-      {
-        weaponIcon = Instantiate(weaponIconPrefab, weaponUIPanel.transform);
-      }
-      else
-      {
-        // 프리팹이 비어있어도 UI가 완전히 사라지지 않도록 최소 아이콘 슬롯 생성
-        weaponIcon = new GameObject("WeaponIcon_Fallback");
-        weaponIcon.transform.SetParent(weaponUIPanel.transform, false);
-        var rt = weaponIcon.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(64f, 64f);
-        var fallbackImg = weaponIcon.AddComponent<Image>();
-        fallbackImg.color = new Color(1f, 1f, 1f, 0.35f);
-
-        GameObject levelObj = new GameObject("LevelText");
-        levelObj.transform.SetParent(weaponIcon.transform, false);
-        var levelRt = levelObj.AddComponent<RectTransform>();
-        levelRt.anchorMin = Vector2.zero;
-        levelRt.anchorMax = Vector2.one;
-        levelRt.offsetMin = Vector2.zero;
-        levelRt.offsetMax = Vector2.zero;
-        var fallbackLevel = levelObj.AddComponent<TextMeshProUGUI>();
-        fallbackLevel.alignment = TextAlignmentOptions.BottomRight;
-        fallbackLevel.fontSize = 18;
-        fallbackLevel.color = Color.white;
-      }
-
-      weaponIcon.SetActive(true);
-      weaponIcon.transform.localScale = Vector3.one;
-      // UI 요소이므로 RectTransform을 사용하는 것이 안전합니다.
-      if (weaponIcon.TryGetComponent<RectTransform>(out var rect))
-      {
-        rect.anchoredPosition = new Vector2(x, -padding); // 상단 기준 배치를 가정 (필요시 조정)
-                                                          // 만약 weaponUIPanel의 피벗이 중앙이면 좌표 계산이 달라질 수 있습니다.
-                                                          // 일단 기존 로직(localPosition)을 유지하되 간격만 넓혀도 됩니다.
-                                                          // 안전하게 기존 localPosition 방식을 사용하되 gap만 늘립니다.
-        weaponIcon.transform.localPosition = new Vector3(x, 0, 0);
-      }
-      else
-      {
-        weaponIcon.transform.localPosition = new Vector3(x, 0, 0);
-      }
-
-      if (weaponIcon.TryGetComponent<Image>(out var img)) img.sprite = weapon.weaponIcon;
-      TextMeshProUGUI lvlText = weaponIcon.GetComponentInChildren<TextMeshProUGUI>();
-      if (lvlText != null) lvlText.text = weapon.level.ToString();
-      x += gap;
+      Debug.LogWarning("[UIManager] weaponUIPanel has no weapon slots to refresh.");
+      return;
     }
+
+    int weaponCount = weapons?.Count ?? 0;
+    Debug.Log($"[UIManager] DrawWeapons called, slots={slotCount}, weapons={weaponCount}");
+
+    for (int i = 0; i < slotCount; i++)
+    {
+      Transform slot = weaponUIPanel.transform.GetChild(i);
+      WeaponBase weapon = (weapons != null && i < weapons.Count) ? weapons[i] : null;
+      ApplyWeaponToSlot(slot, weapon);
+    }
+  }
+
+  private void ApplyWeaponToSlot(Transform slot, WeaponBase weapon)
+  {
+    if (slot == null) return;
+
+    Image iconImage = FindSlotIconImage(slot);
+    if (iconImage != null)
+    {
+      iconImage.sprite = weapon != null ? weapon.weaponIcon : null;
+      iconImage.enabled = weapon != null && weapon.weaponIcon != null;
+    }
+
+    TextMeshProUGUI levelLabel = slot.GetComponentInChildren<TextMeshProUGUI>(true);
+    if (levelLabel != null)
+    {
+      levelLabel.text = weapon != null ? weapon.level.ToString() : string.Empty;
+    }
+  }
+
+  private Image FindSlotIconImage(Transform slot)
+  {
+    Image childFallback = null;
+    Image rootFallback = null;
+    Image[] images = slot.GetComponentsInChildren<Image>(true);
+
+    foreach (var image in images)
+    {
+      if (image == null) continue;
+
+      bool isRootImage = image.transform == slot;
+      string nameLower = image.gameObject.name.ToLowerInvariant();
+
+      if (!isRootImage && nameLower.Contains("icon"))
+        return image;
+
+      if (!isRootImage && childFallback == null)
+        childFallback = image;
+      else if (isRootImage && rootFallback == null)
+        rootFallback = image;
+    }
+
+    return childFallback != null ? childFallback : rootFallback;
   }
 
   private void RefreshWeaponUI(List<WeaponBase> weapons)
   {
     if (weaponUIPanel == null) return;
     Debug.Log("[UIManager] RefreshWeaponUI Event Received");
-    foreach (Transform child in weaponUIPanel.transform)
-    {
-      Destroy(child.gameObject);
-    }
     DrawWeapons(weapons);
   }
 

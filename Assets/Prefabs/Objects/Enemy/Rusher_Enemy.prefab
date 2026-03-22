@@ -128,7 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   attackDamage: 1
-  attackRange: 1.5
+  attackRange: 0.5
   showGizmos: 1
   mechanismType: 2
 --- !u!70 &2150788497966488398

@@ -4679,7 +4679,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 100
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11473,7 +11473,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 55.7
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -12743,9 +12743,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1249975124}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fce808fc5e48c9f47962364594bce39d, type: 3}
+  m_Script: {fileID: 11500000, guid: 881728e36454b9e4d9b32bf9f620d6fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hackingUIPanel: {fileID: 0}
+  securityTurretPrefab: {fileID: 0}
+  electricFencePrefab: {fileID: 0}
+  satelliteUplinkPrefab: {fileID: 0}
+  synapseServerPrefab: {fileID: 0}
+  magneticBeaconPrefab: {fileID: 0}
+  spawnRadius: 3
+  cyborgZoneRadius: 4
+  cyborgTotalTime: 10
 --- !u!1 &1250663597
 GameObject:
   m_ObjectHideFlags: 0
@@ -13701,7 +13710,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 100
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -20354,6 +20363,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28bb3ebbba90f4c4bbaadf3a61dac5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseMenuPanel: {fileID: 0}
+  resumeButton: {fileID: 0}
+  settingsButton: {fileID: 0}
+  quitButton: {fileID: 0}
+  weaponStatsPanel: {fileID: 0}
+  settingsUI: {fileID: 0}
+  quitSceneName: 
 --- !u!1 &1933243700
 GameObject:
   m_ObjectHideFlags: 0

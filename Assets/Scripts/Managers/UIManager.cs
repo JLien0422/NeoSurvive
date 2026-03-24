@@ -19,7 +19,6 @@ public class UIManager : MonoBehaviour
 
   [Header("Weapon UI")]
   public GameObject weaponUIPanel;
-  public Transform weaponUIContainer; // 무기 아이콘들이 배치될 부모 오브젝트 (예: Horizontal Layout Group)
   public GameObject weaponIconPrefab;
 
   [Header("Exp UI")]
@@ -431,36 +430,55 @@ public class UIManager : MonoBehaviour
 
     Debug.Log($"[UIManager] DrawWeapons called with {weapons.Count} weapons");
 
-    if (weaponUIPanel == null)
+    // WeaponUIPanel 하위에 미리 배치된 WeaponIcon 슬롯(직계 자식)을 순서대로 채운다.
+    int slotCount = weaponUIPanel.transform.childCount;
+    for (int i = 0; i < slotCount; i++)
     {
-      Debug.LogError("[UIManager] weaponUIPanel is null, cannot draw weapons.");
-    }
+      Transform slot = weaponUIPanel.transform.GetChild(i);
+      if (slot == null) continue;
 
-    foreach (var w in weapons)
-    {
-      if (w == null) continue;
-
-      GameObject[] icons = weaponUIContainer.GetComponentsInChildren<GameObject>(true);
-      foreach (var icon in icons)
+      Transform iconSpriteTf = slot.Find("IconSprite");
+      Image iconImage = iconSpriteTf != null ? iconSpriteTf.GetComponent<Image>() : null;
+      if (iconImage == null)
       {
-        Image iconSprite = icon.GetComponentsInChildren<Image>(true)[1]; // 자식 Image 컴포넌트 (배경 제외)
-        if (iconSprite != null && iconSprite.sprite == w.weaponIcon)
+        // 이름 기반 참조가 실패하면 슬롯 내부 첫 Image로 fallback
+        iconImage = slot.GetComponentInChildren<Image>(true);
+      }
+
+      Transform levelTf = slot.Find("WeaponLevel");
+      TMP_Text weaponLevelText = levelTf != null ? levelTf.GetComponent<TMP_Text>() : null;
+      if (weaponLevelText == null)
+      {
+        // TextMeshProUGUI / TextMeshPro 모두 대응
+        weaponLevelText = slot.GetComponentInChildren<TMP_Text>(true);
+      }
+
+      WeaponBase weapon = i < weapons.Count ? weapons[i] : null;
+      if (weapon == null)
+      {
+        if (iconImage != null)
         {
-          Debug.Log($"[UIManager] Weapon {w.name} is already displayed, skipping.");
-        }
-        else
-        {
-          iconSprite.sprite = w.weaponIcon;
+          iconImage.sprite = null;
+          iconImage.enabled = false;
         }
 
-        TextMeshPro levelText = icon.GetComponentInChildren<TextMeshPro>(true);
-
-        if (levelText != null)
+        if (weaponLevelText != null)
         {
-          levelText.text = $"{w.level}";
+          weaponLevelText.text = string.Empty;
         }
 
-        break;
+        continue;
+      }
+
+      if (iconImage != null)
+      {
+        iconImage.sprite = weapon.weaponIcon;
+        iconImage.enabled = weapon.weaponIcon != null;
+      }
+
+      if (weaponLevelText != null)
+      {
+        weaponLevelText.text = $"Lv.{weapon.level}";
       }
     }
   }
@@ -469,10 +487,6 @@ public class UIManager : MonoBehaviour
   {
     if (weaponUIPanel == null) return;
     Debug.Log("[UIManager] RefreshWeaponUI Event Received");
-    foreach (Transform child in weaponUIPanel.transform)
-    {
-      Destroy(child.gameObject);
-    }
     DrawWeapons(weapons);
   }
 

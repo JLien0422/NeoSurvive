@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
         CameraController cam = FindObjectOfType<CameraController>();
         if (cam != null) cam.SetTarget(playerTransform);
 
-        var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
+        var mapManager = FindObjectOfType<MapManager>();
         if (mapManager != null) mapManager.SetTarget(playerTransform);
       }
       else

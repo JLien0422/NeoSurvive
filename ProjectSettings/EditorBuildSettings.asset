@@ -11,9 +11,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/lhsScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MainScene.unity
-    guid: 5e531615818f6d34aae6bcbe641e5047
+    guid: 32c30293a7af15c4dbf6e7c56c011985
   - enabled: 1
     path: Assets/Scenes/multiScene.unity
     guid: 1c81409446a072542945757d6569f0cf

@@ -36,7 +36,9 @@ public class EnemyController : MonoBehaviour
   // 참조
   private Enemy enemy;
   private Rigidbody2D rb;
-  private Transform target; // 추적 대상 (Player 또는 Decoy)
+
+  [SerializeField]
+  public Transform target; // 추적 대상 (Player 또는 Decoy)
   private EnemyMechanismBase currentMechanism; // 현재 활성화된 메커니즘
 
   private float searchTimer;
@@ -322,6 +324,7 @@ public class EnemyController : MonoBehaviour
         {
           if (target.TryGetComponent<Character>(out var character))
           {
+            Debug.Log($"{gameObject.name}이(가) {target.gameObject.name}을(를) 공격했습니다! (기본 공격력: {attackDamage})");
             float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
             float finalDamage = attackDamage * outMul;
             character.TakeDamage(finalDamage);
@@ -334,7 +337,6 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
-    Profiler.BeginSample("Enemy_FixedUpdate_Test"); // 프로파일러에 이 이름으로 표시됨
     // 마그네틱 비컨 등 외부 강제 견인 중이면 AI 이동 무시하고 pullVelocity 적용
     if (statusFlags != null && statusFlags.isPulled)
     {
@@ -378,7 +380,6 @@ public class EnemyController : MonoBehaviour
         rb.velocity = Vector2.zero;
       }
     }
-    Profiler.EndSample();
   }
 
 #if UNITY_EDITOR

@@ -1937,63 +1937,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
---- !u!1001 &524163952
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.41770932
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.4076754
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.063158065
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865317613602562821, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8147942469550135973, guid: f120371747a55854f9ff784199813622, type: 3}
-      propertyPath: m_Name
-      value: MultiplayerLobbyManagers
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f120371747a55854f9ff784199813622, type: 3}
 --- !u!1 &542011958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2023,7 +1966,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 405922a61e39deb44b786875dd023894, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: JmgScene
+  gameSceneName: MainScene
 --- !u!4 &542011960
 Transform:
   m_ObjectHideFlags: 0
@@ -8373,7 +8316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7deadd4b3bfaa8c43971fea414b3a70f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: JmgScene
+  gameSceneName: MainScene
   selectionPanel: {fileID: 871177865}
   hackerButton: {fileID: 2086482807}
   cyborgButton: {fileID: 946642199}
@@ -10327,7 +10270,6 @@ SceneRoots:
   - {fileID: 1883344233}
   - {fileID: 1312958940}
   - {fileID: 864484281}
-  - {fileID: 524163952}
   - {fileID: 1389089250}
   - {fileID: 2015771155}
   - {fileID: 542011960}

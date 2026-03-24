@@ -10608,6 +10608,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae758385935e1b489d6fe1b7b50b26d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseTilePrefab: {fileID: 511734254542703334, guid: 99d9c2e74bb554744819d13b52fb8556, type: 3}
+  flowerPrefabs: []
+  grassPrefabs: []
+  autoSizeFromPrefab: 1
+  tilePixelSize: 32
+  pixelsPerUnit: 100
+  gap: 0
+  tileZValue: 100
+  viewDistanceX: 10
+  viewDistanceY: 10
+  despawnMargin: 2
+  seed: 42
+  flowerChance: 0.1
+  grassChance: 0.2
+  playerTransform: {fileID: 0}
 --- !u!1001 &1000662606
 PrefabInstance:
   m_ObjectHideFlags: 0

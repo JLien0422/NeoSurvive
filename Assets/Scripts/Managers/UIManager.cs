@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
 
   [Header("Weapon UI")]
   public GameObject weaponUIPanel;
+  public Transform weaponUIContainer; // 무기 아이콘들이 배치될 부모 오브젝트 (예: Horizontal Layout Group)
   public GameObject weaponIconPrefab;
 
   [Header("Exp UI")]
@@ -426,73 +427,52 @@ public class UIManager : MonoBehaviour
 
   private void DrawWeapons(List<WeaponBase> weapons)
   {
-    if (weaponUIPanel == null) return;
+    if (weapons == null || weaponUIPanel == null) return;
 
-    int slotCount = Mathf.Min(6, weaponUIPanel.transform.childCount);
-    if (slotCount == 0)
+    Debug.Log($"[UIManager] DrawWeapons called with {weapons.Count} weapons");
+
+    if (weaponUIPanel == null)
     {
-      Debug.LogWarning("[UIManager] weaponUIPanel has no weapon slots to refresh.");
-      return;
+      Debug.LogError("[UIManager] weaponUIPanel is null, cannot draw weapons.");
     }
 
-    int weaponCount = weapons?.Count ?? 0;
-    Debug.Log($"[UIManager] DrawWeapons called, slots={slotCount}, weapons={weaponCount}");
-
-    for (int i = 0; i < slotCount; i++)
+    foreach (var w in weapons)
     {
-      Transform slot = weaponUIPanel.transform.GetChild(i);
-      WeaponBase weapon = (weapons != null && i < weapons.Count) ? weapons[i] : null;
-      ApplyWeaponToSlot(slot, weapon);
+      if (w == null) continue;
+
+      GameObject[] icons = weaponUIContainer.GetComponentsInChildren<GameObject>(true);
+      foreach (var icon in icons)
+      {
+        Image iconSprite = icon.GetComponentsInChildren<Image>(true)[1]; // 자식 Image 컴포넌트 (배경 제외)
+        if (iconSprite != null && iconSprite.sprite == w.weaponIcon)
+        {
+          Debug.Log($"[UIManager] Weapon {w.name} is already displayed, skipping.");
+        }
+        else
+        {
+          iconSprite.sprite = w.weaponIcon;
+        }
+
+        TextMeshPro levelText = icon.GetComponentInChildren<TextMeshPro>(true);
+
+        if (levelText != null)
+        {
+          levelText.text = $"{w.level}";
+        }
+
+        break;
+      }
     }
-  }
-
-  private void ApplyWeaponToSlot(Transform slot, WeaponBase weapon)
-  {
-    if (slot == null) return;
-
-    Image iconImage = FindSlotIconImage(slot);
-    if (iconImage != null)
-    {
-      iconImage.sprite = weapon != null ? weapon.weaponIcon : null;
-      iconImage.enabled = weapon != null && weapon.weaponIcon != null;
-    }
-
-    TextMeshProUGUI levelLabel = slot.GetComponentInChildren<TextMeshProUGUI>(true);
-    if (levelLabel != null)
-    {
-      levelLabel.text = weapon != null ? weapon.level.ToString() : string.Empty;
-    }
-  }
-
-  private Image FindSlotIconImage(Transform slot)
-  {
-    Image childFallback = null;
-    Image rootFallback = null;
-    Image[] images = slot.GetComponentsInChildren<Image>(true);
-
-    foreach (var image in images)
-    {
-      if (image == null) continue;
-
-      bool isRootImage = image.transform == slot;
-      string nameLower = image.gameObject.name.ToLowerInvariant();
-
-      if (!isRootImage && nameLower.Contains("icon"))
-        return image;
-
-      if (!isRootImage && childFallback == null)
-        childFallback = image;
-      else if (isRootImage && rootFallback == null)
-        rootFallback = image;
-    }
-
-    return childFallback != null ? childFallback : rootFallback;
   }
 
   private void RefreshWeaponUI(List<WeaponBase> weapons)
   {
     if (weaponUIPanel == null) return;
     Debug.Log("[UIManager] RefreshWeaponUI Event Received");
+    foreach (Transform child in weaponUIPanel.transform)
+    {
+      Destroy(child.gameObject);
+    }
     DrawWeapons(weapons);
   }
 

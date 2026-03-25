@@ -73,13 +73,13 @@ public class HackingSystem : MonoBehaviour
         bool wasActive = hackingUIPanel.activeSelf;
         hackingUIPanel.SetActive(true);
 
-        numberSequenceRoot    = hackingUIPanel.transform.Find("NumberSequence_Root");
-        commandBypassRoot     = hackingUIPanel.transform.Find("CommandBypass_Root");
-        synapseSyncRoot       = hackingUIPanel.transform.Find("SynapseSync_Root");
+        numberSequenceRoot = hackingUIPanel.transform.Find("NumberSequence_Root");
+        commandBypassRoot = hackingUIPanel.transform.Find("CommandBypass_Root");
+        synapseSyncRoot = hackingUIPanel.transform.Find("SynapseSync_Root");
         frequencyOverrideRoot = hackingUIPanel.transform.Find("FrequencyOverride_Root");
-        networkBridgeRoot     = hackingUIPanel.transform.Find("NetworkBridge_Root");
+        networkBridgeRoot = hackingUIPanel.transform.Find("NetworkBridge_Root");
 
-        cyborgHackingRoot     = hackingUIPanel.transform.Find("CyborgHacking_Root");
+        cyborgHackingRoot = hackingUIPanel.transform.Find("CyborgHacking_Root");
 
         Debug.Log($"[HackingSystem] 루트 탐색 결과:" +
             $"\n NumberSequence={numberSequenceRoot != null}" +
@@ -204,8 +204,8 @@ public class HackingSystem : MonoBehaviour
         var minigame = GetOrAddMinigame<NumberSequenceMinigame>(numberSequenceRoot.gameObject);
         currentMinigame = minigame;
 
-        Transform btnGrid   = numberSequenceRoot.Find("BtnGrid");
-        Slider timeGauge    = FindSlider(numberSequenceRoot, "TimeGauge");
+        Transform btnGrid = numberSequenceRoot.Find("BtnGrid");
+        Slider timeGauge = FindSlider(numberSequenceRoot, "TimeGauge");
 
         minigame.SetPreMadeUI(btnGrid, timeGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -220,8 +220,8 @@ public class HackingSystem : MonoBehaviour
         currentMinigame = minigame;
 
         Transform arrowContainer = commandBypassRoot.Find("ArrowContainer");
-        Slider progressGauge     = FindSlider(commandBypassRoot, "ProgressGauge");
-        Slider timeGauge         = FindSlider(commandBypassRoot, "TimeGauge");
+        Slider progressGauge = FindSlider(commandBypassRoot, "ProgressGauge");
+        Slider timeGauge = FindSlider(commandBypassRoot, "TimeGauge");
 
         minigame.SetPreMadeUI(arrowContainer, progressGauge, null, timeGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -236,9 +236,9 @@ public class HackingSystem : MonoBehaviour
         currentMinigame = minigame;
 
         GameObject centerCircle = FindChild(synapseSyncRoot, "CenterCircle");
-        GameObject outerCircle  = FindChild(synapseSyncRoot, "OuterCircle");
-        Slider timeGauge        = FindSlider(synapseSyncRoot, "TimeGauge");
-        Slider successGauge     = FindSlider(synapseSyncRoot, "SuccessGauge");
+        GameObject outerCircle = FindChild(synapseSyncRoot, "OuterCircle");
+        Slider timeGauge = FindSlider(synapseSyncRoot, "TimeGauge");
+        Slider successGauge = FindSlider(synapseSyncRoot, "SuccessGauge");
 
         minigame.SetPreMadeUI(centerCircle, outerCircle, timeGauge, successGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -254,9 +254,9 @@ public class HackingSystem : MonoBehaviour
 
         GameObject targetWave = FindChild(frequencyOverrideRoot, "TargetWave");
         GameObject playerWave = FindChild(frequencyOverrideRoot, "PlayerWave");
-        Slider timeGauge      = FindSlider(frequencyOverrideRoot, "TimeGauge");
-        Slider matchGauge     = FindSlider(frequencyOverrideRoot, "MatchGauge");
-        Slider holdGauge      = FindSlider(frequencyOverrideRoot, "HoldGauge");
+        Slider timeGauge = FindSlider(frequencyOverrideRoot, "TimeGauge");
+        Slider matchGauge = FindSlider(frequencyOverrideRoot, "MatchGauge");
+        Slider holdGauge = FindSlider(frequencyOverrideRoot, "HoldGauge");
 
         minigame.SetPreMadeUI(targetWave, playerWave, timeGauge, matchGauge, holdGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -270,11 +270,11 @@ public class HackingSystem : MonoBehaviour
         var minigame = GetOrAddMinigame<NetworkBridgeMinigame>(networkBridgeRoot.gameObject);
         currentMinigame = minigame;
 
-        Transform leftContainer  = networkBridgeRoot.Find("LeftContainer");
+        Transform leftContainer = networkBridgeRoot.Find("LeftContainer");
         Transform rightContainer = networkBridgeRoot.Find("RightContainer");
         Transform linesContainer = networkBridgeRoot.Find("LinesContainer");
-        Slider timeGauge         = FindSlider(networkBridgeRoot, "TimeGauge");
-        Slider successGauge      = FindSlider(networkBridgeRoot, "SuccessGauge");
+        Slider timeGauge = FindSlider(networkBridgeRoot, "TimeGauge");
+        Slider successGauge = FindSlider(networkBridgeRoot, "SuccessGauge");
 
         minigame.SetPreMadeUI(leftContainer, rightContainer, linesContainer, timeGauge, successGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -316,14 +316,14 @@ public class HackingSystem : MonoBehaviour
     {
         // UI 슬라이더 참조
         Slider progressSlider = (cyborgHackingRoot != null) ? FindSlider(cyborgHackingRoot, "ProgressGauge") : null;
-        Slider timerSlider    = (cyborgHackingRoot != null) ? FindSlider(cyborgHackingRoot, "TimerGauge")    : null;
-        TextMeshProUGUI statusText = (cyborgHackingRoot != null) ? FindTMP(cyborgHackingRoot, "StatusText")  : null;
+        Slider timerSlider = (cyborgHackingRoot != null) ? FindSlider(cyborgHackingRoot, "TimerGauge") : null;
+        TextMeshProUGUI statusText = (cyborgHackingRoot != null) ? FindTMP(cyborgHackingRoot, "StatusText") : null;
 
         // 슬라이더 초기화
         if (progressSlider != null) { progressSlider.minValue = 0f; progressSlider.maxValue = 100f; progressSlider.value = 0f; }
-        if (timerSlider    != null) { timerSlider.minValue    = 0f; timerSlider.maxValue    = cyborgTotalTime; timerSlider.value = cyborgTotalTime; }
+        if (timerSlider != null) { timerSlider.minValue = 0f; timerSlider.maxValue = cyborgTotalTime; timerSlider.value = cyborgTotalTime; }
 
-        float elapsed     = 0f;   // 경과 시간
+        float elapsed = 0f;   // 경과 시간
         float hackProgress = 0f;  // 해킹 진척도 (0~100)
 
         while (elapsed < cyborgTotalTime && hackProgress < 100f)
@@ -348,7 +348,7 @@ public class HackingSystem : MonoBehaviour
 
             // UI 슬라이더 갱신
             if (progressSlider != null) progressSlider.value = hackProgress;
-            if (timerSlider    != null) timerSlider.value    = cyborgTotalTime - elapsed;
+            if (timerSlider != null) timerSlider.value = cyborgTotalTime - elapsed;
 
             yield return null;
         }
@@ -395,10 +395,10 @@ public class HackingSystem : MonoBehaviour
         lr.useWorldSpace = false;  // 부모(zoneObj) 기준 로컬 좌표 사용
         lr.loop = true;
         lr.startWidth = 0.08f;
-        lr.endWidth   = 0.08f;
-        lr.material   = new Material(Shader.Find("Sprites/Default"));
+        lr.endWidth = 0.08f;
+        lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.startColor = Color.cyan;
-        lr.endColor   = Color.cyan;
+        lr.endColor = Color.cyan;
 
         // 원을 36개 선분으로 근사
         int segments = 36;
@@ -423,7 +423,7 @@ public class HackingSystem : MonoBehaviour
 
         Color targetColor = enemyInZone ? Color.red : Color.cyan;
         lr.startColor = targetColor;
-        lr.endColor   = targetColor;
+        lr.endColor = targetColor;
     }
 
     // ─────────────────────────────────────────────
@@ -466,12 +466,12 @@ public class HackingSystem : MonoBehaviour
     // ─────────────────────────────────────────────
     private void SetAllRootsInactive()
     {
-        if (numberSequenceRoot != null)    numberSequenceRoot.gameObject.SetActive(false);
-        if (commandBypassRoot != null)     commandBypassRoot.gameObject.SetActive(false);
-        if (synapseSyncRoot != null)       synapseSyncRoot.gameObject.SetActive(false);
+        if (numberSequenceRoot != null) numberSequenceRoot.gameObject.SetActive(false);
+        if (commandBypassRoot != null) commandBypassRoot.gameObject.SetActive(false);
+        if (synapseSyncRoot != null) synapseSyncRoot.gameObject.SetActive(false);
         if (frequencyOverrideRoot != null) frequencyOverrideRoot.gameObject.SetActive(false);
-        if (networkBridgeRoot != null)     networkBridgeRoot.gameObject.SetActive(false);
-        if (cyborgHackingRoot != null)     cyborgHackingRoot.gameObject.SetActive(false);
+        if (networkBridgeRoot != null) networkBridgeRoot.gameObject.SetActive(false);
+        if (cyborgHackingRoot != null) cyborgHackingRoot.gameObject.SetActive(false);
     }
 
     private T GetOrAddMinigame<T>(GameObject root) where T : HackingMinigameBase

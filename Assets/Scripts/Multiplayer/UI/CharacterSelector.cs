@@ -184,23 +184,7 @@ namespace NeoSurvive.UI
           characterPortrait.sprite = characterData.characterPortrait;
       }
 
-      // 버튼 하이라이트 효과 (선택된 버튼 강조)
-      UpdateButtonHighlight();
-
       Debug.Log($"캐릭터 선택: {characterType}");
-    }
-
-    /// <summary>
-    /// 선택된 버튼을 시각적으로 강조합니다.
-    /// </summary>
-    private void UpdateButtonHighlight()
-    {
-      if (hackerButton != null && cyborgButton != null)
-      {
-        // 선택된 버튼의 스케일을 약간 키워서 강조
-        hackerButton.transform.localScale = selectedCharacter == CharacterType.Hacker ? Vector3.one * 1.1f : Vector3.one;
-        cyborgButton.transform.localScale = selectedCharacter == CharacterType.Cyborg ? Vector3.one * 1.1f : Vector3.one;
-      }
     }
 
     /// <summary>

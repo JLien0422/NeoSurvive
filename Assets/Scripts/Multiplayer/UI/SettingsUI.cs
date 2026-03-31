@@ -590,7 +590,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (effectOpacityText != null && effectOpacitySlider != null)
         {
-            effectOpacityText.text = $"{(int)(effectOpacitySlider.value * 100)}%";
+            effectOpacityText.text = $"{(int)(effectOpacitySlider.value * 100)}";
         }
     }
 
@@ -598,7 +598,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (masterVolumeText != null && masterVolumeSlider != null)
         {
-            masterVolumeText.text = $"{(int)(masterVolumeSlider.value * 100)}%";
+            masterVolumeText.text = $"{(int)(masterVolumeSlider.value * 100)}";
         }
     }
 
@@ -606,7 +606,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (bgmVolumeText != null && bgmVolumeSlider != null)
         {
-            bgmVolumeText.text = $"{(int)(bgmVolumeSlider.value * 100)}%";
+            bgmVolumeText.text = $"{(int)(bgmVolumeSlider.value * 100)}";
         }
     }
 
@@ -614,7 +614,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (sfxVolumeText != null && sfxVolumeSlider != null)
         {
-            sfxVolumeText.text = $"{(int)(sfxVolumeSlider.value * 100)}%";
+            sfxVolumeText.text = $"{(int)(sfxVolumeSlider.value * 100)}";
         }
     }
 

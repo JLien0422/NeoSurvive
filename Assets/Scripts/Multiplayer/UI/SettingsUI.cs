@@ -111,7 +111,7 @@ public class SettingsUI : MonoBehaviour
 
         // 토글 공통 크기 적용 (해상도 바뀌어도 클릭 영역이 충분히 크게)
         ApplyCommonToggleSize();
-        
+
         // 기본적으로 비디오 탭 표시
         ShowTab(0);
 
@@ -154,19 +154,19 @@ public class SettingsUI : MonoBehaviour
     public void ToggleSettings()
     {
         Debug.Log($"[SettingsUI] ToggleSettings 호출됨. 현재 isSettingsOpen: {isSettingsOpen}, settingsPanel: {(settingsPanel != null ? settingsPanel.name : "NULL")}");
-        
+
         isSettingsOpen = !isSettingsOpen;
-        
+
         // settingsPanel이 없으면 오류 출력 후 종료
         if (settingsPanel == null)
         {
             Debug.LogError("[SettingsUI] settingsPanel이 null입니다. 씬에서 SettingsPanel을 만들고 SettingsUI에 연결해 주세요.");
             return;
         }
-        
+
         settingsPanel.SetActive(isSettingsOpen);
         Debug.Log($"[SettingsUI] Settings 패널 {(isSettingsOpen ? "열림" : "닫힘")}, settingsPanel.activeSelf: {settingsPanel.activeSelf}");
-        
+
         // 설정 패널이 보이도록 Canvas Sort Order를 최상위로 설정
         if (isSettingsOpen)
         {
@@ -239,7 +239,7 @@ public class SettingsUI : MonoBehaviour
         {
             Debug.LogWarning("[SettingsUI] videoTabButton이 null입니다!");
         }
-        
+
         if (audioTabButton != null)
         {
             audioTabButton.onClick.AddListener(() => { Debug.Log("[SettingsUI] Audio 탭 버튼 클릭"); ShowTab(1); });
@@ -248,7 +248,7 @@ public class SettingsUI : MonoBehaviour
         {
             Debug.LogWarning("[SettingsUI] audioTabButton이 null입니다!");
         }
-        
+
         if (gameplayTabButton != null)
         {
             gameplayTabButton.onClick.AddListener(() => { Debug.Log("[SettingsUI] Gameplay 탭 버튼 클릭"); ShowTab(2); });
@@ -257,7 +257,7 @@ public class SettingsUI : MonoBehaviour
         {
             Debug.LogWarning("[SettingsUI] gameplayTabButton이 null입니다!");
         }
-        
+
         if (accountTabButton != null)
         {
             accountTabButton.onClick.AddListener(() => { Debug.Log("[SettingsUI] Account 탭 버튼 클릭"); ShowTab(3); });
@@ -274,7 +274,7 @@ public class SettingsUI : MonoBehaviour
     private void ShowTab(int tabIndex)
     {
         Debug.Log($"[SettingsUI] ShowTab({tabIndex}) 호출됨");
-        
+
         // 모든 탭 패널 비활성화
         if (videoTabPanel != null) videoTabPanel.SetActive(false);
         if (audioTabPanel != null) audioTabPanel.SetActive(false);
@@ -656,13 +656,13 @@ public class SettingsUI : MonoBehaviour
             GameObject canvasObj = new GameObject("Canvas");
             canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            
+
             // CanvasScaler 설정
             UnityEngine.UI.CanvasScaler scaler = canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
             scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
-            
+
             canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             Debug.Log("[SettingsUI] Canvas가 없어 새로 생성했습니다.");
         }
@@ -697,7 +697,7 @@ public class SettingsUI : MonoBehaviour
 
         // 탭 버튼 영역 생성
         CreateTabButtons(settingsPanel.transform);
-        
+
         // 탭 패널들 생성
         CreateTabPanels(settingsPanel.transform);
 
@@ -745,15 +745,15 @@ public class SettingsUI : MonoBehaviour
     {
         GameObject buttonObj = new GameObject($"{label}TabButton");
         buttonObj.transform.SetParent(parent, false);
-        
+
         RectTransform buttonRect = buttonObj.AddComponent<RectTransform>();
         buttonRect.sizeDelta = new Vector2(150, 40);
-        
+
         Image buttonImg = buttonObj.AddComponent<Image>();
         buttonImg.color = new Color(0.3f, 0.3f, 0.3f, 1f);
-        
+
         Button button = buttonObj.AddComponent<Button>();
-        
+
         // 텍스트 추가
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(buttonObj.transform, false);
@@ -761,13 +761,13 @@ public class SettingsUI : MonoBehaviour
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
         textRect.sizeDelta = Vector2.zero;
-        
+
         TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
         text.text = label;
         text.fontSize = 18;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
-        
+
         return button;
     }
 
@@ -788,15 +788,15 @@ public class SettingsUI : MonoBehaviour
         // 비디오 탭 패널 생성
         if (videoTabPanel == null)
             videoTabPanel = CreateVideoTabPanel(contentArea.transform);
-        
+
         // 오디오 탭 패널 생성
         if (audioTabPanel == null)
             audioTabPanel = CreateAudioTabPanel(contentArea.transform);
-        
+
         // 게임플레이 탭 패널 생성
         if (gameplayTabPanel == null)
             gameplayTabPanel = CreateGameplayTabPanel(contentArea.transform);
-        
+
         // 계정 탭 패널 생성
         if (accountTabPanel == null)
             accountTabPanel = CreateAccountTabPanel(contentArea.transform);
@@ -919,7 +919,7 @@ public class SettingsUI : MonoBehaviour
         sliderRect.anchorMin = new Vector2(0.5f, 0);
         sliderRect.anchorMax = new Vector2(1, 1);
         sliderRect.sizeDelta = new Vector2(-10, 0);
-        
+
         effectOpacitySlider = CreateSlider(sliderContainer.transform);
         effectOpacityText = CreateText(sliderContainer.transform, "100%");
         RectTransform textRect = effectOpacityText.GetComponent<RectTransform>();
@@ -1018,8 +1018,8 @@ public class SettingsUI : MonoBehaviour
         layoutGroup.spacing = 20;
         layoutGroup.padding = new RectOffset(20, 20, 20, 20);
 
-        CreateSettingRow(panel.transform, "Pause on Focus Lost", out GameObject pauseObj);
-        pauseOnFocusLostToggle = CreateToggle(pauseObj.transform);
+        // CreateSettingRow(panel.transform, "Pause on Focus Lost", out GameObject pauseObj);
+        // pauseOnFocusLostToggle = CreateToggle(pauseObj.transform);
 
         panel.SetActive(false);
         return panel;
@@ -1172,7 +1172,7 @@ public class SettingsUI : MonoBehaviour
         RectTransform itemRect = itemObj.AddComponent<RectTransform>();
         itemRect.sizeDelta = new Vector2(0, 30);
         Toggle itemToggle = itemObj.AddComponent<Toggle>();
-        
+
         // Item Label
         GameObject itemLabelObj = new GameObject("Item Label");
         itemLabelObj.transform.SetParent(itemObj.transform, false);

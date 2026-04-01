@@ -464,7 +464,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -68.34876}
+  m_AnchoredPosition: {x: 960, y: -68.34888}
   m_SizeDelta: {x: 389.2905, y: 85.8208}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &356846421
@@ -1604,6 +1604,7 @@ GameObject:
   - component: {fileID: 803576782}
   - component: {fileID: 803576781}
   - component: {fileID: 803576780}
+  - component: {fileID: 803576783}
   m_Layer: 0
   m_Name: StartGameButton
   m_TagString: Untagged
@@ -1725,6 +1726,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803576778}
   m_CullTransparentMesh: 1
+--- !u!114 &803576783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803576778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdb727f006c47d44a0ab442545a3b4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playHover: 1
+  playClick: 1
+  useCustomHoverEvent: 0
+  hoverEventType: 21
+  useCustomClickEvent: 1
+  clickEventType: 21
 --- !u!1 &845189136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2527,32 +2546,36 @@ MonoBehaviour:
   masterUiVolume: 1
   sfxSlots:
   - eventType: 0
-    clips: []
+    clips:
+    - {fileID: 8300000, guid: d27bc8e082a7b0f47b58635084029c2a, type: 3}
     volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
   - eventType: 1
-    clips: []
-    volume: 0
+    clips:
+    - {fileID: 8300000, guid: 65c5b5f73198e5b458a670af89804913, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0.5
     pitchMax: 0.5
   - eventType: 2
-    clips: []
-    volume: 0
+    clips:
+    - {fileID: 8300000, guid: c6a287a685ae87d46a1b52dd92580bb8, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
   - eventType: 3
-    clips: []
-    volume: 0
+    clips:
+    - {fileID: 8300000, guid: f7c92f382cdb0c54383c203300cd9fbd, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
   - eventType: 5
     clips:
-    - {fileID: 8300000, guid: 37faa689416bd304092886b3d334d8eb, type: 3}
+    - {fileID: 8300000, guid: 65c5b5f73198e5b458a670af89804913, type: 3}
     volume: 1
     randomPitch: 0
     pitchMin: 0
@@ -2570,14 +2593,16 @@ MonoBehaviour:
     pitchMin: 0
     pitchMax: 0
   - eventType: 8
-    clips: []
-    volume: 0
+    clips:
+    - {fileID: 8300000, guid: 99c0c89853e7d234d80abe71121674a8, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
   - eventType: 9
-    clips: []
-    volume: 0
+    clips:
+    - {fileID: 8300000, guid: 623ad2ff21901c24091e29946792d5a9, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
@@ -2595,7 +2620,14 @@ MonoBehaviour:
     pitchMax: 0
   - eventType: 22
     clips: []
-    volume: 0
+    volume: 1
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 21
+    clips:
+    - {fileID: 8300000, guid: a899474aca5b8464991cebd7b2cc379f, type: 3}
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
@@ -15840,3 +15872,4 @@ SceneRoots:
   - {fileID: 864484281}
   - {fileID: 542011960}
   - {fileID: 1046040507}
+  - {fileID: 617508428}

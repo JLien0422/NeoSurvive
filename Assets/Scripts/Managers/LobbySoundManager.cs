@@ -41,7 +41,7 @@ public class LobbySoundManager : MonoBehaviour
         SettingsApply,
 
         // 
-
+        Start,
         UpgradeBuy,
         Error
     }

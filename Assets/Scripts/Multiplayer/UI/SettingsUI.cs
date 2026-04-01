@@ -157,6 +157,11 @@ public class SettingsUI : MonoBehaviour
 
         isSettingsOpen = !isSettingsOpen;
 
+        if (isSettingsOpen)
+            LobbySoundManager.Instance?.PlaySettingsOpen();
+        else
+            LobbySoundManager.Instance?.PlaySettingsClose();
+
         // settingsPanel이 없으면 오류 출력 후 종료
         if (settingsPanel == null)
         {
@@ -274,6 +279,7 @@ public class SettingsUI : MonoBehaviour
     private void ShowTab(int tabIndex)
     {
         Debug.Log($"[SettingsUI] ShowTab({tabIndex}) 호출됨");
+        LobbySoundManager.Instance?.PlaySettingsTabSwitch();
 
         // 모든 탭 패널 비활성화
         if (videoTabPanel != null) videoTabPanel.SetActive(false);

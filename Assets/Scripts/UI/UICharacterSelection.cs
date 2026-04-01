@@ -42,6 +42,7 @@ public class UICharacterSelection : MonoBehaviour
     public void OnHackerMouseEnter()
     {
         CancelExitCheck();
+        LobbySoundManager.Instance?.PlayCharacterHover();
         hoveredSlot = CharacterSlot.Hacker;
         UpdateVisualState();
     }
@@ -49,6 +50,7 @@ public class UICharacterSelection : MonoBehaviour
     public void OnCyborgMouseEnter()
     {
         CancelExitCheck();
+        LobbySoundManager.Instance?.PlayCharacterHover();
         hoveredSlot = CharacterSlot.Cyborg;
         UpdateVisualState();
     }
@@ -67,10 +69,12 @@ public class UICharacterSelection : MonoBehaviour
     {
         if (selectedSlot == CharacterSlot.Hacker)
         {
+            LobbySoundManager.Instance?.PlayCharacterDeselect();
             ClearSelection();
             return;
         }
 
+        LobbySoundManager.Instance?.PlayCharacterSelect();
         selectedSlot = CharacterSlot.Hacker;
         hoveredSlot = CharacterSlot.Hacker;
         UpdateVisualState();
@@ -80,10 +84,12 @@ public class UICharacterSelection : MonoBehaviour
     {
         if (selectedSlot == CharacterSlot.Cyborg)
         {
+            LobbySoundManager.Instance?.PlayCharacterDeselect();
             ClearSelection();
             return;
         }
 
+        LobbySoundManager.Instance?.PlayCharacterSelect();
         selectedSlot = CharacterSlot.Cyborg;
         hoveredSlot = CharacterSlot.Cyborg;
         UpdateVisualState();
@@ -92,6 +98,7 @@ public class UICharacterSelection : MonoBehaviour
     public void ClearSelection()
     {
         CancelExitCheck();
+        LobbySoundManager.Instance?.PlayCharacterDeselect();
         selectedSlot = CharacterSlot.None;
         hoveredSlot = CharacterSlot.None;
         UpdateVisualState();

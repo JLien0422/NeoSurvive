@@ -61,6 +61,7 @@ public class LobbyManager : MonoBehaviour
   {
     if (tabHistory.Count >= 2)
     {
+      LobbySoundManager.Instance?.PlayBack();
       var before = tabHistory[tabHistory.Count - 2];
       OpenTab(before);
       activatedTab = before;
@@ -87,6 +88,9 @@ public class LobbyManager : MonoBehaviour
 
   public void OpenTab(TabType tabType)
   {
+    if (activatedTab != tabType)
+      LobbySoundManager.Instance?.PlayTabSwitch();
+
     foreach (var tab in tabList)
     {
       tab.SetActive(false);
@@ -120,6 +124,7 @@ public class LobbyManager : MonoBehaviour
 
   public void OnExitButtonClicked()
   {
+    LobbySoundManager.Instance?.PlayCancel();
     Debug.Log("Exit Button Clicked: Quitting Application...");
     Application.Quit();
 #if UNITY_EDITOR

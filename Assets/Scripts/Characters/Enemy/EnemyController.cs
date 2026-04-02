@@ -177,7 +177,7 @@ public class EnemyController : MonoBehaviour
     // 플레이어 거리 체크 (sqrMagnitude로 제곱근 없이 비교)
     if (playerObj != null)
     {
-      float d = (transform.position - playerObj.transform.position).sqrMagnitude;
+      float d = ((Vector2)transform.position - (Vector2)playerObj.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -190,7 +190,7 @@ public class EnemyController : MonoBehaviour
     {
       foreach (var decoy in decoys)
       {
-        float d = (transform.position - decoy.transform.position).sqrMagnitude;
+        float d = ((Vector2)transform.position - (Vector2)decoy.transform.position).sqrMagnitude;
         if (d < closestDist)
         {
           closestDist = d;
@@ -220,7 +220,7 @@ public class EnemyController : MonoBehaviour
       if (e == null) continue;
       if (e == gameObject) continue; // 자기 자신 제외
 
-      float d = (transform.position - e.transform.position).sqrMagnitude;
+      float d = ((Vector2)transform.position - (Vector2)e.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -317,12 +317,12 @@ public class EnemyController : MonoBehaviour
 
       if (target != null)
       {
-        // sqrMagnitude로 제곱근 없이 거리 비교
-        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        // 2D 게임 기준으로 XY 평면 거리만 사용
+        float sqrDist = ((Vector2)transform.position - (Vector2)target.position).sqrMagnitude;
 
         if (sqrDist <= attackRange * attackRange)
         {
-          if (target.TryGetComponent<Character>(out var character))
+          if (TryGetCharacterOnTarget(target, out var character))
           {
             Debug.Log($"{gameObject.name}이(가) {target.gameObject.name}을(를) 공격했습니다! (기본 공격력: {attackDamage})");
             float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
@@ -362,8 +362,8 @@ public class EnemyController : MonoBehaviour
       // 기본 이동 로직
       if (target != null)
       {
-        // sqrMagnitude로 제곱근 없이 거리 비교
-        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        // 2D 게임 기준으로 XY 평면 거리만 사용
+        float sqrDist = ((Vector2)transform.position - (Vector2)target.position).sqrMagnitude;
 
         if (sqrDist > attackRange * attackRange)
         {
@@ -380,6 +380,20 @@ public class EnemyController : MonoBehaviour
         rb.velocity = Vector2.zero;
       }
     }
+  }
+
+  private static bool TryGetCharacterOnTarget(Transform targetTransform, out Character character)
+  {
+    character = null;
+    if (targetTransform == null) return false;
+
+    if (targetTransform.TryGetComponent<Character>(out character)) return true;
+
+    character = targetTransform.GetComponentInParent<Character>();
+    if (character != null) return true;
+
+    character = targetTransform.GetComponentInChildren<Character>();
+    return character != null;
   }
 
 #if UNITY_EDITOR

@@ -5625,7 +5625,8 @@ MonoBehaviour:
   killCountText: {fileID: 2096946303}
   playerHealthSlider: {fileID: 1205811752}
   gameManager: {fileID: 0}
-  characterChoicePanel: {fileID: 0}
+  goldText: {fileID: 0}
+  characterChoicePanel: {fileID: 2078993006}
   psychoCorruptionSlider: {fileID: 1103475452}
   psychoCorruptionText: {fileID: 0}
   screenNoiseOverlay: {fileID: 0}
@@ -24039,7 +24040,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6922167090381623403, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.67
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6922167090381623403, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: m_LocalPosition.y

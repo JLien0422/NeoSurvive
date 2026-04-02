@@ -16,7 +16,7 @@ public class LobbySoundManager : MonoBehaviour
         UICancel,
         UIConfirm,
         UIBack,
-        
+
         TabSwitch,
         PanelOpen,
         PanelClose,
@@ -39,10 +39,10 @@ public class LobbySoundManager : MonoBehaviour
         SettingsClose,
         SettingsTabSwitch,
         SettingsApply,
-
-        // 
-
         UpgradeBuy,
+
+        원하는거근데한글은안됨,
+
         Error
     }
 

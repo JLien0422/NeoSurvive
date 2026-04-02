@@ -47,6 +47,7 @@ public class DataChip : MonoBehaviour, IPickupable
         }
 
         player.AddNeuralLinkGauge(gaugeAmount);
+        MainSceneSoundManager.Instance?.PlayDataChipPickup();
         Destroy(gameObject);
     }
 }

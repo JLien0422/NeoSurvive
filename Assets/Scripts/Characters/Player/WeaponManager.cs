@@ -119,6 +119,7 @@ namespace NeoSurvive.Weapon
       {
         // 레벨업 로직
         weaponData.level++;
+        MainSceneSoundManager.Instance?.PlayWeaponLevelUp(weaponData);
         RaiseWeaponChanged();
 
         // 생성된 무기 오브젝트에 레벨업 알림
@@ -133,6 +134,7 @@ namespace NeoSurvive.Weapon
       activeWeapons.Add(weaponData);
       // 초기 레벨 설정 (혹시 모르니)
       weaponData.level = 1;
+      MainSceneSoundManager.Instance?.PlayWeaponEquip(weaponData);
 
       GameObject weaponObj = null;
       if (weaponData.weaponPrefab != null)

@@ -55,6 +55,7 @@ public class ChestPickup : MonoBehaviour, IPickupable
     private void Open()
     {
         Debug.Log("🎁 Chest Opened!");
+        MainSceneSoundManager.Instance?.PlayChestOpened();
         OnChestOpened?.Invoke();
         Destroy(gameObject);
     }

@@ -33,6 +33,9 @@ public class UIManager : MonoBehaviour
 
   public GameManager gameManager;
 
+  [Header("Gold UI")]
+  public TextMeshProUGUI goldText;
+
   [Header("Character Choice UI")]
   public GameObject characterChoicePanel;
 

@@ -39,7 +39,7 @@ public class ShooterMechanism : EnemyMechanismBase
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
         base.Initialize(enemyRef, controllerRef);
-        
+
         // 기본 공격 범위 가져오기
         if (controller != null)
         {
@@ -109,7 +109,7 @@ public class ShooterMechanism : EnemyMechanismBase
 
         // 투사체 생성
         GameObject projectile = Instantiate(projectilePrefab, shootPosition, Quaternion.identity);
-        
+
         // 투사체 초기화
         NeoSurvive.Weapon.Projectile proj = projectile.GetComponent<NeoSurvive.Weapon.Projectile>();
         if (proj != null)
@@ -149,9 +149,15 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        Player player = other.GetComponent<Player>() ?? other.GetComponentInParent<Player>();
+        if (player != null)
         {
-            Character character = other.GetComponent<Character>();
+            Character character = player;
+            if (character == null)
+            {
+                character = other.GetComponent<Character>() ?? other.GetComponentInParent<Character>();
+            }
+
             if (character != null)
             {
                 character.TakeDamage(damage);

@@ -47,6 +47,7 @@ public class PsychoCorruptionItem : MonoBehaviour, IPickupable
         }
 
         player.AddPsychoCorruption(corruptionAmount);
+        MainSceneSoundManager.Instance?.PlayPsychoCorruptionPickup();
         Destroy(gameObject);
     }
 }

@@ -47,6 +47,8 @@ public class GoldPickup : MonoBehaviour, IPickupable
         if (GameManager.Instance != null)
             GameManager.Instance.AddGold(goldAmount);
 
+        MainSceneSoundManager.Instance?.PlayGoldPickup();
+
         Destroy(gameObject);
     }
 }

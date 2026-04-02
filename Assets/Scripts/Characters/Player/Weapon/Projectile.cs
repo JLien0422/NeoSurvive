@@ -52,6 +52,7 @@ namespace NeoSurvive.Weapon
       {
         ReportEnemyHitIfNeeded(enemy, damage);
         enemy.TakeDamage(damage, sourceWeapon);
+        MainSceneSoundManager.Instance?.PlayWeaponHit(sourceWeapon);
         OnHitEvent?.Invoke();
         OnHit();
       }

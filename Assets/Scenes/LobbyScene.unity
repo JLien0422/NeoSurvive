@@ -974,37 +974,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 569935584}
   m_CullTransparentMesh: 1
---- !u!1 &617508427
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 617508428}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &617508428
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 617508427}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &651847887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1604,6 +1573,7 @@ GameObject:
   - component: {fileID: 803576782}
   - component: {fileID: 803576781}
   - component: {fileID: 803576780}
+  - component: {fileID: 803576783}
   m_Layer: 0
   m_Name: StartGameButton
   m_TagString: Untagged
@@ -1725,6 +1695,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803576778}
   m_CullTransparentMesh: 1
+--- !u!114 &803576783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803576778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdb727f006c47d44a0ab442545a3b4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playHover: 1
+  playClick: 1
+  useCustomHoverEvent: 0
+  hoverEventType: 0
+  useCustomClickEvent: 0
+  clickEventType: 22
 --- !u!1 &845189136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2800,6 +2788,7 @@ GameObject:
   - component: {fileID: 1235067715}
   - component: {fileID: 1235067716}
   - component: {fileID: 1235067717}
+  - component: {fileID: 1235067718}
   m_Layer: 0
   m_Name: CharactersContainer
   m_TagString: Untagged
@@ -2877,6 +2866,24 @@ MonoBehaviour:
   fadeDuration: 0.22
   showEase: 9
   hideEase: 6
+--- !u!114 &1235067718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1235067712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdb727f006c47d44a0ab442545a3b4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playHover: 1
+  playClick: 1
+  useCustomHoverEvent: 0
+  hoverEventType: 0
+  useCustomClickEvent: 0
+  clickEventType: 1
 --- !u!1 &1312958937
 GameObject:
   m_ObjectHideFlags: 0

@@ -57,6 +57,7 @@ namespace NeoSurvive.Weapon
     public float damage = 5f;
     private float baseDamage;
     private System.Collections.Generic.List<AIDrone> subDrones = new System.Collections.Generic.List<AIDrone>();
+    private bool isFacingRight = true;
 
     private void Start()
     {
@@ -122,6 +123,8 @@ namespace NeoSurvive.Weapon
 
       if (target != null)
       {
+        UpdateFacingByTarget();
+
         fireElapsed += Time.deltaTime;
         if (fireElapsed >= 1f / attackSpeed)
         {
@@ -137,23 +140,54 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
+      if (projectilePrefab == null || target == null) return;
+
+      Vector3 muzzlePos = GetMuzzlePosition();
+      Vector3 dir = (target.position - muzzlePos).normalized;
+
       // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
       var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null && target != null)
+      if (runtimeInfo != null)
       {
-        Vector3 dir = (target.position - (transform.position + (Vector3)fireOffset)).normalized;
-        runtimeInfo.ReportProjectile(transform.position + (Vector3)fireOffset, dir, 20f, detectionRange, 0, 0);
+        runtimeInfo.ReportProjectile(muzzlePos, dir, 20f, detectionRange, 0, 0);
       }
 
-      GameObject obj = Instantiate(projectilePrefab, transform.position + (Vector3)fireOffset, Quaternion.identity);
+      GameObject obj = Instantiate(projectilePrefab, muzzlePos, Quaternion.identity);
       if (obj.TryGetComponent<Projectile>(out var proj))
       {
-        proj.Initialize(transform.right, damage, 20f);
+        proj.Initialize(dir, damage, 20f);
         proj.SetTarget(target);
         var src = GetComponent<WeaponSource>();
         if (src != null) proj.SetSourceWeapon(src.weaponData);
       }
       anim.SetTrigger("doAttack");
+    }
+
+    private void UpdateFacingByTarget()
+    {
+      if (target == null) return;
+
+      float deltaX = target.position.x - transform.position.x;
+      if (Mathf.Abs(deltaX) < 0.001f) return;
+
+      bool shouldFaceRight = deltaX > 0f;
+      if (shouldFaceRight == isFacingRight) return;
+
+      isFacingRight = shouldFaceRight;
+      Vector3 scale = transform.localScale;
+      scale.x = Mathf.Abs(scale.x) * (isFacingRight ? 1f : -1f);
+      transform.localScale = scale;
+    }
+
+    private Vector3 GetMuzzlePosition()
+    {
+      Vector2 localOffset = fireOffset;
+      if (!isFacingRight)
+      {
+        localOffset.x = -localOffset.x;
+      }
+
+      return transform.position + (Vector3)localOffset;
     }
 
     private void UpdateAnimationSpeed()

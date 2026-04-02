@@ -92,13 +92,13 @@ public class BomberMechanism : EnemyMechanismBase
 
         foreach (var hit in hits)
         {
-            Character character = hit.GetComponent<Character>();
+            Character character = hit.GetComponent<Character>() ?? hit.GetComponentInParent<Character>();
             if (character != null && character != enemy) // 자기 자신은 제외
             {
                 float distance = Vector2.Distance(explosionPos, hit.transform.position);
                 float damageMultiplier = 1f - (distance / explosionRadius); // 거리에 따라 대미지 감소
                 float finalDamage = explosionDamage * damageMultiplier;
-                
+
                 character.TakeDamage(finalDamage);
             }
         }

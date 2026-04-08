@@ -213,7 +213,10 @@ public class SettingsManager : MonoBehaviour
   public void SetSfxVolume(float volume)
   {
     sfxVolume = volume;
-    // TODO: 효과음 매니저와 연동
+    if (SoundManager.Instance != null)
+    {
+      SoundManager.Instance.UpdateVolume();
+    }
   }
 
   // 비디오 설정 메서드
@@ -238,9 +241,9 @@ public class SettingsManager : MonoBehaviour
   public void SetPostProcessing(bool enabled)
   {
     postProcessingEnabled = enabled;
-    
+
     // PostProcessVolume 컴포넌트를 찾아서 활성화/비활성화
-    #if UNITY_POST_PROCESSING_STACK_V2
+#if UNITY_POST_PROCESSING_STACK_V2
     UnityEngine.Rendering.PostProcessing.PostProcessVolume volume = FindObjectOfType<UnityEngine.Rendering.PostProcessing.PostProcessVolume>();
     if (volume != null)
     {
@@ -251,9 +254,9 @@ public class SettingsManager : MonoBehaviour
     {
       Debug.LogWarning("[SettingsManager] PostProcessVolume을 찾을 수 없습니다. 씬에 추가해 주세요.");
     }
-    #else
+#else
     Debug.LogWarning("[SettingsManager] Post Processing Stack V2가 설치되지 않았습니다.");
-    #endif
+#endif
   }
 
   public void SetShowDamageNumbers(bool show)

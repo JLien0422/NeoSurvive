@@ -125,8 +125,8 @@ public class MapManager : MonoBehaviour
 
     // 월드 크기를 타일의 실제 월드 크기로 나누어 필요한 타일의 '반지름' 개수를 구합니다.
     // 배경이 보이지 않도록 충분한 여유를 둡니다
-    viewDistanceX = Mathf.CeilToInt((worldWidth / actualTileSize) * 1.0f) + 4;
-    viewDistanceY = Mathf.CeilToInt((worldHeight / actualTileSize) * 1.0f) + 4;
+    viewDistanceX = (Mathf.CeilToInt((worldWidth / actualTileSize) * 1.0f) + 4) / 2;
+    viewDistanceY = (Mathf.CeilToInt((worldHeight / actualTileSize) * 1.0f) + 4) / 2;
 
     // Debug.Log($"[MapManager] View distances updated: X={viewDistanceX}, Y={viewDistanceY} (Camera World View: {worldWidth:F1}x{worldHeight:F1})");
   }

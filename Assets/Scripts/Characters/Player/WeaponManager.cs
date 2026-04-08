@@ -119,7 +119,7 @@ namespace NeoSurvive.Weapon
       {
         // 레벨업 로직
         weaponData.level++;
-        MainSceneSoundManager.Instance?.PlayWeaponLevelUp(weaponData);
+        SoundManager.Instance?.PlayWeaponLevelUp(weaponData);
         RaiseWeaponChanged();
 
         // 생성된 무기 오브젝트에 레벨업 알림
@@ -134,7 +134,7 @@ namespace NeoSurvive.Weapon
       activeWeapons.Add(weaponData);
       // 초기 레벨 설정 (혹시 모르니)
       weaponData.level = 1;
-      MainSceneSoundManager.Instance?.PlayWeaponEquip(weaponData);
+      SoundManager.Instance?.PlayWeaponEquip(weaponData);
 
       GameObject weaponObj = null;
       if (weaponData.weaponPrefab != null)
@@ -170,7 +170,7 @@ namespace NeoSurvive.Weapon
       }
 
       RaiseWeaponChanged();
-            Debug.Log(string.Join("," , activeWeapons));
+      Debug.Log(string.Join(",", activeWeapons));
 
       // [Coop] 로컬 플레이어인 경우 서버에 무기 장착 알림
       if (sendToServer)

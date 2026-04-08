@@ -20,7 +20,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
 
       weaponManager.SendWeaponAttack(WeaponId, direction);
     }
@@ -30,7 +30,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
@@ -60,7 +60,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
@@ -89,7 +89,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
@@ -118,7 +118,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
@@ -146,7 +146,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
@@ -174,7 +174,7 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      MainSceneSoundManager.Instance?.PlayWeaponUseById(WeaponId);
+      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
       if (UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(

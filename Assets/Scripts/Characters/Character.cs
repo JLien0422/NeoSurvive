@@ -65,9 +65,9 @@ public abstract class Character : MonoBehaviour
     currentHealth -= amount;
 
     if (this is Player)
-      MainSceneSoundManager.Instance?.PlayPlayerHit();
+      SoundManager.Instance?.PlayPlayerHit();
     else if (this is Enemy)
-      MainSceneSoundManager.Instance?.PlayEnemyHit();
+      SoundManager.Instance?.PlayEnemyHit();
 
     // 데미지 텍스트 표시
     if (UIManager.Instance != null)
@@ -100,9 +100,9 @@ public abstract class Character : MonoBehaviour
     IsDead = true;
 
     if (this is Player)
-      MainSceneSoundManager.Instance?.PlayPlayerDeath();
+      SoundManager.Instance?.PlayPlayerDeath();
     else if (this is Enemy)
-      MainSceneSoundManager.Instance?.PlayEnemyDeath();
+      SoundManager.Instance?.PlayEnemyDeath();
 
     Debug.Log($"{gameObject.name}이(가) 사망했습니다.");
   }

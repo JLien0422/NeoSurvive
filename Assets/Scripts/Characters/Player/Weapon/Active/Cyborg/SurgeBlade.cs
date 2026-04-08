@@ -144,12 +144,12 @@ namespace NeoSurvive.Weapon
         Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
         if (Vector3.Angle(forward, dirToEnemy) > useAngle * 0.5f) continue;
 
-        // Enemy가 부모에 붙어있는 구조 대응
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy == null) continue;
+        // Character 베이스로 Enemy/Boss 모두 처리
+        Character character = col.GetComponentInParent<Character>();
+        if (character == null) continue;
 
-        var src = GetComponent<WeaponSource>();
-        enemy.TakeDamage(useDamage, src != null ? src.weaponData : null); // ✅ 변경: 이번 공격 데미지 반영
+        var src = GetComponentInParent<WeaponSource>();
+        character.TakeDamage(useDamage, src != null ? src.weaponData : null); // ✅ 변경: 이번 공격 데미지 반영
         damaged++;
 
         if (damaged >= currentMaxTargets) break;

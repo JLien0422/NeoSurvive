@@ -131,12 +131,12 @@ public class PauseMenuController : MonoBehaviour
 
         isPauseMenuOpen = true;
         pauseMenuPanel.SetActive(true);
-        Time.timeScale = 0f;
 
         if (pauseCanvas != null)
             pauseCanvas.sortingOrder = 99;
 
         PlaceWeaponStatsPanelInCenter();
+        Time.timeScale = 0f;
     }
 
     public void ClosePauseMenu()

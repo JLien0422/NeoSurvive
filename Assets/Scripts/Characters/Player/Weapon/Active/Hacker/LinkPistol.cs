@@ -86,7 +86,7 @@ namespace NeoSurvive.Weapon
       if (p != null)
       {
         p.Initialize(direction, damage, bulletSpeed);
-        var src = GetComponent<WeaponSource>();
+        var src = GetComponentInParent<WeaponSource>();
         if (src != null) p.SetSourceWeapon(src.weaponData);
       }
     }

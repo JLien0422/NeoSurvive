@@ -97,7 +97,8 @@ namespace NeoSurvive.Weapon
 
       GameObject drone = Instantiate(dronePrefab, transform.position + (Vector3)randomOffset, Quaternion.identity);
       DeployedTurret deployedTurret = drone.GetComponent<DeployedTurret>();
-      deployedTurret.Initialize(damage, range, fireRate, lifeTime, projectilePrefab);
+      var src = GetComponentInParent<WeaponSource>();
+      deployedTurret.Initialize(damage, range, fireRate, lifeTime, projectilePrefab, src != null ? src.weaponData : null);
 
       elpased = 0f;
     }

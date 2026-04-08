@@ -28,6 +28,8 @@ namespace NeoSurvive.UI
         textMesh = gameObject.AddComponent<TextMeshProUGUI>();
         textMesh.alignment = TextAlignmentOptions.Center;
         textMesh.color = Color.yellow;
+        var font = Resources.Load<TMP_FontAsset>("Fonts/Maplestory Light SDF");
+        if (font != null) textMesh.font = font;
       }
 
       color = textMesh.color;

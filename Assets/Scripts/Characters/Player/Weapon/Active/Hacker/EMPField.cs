@@ -20,12 +20,16 @@ namespace NeoSurvive.Weapon
 
     public Animator animator;
 
-    public void Initialize(float damage, float radius, float duration, bool destroyProjectile)
+    // DPM 기록용 소스 무기
+    private WeaponBase sourceWeapon;
+
+    public void Initialize(float damage, float radius, float duration, bool destroyProjectile, WeaponBase weaponBase = null)
     {
       this.damage = damage;
       this.radius = radius;
       this.duration = duration;
       this.destroyProjectile = destroyProjectile;
+      this.sourceWeapon = weaponBase;
 
       // 시각적 크기 조정 (기본 스프라이트 크기가 1x1이라 가정)
       // 반지름이 radius이므로 지름은 radius * 2
@@ -63,11 +67,8 @@ namespace NeoSurvive.Weapon
       {
         if (hit.CompareTag("Enemy"))
         {
-          if (hit.TryGetComponent<Enemy>(out var enemy))
-          {
-            var src = GetComponent<WeaponSource>();
-            enemy.TakeDamage(damage, src != null ? src.weaponData : null);
-          }
+          if (hit.TryGetComponent<Character>(out var character))
+            character.TakeDamage(damage, sourceWeapon);
         }
       }
     }

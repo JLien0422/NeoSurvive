@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 using NeoSurvive.Weapon;
 
 /// <summary>
@@ -26,6 +27,21 @@ public class WeaponStatsPanelUI : MonoBehaviour
         if (TryGetComponent<Image>(out var img))
             img.raycastTarget = false;
         Refresh();
+        StartCoroutine(AutoRefresh());
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+    private IEnumerator AutoRefresh()
+    {
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(0.5f);
+            Refresh();
+        }
     }
 
     public void Refresh()
@@ -70,6 +86,13 @@ public class WeaponStatsPanelUI : MonoBehaviour
             {
                 images[0].sprite = weapon.weaponIcon;
                 images[0].enabled = true;
+            }
+
+            // 모든 텍스트 필드를 먼저 비워서 이전 값이 남지 않도록 함
+            if (texts != null)
+            {
+                foreach (var t in texts)
+                    t.text = "";
             }
 
             if (texts != null && texts.Length >= 3)

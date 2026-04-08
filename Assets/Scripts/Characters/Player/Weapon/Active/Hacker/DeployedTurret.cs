@@ -13,12 +13,16 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
 
-    public void Initialize(float damage, float range, float fireRate, float lifeTime, GameObject projectilePrefab)
+    // DPM 기록용 소스 무기
+    private WeaponBase sourceWeapon;
+
+    public void Initialize(float damage, float range, float fireRate, float lifeTime, GameObject projectilePrefab, WeaponBase weaponBase = null)
     {
       this.damage = damage;
       this.range = range;
       this.fireRate = fireRate;
       this.projectilePrefab = projectilePrefab;
+      this.sourceWeapon = weaponBase;
 
       Destroy(gameObject, lifeTime);
 
@@ -54,8 +58,8 @@ namespace NeoSurvive.Weapon
       if (obj.TryGetComponent<Projectile>(out var p))
       {
         p.Initialize(dir, damage, 20f);
-        var src = GetComponent<WeaponSource>();
-        if (src != null) p.SetSourceWeapon(src.weaponData);
+        // 부모 무기에서 전달받은 sourceWeapon으로 DPM 기록
+        if (sourceWeapon != null) p.SetSourceWeapon(sourceWeapon);
       }
     }
 

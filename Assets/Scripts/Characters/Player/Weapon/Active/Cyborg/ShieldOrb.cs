@@ -58,12 +58,12 @@ namespace NeoSurvive.Weapon
           return;
       }
 
-      // ✅ 핵심: Enemy는 부모에 붙어 있을 수 있음
-      Enemy enemy = other.GetComponentInParent<Enemy>();
-      if (enemy != null)
+      // Character 베이스로 Enemy/Boss 모두 처리
+      Character character = other.GetComponentInParent<Character>();
+      if (character != null)
       {
-        var src = GetComponent<WeaponSource>();
-        enemy.TakeDamage(damage, src != null ? src.weaponData : null);
+        var src = GetComponentInParent<WeaponSource>();
+        character.TakeDamage(damage, src != null ? src.weaponData : null);
       }
     }
   }

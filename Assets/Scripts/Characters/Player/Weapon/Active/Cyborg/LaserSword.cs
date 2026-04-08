@@ -123,12 +123,12 @@ namespace NeoSurvive.Weapon
         Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
         if (Vector3.Angle(forward, dirToEnemy) > angle * 0.5f) continue;
 
-        // Enemy는 부모에서 찾는다 (중요)
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy != null)
+        // Character 베이스로 Enemy/Boss 모두 처리
+        Character character = col.GetComponentInParent<Character>();
+        if (character != null)
         {
-          var src = GetComponent<WeaponSource>();
-          enemy.TakeDamage(damage, src != null ? src.weaponData : null);
+          var src = GetComponentInParent<WeaponSource>();
+          character.TakeDamage(damage, src != null ? src.weaponData : null);
         }
       }
 
@@ -158,7 +158,7 @@ namespace NeoSurvive.Weapon
           hitMask,
           enemyTag
         );
-        var src = GetComponent<WeaponSource>();
+        var src = GetComponentInParent<WeaponSource>();
         if (src != null) rift.SetSourceWeapon(src.weaponData);
       }
     }

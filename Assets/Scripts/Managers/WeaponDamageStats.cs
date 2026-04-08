@@ -11,6 +11,8 @@ public class WeaponDamageStats : MonoBehaviour
   public static WeaponDamageStats Instance { get; private set; }
 
   private Dictionary<WeaponBase, float> totalDamagePerWeapon = new Dictionary<WeaponBase, float>();
+  private Dictionary<WeaponBase, int> debugLogCount = new Dictionary<WeaponBase, int>();
+  private const int DEBUG_LOG_LIMIT = 5;
   private float gameStartTime;
 
   private void Awake()
@@ -34,15 +36,27 @@ public class WeaponDamageStats : MonoBehaviour
   {
     if (weapon == null) return;
     if (!totalDamagePerWeapon.ContainsKey(weapon))
+    {
       totalDamagePerWeapon[weapon] = 0f;
+      debugLogCount[weapon] = 0;
+      Debug.Log($"[WeaponDamageStats] 새 무기 등록: {weapon.weaponName}");
+    }
     totalDamagePerWeapon[weapon] += amount;
+
+    if (debugLogCount[weapon] < DEBUG_LOG_LIMIT)
+    {
+      debugLogCount[weapon]++;
+      Debug.Log($"[WeaponDamageStats] RecordDamage ({debugLogCount[weapon]}/{DEBUG_LOG_LIMIT}): {weapon.weaponName} +{amount:F1} → 누적={totalDamagePerWeapon[weapon]:F1}");
+    }
   }
 
   /// <summary>
-  /// 경과 시간(분). 게임 시작 시점 기준.
+  /// 경과 시간(분). GameManager의 게임 타이머와 동일한 기준 사용.
   /// </summary>
   public float GetElapsedMinutes()
   {
+    if (GameManager.Instance != null)
+      return GameManager.Instance.GetGameTime() / 60f;
     float elapsed = Time.time - gameStartTime;
     return elapsed / 60f;
   }

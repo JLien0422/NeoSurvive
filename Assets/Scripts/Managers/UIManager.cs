@@ -47,6 +47,8 @@ public class UIManager : MonoBehaviour
   public Slider neuralLinkSlider;
   public TextMeshProUGUI neuralLinkText;
 
+  private TMP_FontAsset _maplestoryLight;
+
   private Transform playerTransform;
   [Header("Health Bar Positioning")]
   public Vector3 healthBarOffset = new Vector3(0, 1.0f, 0); // 캐릭터 머리 위 오프셋
@@ -70,6 +72,7 @@ public class UIManager : MonoBehaviour
   private void Awake()
   {
     Debug.Log("[UIManager] Awake called");
+    _maplestoryLight = Resources.Load<TMP_FontAsset>("Fonts/Maplestory Light SDF");
     if (Instance == null)
     {
       Instance = this;
@@ -461,6 +464,7 @@ public class UIManager : MonoBehaviour
         fallbackLevel.alignment = TextAlignmentOptions.BottomRight;
         fallbackLevel.fontSize = 18;
         fallbackLevel.color = Color.white;
+        if (_maplestoryLight != null) fallbackLevel.font = _maplestoryLight;
       }
 
       weaponIcon.SetActive(true);

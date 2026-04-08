@@ -123,11 +123,11 @@ namespace NeoSurvive.Weapon
             continue;
         }
 
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy != null)
+        Character character = col.GetComponentInParent<Character>();
+        if (character != null)
         {
-          var src = GetComponent<WeaponSource>();
-          enemy.TakeDamage(auraDamage, src != null ? src.weaponData : null);
+          var src = GetComponentInParent<WeaponSource>();
+          character.TakeDamage(auraDamage, src != null ? src.weaponData : null);
         }
       }
 
@@ -174,17 +174,17 @@ namespace NeoSurvive.Weapon
             continue;
         }
 
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy == null) continue;
+        Character character = col.GetComponentInParent<Character>();
+        if (character == null) continue;
 
         float dmg = auraDamage * lightningDamageFactor;
-        var src2 = GetComponent<WeaponSource>();
-        enemy.TakeDamage(dmg, src2 != null ? src2.weaponData : null);
+        var src2 = GetComponentInParent<WeaponSource>();
+        character.TakeDamage(dmg, src2 != null ? src2.weaponData : null);
 
         // 이펙트(선택)
         if (lightningPrefab != null)
         {
-          Instantiate(lightningPrefab, enemy.transform.position, Quaternion.identity);
+          Instantiate(lightningPrefab, character.transform.position, Quaternion.identity);
         }
         return;
       }

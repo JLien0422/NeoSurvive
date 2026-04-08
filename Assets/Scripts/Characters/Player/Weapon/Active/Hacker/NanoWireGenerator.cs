@@ -57,7 +57,8 @@ namespace NeoSurvive.Weapon
 
             if (obj.TryGetComponent<NanoWire>(out var wire))
             {
-                wire.Initialize(damage, duration);
+                var src = GetComponentInParent<WeaponSource>();
+                wire.Initialize(damage, duration, src != null ? src.weaponData : null);
             }
         }
 

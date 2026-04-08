@@ -47,14 +47,19 @@ namespace NeoSurvive.Weapon
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-      collision.gameObject.TryGetComponent(out Enemy enemy);
-      if (enemy != null)
-      {
+      // "Enemy" 태그로 적/보스 통합 체크 (Enemy, Boss 모두 태그가 "Enemy"임)
+      if (!collision.CompareTag("Enemy")) return;
+
+      // Character 베이스 컴포넌트로 TakeDamage 호출
+      if (!collision.gameObject.TryGetComponent(out Character character)) return;
+
+      // 멀티플레이 데미지 리포트 (일반 적만 해당)
+      if (collision.gameObject.TryGetComponent(out Enemy enemy))
         ReportEnemyHitIfNeeded(enemy, damage);
-        enemy.TakeDamage(damage, sourceWeapon);
-        OnHitEvent?.Invoke();
-        OnHit();
-      }
+
+      character.TakeDamage(damage, sourceWeapon);
+      OnHitEvent?.Invoke();
+      OnHit();
     }
 
     private void ReportEnemyHitIfNeeded(Enemy enemy, float damageAmount)

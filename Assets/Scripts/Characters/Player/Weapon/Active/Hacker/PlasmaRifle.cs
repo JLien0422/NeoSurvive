@@ -72,7 +72,8 @@ public class PlasmaRifle : MonoBehaviour
 
     if (obj.TryGetComponent<PlasmaLazer>(out var lazer))
     {
-      lazer.Initialize(dir, damage, currentPenetration);
+      var src = GetComponentInParent<NeoSurvive.Weapon.WeaponSource>();
+      lazer.Initialize(dir, damage, currentPenetration, src != null ? src.weaponData : null);
     }
   }
 

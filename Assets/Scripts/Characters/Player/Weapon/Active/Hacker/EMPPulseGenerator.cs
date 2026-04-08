@@ -63,8 +63,9 @@ namespace NeoSurvive.Weapon
       // 장판 초기화
       if (obj.TryGetComponent<EMPField>(out var field))
       {
-        // Lv.5 이상이면 투사체 파괴 옵션 true
-        field.Initialize(damage, areaSize, duration, currentLevel >= 5);
+        var src = GetComponentInParent<WeaponSource>();
+        // Lv.5 이상이면 투사체 파괴 옵션 true, WeaponBase 전달로 DPM 기록
+        field.Initialize(damage, areaSize, duration, currentLevel >= 5, src != null ? src.weaponData : null);
       }
     }
 

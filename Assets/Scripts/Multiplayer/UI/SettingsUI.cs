@@ -60,8 +60,11 @@ public class SettingsUI : MonoBehaviour
     private bool isSettingsOpen = false;
     public System.Action onSettingsClosed;
 
+    private TMP_FontAsset _maplestoryLight;
+
     private void Awake()
     {
+        _maplestoryLight = Resources.Load<TMP_FontAsset>("Fonts/Maplestory Light SDF");
         settingsManager = SettingsManager.Instance;
         if (settingsManager == null)
         {
@@ -767,6 +770,7 @@ public class SettingsUI : MonoBehaviour
         text.fontSize = 18;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
+        if (_maplestoryLight != null) text.font = _maplestoryLight;
         
         return button;
     }
@@ -1051,6 +1055,7 @@ public class SettingsUI : MonoBehaviour
         text.fontSize = 20;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
+        if (_maplestoryLight != null) text.font = _maplestoryLight;
 
         panel.SetActive(false);
         return panel;
@@ -1085,6 +1090,7 @@ public class SettingsUI : MonoBehaviour
         label.fontSize = 16;
         label.alignment = TextAlignmentOptions.Left;
         label.color = Color.white;
+        if (_maplestoryLight != null) label.font = _maplestoryLight;
     }
 
     /// <summary>
@@ -1116,6 +1122,7 @@ public class SettingsUI : MonoBehaviour
         label.fontSize = 14;
         label.alignment = TextAlignmentOptions.Left;
         label.color = Color.white;
+        if (_maplestoryLight != null) label.font = _maplestoryLight;
         dropdown.captionText = label;
 
         // Arrow
@@ -1185,6 +1192,7 @@ public class SettingsUI : MonoBehaviour
         itemLabel.fontSize = 14;
         itemLabel.alignment = TextAlignmentOptions.Left;
         itemLabel.color = Color.white;
+        if (_maplestoryLight != null) itemLabel.font = _maplestoryLight;
         dropdown.itemText = itemLabel;
 
         return dropdown;
@@ -1309,6 +1317,7 @@ public class SettingsUI : MonoBehaviour
         textComponent.fontSize = 14;
         textComponent.alignment = TextAlignmentOptions.Center;
         textComponent.color = Color.white;
+        if (_maplestoryLight != null) textComponent.font = _maplestoryLight;
         return textComponent;
     }
 }

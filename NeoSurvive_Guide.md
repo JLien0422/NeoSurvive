@@ -21,6 +21,19 @@
    - 인스펙터, 하이어라키 등 에디터 작업이 필요하면 단계별로 안내한다
 
 5. **항상 한국어로 작성해주고, 변경 사항을 전부 빠짐없이, 명확하게 설명해줘. Bullet point로 작성하고, 매 변경사항마다 어떤 파일이 변경되었는지 언급해줘. (예시) - 어떤 사항이 변경되었습니다\n  - src/code1.tsx\n - src/code2.tsx\n"
+
+6. **가지고 있는 에셋 정리**
+1	Easy Save (ES3)				시스템	로컬 세이브/로드		ES3.Save("key", value) / ES3.Load<T>("key") 로 업그레이드, 설정, 게임 진행 데이터 저장
+2	Odin Inspector				에디터	인스펙터 강화		[Button], [ShowInInspector], [DictionaryDrawerSettings] 어트리뷰트로 딕셔너리/리스트 인스펙터 시각화
+3	DOTween Pro				애니메이션	트윈 애니메이션		DOFade(), DOScale(), DOMove() 로 UI 등장/퇴장, 대미지 텍스트 튀어오르기, 레벨업 연출
+4	RaycastPro					시스템	고급 레이캐스트		2D 시야각 계산, 다중 레이캐스트로 현재 FindGameObjectsWithTag 반복문 기반 적 탐색 대체 가능
+5	All In 1 Sprite Shader			비주얼	스프라이트 쉐이더	_HitEffectColor, _OutlineColor, _DissolveAmount 파라미터로 피격 플래시, 해킹 아웃라인, 사망 디졸브 연출
+6	SPUM					비주얼	픽셀 캐릭터 조립		SPUMobj 컴포넌트로 머리/몸/팔/다리 파츠 조립 및 애니메이션 재생, 플레이어/적 비주얼 커스터마이징
+7	Universal Sound FX			오디오	범용 효과음		AudioSource.PlayOneShot(clip) 으로 총소리, 폭발음, 아이템 획득음 등 효과음 클립 연결
+8	Earth Materials SFX Mini-Pack	오디오	환경 효과음		지형별 발소리, 충돌음 클립 제공. 플레이어/적 이동 시 지형 태그에 따라 클립 전환
+9	8Bit Music Album - 051321		오디오	8비트 BGM			AudioClip 배열로 관리해 씬/페이즈별 BGM 전환. 현재 BGM 시스템에 클립으로 연결
+10	vFavorites 2				에디터	즐겨찾기			에디터 전용 툴. 코드/런타임 영향 없음
+
 ---
 
 ## 프로젝트 기본 정보

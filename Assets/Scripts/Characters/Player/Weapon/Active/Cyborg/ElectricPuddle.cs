@@ -62,11 +62,11 @@ namespace NeoSurvive.Weapon
             continue;
         }
 
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy != null)
+        Character character = col.GetComponentInParent<Character>();
+        if (character != null)
         {
-          var src = GetComponent<WeaponSource>();
-          enemy.TakeDamage(damage, src != null ? src.weaponData : null);
+          var src = GetComponentInParent<WeaponSource>();
+          character.TakeDamage(damage, src != null ? src.weaponData : null);
         }
       }
     }

@@ -33,9 +33,6 @@ public class UIManager : MonoBehaviour
 
   public GameManager gameManager;
 
-  [Header("Gold UI")]
-  public TextMeshProUGUI goldText;
-
   [Header("Character Choice UI")]
   public GameObject characterChoicePanel;
 
@@ -49,6 +46,8 @@ public class UIManager : MonoBehaviour
   [Header("신경링크 UI")]
   public Slider neuralLinkSlider;
   public TextMeshProUGUI neuralLinkText;
+
+  private TMP_FontAsset _maplestoryLight;
 
   private Transform playerTransform;
   [Header("Health Bar Positioning")]
@@ -73,6 +72,7 @@ public class UIManager : MonoBehaviour
   private void Awake()
   {
     Debug.Log("[UIManager] Awake called");
+    _maplestoryLight = Resources.Load<TMP_FontAsset>("Fonts/Maplestory Light SDF");
     if (Instance == null)
     {
       Instance = this;
@@ -433,56 +433,60 @@ public class UIManager : MonoBehaviour
 
     Debug.Log($"[UIManager] DrawWeapons called with {weapons.Count} weapons");
 
-    // WeaponUIPanel 하위에 미리 배치된 WeaponIcon 슬롯(직계 자식)을 순서대로 채운다.
-    int slotCount = weaponUIPanel.transform.childCount;
-    for (int i = 0; i < slotCount; i++)
+    float gap = 80f;
+    float padding = 20f;
+    float x = padding;
+    foreach (WeaponBase weapon in weapons)
     {
-      Transform slot = weaponUIPanel.transform.GetChild(i);
-      if (slot == null) continue;
-
-      Transform iconSpriteTf = slot.Find("IconSprite");
-      Image iconImage = iconSpriteTf != null ? iconSpriteTf.GetComponent<Image>() : null;
-      if (iconImage == null)
+      GameObject weaponIcon;
+      if (weaponIconPrefab != null)
       {
-        // 이름 기반 참조가 실패하면 슬롯 내부 첫 Image로 fallback
-        iconImage = slot.GetComponentInChildren<Image>(true);
+        weaponIcon = Instantiate(weaponIconPrefab, weaponUIPanel.transform);
+      }
+      else
+      {
+        // 프리팹이 비어있어도 UI가 완전히 사라지지 않도록 최소 아이콘 슬롯 생성
+        weaponIcon = new GameObject("WeaponIcon_Fallback");
+        weaponIcon.transform.SetParent(weaponUIPanel.transform, false);
+        var rt = weaponIcon.AddComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(64f, 64f);
+        var fallbackImg = weaponIcon.AddComponent<Image>();
+        fallbackImg.color = new Color(1f, 1f, 1f, 0.35f);
+
+        GameObject levelObj = new GameObject("LevelText");
+        levelObj.transform.SetParent(weaponIcon.transform, false);
+        var levelRt = levelObj.AddComponent<RectTransform>();
+        levelRt.anchorMin = Vector2.zero;
+        levelRt.anchorMax = Vector2.one;
+        levelRt.offsetMin = Vector2.zero;
+        levelRt.offsetMax = Vector2.zero;
+        var fallbackLevel = levelObj.AddComponent<TextMeshProUGUI>();
+        fallbackLevel.alignment = TextAlignmentOptions.BottomRight;
+        fallbackLevel.fontSize = 18;
+        fallbackLevel.color = Color.white;
+        if (_maplestoryLight != null) fallbackLevel.font = _maplestoryLight;
       }
 
-      Transform levelTf = slot.Find("WeaponLevel");
-      TMP_Text weaponLevelText = levelTf != null ? levelTf.GetComponent<TMP_Text>() : null;
-      if (weaponLevelText == null)
+      weaponIcon.SetActive(true);
+      weaponIcon.transform.localScale = Vector3.one;
+      // UI 요소이므로 RectTransform을 사용하는 것이 안전합니다.
+      if (weaponIcon.TryGetComponent<RectTransform>(out var rect))
       {
-        // TextMeshProUGUI / TextMeshPro 모두 대응
-        weaponLevelText = slot.GetComponentInChildren<TMP_Text>(true);
+        rect.anchoredPosition = new Vector2(x, -padding); // 상단 기준 배치를 가정 (필요시 조정)
+                                                          // 만약 weaponUIPanel의 피벗이 중앙이면 좌표 계산이 달라질 수 있습니다.
+                                                          // 일단 기존 로직(localPosition)을 유지하되 간격만 넓혀도 됩니다.
+                                                          // 안전하게 기존 localPosition 방식을 사용하되 gap만 늘립니다.
+        weaponIcon.transform.localPosition = new Vector3(x, 0, 0);
+      }
+      else
+      {
+        weaponIcon.transform.localPosition = new Vector3(x, 0, 0);
       }
 
-      WeaponBase weapon = i < weapons.Count ? weapons[i] : null;
-      if (weapon == null)
-      {
-        if (iconImage != null)
-        {
-          iconImage.sprite = null;
-          iconImage.enabled = false;
-        }
-
-        if (weaponLevelText != null)
-        {
-          weaponLevelText.text = string.Empty;
-        }
-
-        continue;
-      }
-
-      if (iconImage != null)
-      {
-        iconImage.sprite = weapon.weaponIcon;
-        iconImage.enabled = weapon.weaponIcon != null;
-      }
-
-      if (weaponLevelText != null)
-      {
-        weaponLevelText.text = $"Lv.{weapon.level}";
-      }
+      if (weaponIcon.TryGetComponent<Image>(out var img)) img.sprite = weapon.weaponIcon;
+      TextMeshProUGUI lvlText = weaponIcon.GetComponentInChildren<TextMeshProUGUI>();
+      if (lvlText != null) lvlText.text = weapon.level.ToString();
+      x += gap;
     }
   }
 
@@ -490,6 +494,10 @@ public class UIManager : MonoBehaviour
   {
     if (weaponUIPanel == null) return;
     Debug.Log("[UIManager] RefreshWeaponUI Event Received");
+    foreach (Transform child in weaponUIPanel.transform)
+    {
+      Destroy(child.gameObject);
+    }
     DrawWeapons(weapons);
   }
 

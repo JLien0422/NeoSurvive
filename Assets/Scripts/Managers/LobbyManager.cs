@@ -2,38 +2,35 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using NeoSurvive.UI;
+using NeoSurvive.UI.Multiplayer;
 using System.Security.Cryptography.X509Certificates;
-using System.Collections.Generic;
-using System.Linq;
 
 public class LobbyManager : MonoBehaviour
 {
   public static LobbyManager Instance { get; private set; }
 
-  public enum TabType
-  {
-    Lobby,
-    Settings,
-    CharacterSelection,
-    Trait,
-  }
 
-  public Dictionary<string, int> TabDomainDict = new Dictionary<string, int>
-  {
-    ["Lobby"] = (int)TabType.Lobby,
-    ["Settings"] = (int)TabType.Settings,
-    ["CharacterSelection"] = (int)TabType.CharacterSelection,
-    ["Trait"] = (int)TabType.Trait,
-  };
+  [Header("UI References")]
+  public Button singlePlayButton;
+  public Button multiplayerButton;
+  public Button settingButton;
+  public Button exitButton;
+  public Button upgradeButton;
+  public GameObject mainMenuPanel; // 메인 버튼들을 포함하는 패널
+
+  [Header("설정 UI")]
+  public SettingsUI settingsUI;
+
+  [Header("Tabs")]
+  [SerializeField] private GameObject lobbyTab;
+  [SerializeField] private GameObject multiplayerTab;
+
+  [Header("Multiplayer UI")]
+  [SerializeField] private MultiplayerRoomUI multiplayerRoomUI;
 
   [Header("Managers")]
   public UpgradeManager upgradeManager;
   public CharacterSelector characterSelector;
-
-  public List<GameObject> tabList = new List<GameObject>();
-  public List<TabType> tabHistory = new List<TabType>();
-
-  public TabType activatedTab;
 
   private void Awake()
   {
@@ -46,85 +43,119 @@ public class LobbyManager : MonoBehaviour
       Destroy(gameObject);
       return;
     }
+
+    // UI 참조 자동 찾기
+    if (multiplayerRoomUI == null)
+      multiplayerRoomUI = FindObjectOfType<MultiplayerRoomUI>();
   }
 
-  private void Update()
+  private void Start()
   {
-    // 닫기
-    if (Input.GetKeyDown(KeyCode.Escape))
+
+    if (upgradeManager == null) upgradeManager = FindObjectOfType<UpgradeManager>(true);
+    if (characterSelector == null) characterSelector = FindObjectOfType<CharacterSelector>(true);
+
+    // 이벤트 연결
+    if (singlePlayButton != null)
     {
-      BackTab();
+      singlePlayButton.onClick.RemoveAllListeners();
+      singlePlayButton.onClick.AddListener(characterSelector.ShowCharacterSelection);
     }
-  }
 
-  public void BackTab()
-  {
-    if (tabHistory.Count >= 2)
+    if (multiplayerButton != null)
     {
-      LobbySoundManager.Instance?.PlayBack();
-      var before = tabHistory[tabHistory.Count - 2];
-      OpenTab(before);
-      activatedTab = before;
-      tabHistory.RemoveAt(tabHistory.Count - 1);
+      multiplayerButton.onClick.RemoveAllListeners();
+      multiplayerButton.onClick.AddListener(ShowMultiplayerTab);
     }
-  }
 
-  public void OpenTab(int tabType)
-  {
-    OpenTab((TabType)tabType);
-  }
-
-  public void OpenTab(string tabName)
-  {
-    if (System.Enum.TryParse(tabName, out TabType tabType))
+    if (settingButton != null)
     {
-      OpenTab(tabType);
+      if (settingsUI == null) settingsUI = FindObjectOfType<SettingsUI>(true);
+      settingButton.onClick.RemoveAllListeners();
+      settingButton.onClick.AddListener(OnSettingButtonClicked);
+    }
+
+    if (exitButton != null)
+    {
+      exitButton.onClick.RemoveAllListeners();
+      exitButton.onClick.AddListener(OnExitButtonClicked);
+    }
+
+    if (upgradeButton != null && upgradeManager != null)
+    {
+      upgradeButton.onClick.RemoveAllListeners();
+      upgradeButton.onClick.AddListener(upgradeManager.OpenUpgradeWindow);
+    }
+
+    // 초기 상태: 로비 탭 표시
+    ShowLobbyTab();
+  }
+
+  /// <summary>
+  /// 로비 탭을 표시합니다
+  /// </summary>
+  public void ShowLobbyTab()
+  {
+    if (lobbyTab != null)
+      lobbyTab.SetActive(true);
+
+    if (multiplayerTab != null)
+      multiplayerTab.SetActive(false);
+
+    Debug.Log("[LobbyManager] 로비 탭 표시");
+  }
+
+  /// <summary>
+  /// 멀티플레이어 대기실 탭을 표시합니다
+  /// </summary>
+  public void ShowMultiplayerTab()
+  {
+    if (lobbyTab != null)
+      lobbyTab.SetActive(false);
+
+    if (multiplayerTab != null)
+    {
+      multiplayerTab.SetActive(true);
     }
     else
     {
-      Debug.LogWarning($"[LobbyManager] Invalid tab name: {tabName}");
+      Debug.LogError("[LobbyManager] Multiplayer Tab not found");
     }
+
+    if (multiplayerRoomUI != null)
+      multiplayerRoomUI.ShowRoomList();
+
+    Debug.Log("[LobbyManager] 멀티플레이어 탭 표시");
   }
 
-  public void OpenTab(TabType tabType)
+  public void OnSettingButtonClicked()
   {
-    if (activatedTab != tabType)
-      LobbySoundManager.Instance?.PlayTabSwitch();
-
-    foreach (var tab in tabList)
+    if (settingsUI == null)
     {
-      tab.SetActive(false);
+      Debug.LogWarning("[LobbyManager] SettingsUI가 할당되지 않았습니다!");
+      return;
     }
-    tabList[(int)tabType].SetActive(true);
-    activatedTab = tabType;
 
-    if (!tabHistory.Contains(tabType))
+    // 로비 메인 패널 숨기기
+    if (mainMenuPanel != null)
+      mainMenuPanel.SetActive(false);
+
+    // SettingUi 게임오브젝트 자체를 먼저 활성화
+    settingsUI.gameObject.SetActive(true);
+
+    // 설정이 닫힐 때: 로비 패널 보이기 + SettingUi 비활성화
+    settingsUI.onSettingsClosed = () =>
     {
-      tabHistory.Add(tabType);
-    }
-  }
+      settingsUI.gameObject.SetActive(false);
+      if (mainMenuPanel != null)
+        mainMenuPanel.SetActive(true);
+    };
 
-  public void CloseTab(TabType tabType)
-  {
-    tabList[(int)tabType].SetActive(false);
-  }
-
-  public void CloseCurrentTab()
-  {
-    CloseTab(activatedTab);
-
-    if (tabHistory.Count > 0)
-    {
-      var lastTab = tabHistory.Last();
-      OpenTab(lastTab);
-      activatedTab = lastTab;
-      tabHistory.RemoveAt(tabHistory.Count - 1);
-    }
+    settingsUI.OpenSettings();
   }
 
   public void OnExitButtonClicked()
   {
-    LobbySoundManager.Instance?.PlayCancel();
     Debug.Log("Exit Button Clicked: Quitting Application...");
     Application.Quit();
 #if UNITY_EDITOR

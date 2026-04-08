@@ -46,11 +46,11 @@ public class GameManager : MonoBehaviour
     startTime = Time.time; // ***** 추가: async Start() 전에 기준 시간 먼저 잡기
   }
 
-  private async void Start()
+  private void Start()
   {
-    await LoadTotalGoldAsync();
+    LoadTotalGold();
 
-    startTime = Time.time; // (기존) 여기서도 다시 잡힘 (유지)
+    startTime = Time.time;
 
     bool isMultiplayer = UDPClient.Instance != null;
 
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
         CameraController cam = FindObjectOfType<CameraController>();
         if (cam != null) cam.SetTarget(playerTransform);
 
-        var mapManager = FindObjectOfType<MapManager>();
+        var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
         if (mapManager != null) mapManager.SetTarget(playerTransform);
       }
       else
@@ -95,14 +95,14 @@ public class GameManager : MonoBehaviour
 
   private void SaveTotalGold()
   {
-    ServerSaveSystem.Save(GOLD_SAVE_KEY, totalGold);
-    Debug.Log($"총 골드 {totalGold}를 서버에 저장했습니다.");
+    ES3.Save(GOLD_SAVE_KEY, totalGold);
+    Debug.Log($"총 골드 {totalGold}를 저장했습니다.");
   }
 
-  private async System.Threading.Tasks.Task LoadTotalGoldAsync()
+  private void LoadTotalGold()
   {
-    totalGold = await ServerSaveSystem.LoadAsync(GOLD_SAVE_KEY, 0);
-    Debug.Log($"서버에서 총 골드 {totalGold}를 불러왔습니다.");
+    totalGold = ES3.Load<int>(GOLD_SAVE_KEY, 0);
+    Debug.Log($"총 골드 {totalGold}를 불러왔습니다.");
   }
 
   public float GetGameTime()

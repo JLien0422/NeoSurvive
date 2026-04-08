@@ -100,4 +100,13 @@ public class EnemySpawner : MonoBehaviour
         bomberWeight = bo;
         tankerWeight = t;
     }
+
+    /// <summary>
+    /// 보스 등장 시 호출 - 적 스폰 코루틴을 완전히 중단합니다.
+    /// </summary>
+    public void StopSpawning()
+    {
+        StopAllCoroutines();
+        Debug.Log("[EnemySpawner] 스폰 중단 완료");
+    }
 }

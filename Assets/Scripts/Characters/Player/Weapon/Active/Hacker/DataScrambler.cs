@@ -95,11 +95,11 @@ namespace NeoSurvive.Weapon
         if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
         {
           // 부채꼴 범위 안
-          if (col.TryGetComponent<Enemy>(out var enemy))
+          if (col.TryGetComponent<Character>(out var character))
           {
-            var src = GetComponent<WeaponSource>();
-            enemy.TakeDamage(damage, src != null ? src.weaponData : null); // 즉시 피해
-            ApplyConfusion(col.gameObject);
+            var src = GetComponentInParent<WeaponSource>();
+            character.TakeDamage(damage, src != null ? src.weaponData : null); // 즉시 피해
+            if (character is Enemy) ApplyConfusion(col.gameObject);
           }
         }
       }
@@ -115,7 +115,7 @@ namespace NeoSurvive.Weapon
       }
 
       // 이미 있으면 시간/데미지 갱신
-      var src = GetComponent<WeaponSource>();
+      var src = GetComponentInParent<WeaponSource>();
       confusion.Initialize(damage, duration, src != null ? src.weaponData : null);
 
       // (추가) Lv5일 때 FrenzyDebuff 같이 적용

@@ -39,7 +39,7 @@ namespace NeoSurvive.Weapon
             // 플레이어(혹은 무기)가 가진 "가하는 데미지 배율" 반영
             float outMul = (ownerFlags != null) ? ownerFlags.outgoingDamageMul : 1f;
             proj.Init(dir, outMul);
-            var src = GetComponent<WeaponSource>();
+            var src = GetComponentInParent<WeaponSource>();
             if (src != null) proj.SetSourceWeapon(src.weaponData);
         }
 

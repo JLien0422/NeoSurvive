@@ -27,6 +27,8 @@ public abstract class Character : MonoBehaviour
   public event System.Action<float, float> OnHealthChanged;
 
   private StatusFlags _baseFlags; // (추가)
+  private int _nullWeaponWarnCount = 0;
+  private const int NULL_WEAPON_WARN_LIMIT = 5;
 
   protected virtual void Awake()
   {
@@ -58,27 +60,27 @@ public abstract class Character : MonoBehaviour
   {
     if (IsDead) return;
 
+    // 무기별 대미지 통계 기록 (배율 적용 전 원본 수치로 기록)
+    if (sourceWeapon != null && WeaponDamageStats.Instance != null)
+    {
+      WeaponDamageStats.Instance.RecordDamage(sourceWeapon, amount);
+    }
+    else if (sourceWeapon == null && _nullWeaponWarnCount < NULL_WEAPON_WARN_LIMIT)
+    {
+      _nullWeaponWarnCount++;
+      Debug.LogWarning($"[DPM 누락 {_nullWeaponWarnCount}/{NULL_WEAPON_WARN_LIMIT}] {gameObject.name}이(가) sourceWeapon=null로 피해를 받음. 대미지={amount:F1}. 투사체나 무기 스크립트의 SetSourceWeapon/GetComponentInParent<WeaponSource>() 를 확인하세요.");
+    }
+
     // (추가) 받는 피해 배율(데미지 2배 디버프 등) 적용
     if (_baseFlags == null) _baseFlags = GetComponent<StatusFlags>(); // (추가)
     if (_baseFlags != null) amount *= _baseFlags.incomingDamageMul;   // (추가)
 
     currentHealth -= amount;
 
-    if (this is Player)
-      SoundManager.Instance?.PlayPlayerHit();
-    else if (this is Enemy)
-      SoundManager.Instance?.PlayEnemyHit();
-
     // 데미지 텍스트 표시
     if (UIManager.Instance != null)
     {
       UIManager.Instance.ShowDamageText(transform.position, amount);
-    }
-
-    // 무기별 대미지 통계 기록 (플레이어 무기 소스일 때만)
-    if (sourceWeapon != null && WeaponDamageStats.Instance != null)
-    {
-      WeaponDamageStats.Instance.RecordDamage(sourceWeapon, amount);
     }
 
     // 체력 변경 알림
@@ -98,12 +100,6 @@ public abstract class Character : MonoBehaviour
   {
     if (IsDead) return;
     IsDead = true;
-
-    if (this is Player)
-      SoundManager.Instance?.PlayPlayerDeath();
-    else if (this is Enemy)
-      SoundManager.Instance?.PlayEnemyDeath();
-
     Debug.Log($"{gameObject.name}이(가) 사망했습니다.");
   }
 

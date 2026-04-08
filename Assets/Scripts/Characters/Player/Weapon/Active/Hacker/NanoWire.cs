@@ -18,17 +18,17 @@ namespace NeoSurvive.Weapon
 
         [SerializeField] private SpriteRenderer spriteRenderer;
         
-        // 데미지 주기 (0.5초마다?) or 닿자마자 1회? 
-        // "절단" -> 지속 데미지보다는 닿으면 큰 데미지?
-        // 하지만 장판류는 지속 데미지가 일반적. 
-        // 여기선 0.2초마다 틱 데미지로 구현.
         private float tickRate = 0.2f;
         private float tickTimer = 0f;
 
-        public void Initialize(float damage, float duration)
+        // DPM 기록용 소스 무기
+        private WeaponBase sourceWeapon;
+
+        public void Initialize(float damage, float duration, WeaponBase weaponBase = null)
         {
             this.damage = damage;
             this.duration = duration;
+            this.sourceWeapon = weaponBase;
 
             if (spriteRenderer == null) 
                 spriteRenderer = GetComponent<SpriteRenderer>();
@@ -95,11 +95,8 @@ namespace NeoSurvive.Weapon
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 0.5f);
             foreach(var hit in hits)
             {
-                if(hit.CompareTag("Enemy") && hit.TryGetComponent<Enemy>(out var enemy))
-                {
-                    var src = GetComponentInParent<WeaponSource>();
-                    enemy.TakeDamage(damage, src != null ? src.weaponData : null);
-                }
+                if (hit.CompareTag("Enemy") && hit.TryGetComponent<Character>(out var character))
+                    character.TakeDamage(damage, sourceWeapon);
             }
         }
 

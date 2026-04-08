@@ -43,13 +43,12 @@ public class PlasmaLazer : MonoBehaviour
 
     foreach (var hit in hits)
     {
-      if (hit.collider != null && hit.collider.TryGetComponent<Enemy>(out var enemy))
+      if (hit.collider != null && hit.collider.CompareTag("Enemy") && hit.collider.TryGetComponent<Character>(out var character))
       {
-        int id = enemy.GetInstanceID();
+        int id = character.GetInstanceID();
         if (hitEnemyIds.Contains(id)) continue;
 
-        var src = GetComponent<WeaponSource>();
-        enemy.TakeDamage(damage, src != null ? src.weaponData : null);
+        character.TakeDamage(damage, sourceWeapon);
         hitEnemyIds.Add(id);
         currentHitCount++;
 
@@ -69,11 +68,15 @@ public class PlasmaLazer : MonoBehaviour
   private int currentHitCount = 0;
   private HashSet<int> hitEnemyIds = new HashSet<int>();
 
-  public void Initialize(Vector3 direction, float damage, int penetration)
+  // DPM 기록용 소스 무기
+  private WeaponBase sourceWeapon;
+
+  public void Initialize(Vector3 direction, float damage, int penetration, WeaponBase weaponBase = null)
   {
     this.direction = direction;
     this.damage = damage;
     this.maxPenetration = penetration;
+    this.sourceWeapon = weaponBase;
 
     if (trailRenderer != null)
     {

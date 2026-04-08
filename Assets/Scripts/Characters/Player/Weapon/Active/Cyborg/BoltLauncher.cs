@@ -128,7 +128,7 @@ namespace NeoSurvive.Weapon
             overloadExplosionRadius,
             overloadExplosionDamageFactor
           );
-          var src = GetComponent<WeaponSource>();
+          var src = GetComponentInParent<WeaponSource>();
           if (src != null) proj.SetSourceWeapon(src.weaponData);
         }
       }

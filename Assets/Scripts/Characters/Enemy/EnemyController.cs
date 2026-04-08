@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using NeoSurvive.Buff;
-using UnityEngine.Profiling; // (추가)
+using NeoSurvive.Buff; // (추가)
 
 // EnemyController 클래스는 적 캐릭터의 인공지능(AI)과 움직임을 처리합니다.
 // 이 컴포넌트는 Enemy 컴포넌트가 있는 게임 오브젝트에 추가되어야 합니다.
@@ -36,9 +35,7 @@ public class EnemyController : MonoBehaviour
   // 참조
   private Enemy enemy;
   private Rigidbody2D rb;
-
-  [SerializeField]
-  public Transform target; // 추적 대상 (Player 또는 Decoy)
+  private Transform target; // 추적 대상 (Player 또는 Decoy)
   private EnemyMechanismBase currentMechanism; // 현재 활성화된 메커니즘
 
   private float searchTimer;
@@ -177,7 +174,7 @@ public class EnemyController : MonoBehaviour
     // 플레이어 거리 체크 (sqrMagnitude로 제곱근 없이 비교)
     if (playerObj != null)
     {
-      float d = ((Vector2)transform.position - (Vector2)playerObj.transform.position).sqrMagnitude;
+      float d = (transform.position - playerObj.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -190,7 +187,7 @@ public class EnemyController : MonoBehaviour
     {
       foreach (var decoy in decoys)
       {
-        float d = ((Vector2)transform.position - (Vector2)decoy.transform.position).sqrMagnitude;
+        float d = (transform.position - decoy.transform.position).sqrMagnitude;
         if (d < closestDist)
         {
           closestDist = d;
@@ -220,7 +217,7 @@ public class EnemyController : MonoBehaviour
       if (e == null) continue;
       if (e == gameObject) continue; // 자기 자신 제외
 
-      float d = ((Vector2)transform.position - (Vector2)e.transform.position).sqrMagnitude;
+      float d = (transform.position - e.transform.position).sqrMagnitude;
       if (d < closestDist)
       {
         closestDist = d;
@@ -317,14 +314,13 @@ public class EnemyController : MonoBehaviour
 
       if (target != null)
       {
-        // 2D 게임 기준으로 XY 평면 거리만 사용
-        float sqrDist = ((Vector2)transform.position - (Vector2)target.position).sqrMagnitude;
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
 
         if (sqrDist <= attackRange * attackRange)
         {
-          if (TryGetCharacterOnTarget(target, out var character))
+          if (target.TryGetComponent<Character>(out var character))
           {
-            Debug.Log($"{gameObject.name}이(가) {target.gameObject.name}을(를) 공격했습니다! (기본 공격력: {attackDamage})");
             float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
             float finalDamage = attackDamage * outMul;
             character.TakeDamage(finalDamage);
@@ -362,8 +358,8 @@ public class EnemyController : MonoBehaviour
       // 기본 이동 로직
       if (target != null)
       {
-        // 2D 게임 기준으로 XY 평면 거리만 사용
-        float sqrDist = ((Vector2)transform.position - (Vector2)target.position).sqrMagnitude;
+        // sqrMagnitude로 제곱근 없이 거리 비교
+        float sqrDist = (transform.position - target.position).sqrMagnitude;
 
         if (sqrDist > attackRange * attackRange)
         {
@@ -382,30 +378,16 @@ public class EnemyController : MonoBehaviour
     }
   }
 
-  private static bool TryGetCharacterOnTarget(Transform targetTransform, out Character character)
-  {
-    character = null;
-    if (targetTransform == null) return false;
-
-    if (targetTransform.TryGetComponent<Character>(out character)) return true;
-
-    character = targetTransform.GetComponentInParent<Character>();
-    if (character != null) return true;
-
-    character = targetTransform.GetComponentInChildren<Character>();
-    return character != null;
-  }
-
 #if UNITY_EDITOR
-  // 에디터에서 감지 범위와 공격 범위를 시각적으로 보여줍니다.
-  private void OnDrawGizmos()
-  {
-    if (showGizmos)
+    // 에디터에서 감지 범위와 공격 범위를 시각적으로 보여줍니다.
+    private void OnDrawGizmos()
     {
-      // 공격 범위 (노란색)
-      Gizmos.color = Color.yellow;
-      Gizmos.DrawWireSphere(transform.position, attackRange);
+        if (showGizmos)
+        {
+            // 공격 범위 (노란색)
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+        }
     }
-  }
 #endif
 }

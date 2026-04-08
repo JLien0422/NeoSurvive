@@ -20,18 +20,13 @@ namespace NeoSurvive.Weapon
       if (owner == null || weaponManager == null) return;
       if (!owner.IsLocal) return;
 
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-
       weaponManager.SendWeaponAttack(WeaponId, direction);
     }
 
     public void ReportProjectile(Vector3 spawnPos, Vector3 direction, float speed, float range = 0f, int penetration = 0, uint targetId = 0)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,
@@ -58,10 +53,7 @@ namespace NeoSurvive.Weapon
     public void ReportBeam(Vector3 startPos, Vector3 direction, float duration, float speed = 0f, int penetration = 0)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,
@@ -87,10 +79,7 @@ namespace NeoSurvive.Weapon
     public void ReportCone(Vector3 origin, Vector3 direction, float angle, float range, float statusDuration)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,
@@ -116,10 +105,7 @@ namespace NeoSurvive.Weapon
     public void ReportArea(Vector3 center, float radius, float duration, float tickRate, bool destroyProjectiles)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,
@@ -144,10 +130,7 @@ namespace NeoSurvive.Weapon
     public void ReportSummon(Vector3 spawnPos, float duration, float hp, bool spawnPrison, float prisonDuration)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,
@@ -172,10 +155,7 @@ namespace NeoSurvive.Weapon
     public void ReportTrap(Vector3 spawnPos, float duration, float activationDelay, float tickRate, float radius)
     {
       if (owner == null || weaponManager == null) return;
-      if (!owner.IsLocal) return;
-
-      SoundManager.Instance?.PlayWeaponUseById(WeaponId);
-      if (UDPClient.Instance == null) return;
+      if (!owner.IsLocal || UDPClient.Instance == null) return;
 
       UDPClient.Instance.SendWeaponAction(
         NeoSurvive.Network.Protocol.ActionType.WeaponUse,

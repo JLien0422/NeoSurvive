@@ -103,9 +103,27 @@ public class PlayerController : MonoBehaviour
             // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.
             moveInput = new Vector2(moveX, moveY).normalized;
         }
+
+        // 이동 입력에 따라 애니메이션 및 스프라이트 방향 갱신
+        UpdateAnimation();
     }
 
+    /// <summary>
+    /// 이동 상태에 따라 Animator 파라미터와 스프라이트 좌우 반전을 갱신합니다.
+    /// </summary>
+    private void UpdateAnimation()
+    {
+        bool isMoving = moveInput.sqrMagnitude > 0f;
 
+        // Animator가 있을 때만 파라미터 설정 (없어도 오류 없이 동작)
+        if (animator != null)
+            animator.SetBool(IsMovingHash, isMoving);
+
+        // 수평 입력이 있을 때만 flipX 갱신 (수직 이동만 할 때 방향 유지)
+        if (spriteRenderer != null && Mathf.Abs(moveInput.x) > 0.01f)
+            spriteRenderer.flipX = moveInput.x < 0f;
+    }
+    
     /// <summary>
     /// 가장 가까운 적을 찾습니다.
     /// </summary>
@@ -137,24 +155,11 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (moveInput.x < 0)
-        {
-            // X축 크기를 -1로 만들어서 전체를 반전
-            transform.localScale = new Vector3(1, 1, 1);
-        }
-        else if (moveInput.x > 0)
-        {
-            // X축 크기를 1로 만들어서 원상복구
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-
         // Rigidbody의 속도를 변경하여 플레이어를 움직입니다.
         // 이제 Player 스크립트에 있는 최종 계산된 이동 속도(CurrentMoveSpeed)를 사용합니다.
         if (rb != null && player != null)
         {
-            Vector2 finalMoveSpeed = moveInput * player.CurrentMoveSpeed;
-            rb.velocity = finalMoveSpeed;
-            animator.SetFloat("moveSpeed", finalMoveSpeed.magnitude); // 애니메이션 속도 매개변수 설정
+            rb.velocity = moveInput * player.CurrentMoveSpeed;
         }
     }
 }

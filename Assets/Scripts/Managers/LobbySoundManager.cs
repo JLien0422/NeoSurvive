@@ -39,6 +39,9 @@ public class LobbySoundManager : MonoBehaviour
         SettingsClose,
         SettingsTabSwitch,
         SettingsApply,
+
+        // 
+        Start,
         UpgradeBuy,
 
         원하는거근데한글은안됨,

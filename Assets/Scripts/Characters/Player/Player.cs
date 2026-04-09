@@ -126,6 +126,7 @@ public class Player : Character
   // (추가) StatusFlags 배율을 Stat에 반영하기 위한 캐시
   private float lastMoveSpeedMul = 1f;      // (추가)
   private float lastOutgoingDamageMul = 1f; // (추가)
+
   #endregion
 
   #endregion

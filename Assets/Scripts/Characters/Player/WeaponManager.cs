@@ -25,8 +25,6 @@ namespace NeoSurvive.Weapon
     public List<WeaponBase> activeWeapons = new(); // 플레이어가 현재 보유한 무기 데이터
     private Dictionary<WeaponBase, GameObject> spawnedWeapons = new(); // 데이터별 생성된 실제 무기 오브젝트
 
-    public List<Passive> activePassives = new();
-
     public static event System.Action<List<WeaponBase>> OnWeaponChanged;
 
     private void RaiseWeaponChanged()
@@ -36,7 +34,6 @@ namespace NeoSurvive.Weapon
       OnWeaponChanged?.Invoke(activeWeapons);
     }
 
-    // [Coop] Player 참조
     private Player player;
 
     private WeaponBase FindWeaponById(int weaponId)
@@ -167,7 +164,7 @@ namespace NeoSurvive.Weapon
       }
 
       RaiseWeaponChanged();
-            Debug.Log(string.Join("," , activeWeapons));
+      Debug.Log(string.Join(",", activeWeapons));
 
       // sendToServer는 네트워크 제거 이후 호환성 유지를 위해 유지합니다.
     }

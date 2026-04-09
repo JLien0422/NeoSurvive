@@ -2,6 +2,16 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+// Define the Stat Types available for modification
+public enum StatType
+{
+  MaxHP,
+  MoveSpeed,
+  AttackDamage,
+  AttackRange,
+  AttackSpeed
+}
+
 // Stat 클래스는 캐릭터의 다양한 능력치(체력, 공격력 등)를 나타냅니다.
 // 이 클래스는 직렬화가 가능하여 인스펙터에서 값을 편집할 수 있습니다.
 [Serializable]

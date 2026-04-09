@@ -36,10 +36,13 @@ namespace NeoSurvive.Weapon
 
     private Player player;
 
+    private int maxWeapon = 6;
+
     private WeaponBase FindWeaponById(int weaponId)
     {
       return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId);
     }
+
     // ***** (추가) 클래스별 무기 풀(= All Weapon Datas 템플릿)
     [Header("Class Weapon Sets (Templates)")] // ***** (추가)
     public List<WeaponBase> cyborgAllWeaponDatas = new(); // ***** (추가)

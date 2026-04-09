@@ -23,7 +23,11 @@ public class Stat
   public float BaseValue
   {
     get { return baseValue; }
-    set { baseValue = value; }
+    set
+    {
+      baseValue = value;
+      onValueChanged?.Invoke(currentValue, baseValue); // 값이 변경될 때 이벤트 호출}
+    }
   }
 
   [SerializeField]
@@ -31,7 +35,11 @@ public class Stat
   public float CurrentValue
   {
     get { return currentValue; }
-    set { currentValue = value; }
+    set
+    {
+      currentValue = value;
+      onValueChanged?.Invoke(currentValue, baseValue); // 값이 변경될 때 이벤트 호출
+    }
   }
 
   // 능력치 수정을 위한 변수들

@@ -101,9 +101,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02a7b6717837a1e4a8addd0d2eac49df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthStat:
-    baseValue: 15
-  currentHealth: 0
+  currentHP:
+    baseValue: 0
+    currentValue: 0
+  maxHP:
+    baseValue: 0
+    currentValue: 0
   experienceToGive: 10
   expOrbPrefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}
   dropCount: 1
@@ -128,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   attackDamage: 1
-  attackRange: 0.5
+  attackRange: 1.5
   showGizmos: 1
   mechanismType: 3
 --- !u!70 &4821075841927757036

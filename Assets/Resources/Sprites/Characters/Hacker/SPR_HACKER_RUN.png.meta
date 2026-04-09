@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: dd82ddb6c9941d24c89505603391cc19
+guid: 1220afb6f67ee754381d6687ab0100b6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,139 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hacker_WALK_1_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5fd06c8fce02d6d4995175b6a062537c
-      internalID: -474438678
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 863b41b569cf51e4c908ede0c6c25da8
-      internalID: -1391820162
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d933f9703d8f28240940135fbce3aa89
-      internalID: -1864228799
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 538b15782d49c9347a33edb44f9008b0
-      internalID: 1685496020
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_4
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a80094c84e13c214cadf9ce2a637db7a
-      internalID: -1576694160
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_5
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 43ae3e1b14c7ee444afac94b0ba7c394
-      internalID: 2081175281
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hacker_WALK_1_6
+      name: SPR_HACKER_RUN_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 64
-        height: 64
+        width: 134
+        height: 144
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -237,20 +111,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9040f3a8818e42d4ba9133fe3f988f32
-      internalID: -730717111
+      spriteID: 068b0912e3f5d074f818961706b39ac6
+      internalID: -1986529579
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Hacker_WALK_1_7
+      name: SPR_HACKER_RUN_1
       rect:
         serializedVersion: 2
-        x: 64
+        x: 134
         y: 0
-        width: 64
-        height: 64
+        width: 134
+        height: 144
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -258,8 +132,134 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3a309d57b26d01140bf7fcf207067590
-      internalID: -1505606996
+      spriteID: fb94f358a8c794b4bb0b70c29156b93d
+      internalID: -674515489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_2
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8435f62971df2724082b7b5bca7f20e6
+      internalID: -856329925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_3
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b7e206931b3ddd4b8ad0c82625a39e2
+      internalID: 1642353631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_4
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 853c3c574f3d47c4197d1d14c7979c3d
+      internalID: -77324843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_5
+      rect:
+        serializedVersion: 2
+        x: 670
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a340ff5d27096254ead3434ec9a3df88
+      internalID: -1424958518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_6
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69618f649577a4d42acb3d239917a6a4
+      internalID: 9318652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_HACKER_RUN_7
+      rect:
+        serializedVersion: 2
+        x: 938
+        y: 0
+        width: 134
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92d77080f38a98444ab3a3545a3fa06b
+      internalID: 370513643
       vertices: []
       indices: 
       edges: []
@@ -275,14 +275,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Hacker_WALK_1_0: -474438678
-      Hacker_WALK_1_1: -1391820162
-      Hacker_WALK_1_2: -1864228799
-      Hacker_WALK_1_3: 1685496020
-      Hacker_WALK_1_4: -1576694160
-      Hacker_WALK_1_5: 2081175281
-      Hacker_WALK_1_6: -730717111
-      Hacker_WALK_1_7: -1505606996
+      SPR_HACKER_RUN_0: -1986529579
+      SPR_HACKER_RUN_1: -674515489
+      SPR_HACKER_RUN_2: -856329925
+      SPR_HACKER_RUN_3: 1642353631
+      SPR_HACKER_RUN_4: -77324843
+      SPR_HACKER_RUN_5: -1424958518
+      SPR_HACKER_RUN_6: 9318652
+      SPR_HACKER_RUN_7: 370513643
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

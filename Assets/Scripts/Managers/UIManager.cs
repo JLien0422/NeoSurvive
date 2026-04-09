@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
 
   [Header("UI Elements")]
   public GameObject damageTextPrefab;
+  public float damageTextOffsetY = 1.5f;
   public Transform canvas;
 
   [Header("Weapon UI")]
@@ -179,6 +180,8 @@ public class UIManager : MonoBehaviour
   private void RegisterEvents()
   {
     if (eventsRegistered) return;
+    Player p = FindObjectOfType<Player>();
+    if (p != null) p.CurrentHP.onValueChanged += UpdatePlayerHealthUI;
     WeaponManager.OnWeaponChanged += RefreshWeaponUI;
     Player.OnExpChanged += UpdateExpUI;
     Player.OnLevelUp += UpdateLevelUI;
@@ -196,6 +199,10 @@ public class UIManager : MonoBehaviour
   private void UnregisterEvents()
   {
     if (!eventsRegistered) return;
+
+    Player p = FindObjectOfType<Player>();
+    if (p != null) p.CurrentHP.onValueChanged -= UpdatePlayerHealthUI;
+
     WeaponManager.OnWeaponChanged -= RefreshWeaponUI;
     Player.OnExpChanged -= UpdateExpUI;
     Player.OnLevelUp -= UpdateLevelUI;
@@ -326,79 +333,79 @@ public class UIManager : MonoBehaviour
   {
     Debug.Log("[UIManager] Chest opened → Weapon choice UI"); // ***
 
-    // 씬에서 WeaponManager 찾기 // *****
-    var wm = GetBestWeaponManager(); // *****
-    if (wm == null) // *****
+    // 씬에서 WeaponManager 찾기 
+    var wm = GetBestWeaponManager();
+    if (wm == null)
     {
-      Debug.LogError("[UIManager] WeaponManager not found in scene!"); // *****
-      return; // *****
+      Debug.LogError("[UIManager] WeaponManager not found in scene!");
+      return;
     }
 
-    // allWeaponDatas에서 랜덤 3개 뽑기 // *****
-    var choices = Pick3RandomWeapons(wm.allWeaponDatas); // *****
-    if (choices == null) // *****
+    // allWeaponDatas에서 랜덤 3개 뽑기 
+    var choices = Pick3RandomWeapons(wm.allWeaponDatas);
+    if (choices == null)
     {
-      Debug.LogError("[UIManager] Not enough weapons in allWeaponDatas (need 3+)"); // *****
-      return; // *****
+      Debug.LogError("[UIManager] Not enough weapons in allWeaponDatas (need 3+)");
+      return;
     }
 
-    // UI 띄우기 + 선택하면 WeaponManager.AddWeapon 호출 // *****
-    ShowWeaponChoiceByData(choices, (picked) => // *****
+    // UI 띄우기 + 선택하면 WeaponManager.AddWeapon 호출 
+    ShowWeaponChoiceByData(choices, (picked) =>
     {
-      if (picked == null) return; // *****
-      wm.AddWeapon(picked); // *****
-      Debug.Log($"[UIManager] Picked weapon: {picked.name}"); // *****
-    }); // *****
+      if (picked == null) return;
+      wm.AddWeapon(picked);
+      Debug.Log($"[UIManager] Picked weapon: {picked.name}");
+    });
   }
 
-  // allWeaponDatas에서 중복 없이 3개 랜덤 선택 (추가) // *****
-  private NeoSurvive.Weapon.WeaponBase[] Pick3RandomWeapons(List<NeoSurvive.Weapon.WeaponBase> all) // *****
+  // allWeaponDatas에서 중복 없이 3개 랜덤 선택 (추가) 
+  private NeoSurvive.Weapon.WeaponBase[] Pick3RandomWeapons(List<NeoSurvive.Weapon.WeaponBase> all)
   {
-    if (all == null || all.Count < 3) return null; // *****
+    if (all == null || all.Count < 3) return null;
 
-    List<NeoSurvive.Weapon.WeaponBase> temp = new List<NeoSurvive.Weapon.WeaponBase>(all); // *****
+    List<NeoSurvive.Weapon.WeaponBase> temp = new List<NeoSurvive.Weapon.WeaponBase>(all);
 
-    for (int i = 0; i < temp.Count; i++) // *****
+    for (int i = 0; i < temp.Count; i++)
     {
-      int j = UnityEngine.Random.Range(i, temp.Count); // *****
-      var t = temp[i]; temp[i] = temp[j]; temp[j] = t; // *****
+      int j = UnityEngine.Random.Range(i, temp.Count);
+      var t = temp[i]; temp[i] = temp[j]; temp[j] = t;
     }
 
-    return new NeoSurvive.Weapon.WeaponBase[] { temp[0], temp[1], temp[2] }; // *****
+    return new NeoSurvive.Weapon.WeaponBase[] { temp[0], temp[1], temp[2] };
   }
 
-  // WeaponBase 3개를 UI에 표시하고, 선택된 WeaponBase를 콜백으로 전달 (추가) // *****
-  public void ShowWeaponChoiceByData(NeoSurvive.Weapon.WeaponBase[] choices, Action<NeoSurvive.Weapon.WeaponBase> onPicked) // *****
+  // WeaponBase 3개를 UI에 표시하고, 선택된 WeaponBase를 콜백으로 전달 (추가) 
+  public void ShowWeaponChoiceByData(NeoSurvive.Weapon.WeaponBase[] choices, Action<NeoSurvive.Weapon.WeaponBase> onPicked)
   {
-    if (weaponChoicePanel == null) return; // *****
-    if (choices == null || choices.Length != 3) return; // *****
+    if (weaponChoicePanel == null) return;
+    if (choices == null || choices.Length != 3) return;
 
-    currentChoices = choices; // *****
+    currentChoices = choices;
 
-    for (int i = 0; i < 3; i++) // *****
+    for (int i = 0; i < 3; i++)
     {
-      var w = choices[i]; // *****
+      var w = choices[i];
 
-      if (weaponChoiceIcons[i] != null) // *****
-        weaponChoiceIcons[i].sprite = (w != null) ? w.weaponIcon : null; // *****
+      if (weaponChoiceIcons[i] != null)
+        weaponChoiceIcons[i].sprite = (w != null) ? w.weaponIcon : null;
 
-      if (weaponChoiceTexts[i] != null) // *****
-        weaponChoiceTexts[i].text = (w != null) ? w.name : "NULL"; // *****
+      if (weaponChoiceTexts[i] != null)
+        weaponChoiceTexts[i].text = (w != null) ? w.name : "NULL";
 
-      int idx = i; // *****
-      weaponChoiceButtons[i].onClick.RemoveAllListeners(); // *****
-      weaponChoiceButtons[i].onClick.AddListener(() => // *****
+      int idx = i;
+      weaponChoiceButtons[i].onClick.RemoveAllListeners();
+      weaponChoiceButtons[i].onClick.AddListener(() =>
       {
-        weaponChoicePanel.SetActive(false); // *****
-        Time.timeScale = 1f; // *****
+        weaponChoicePanel.SetActive(false);
+        Time.timeScale = 1f;
 
-        onPicked?.Invoke(currentChoices[idx]); // *****
-        currentChoices = null; // *****
-      }); // *****
+        onPicked?.Invoke(currentChoices[idx]);
+        currentChoices = null;
+      });
     }
 
-    weaponChoicePanel.SetActive(true); // *****
-    Time.timeScale = 0f; // *****
+    weaponChoicePanel.SetActive(true);
+    Time.timeScale = 0f;
   }
 
   private IEnumerator ShowGameTimeCoroutine()
@@ -496,24 +503,19 @@ public class UIManager : MonoBehaviour
   public void ShowDamageText(Vector3 position, float damage)
   {
     // SettingsManager에서 데미지 숫자 표시 옵션 확인
-    if (SettingsManager.Instance != null && !SettingsManager.Instance.showDamageNumbers)
-    {
-      return; // 옵션이 꺼져 있으면 표시하지 않음
-    }
+    if (SettingsManager.Instance != null && !SettingsManager.Instance.showDamageNumbers) return;
 
     // 해킹 미니게임 진행 중이면 데미지 텍스트를 표시하지 않음
-    if (HackingSystem.Instance != null && HackingSystem.Instance.IsHacking)
-    {
-      return;
-    }
+    if (HackingSystem.Instance != null && HackingSystem.Instance.IsHacking) return;
 
     if (damageTextPrefab == null || weaponUIPanel == null) return;
 
+    Vector3 spanwnPos = position + new Vector3(0, damageTextOffsetY, 0); // 캐릭터 머리 위에 스폰
     // 월드 좌표를 스크린 좌표로 변환
-    Vector2 screenPosition = Camera.main.WorldToScreenPoint(position);
+    Vector2 screenPosition = Camera.main.WorldToScreenPoint(spanwnPos);
 
     // Canvas 부모 하위에 생성 (weaponUIPanel의 부모인 Canvas를 쓰거나, 별도 레이어 사용 가능)
-    GameObject obj = Instantiate(damageTextPrefab, canvas);
+    GameObject obj = Instantiate(damageTextPrefab, screenPosition, Quaternion.identity, canvas);
 
     if (obj.TryGetComponent<RectTransform>(out var rect))
     {
@@ -564,11 +566,12 @@ public class UIManager : MonoBehaviour
     this.playerTransform = player.transform;
 
     // 초기값 설정
-    UpdatePlayerHealthUI(player.CurrentHP.CurrentValue, player.MaxHP.GetValue());
+    UpdatePlayerHealthUI(player.CurrentHP.CurrentValue, player.MaxHP.CurrentValue);
   }
 
   private void UpdatePlayerHealthUI(float current, float max)
   {
+    Debug.Log("[UIManager] UpdatePlayerHealthUI called: " + current + " / " + max);
     if (playerHealthSlider != null)
     {
       playerHealthSlider.maxValue = max;

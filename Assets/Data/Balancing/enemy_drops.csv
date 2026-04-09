@@ -1,0 +1,6 @@
+﻿enemyId,experienceToGive,dropCount,scatterRadius,goldDropChance,psychoCorruptionDropChance,dataChipDropChance
+basic,50,1,1,20,5,5
+shooter,50,1,1,20,5,5
+rusher,50,1,1,20,5,5
+bomber,50,1,1,20,5,5
+tanker,50,1,1,20,5,5

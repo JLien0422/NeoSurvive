@@ -24,13 +24,13 @@ public class PlayerHealthBarView : MonoBehaviour
     void OnEnable()
     {
         if (target != null)
-            target.OnHealthChanged += HandleHealthChanged;
+            target.CurrentHP.onValueChanged += HandleHealthChanged;
     }
 
     void OnDisable()
     {
         if (target != null)
-            target.OnHealthChanged -= HandleHealthChanged;
+            target.CurrentHP.onValueChanged -= HandleHealthChanged;
     }
 
     void Start()
@@ -43,8 +43,8 @@ public class PlayerHealthBarView : MonoBehaviour
     {
         if (target == null || _slider == null) return;
 
-        float max = target.HealthStat != null ? target.HealthStat.GetValue() : 100f;
-        float cur = Mathf.Clamp(target.CurrentHealth, 0f, max);
+        float max = target.MaxHP != null ? target.MaxHP.GetValue() : 100f;
+        float cur = Mathf.Clamp(target.CurrentHP.CurrentValue, 0f, max);
         Apply(cur, max);
     }
 

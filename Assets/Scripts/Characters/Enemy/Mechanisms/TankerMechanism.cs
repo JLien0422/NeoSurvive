@@ -26,7 +26,7 @@ public class TankerMechanism : EnemyMechanismBase
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
         base.Initialize(enemyRef, controllerRef);
-        
+
         // EnemyController의 기본 이동 속도 가져오기
         if (controller != null)
         {
@@ -39,12 +39,12 @@ public class TankerMechanism : EnemyMechanismBase
             baseMoveSpeed = 3f;
             baseAttackRange = 1.5f * attackRangeMultiplier;
         }
-        
+
         // 체력 증가
-        if (enemy != null && enemy.HealthStat != null)
+        if (enemy != null && enemy.CurrentHP != null)
         {
-            baseHealth = enemy.HealthStat.GetValue();
-            enemy.HealthStat.AddPercentModifier(healthMultiplier - 1f); // 예: 2배면 +100%
+            baseHealth = enemy.CurrentHP.GetValue();
+            enemy.CurrentHP.AddPercentModifier(healthMultiplier - 1f); // 예: 2배면 +100%
             enemy.TakeDamage(0f); // 체력 갱신
         }
 
@@ -63,7 +63,7 @@ public class TankerMechanism : EnemyMechanismBase
         // 플레이어를 향해 매우 느리게 이동
         Vector2 direction = (target.position - transform.position).normalized;
         float currentSpeed = baseMoveSpeed * speedMultiplier;
-        
+
         rb.velocity = direction * currentSpeed;
     }
 

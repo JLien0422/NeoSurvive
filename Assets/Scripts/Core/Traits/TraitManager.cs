@@ -159,16 +159,6 @@ public class TraitManager : MonoBehaviour
         Debug.Log($"Acquired trait: {GetTrait(traitId, characterClass).name}, Level: {playerTraitData.acquiredTraits[traitId]}");
 
         // Apply effects immediately
-        ApplyTraitEffects();
         SavePlayerTraits();
-    }
-
-    public void ApplyTraitEffects()
-    {
-        Player player = FindObjectOfType<Player>();
-        if (player != null)
-        {
-            player.ApplyAllTraitEffects();
-        }
     }
 }

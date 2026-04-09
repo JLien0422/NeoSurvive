@@ -294,7 +294,7 @@ public class UIManager : MonoBehaviour
     }
   }
 
-  private NeoSurvive.Weapon.WeaponManager GetBestWeaponManager()
+  private WeaponManager GetBestWeaponManager()
   {
     // 1) Player 태그 기준 우선
     GameObject playerObj = GameObject.FindWithTag("Player");
@@ -308,7 +308,7 @@ public class UIManager : MonoBehaviour
     var players = FindObjectsOfType<Player>(true);
     foreach (var p in players)
     {
-      if (p != null && p.IsLocal)
+      if (p != null)
       {
         var wm = p.GetComponent<NeoSurvive.Weapon.WeaponManager>();
         if (wm != null) return wm;
@@ -410,7 +410,7 @@ public class UIManager : MonoBehaviour
     }
   }
 
-  private void UpdateExpUI(int currentExp, int maxExp)
+  private void UpdateExpUI(float currentExp, float maxExp)
   {
     if (expSlider != null)
     {
@@ -566,13 +566,13 @@ public class UIManager : MonoBehaviour
     if (playerHealthSlider == null) return;
 
     // 기존 구독 해제 처리는 생략 (단일 플레이어 가정)
-    player.OnHealthChanged += UpdatePlayerHealthUI;
+    player.CurrentHP.onValueChanged += UpdatePlayerHealthUI;
 
     // 추적 대상 설정
     this.playerTransform = player.transform;
 
     // 초기값 설정
-    UpdatePlayerHealthUI(player.CurrentHealth, player.HealthStat.GetValue());
+    UpdatePlayerHealthUI(player.CurrentHP.CurrentValue, player.MaxHP.CurrentValue);
   }
 
   private void UpdatePlayerHealthUI(float current, float max)

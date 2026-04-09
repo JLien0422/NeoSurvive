@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,range,angle,firerate,duration,damageperlevel,rangeperlevel,durationperlevel,frenzyduration,explosionradius
+datascrambler,1,10,5,60,2,3,0.1,0.15,0.2,2.5,2.5
+datascrambler,2,10,5,60,2,3,0.1,0.15,0.2,2.5,2.5
+datascrambler,3,10,5,60,2,3,0.1,0.15,0.2,2.5,2.5
+datascrambler,4,10,5,60,2,3,0.1,0.15,0.2,2.5,2.5
+datascrambler,5,10,5,60,2,3,0.1,0.15,0.2,2.5,2.5

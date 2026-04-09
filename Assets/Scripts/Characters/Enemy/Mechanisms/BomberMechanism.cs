@@ -98,7 +98,7 @@ public class BomberMechanism : EnemyMechanismBase
                 float distance = Vector2.Distance(explosionPos, hit.transform.position);
                 float damageMultiplier = 1f - (distance / explosionRadius); // 거리에 따라 대미지 감소
                 float finalDamage = explosionDamage * damageMultiplier;
-                
+
                 character.TakeDamage(finalDamage);
             }
         }

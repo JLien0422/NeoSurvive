@@ -1,0 +1,3 @@
+﻿mapId,id,name,type,autoFit,triggerPaddingX,triggerPaddingY,reducedOrthographicSize,zoomLerpSpeed,sortingLayerName,sortingOrder,maxHp,dropRandomOne,dropBoth,despawnDistance,despawnDelayMin,despawnDelayMax,enableRandomSpark,sparkIntervalMin,sparkIntervalMax,colliderPaddingX,colliderPaddingY,notes
+Map1,illegal_hologram_billboard,불법 개조 홀로그램 광고판,IllegalHologramBillboard,TRUE,0,0,5.5,4,Default,10,0,FALSE,FALSE,0,0,0,FALSE,0,0,0,0,플레이어 진입 시 카메라 시야 축소
+Map1,malfunction_vending_machine,오작동하는 자판기,MalfunctionVendingMachine,TRUE,0,0,0,0,None,0,20,TRUE,FALSE,35,30,60,TRUE,1.5,4,0,0,파괴 가능 자판기

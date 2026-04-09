@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,range,firerate,bulletspeed,damageperlevel
+linkpistol,1,100,10,1,20,0.2
+linkpistol,2,5,10,1,20,0.2
+linkpistol,3,5,10,1,20,0.2
+linkpistol,4,5,10,1,20,0.2
+linkpistol,5,5,10,1,20,0.2

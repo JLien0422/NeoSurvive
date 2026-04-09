@@ -45,7 +45,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       // 로컬 플레이어만 자동 공격 시도
-      if (owner != null && !owner.IsLocal) return;
+      if (owner != null) return;
 
       fireTimer += Time.deltaTime;
       if (fireTimer >= fireRate)

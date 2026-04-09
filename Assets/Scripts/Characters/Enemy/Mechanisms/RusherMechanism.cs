@@ -48,10 +48,10 @@ public class RusherMechanism : EnemyMechanismBase
         }
 
         // 체력 감소 (체력 매우 낮음)
-        if (enemy != null && enemy.HealthStat != null)
+        if (enemy != null && enemy.CurrentHP != null)
         {
-            float currentHealth = enemy.HealthStat.GetValue();
-            enemy.HealthStat.SetBaseValue(currentHealth * 0.5f); // 체력을 절반으로
+            float currentHealth = enemy.CurrentHP.GetValue();
+            enemy.CurrentHP.SetBaseValue(currentHealth * 0.5f); // 체력을 절반으로
             enemy.TakeDamage(0f); // 체력 갱신
         }
     }

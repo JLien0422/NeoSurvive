@@ -1,5 +1,5 @@
 using UnityEngine;
-using NeoSurvive.Characters; 
+using NeoSurvive.Characters;
 using System.Collections;
 using NeoSurvive.Buff; // ✅ (추가) BuffUtil, RootDebuff
 
@@ -18,15 +18,14 @@ namespace NeoSurvive.Weapon
         {
             // Character 클래스의 healthStat 초기화
             // (Character.cs가 protected healthStat을 가지고 있다고 가정)
-            healthStat = new Stat(hp);
-            currentHealth = hp;
+            currentHP = new Stat(hp);
 
             this.spawnPrisonOnDeath = spawnPrison;
             this.prisonDuration = prisonDur;
 
             // 태그 설정 (EnemyController가 인식하도록)
             gameObject.tag = "Decoy";
-            
+
             // 레이어 설정 (Enemy와 충돌 가능해야 함) - 보통 "Player" 레이어 사용 권장
             // gameObject.layer = LayerMask.NameToLayer("Player");
         }
@@ -37,7 +36,7 @@ namespace NeoSurvive.Weapon
             {
                 SpawnDataPrison();
             }
-            
+
             base.Die(); // base.Die() 호출 (Effect 재생 등 있을 수 있음)
             // base.Die()가 Destroy를 포함한다면 아래 코드는 불필요하지만, 
             // Player.cs를 보면 Destroy(gameObject)를 직접 함.
@@ -51,10 +50,10 @@ namespace NeoSurvive.Weapon
         {
             GameObject prison = new GameObject("DataPrison");
             prison.transform.position = transform.position;
-            
+
             // 감옥 스크립트 추가
             var prisonScript = prison.AddComponent<DataPrisonEffect>();
-            prisonScript.Initialize(3.0f, prisonDuration); 
+            prisonScript.Initialize(3.0f, prisonDuration);
         }
     }
 
@@ -70,16 +69,16 @@ namespace NeoSurvive.Weapon
         {
             this.range = range;
             this.duration = duration;
-            
+
             // ✅ 생성 즉시 1회만 적용 (원샷형)
             ApplySnareOnce();
-            
+
             // 시각 효과 (반투명 파란 구체)
             var sr = gameObject.AddComponent<SpriteRenderer>();
             // 스프라이트가 없으면 사각형이라도 나오게... (기본 UI sprite나 null이면 안보임)
             // 보통 프리팹을 쓰지만 스크립트로 생성 중이라.
             // 일단 디버그용 Gizmos로 확인 가능.
-            
+
             Destroy(gameObject, duration);
         }
 

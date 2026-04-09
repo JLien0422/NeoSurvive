@@ -2,19 +2,121 @@ using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
 using NeoSurvive.Weapon;
-using NeoSurvive.Buff; // (추가)
+using NeoSurvive.Buff;
+using NeoSurvive.Exp; // (추가)
 
 // Player 클래스는 플레이어 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
 {
-  //************************버프/디버프 관련 헬퍼************************//
+  #region Variables
+
+  #region Stats
+  [Header("스탯")]
+
+  // 플레이어의 경험치를 저장하는 변수입니다.
+  [SerializeField]
+  private float experience = 0;
+  public float Experience => experience;
+
+  // 다음 레벨업에 필요한 경험치
+  [SerializeField] private int requiredExpForNextLevel = 5;
+  // 경험치 요구량 증가 배율
+  [SerializeField] private float growthMultiplier = 1.25f;
+
+  // 플레이어의 레벨을 저장하는 변수입니다.
+  [SerializeField]
+  private int level = 1;
+  // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
+  public int Level => level;
+
+  [Header("스탯 설정")]
+  // 공격력
+  [SerializeField]
+  private Stat attackDamage = new Stat(10f);
+  // 공격 범위
+  [SerializeField]
+  private Stat attackRange = new Stat(3f);
+  // 기본 공격 주기 (초)
+  [SerializeField]
+  private float baseAttackInterval = 1.0f;
+  // 공격 속도 (1.0 = 100%)
+  [SerializeField]
+  private Stat attackSpeed = new Stat(1.0f);
+
+  [SerializeField]
+  private Stat moveSpeed = new Stat(5f); // PlayerController가 참조할 이동 속도 Stat
+  public float CurrentMoveSpeed => moveSpeed.GetValue(); // PlayerController가 최종 이동 속도를 가져갈 프로퍼티
+
+  #endregion
+
+  #region Events
+
+  public static event System.Action<float, float> OnExpChanged; // (current, max)
+  public static event System.Action<int> OnLevelUp; // (new level)
+
+  // 사이코 잠식도 변경 이벤트 (현재 값, 최대 값)
+  public static event System.Action<float, float> OnPsychoCorruptionChanged; // (current, max)
+  public static event System.Action OnBerserkStarted; // 폭주 시작
+  public static event System.Action OnBerserkEnded; // 폭주 종료
+
+
+  #endregion
+
+  #region Cyber Psycho & Neural Link
+
+  [Header("사이코 잠식도 (과부하) 시스템")]
+  [SerializeField]
+  [Range(0f, 100f)]
+  [Tooltip("현재 사이코 잠식도 (0~100%)")]
+  private float psychoCorruption = 0f;
+
+  // 사이코 잠식도 관련 프로퍼티
+  public float PsychoCorruption => psychoCorruption;
+  public bool IsBerserk { get; private set; } = false;
+
+  // 사이코 잠식도 효과 적용 여부
+  private bool has30PercentEffect = false;
+  private bool has60PercentEffect = false;
+  private bool has100PercentEffect = false;
+
+  // 원래 스탯 값 저장 (효과 제거 시 복원용)
+  private float originalMoveSpeedPercent = 0f;
+  private float originalAttackSpeedPercent = 0f;
+  private float originalDamagePercent = 0f;
+
+  [Header("신경 링크 (Neural Link) 시스템")]
+  [SerializeField]
+  [Range(0f, 100f)]
+  [Tooltip("현재 신경링크 게이지 (0~100%)")]
+  private float neuralLinkGauge = 0f;
+
+  // 신경링크 게이지 변경 이벤트 (현재 값, 최대 값)
+  public static event System.Action<float, float> OnNeuralLinkGaugeChanged;
+
+  // 신경링크 발동 이벤트
+  public static event System.Action<CharacterType> OnNeuralLinkActivated;
+
+  // 신경링크 관련 프로퍼티
+  public float NeuralLinkGauge => neuralLinkGauge;
+
+  #endregion
+
+  #region Character Type & StatusFlags
+  // 현재 선택된 캐릭터 타입
+  [Header("플레이어 클래스 설정")]
+  [SerializeField]
+  [Tooltip("이 플레이어가 어떤 클래스인지 설정")]
+  private CharacterType characterType = CharacterType.Hacker;
+  public CharacterType CharacterType => characterType;
+
   private StatusFlags _playerFlags; // (추가)
 
   // (추가) 다른 스크립트들이 쉽게 참조하도록
   public StatusFlags Status => _playerFlags != null
    ? _playerFlags
    : (_playerFlags = GetComponent<StatusFlags>() ?? gameObject.AddComponent<StatusFlags>()); // (추가)
+
   public bool CanMove => !Status.moveBlocked;   // (추가)
   public bool CanAttack => !Status.attackBlocked; // (추가)
 
@@ -24,6 +126,9 @@ public class Player : Character
   // (추가) StatusFlags 배율을 Stat에 반영하기 위한 캐시
   private float lastMoveSpeedMul = 1f;      // (추가)
   private float lastOutgoingDamageMul = 1f; // (추가)
+  #endregion
+
+  #endregion
 
   // (추가) StatusFlags의 배율을 Stat 퍼센트 모디파이어로 적용/해제(델타 방식)
   private void SyncBuffMultipliersToStats() // (추가)
@@ -59,113 +164,54 @@ public class Player : Character
     // 이유: 기존 이동/공격 로직을 깨지 않기 위해.
     // 대신 CanMove/CanAttack를 추가했으니, 이동/공격 쪽에서 참조하면 CC가 완성됨.
   }
-  //************************여기까지 버프/디버프************************//
 
+  public void SetCharacterType(CharacterType type)
+  {
+    characterType = type;
+  }
 
-  // 플레이어의 경험치를 저장하는 변수입니다.
-  [SerializeField]
-  private int experience = 0;
-  // 외부에서 경험치를 읽을 수 있는 프로퍼티입니다. (읽기 전용)
-  public int Experience => experience;
+  /// <summary>
+  /// 플레이어의 "최종 공격력 배율"을 반환합니다.
+  /// 예: 기본 공격력이 10, 현재 최종 공격력이 15이면 1.5를 반환
+  /// </summary>
+  public float WeaponDamageMultiplier
+  {
+    get
+    {
+      float baseValue = Mathf.Max(0.0001f, attackDamage.BaseValue);
+      return attackDamage.GetValue() / baseValue;
+    }
+  }
 
-  // 플레이어의 레벨을 저장하는 변수입니다.
-  [SerializeField]
-  private int level = 1;
-  // 외부에서 레벨을 읽을 수 있는 프로퍼티입니다. (읽기 전용)
-  public int Level => level;
+  /// <summary>
+  /// 플레이어의 "최종 공격속도 배율"을 반환합니다.
+  /// 예: 기본 공격속도가 1.0, 현재 최종 공격속도가 1.25이면 1.25를 반환
+  /// </summary>
+  public float WeaponAttackSpeedMultiplier
+  {
+    get
+    {
+      float baseValue = Mathf.Max(0.0001f, attackSpeed.BaseValue);
+      return attackSpeed.GetValue() / baseValue;
+    }
+  }
 
-  public static event System.Action<int, int> OnExpChanged; // (current, max)
-  public static event System.Action<int> OnLevelUp; // (new level)
+  /// <summary>
+  /// 무기의 기본 데미지에 플레이어의 최종 공격력 배율을 적용합니다.
+  /// </summary>
+  public float ApplyWeaponDamageMultiplier(float baseWeaponDamage)
+  {
+    return baseWeaponDamage * WeaponDamageMultiplier;
+  }
 
-  // 레벨업 관련 설정(추가)
-  [Header("Level Up Settings (추가)")]
-  // 다음 레벨업에 필요한 경험치
-  [SerializeField] private int requiredExpForNextLevel = 5;
-  // 경험치 요구량 증가 배율
-  [SerializeField] private float growthMultiplier = 1.25f;
-
-  [Header("캐릭터 데이터")]
-  [Tooltip("해커 캐릭터 데이터")]
-  [SerializeField]
-  private CharacterData hackerData;
-  [Tooltip("사이보그 캐릭터 데이터")]
-  [SerializeField]
-  private CharacterData cyborgData;
-
-  [Header("자동 공격 설정")]
-  // 공격력
-  [SerializeField]
-  private Stat attackDamage = new Stat(10f);
-  // 공격 범위
-  [SerializeField]
-  private Stat attackRange = new Stat(3f);
-  // 공격 속도 (1.0 = 100%)
-  [SerializeField]
-  private Stat attackSpeed = new Stat(1.0f);
-
-  [Header("이동 속도 설정")]
-  [SerializeField]
-  private Stat moveSpeed = new Stat(5f); // PlayerController가 참조할 이동 속도 Stat
-  public float CurrentMoveSpeed => moveSpeed.GetValue(); // PlayerController가 최종 이동 속도를 가져갈 프로퍼티
-
-  [Header("현재 스탯 값 (인스펙터 확인용)")]
-  [SerializeField]
-  [Tooltip("현재 이동속도 최종 값")]
-  private float currentMoveSpeedValue;
-  [SerializeField]
-  [Tooltip("현재 공격속도 최종 값")]
-  private float currentAttackSpeedValue;
-  [SerializeField]
-  [Tooltip("현재 공격력 최종 값")]
-  private float currentAttackDamageValue;
-
-  [Header("사이코 잠식도 (과부하) 시스템")]
-  [SerializeField]
-  [Range(0f, 100f)]
-  [Tooltip("현재 사이코 잠식도 (0~100%)")]
-  private float psychoCorruption = 0f;
-
-  // 사이코 잠식도 변경 이벤트 (현재 값, 최대 값)
-  public static event System.Action<float, float> OnPsychoCorruptionChanged;
-
-  // 폭주 상태 시작/종료 이벤트
-  public static event System.Action OnBerserkStarted;
-  public static event System.Action OnBerserkEnded;
-
-  // 사이코 잠식도 관련 프로퍼티
-  public float PsychoCorruption => psychoCorruption;
-  public bool IsBerserk { get; private set; } = false;
-
-  // 사이코 잠식도 효과 적용 여부
-  private bool has30PercentEffect = false;
-  private bool has60PercentEffect = false;
-  private bool has100PercentEffect = false;
-
-  // 원래 스탯 값 저장 (효과 제거 시 복원용)
-  private float originalMoveSpeedPercent = 0f;
-  private float originalAttackSpeedPercent = 0f;
-  private float originalDamagePercent = 0f;
-
-  [Header("신경 링크 (Neural Link) 시스템")]
-  [SerializeField]
-  [Range(0f, 100f)]
-  [Tooltip("현재 신경링크 게이지 (0~100%)")]
-  private float neuralLinkGauge = 0f;
-
-  // 신경링크 게이지 변경 이벤트 (현재 값, 최대 값)
-  public static event System.Action<float, float> OnNeuralLinkGaugeChanged;
-
-  // 신경링크 발동 이벤트
-  public static event System.Action<CharacterType> OnNeuralLinkActivated;
-
-  // 신경링크 관련 프로퍼티
-  public float NeuralLinkGauge => neuralLinkGauge;
-
-  // 현재 선택된 캐릭터 타입
-  private CharacterType currentCharacterType = CharacterType.Hacker;
-
-  // [Coop] 로컬 플레이어 여부
-  public bool IsLocal { get; set; } = true; // 기본값은 true (싱글용)
+  /// <summary>
+  /// 무기의 기본 공격 주기(fireRate)에 플레이어의 최종 공격속도 배율을 적용합니다.
+  /// 공격속도가 높아질수록 실제 공격 주기는 더 짧아집니다.
+  /// </summary>
+  public float ApplyWeaponFireRate(float baseWeaponFireRate)
+  {
+    return baseWeaponFireRate / Mathf.Max(0.0001f, WeaponAttackSpeedMultiplier);
+  }
 
   public void ApplyStatChange(StatType type, float flat, float percent)
   {
@@ -183,9 +229,7 @@ public class Player : Character
         attackSpeed.AddPercentModifier(percent);
         break;
       case StatType.MaxHP:
-        // Character.cs defines healthStat
-        healthStat.AddFixedModifier(flat);
-        healthStat.AddPercentModifier(percent);
+        maxHP.AddPercentModifier(percent);
         break;
       case StatType.MoveSpeed:
         moveSpeed.AddFixedModifier(flat);
@@ -198,27 +242,6 @@ public class Player : Character
   protected override void Awake()
   {
     base.Awake(); // 부모 Awake 호출
-    ApplyUpgrades(); // 업그레이드 적용
-    StartCoroutine(ApplyTraitsAfterManagerInit());
-  }
-
-  // 업그레이드 매니저로부터 스탯 보너스를 가져와 적용하는 메서드
-  private void ApplyUpgrades()
-  {
-    if (UpgradeManager.Instance != null)
-    {
-      // 체력 업그레이드 적용 (기본 체력에 보너스 추가)
-      healthStat.AddFixedModifier(UpgradeManager.Instance.GetHealthUpgradeBonus());
-      currentHealth = healthStat.GetValue(); // 체력 즉시 반영
-
-      // 공격력 업그레이드 적용
-      attackDamage.AddFixedModifier(UpgradeManager.Instance.GetDamageUpgradeBonus());
-
-      // 이동 속도 업그레이드 적용
-      moveSpeed.AddFixedModifier(UpgradeManager.Instance.GetMoveSpeedUpgradeBonus());
-
-      Debug.Log("플레이어에게 영구 업그레이드 보너스 적용 완료.");
-    }
   }
 
   /// <summary>
@@ -226,24 +249,33 @@ public class Player : Character
   /// </summary>
   public void InitCharacter(CharacterType type)
   {
-    CharacterData data = (type == CharacterType.Hacker) ? hackerData : cyborgData;
-    if (data == null)
+    // CSV 값이 있으면 덮어쓰기
+    if (CharacterBalanceLoader.DB != null)
     {
-      Debug.LogError($"[Player] {type}에 해당하는 캐릭터 데이터가 없습니다!");
-      return;
+      string id = type.ToString().ToLower();   // ★ "Hacker" -> "hacker"
+      if (CharacterBalanceLoader.DB.rows.TryGetValue(id, out var row))
+      {
+        if (row.baseHealth > 0f) currentHP.BaseValue = row.baseHealth;
+        if (row.baseAttackDamage > 0f) attackDamage.BaseValue = row.baseAttackDamage;
+        if (row.baseAttackRange > 0f) attackRange.BaseValue = row.baseAttackRange;
+        if (row.baseAttackSpeed > 0f) attackSpeed.BaseValue = row.baseAttackSpeed;
+        if (row.baseMoveSpeed > 0f) moveSpeed.BaseValue = row.baseMoveSpeed;
+
+        Debug.Log($"[Player] CSV 적용 성공: {id} | HP={currentHP.BaseValue}, ATK={attackDamage.BaseValue}, RANGE={attackRange.BaseValue}, ASPD={attackSpeed.BaseValue}, MOVE={moveSpeed.BaseValue}");
+      }
+      else
+      {
+        Debug.LogWarning($"[Player] CSV에서 '{id}' 키를 찾지 못했습니다.");
+      }
+    }
+    else
+    {
+      Debug.LogWarning("[Player] CharacterBalanceLoader.DB가 null입니다.");
     }
 
-    // 기본 스탯 설정
-    healthStat.BaseValue = data.baseHealth;
-    currentHealth = data.baseHealth;
-    attackDamage.BaseValue = data.baseAttackDamage;
-    attackRange.BaseValue = data.baseAttackRange;
-    attackSpeed.BaseValue = data.baseAttackSpeed;
-    moveSpeed.BaseValue = data.baseMoveSpeed;
+    // TODO -> 특성 등 추가 시 여기에 초기화 코드 작성
 
-    Debug.Log($"[Player] {type} 캐릭터 초기화 완료: HP={data.baseHealth}, ATK={data.baseAttackDamage}");
-
-    // TODO: 캐릭터 타입에 따른 스프라이트/애니메이터 교체 로직 추가 필요
+    Debug.Log($"[Player] {type} 캐릭터 초기화 완료: HP={currentHP.BaseValue}, ATK={attackDamage.BaseValue}");
   }
 
   // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
@@ -253,116 +285,39 @@ public class Player : Character
     if (IsDead) return;
     base.Die();
 
-    Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
+    Debug.Log($"{gameObject.name} (플레이어)가 죽었습니다!");
 
     // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
-    if (GameManager.Instance != null && IsLocal)
+    if (GameManager.Instance != null)
     {
       GameManager.Instance.OnPlayerDeath();
     }
 
-    // 싱글플레이에서는 즉시 제거합니다.
+    // TODO -> 죽음 후 UI 처리, 리스폰 처리 등 추가
+
+    // 싱글플레이인 경우 요청에 따라 게임 오브젝트를 파괴합니다.
     Destroy(gameObject);
-  }
-
-  /// <summary>
-  /// 플레이어를 부활시킵니다.
-  /// </summary>
-  public override void Revive(float healthRatio = 1.0f)
-  {
-    base.Revive(healthRatio);
-
-    // 컨트롤러 재활성화 (로컬인 경우만)
-    var controller = GetComponent<PlayerController>();
-    if (controller != null && IsLocal)
-    {
-      controller.enabled = true;
-    }
-
-    // 시각적 복구
-    var sprite = GetComponentInChildren<SpriteRenderer>();
-    if (sprite != null)
-    {
-      Color c = sprite.color;
-      c.a = 1.0f;
-      sprite.color = c;
-    }
-
-    Debug.Log($"[Player] {gameObject.name} 부활 완료 (HP Ratio: {healthRatio})");
   }
 
   // 플레이어가 경험치를 얻었을 때 호출되는 메서드입니다.
   public void GainExperience(int amount)
   {
     experience += amount;
-    // 경험치 UI 갱신
     OnExpChanged?.Invoke(experience, requiredExpForNextLevel);
 
     // 경험치가 충분한지 확인하고 레벨업 처리
     CheckLevelUp();
   }
 
-  // ===================== Exp Orb 처리 =====================
-
-  private void OnTriggerEnter2D(Collider2D other)
-  {
-    // 로컬 플레이어만 아이템 획득 판정
-    if (!IsLocal) return;
-
-    // Enemy가 만든 Exp Orb인지 확인
-    if (!other.name.StartsWith("ExpOrb_")) return;
-
-    int amount = ParseExpOrbAmount(other.name);
-    if (amount <= 0) amount = 1;
-
-    GainExperience(amount);
-
-    Destroy(other.gameObject);
-  }
-
-  private int ParseExpOrbAmount(string orbName)
-  {
-    int idx = orbName.LastIndexOf('_');
-    if (idx < 0 || idx == orbName.Length - 1) return 0;
-
-    string value = orbName.Substring(idx + 1);
-    return int.TryParse(value, out int result) ? result : 0;
-  }
   // 매 프레임마다 인스펙터 표시용 값 업데이트 및 입력 처리
   private void Update()
   {
     SyncBuffMultipliersToStats(); // (추가) 
 
-    UpdateInspectorStats();
-
     // R키로 신경링크 발동 (로컬 플레이어만)
-    if (IsLocal && Input.GetKeyDown(KeyCode.R))
+    if (Input.GetKeyDown(KeyCode.R))
     {
       ActivateNeuralLink();
-    }
-  }
-
-  /// <summary>
-  /// [Coop] 특정 무기의 공격을 실행 (원격 플레이어 동기화용)
-  /// </summary>
-  public void ExecuteAttack(int weaponId, Vector3 direction)
-  {
-    var weaponManager = GetComponent<WeaponManager>();
-    if (weaponManager != null)
-    {
-      weaponManager.ExecuteWeaponAttack(weaponId, direction);
-    }
-  }
-
-  /// <summary>
-  /// [Coop] 원격 플레이어의 무기 장착 동기화
-  /// </summary>
-  public void SyncWeaponEquip(int weaponId)
-  {
-    var weaponManager = GetComponent<WeaponManager>();
-    if (weaponManager != null)
-    {
-      weaponManager.SyncWeaponEquip(weaponId);
     }
   }
 
@@ -371,26 +326,9 @@ public class Player : Character
   {
     base.Start();
 
-    // GameManager에서 선택된 캐릭터 타입 가져오기
-    if (GameManager.Instance != null)
-    {
-      currentCharacterType = GameManager.Instance.GetSelectedCharacter();
-    }
+    InitCharacter(characterType);
+    // ApplyUpgrades();
   }
-
-  /// <summary>
-  /// 인스펙터에서 확인할 수 있도록 현재 스탯 값들을 업데이트합니다.
-  /// </summary>
-  private void UpdateInspectorStats()
-  {
-    if (moveSpeed != null)
-      currentMoveSpeedValue = moveSpeed.GetValue();
-    if (attackSpeed != null)
-      currentAttackSpeedValue = attackSpeed.GetValue();
-    if (attackDamage != null)
-      currentAttackDamageValue = attackDamage.GetValue();
-  }
-
 
   // ===================== 레벨업 로직 =====================
 
@@ -417,7 +355,20 @@ public class Player : Character
     OnLevelUp?.Invoke(level);
   }
 
-  // ===================== 사이코 잠식도 시스템 =====================
+  #region Cyber Psycho
+  /// <summary>
+  /// 사이버사이코 잠식도를 감소시킵니다.
+  /// 잠식도 감소 아이템이 이 함수를 호출합니다.
+  /// </summary>
+  public void ReduceCyberPsycho(float amount)
+  {
+    psychoCorruption = Mathf.Clamp(psychoCorruption - amount, 0f, 100f);
+    OnPsychoCorruptionChanged?.Invoke(psychoCorruption, 100f);
+
+    UpdatePsychoCorruptionEffects();
+
+    Debug.Log($"[Player] 사이코 잠식도 감소: -{amount} | 현재 잠식도: {psychoCorruption:F1}%");
+  }
 
   /// <summary>
   /// 사이코 잠식도를 추가합니다.
@@ -534,9 +485,8 @@ public class Player : Character
     OnBerserkStarted?.Invoke();
 
     // 현재 체력의 30% 감소
-    float healthLoss = currentHealth * 0.3f;
-    currentHealth = Mathf.Max(1f, currentHealth - healthLoss);
-    NotifyHealthChanged();
+    float healthLoss = currentHP.CurrentValue * 0.3f;
+    currentHP.CurrentValue = Mathf.Max(1f, currentHP.CurrentValue - healthLoss);
 
     // 이동속도/공격속도/대미지 +50% (기존 효과와 중첩)
     moveSpeed.AddPercentModifier(0.50f);
@@ -555,7 +505,7 @@ public class Player : Character
   /// <summary>
   /// 폭주 상태 코루틴 (15초 후 종료)
   /// </summary>
-  private System.Collections.IEnumerator BerserkStateCoroutine()
+  private IEnumerator BerserkStateCoroutine()
   {
     yield return new WaitForSeconds(15f);
 
@@ -618,6 +568,9 @@ public class Player : Character
     }
   }
 
+  #endregion
+
+  #region Neural Link
   // ===================== 신경 링크 시스템 =====================
 
   /// <summary>
@@ -657,17 +610,17 @@ public class Player : Character
     OnNeuralLinkGaugeChanged?.Invoke(neuralLinkGauge, 100f);
 
     // 캐릭터 타입에 따라 다른 효과 발동
-    if (currentCharacterType == CharacterType.Hacker)
+    if (characterType == CharacterType.Hacker)
     {
       ActivateHackerNeuralLink();
     }
-    else if (currentCharacterType == CharacterType.Cyborg)
+    else if (characterType == CharacterType.Cyborg)
     {
       ActivateCyborgNeuralLink();
     }
 
-    OnNeuralLinkActivated?.Invoke(currentCharacterType);
-    Debug.Log($"신경링크 발동! ({currentCharacterType})");
+    OnNeuralLinkActivated?.Invoke(characterType);
+    Debug.Log($"신경링크 발동! ({characterType})");
   }
 
   /// <summary>
@@ -788,6 +741,8 @@ public class Player : Character
     }
   }
 
+  #endregion
+
 #if UNITY_EDITOR
   // 에디터에서 공격 범위를 시각적으로 보여주는 기즈모입니다.
   private void OnDrawGizmosSelected()
@@ -797,132 +752,4 @@ public class Player : Character
       Gizmos.DrawWireSphere(transform.position, attackRange.GetValue());
   }
 #endif
-
-  // ===================== 특성 시스템 연동 =====================
-
-  // 모든 특성으로 인한 스탯 보너스를 초기화하는 메서드
-  public void ResetTraitBonuses()
-  {
-    // Stat 클래스에 ClearModifiers 같은 메서드가 있다면 더 효율적입니다.
-    // 현재는 캐릭터 기본 데이터로 스탯을 다시 설정하고 업그레이드를 재적용하는 방식입니다.
-    InitCharacter(currentCharacterType);
-    ApplyUpgrades();
-    Debug.Log("Trait bonuses have been reset to character base stats.");
-  }
-
-  // TraitManager로부터 모든 특성 효과를 가져와 플레이어 스탯에 적용합니다.
-  public void ApplyAllTraitEffects()
-  {
-    if (TraitManager.Instance == null)
-    {
-      Debug.LogWarning("TraitManager instance not found. Cannot apply trait effects.");
-      return;
-    }
-
-    ResetTraitBonuses(); // 먼저 모든 보너스를 초기화
-
-    var acquiredTraits = TraitManager.Instance.playerTraitData.acquiredTraits;
-    // TODO: 현재 캐릭터 클래스를 GameManager 등에서 정확히 가져와야 합니다.
-    string characterClass = GameManager.Instance != null ? GameManager.Instance.GetSelectedCharacter().ToString() : "Hacker";
-
-    Debug.Log($"Applying all trait effects for {characterClass}. {acquiredTraits.Count} traits acquired.");
-
-    foreach (var entry in acquiredTraits)
-    {
-      Trait trait = TraitManager.Instance.GetTrait(entry.Key, characterClass);
-      if (trait != null && trait.effect != null)
-      {
-        ApplyTraitEffect(trait.effect, entry.Value);
-      }
-    }
-    UpdateInspectorStats(); // 변경된 스탯을 인스펙터에 반영
-  }
-
-  // 개별 특성 효과를 스탯에 적용하는 메서드
-  private void ApplyTraitEffect(TraitEffect effect, int level)
-  {
-    float totalValue = effect.value * level;
-
-    Stat targetStat = null;
-    switch (effect.stat)
-    {
-      // 공통
-      case "MaxHealth": targetStat = healthStat; break;
-      case "HealthRegen": /* Regen은 별도 처리 필요 */ break;
-      case "DodgeChance": /* 회피 로직에 적용 필요 */ break;
-      case "CritChance": /* 치명타 로직에 적용 필요 */ break;
-      case "CritDamage": /* 치명타 로직에 적용 필요 */ break;
-      case "GlobalCooldownReduction": /* 모든 무기 쿨다운에 적용 필요 */ break;
-      case "PickupRange": /* 아이템 픽업 스크립트에 적용 필요 */ break;
-      case "ExpGain": /* 경험치 획득 로직에 적용 필요 */ break;
-      case "CreditGain": /* 크레딧 획득 로직에 적용 필요 */ break;
-      case "MoveSpeed": targetStat = moveSpeed; break;
-      case "DashCooldown": /* 대시 스킬에 적용 필요 */ break;
-      case "DashDistance": /* 대시 스킬에 적용 필요 */ break;
-      case "DashCharges": /* 대시 스킬에 적용 필요 */ break;
-
-      // 해커
-      case "AttackSpeed": targetStat = attackSpeed; break;
-      case "CooldownReduction": /* 스킬 쿨다운 스탯에 적용 필요 */ break;
-      case "ProjectileDamage": targetStat = attackDamage; break;
-      case "SummonDuration": /* 소환수 지속시간에 적용 필요 */ break;
-      case "ProjectileRange": targetStat = attackRange; break;
-      case "ProjectileSize": /* 투사체 크기 조절 로직에 적용 필요 */ break;
-
-      // 사이보그
-      case "BaseDamage": targetStat = attackDamage; break;
-      case "DamageReduction": /* 받는 데미지 계산 시 적용 필요 */ break;
-      case "AttackRange": targetStat = attackRange; break;
-      case "DotTickSpeed": /* 도트 데미지 로직에 적용 필요 */ break;
-      case "StatusEffectUp": /* 상태이상 로직에 적용 필요 */ break;
-
-      default:
-        // Stat으로 처리되지 않는 특수 효과들
-        ApplySpecialTraitEffect(effect.stat, level);
-        return;
-    }
-
-    if (targetStat != null)
-    {
-      if (effect.type == "Percentage")
-      {
-        targetStat.AddPercentModifier(totalValue / 100f);
-        Debug.Log($"Applied {effect.stat}: +{totalValue}% to {targetStat}");
-      }
-      else // Flat
-      {
-        targetStat.AddFixedModifier(totalValue);
-        Debug.Log($"Applied {effect.stat}: +{totalValue} flat to {targetStat}");
-      }
-    }
-  }
-
-  // Stat으로 직접 처리되지 않는 특수 효과들을 처리하는 메서드
-  private void ApplySpecialTraitEffect(string effectStat, int level)
-  {
-    // TODO: 여기에 각 특수 효과에 대한 실제 로직을 구현해야 합니다.
-    // 예를 들어, 도탄 횟수 증가, 소환수 강화, 특정 조건부 데미지 증가 등
-    Debug.Log($"Applying special effect: {effectStat}, Level: {level}. Implementation needed.");
-    switch (effectStat)
-    {
-      case "ExtraLife":
-        // TODO: 부활 기능 구현
-        break;
-      case "ProjectileBounce":
-        // TODO: 무기 시스템에 튕기는 횟수 전달
-        break;
-      case "SummonEnhancement":
-        // TODO: 소환수 관리 시스템에 강화 효과 전달
-        break;
-        // ... 기타 등등
-    }
-  }
-
-  // TraitManager가 초기화된 후 특성 효과를 적용하기 위한 코루틴
-  private System.Collections.IEnumerator ApplyTraitsAfterManagerInit()
-  {
-    // TraitManager 싱글톤 인스턴스가 준비될 때까지 한 프레임 대기
-    yield return new WaitUntil(() => TraitManager.Instance != null);
-    ApplyAllTraitEffects();
-  }
 }

@@ -52,7 +52,7 @@ public class HackableObject : MonoBehaviour
         if (cachedPlayer == null || playerSearchTimer >= PlayerSearchInterval)
         {
             playerSearchTimer = 0f;
-            cachedPlayer = FindLocalPlayer();
+            cachedPlayer = FindPlayers();
         }
 
         if (cachedPlayer == null) { canHack = false; return; }
@@ -65,11 +65,9 @@ public class HackableObject : MonoBehaviour
     /// <summary>
     /// 로컬 플레이어를 찾습니다. (싱글플레이 또는 로컬 플레이어 우선)
     /// </summary>
-    private Player FindLocalPlayer()
+    private Player FindPlayers()
     {
         Player[] players = FindObjectsOfType<Player>();
-        foreach (var p in players)
-            if (p.IsLocal) return p;
         return players.Length > 0 ? players[0] : null;
     }
 
@@ -104,7 +102,7 @@ public class HackableObject : MonoBehaviour
         Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
 
         // 캐시된 플레이어 우선 사용, 없으면 재탐색
-        Player player = cachedPlayer != null ? cachedPlayer : FindLocalPlayer();
+        Player player = cachedPlayer != null ? cachedPlayer : FindPlayers();
         if (player != null)
             player.AddPsychoCorruption(psychoIncreaseOnFail);
     }
@@ -131,49 +129,49 @@ public class HackableObject : MonoBehaviour
         switch (objectType)
         {
             case HackableObjectType.SecurityTurret:
-            {
-                Debug.Log("[Effect] 보안 터렛 활성화!");
-                var turret = GetComponent<SecurityTurretEffect>()
-                             ?? gameObject.AddComponent<SecurityTurretEffect>();
-                turret.Activate();
-                break;
-            }
+                {
+                    Debug.Log("[Effect] 보안 터렛 활성화!");
+                    var turret = GetComponent<SecurityTurretEffect>()
+                                 ?? gameObject.AddComponent<SecurityTurretEffect>();
+                    turret.Activate();
+                    break;
+                }
 
             case HackableObjectType.ElectricFence:
-            {
-                Debug.Log("[Effect] 전기 울타리 생성!");
-                var fence = GetComponent<ElectricFenceEffect>()
-                            ?? gameObject.AddComponent<ElectricFenceEffect>();
-                fence.Activate();
-                break;
-            }
+                {
+                    Debug.Log("[Effect] 전기 울타리 생성!");
+                    var fence = GetComponent<ElectricFenceEffect>()
+                                ?? gameObject.AddComponent<ElectricFenceEffect>();
+                    fence.Activate();
+                    break;
+                }
 
             case HackableObjectType.SatelliteUplink:
-            {
-                Debug.Log("[Effect] 새틀라이트 레이저 발동!");
-                var satellite = GetComponent<SatelliteUplinkEffect>()
-                                ?? gameObject.AddComponent<SatelliteUplinkEffect>();
-                satellite.Activate();
-                break;
-            }
+                {
+                    Debug.Log("[Effect] 새틀라이트 레이저 발동!");
+                    var satellite = GetComponent<SatelliteUplinkEffect>()
+                                    ?? gameObject.AddComponent<SatelliteUplinkEffect>();
+                    satellite.Activate();
+                    break;
+                }
 
             case HackableObjectType.SynapseServer:
-            {
-                Debug.Log("[Effect] 적 절반 아군화!");
-                var synapse = GetComponent<SynapseServerEffect>()
-                              ?? gameObject.AddComponent<SynapseServerEffect>();
-                synapse.Activate();
-                break;
-            }
+                {
+                    Debug.Log("[Effect] 적 절반 아군화!");
+                    var synapse = GetComponent<SynapseServerEffect>()
+                                  ?? gameObject.AddComponent<SynapseServerEffect>();
+                    synapse.Activate();
+                    break;
+                }
 
             case HackableObjectType.MagneticBeacon:
-            {
-                Debug.Log("[Effect] 마그네틱 비컨 발동 - 적 견인!");
-                var beacon = GetComponent<MagneticBeaconEffect>()
-                             ?? gameObject.AddComponent<MagneticBeaconEffect>();
-                beacon.Activate();
-                break;
-            }
+                {
+                    Debug.Log("[Effect] 마그네틱 비컨 발동 - 적 견인!");
+                    var beacon = GetComponent<MagneticBeaconEffect>()
+                                 ?? gameObject.AddComponent<MagneticBeaconEffect>();
+                    beacon.Activate();
+                    break;
+                }
 
             default:
                 return;

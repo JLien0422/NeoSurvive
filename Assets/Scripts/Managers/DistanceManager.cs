@@ -167,8 +167,7 @@ public class DistanceManager : MonoBehaviour
         {
             Player p = obj.GetComponent<Player>();
             if (p == null) continue;
-            if (p.IsLocal) return p;       // 로컬 플레이어 즉시 반환
-            if (fallback == null) fallback = p; // 싱글플레이 대비 첫 번째 저장
+            return p;
         }
 
         return fallback;

@@ -19,6 +19,7 @@ public class PassiveEffect
   public StatType statType;
   [Tooltip("고정 수치 만큼 증가합니다.")]
   public float fixedIncrease;
+
   [Tooltip("퍼센트 만큼 증가합니다.")]
   public float percentIncrease;
 }

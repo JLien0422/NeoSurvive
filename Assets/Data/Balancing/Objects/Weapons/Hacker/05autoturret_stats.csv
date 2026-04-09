@@ -1,0 +1,6 @@
+﻿weaponid,level,installcooldown,lifetime,damage,range,firerate,damageperlevel,rangeperlevel,lifetimeperlevel
+autoturret,1,5,10,5,5,1,0.2,0.1,0.1
+autoturret,2,5,10,5,5,1,0.2,0.1,0.1
+autoturret,3,5,10,5,5,1,0.2,0.1,0.1
+autoturret,4,5,10,5,5,1,0.2,0.1,0.1
+autoturret,5,5,10,5,5,1,0.2,0.1,0.1

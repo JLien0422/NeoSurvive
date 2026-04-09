@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,areasize,duration,firerate,spawnradius,damageperlevel,areasizeperlevel
+emppulsegenerator,1,5,2,4,3,4,0.1,0.15
+emppulsegenerator,2,5,2,4,3,4,0.1,0.15
+emppulsegenerator,3,5,2,4,3,4,0.1,0.15
+emppulsegenerator,4,5,2,4,3,4,0.1,0.15
+emppulsegenerator,5,5,2,4,3,4,0.1,0.15

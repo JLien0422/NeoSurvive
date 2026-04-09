@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,range,firerate,speed,damageperlevel,speedperlevel,basecount,maxcount,homingsearchrange,
+boosterknuckle,1,14,12,1.2,18,0.18,0.12,1,4,360,10
+boosterknuckle,2,14,12,1.2,18,0.18,0.12,1,4,360,10
+boosterknuckle,3,14,12,1.2,18,0.18,0.12,1,4,360,10
+boosterknuckle,4,14,12,1.2,18,0.18,0.12,1,4,360,10
+boosterknuckle,5,14,12,1.2,18,0.18,0.12,1,4,360,10

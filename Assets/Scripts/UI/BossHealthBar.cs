@@ -51,16 +51,16 @@ public class BossHealthBar : MonoBehaviour
 
         // 이전 보스 구독 해제
         if (currentBoss != null)
-            currentBoss.OnHealthChanged -= UpdateHP;
+            currentBoss.CurrentHP.onValueChanged -= UpdateHP;
 
         currentBoss = boss;
 
         // HP 변경 이벤트 구독
-        currentBoss.OnHealthChanged += UpdateHP;
+        currentBoss.CurrentHP.onValueChanged += UpdateHP;
 
         // 초기 HP 설정
-        float maxHP = currentBoss.HealthStat.GetValue();
-        float curHP = currentBoss.CurrentHealth;
+        float maxHP = currentBoss.MaxHP.GetValue();
+        float curHP = currentBoss.CurrentHP.CurrentValue;
 
         if (hpSlider != null)
         {
@@ -104,7 +104,7 @@ public class BossHealthBar : MonoBehaviour
     {
         if (currentBoss != null)
         {
-            currentBoss.OnHealthChanged -= UpdateHP;
+            currentBoss.CurrentHP.onValueChanged -= UpdateHP;
             currentBoss = null;
         }
 

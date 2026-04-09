@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,hpratiodamage,hitcooldown,speed,radiusscale,hitradius,halfwidth,halfheight
+chainsaw,1,2,0.05,0.2,8,1,0.6,15,10
+chainsaw,2,2,0.05,0.2,8.5,1,0.6,15,10
+chainsaw,3,2,0.05,0.2,9,1.05,0.65,15,10
+chainsaw,4,2,0.05,0.2,9.5,1.1,0.7,15,10
+chainsaw,5,2,0.05,0.2,10,1.15,0.75,15,10

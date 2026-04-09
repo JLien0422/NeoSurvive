@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,range,angle,firerate,knockbackforce,damageperlevel,rangeperlevel,knockbackperlevel,blackholeduration,blackholepullradius,blackholepullforce
+gravityhammer,1,18,4.5,70,1.6,6,0.15,0.12,0.15,2,2.5,10
+gravityhammer,2,18,4.5,70,1.6,6,0.15,0.12,0.15,2,2.5,10
+gravityhammer,3,18,4.5,70,1.6,6,0.15,0.12,0.15,2,2.5,10
+gravityhammer,4,18,4.5,70,1.6,6,0.15,0.12,0.15,2,2.5,10
+gravityhammer,5,18,4.5,70,1.6,6,0.15,0.12,0.15,2,2.5,10

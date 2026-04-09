@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,followdistance,followspeed,detectionrange,attackspeed,projectilespeed,damageperlevel,subdronecount
+aidrone,1,5,2,1,10,5,20,0.2,0
+aidrone,2,5,2,1,10,5,20,0.2,1
+aidrone,3,5,2,1,10,5,20,0.2,2
+aidrone,4,5,2,1,10,5,20,0.2,3
+aidrone,5,5,2,1,10,5,20,0.2,4

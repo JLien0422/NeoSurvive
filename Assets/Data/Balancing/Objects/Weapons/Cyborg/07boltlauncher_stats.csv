@@ -1,0 +1,6 @@
+﻿weaponid,level,damage,range,speed,homingturnspeed,baseburstinterval,baseburstcount,intervaldecreaseperlevel,countincreaseperlevel,minburstinterval,maxburstcount,spreadangle,overloadstackstoexplode,overloadexplosionradius,overloadexplosiondamagefactor
+boltlauncher,1,10,12,16,540,5,4,1,1,1,8,22,5,2.8,1.4
+boltlauncher,2,10,12,16,540,5,4,1,1,1,8,22,5,2.8,1.4
+boltlauncher,3,10,12,16,540,5,4,1,1,1,8,22,5,2.8,1.4
+boltlauncher,4,10,12,16,540,5,4,1,1,1,8,22,5,2.8,1.4
+boltlauncher,5,10,12,16,540,5,4,1,1,1,8,22,5,2.8,1.4

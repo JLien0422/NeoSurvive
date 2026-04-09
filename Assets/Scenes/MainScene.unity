@@ -5630,7 +5630,6 @@ MonoBehaviour:
   killCountText: {fileID: 2096946303}
   playerHealthSlider: {fileID: 1205811752}
   gameManager: {fileID: 0}
-  goldText: {fileID: 0}
   characterChoicePanel: {fileID: 2078993006}
   psychoCorruptionSlider: {fileID: 1103475452}
   psychoCorruptionText: {fileID: 0}
@@ -6167,6 +6166,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 556891367}
   m_CullTransparentMesh: 1
+--- !u!1 &575507293
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 575507295}
+  - component: {fileID: 575507294}
+  m_Layer: 0
+  m_Name: BossSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &575507294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 575507293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 873b58cf14e5b1847babdf9c4f55b125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bossPrefabsByMapId:
+  - {fileID: 1863590038507068367, guid: 69a095e09086345419c6ae2a01aa937c, type: 3}
+  selectedMapId: 1
+  spawnOffsetY: 5
+  fadeInDuration: 1.5
+--- !u!4 &575507295
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 575507293}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.96355766, y: -2.42092, z: -2.732179}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &578832446
 GameObject:
   m_ObjectHideFlags: 0
@@ -13389,7 +13437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hackingUIPanel: {fileID: 0}
   securityTurretPrefab: {fileID: 0}
-  electricFencePrefab: {fileID: 0}
+  electricFencePrefab: {fileID: 733874190501676579, guid: e34d5199262cb1a4ab57c961ebcd5fa3, type: 3}
   satelliteUplinkPrefab: {fileID: 0}
   synapseServerPrefab: {fileID: 0}
   magneticBeaconPrefab: {fileID: 0}
@@ -14855,18 +14903,13 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 78534b0cd52999e4ca9508768fc62021, type: 3}
   sfxSource: {fileID: 0}
   masterSfxVolume: 1
-  sfxSlots: []
-  weaponSfxSlots:
-  - weaponId: 0
-    weaponName: 
-    equipClips: []
-    levelUpClips: []
-    useClips: []
-    hitClips: []
-    volume: 0
-    randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+  eventDefinitions:
+  - {fileID: 11400000, guid: bbafc91f695b32243b015c0100534c01, type: 2}
+  autoLoadEventDefinitionsFromAssets: 1
+  eventDefinitionsAssetsPath: Assets/Data/Sounds/Ingame
+  weaponSoundProfiles: []
+  autoLoadWeaponProfilesFromAssets: 1
+  weaponProfilesAssetsPath: Assets/Data/Sounds/Ingame
 --- !u!82 &1363044923
 AudioSource:
   m_ObjectHideFlags: 0
@@ -20572,8 +20615,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1234567890
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e7d858be6b7af0548a472048a9056274, type: 2}
-  m_sharedMaterial: {fileID: -367055782425989523, guid: e7d858be6b7af0548a472048a9056274, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -21469,6 +21512,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28bb3ebbba90f4c4bbaadf3a61dac5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseMenuPanel: {fileID: 0}
+  resumeButton: {fileID: 0}
+  settingsButton: {fileID: 0}
+  quitButton: {fileID: 0}
+  weaponStatsPanel: {fileID: 0}
+  settingsUI: {fileID: 0}
+  quitSceneName: 
 --- !u!1 &1933243700
 GameObject:
   m_ObjectHideFlags: 0
@@ -23204,7 +23254,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2078993009}
   - component: {fileID: 2078993008}
-  - component: {fileID: 2078993010}
   - component: {fileID: 2078993011}
   m_Layer: 0
   m_Name: GameManager
@@ -23255,21 +23304,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2078993010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2078993006}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 542beddc2855b1842b67b6d36d6cb00f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentRunGold: 0
-  totalGold: 0
-  serverAPI: {fileID: 0}
 --- !u!114 &2078993011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23636,8 +23670,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e7d858be6b7af0548a472048a9056274, type: 2}
-  m_sharedMaterial: {fileID: -367055782425989523, guid: e7d858be6b7af0548a472048a9056274, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -24322,3 +24356,4 @@ SceneRoots:
   - {fileID: 902696064}
   - {fileID: 1249975125}
   - {fileID: 1310064708}
+  - {fileID: 575507295}

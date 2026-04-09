@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace NeoSurvive.Network
+namespace NeoSurvive.Utils
 {
   /// <summary>
   /// ES3를 활용한 직렬화/역직렬화 헬퍼 클래스

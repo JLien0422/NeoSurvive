@@ -1,7 +1,5 @@
 using UnityEngine;
 using NeoSurvive.UI;
-using NeoSurvive.Network;
-using NeoSurvive.Network.Protocol;
 
 namespace NeoSurvive.Weapon
 {
@@ -18,7 +16,6 @@ namespace NeoSurvive.Weapon
 
     private Transform target;
     private Vector3 destination;
-    private bool shouldReportDamage = true;
     private WeaponBase sourceWeapon;
 
     public event System.Action OnHitEvent;
@@ -28,7 +25,6 @@ namespace NeoSurvive.Weapon
       direction = dir.normalized;
       damage = dmg;
       this.speed = speed;
-      shouldReportDamage = !NetworkDamageContext.IsRemoteAction;
       Destroy(gameObject, lifeTime);
     }
 
@@ -53,27 +49,9 @@ namespace NeoSurvive.Weapon
       // Character 베이스 컴포넌트로 TakeDamage 호출
       if (!collision.gameObject.TryGetComponent(out Character character)) return;
 
-      // 멀티플레이 데미지 리포트 (일반 적만 해당)
-      if (collision.gameObject.TryGetComponent(out Enemy enemy))
-        ReportEnemyHitIfNeeded(enemy, damage);
-
       character.TakeDamage(damage, sourceWeapon);
       OnHitEvent?.Invoke();
       OnHit();
-    }
-
-    private void ReportEnemyHitIfNeeded(Enemy enemy, float damageAmount)
-    {
-      if (!shouldReportDamage) return;
-      if (UDPClient.Instance == null) return;
-
-      var proxy = enemy.GetComponent<NeoSurvive.Network.EnemyProxy>();
-      if (proxy == null) return;
-
-      uint dmg = (uint)Mathf.Max(0, Mathf.RoundToInt(damageAmount));
-      if (dmg == 0) return;
-
-      UDPClient.Instance.SendAction(ActionType.Damage, proxy.EnemyId, Vector2.zero, dmg, 0);
     }
 
     protected virtual void OnHit()

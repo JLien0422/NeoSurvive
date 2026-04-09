@@ -84,22 +84,6 @@ public class Enemy : Character
     // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
     base.Die();
 
-    // 멀티플레이 개발 중: 멀티플레이 모드에서는 서버가 아이템 드랍 및 킬 카운트를 관리하므로
-    // 클라이언트에서는 시각적/물리적 비활성 처리만 권장됩니다.
-    if (UDPClient.Instance != null)
-    {
-      // 멀티플레이어인 경우 파괴는 EnemyManager가 스냅샷을 기반으로 수행합니다.
-      // 여기서는 충돌 등만 꺼줍니다.
-      var col = GetComponent<Collider2D>();
-      if (col != null) col.enabled = false;
-
-      var rb = GetComponent<Rigidbody2D>();
-      if (rb != null) rb.velocity = Vector2.zero;
-
-      Debug.Log($"[Enemy] 적 {gameObject.name} 사망 처리 (멀티플레이)");
-      return;
-    }
-
     // 싱글플레이: 경험치 오브 드랍 메서드 호출 (추가)
     DropExpOrbs();
     // 골드 드랍 메서드 호출

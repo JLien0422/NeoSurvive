@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
-using NeoSurvive.Network.Protocol;
 using NeoSurvive.Weapon;
 using NeoSurvive.Buff; // (추가)
 
@@ -200,6 +199,7 @@ public class Player : Character
   {
     base.Awake(); // 부모 Awake 호출
     ApplyUpgrades(); // 업그레이드 적용
+    StartCoroutine(ApplyTraitsAfterManagerInit());
   }
 
   // 업그레이드 매니저로부터 스탯 보너스를 가져와 적용하는 메서드
@@ -255,41 +255,14 @@ public class Player : Character
 
     Debug.Log($"{gameObject.name} (플레이어)가 패배했습니다!");
 
-    // [Coop] 로컬 플레이어인 경우 서버에 죽음 알림
-    if (IsLocal && UDPClient.Instance != null)
-    {
-      UDPClient.Instance.SendAction(ActionType.Dead);
-    }
-
     // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
     if (GameManager.Instance != null && IsLocal)
     {
       GameManager.Instance.OnPlayerDeath();
     }
 
-    // 멀티플레이어인 경우 파괴하지 않고 비활성화 처리 (부활 가능성을 위해)
-    if (UDPClient.Instance != null)
-    {
-      // 시각적으로 죽었음을 표시 (투명도 조절)
-      var rb = GetComponent<Rigidbody2D>();
-      if (rb != null) rb.velocity = Vector2.zero;
-
-      var controller = GetComponent<PlayerController>();
-      if (controller != null) controller.enabled = false;
-
-      var sprite = GetComponentInChildren<SpriteRenderer>();
-      if (sprite != null)
-      {
-        Color c = sprite.color;
-        c.a = 0.3f;
-        sprite.color = c;
-      }
-    }
-    else
-    {
-      // 싱글플레이인 경우 요청에 따라 게임 오브젝트를 파괴합니다.
-      Destroy(gameObject);
-    }
+    // 싱글플레이에서는 즉시 제거합니다.
+    Destroy(gameObject);
   }
 
   /// <summary>
@@ -343,12 +316,6 @@ public class Player : Character
     if (amount <= 0) amount = 1;
 
     GainExperience(amount);
-
-    // [Coop] 서버에 아이템 획득 보고 (TargetID는 일단 해시 사용)
-    if (UDPClient.Instance != null)
-    {
-      UDPClient.Instance.SendAction(ActionType.ItemPickup, (uint)other.gameObject.GetInstanceID());
-    }
 
     Destroy(other.gameObject);
   }
@@ -677,12 +644,6 @@ public class Player : Character
       return;
     }
 
-    // 로컬 플레이어라면 서버로 전송
-    if (IsLocal && UDPClient.Instance != null)
-    {
-      UDPClient.Instance.SendAction(ActionType.NeuralLink);
-    }
-
     ExecuteNeuralLink();
   }
 
@@ -836,4 +797,132 @@ public class Player : Character
       Gizmos.DrawWireSphere(transform.position, attackRange.GetValue());
   }
 #endif
+
+  // ===================== 특성 시스템 연동 =====================
+
+  // 모든 특성으로 인한 스탯 보너스를 초기화하는 메서드
+  public void ResetTraitBonuses()
+  {
+    // Stat 클래스에 ClearModifiers 같은 메서드가 있다면 더 효율적입니다.
+    // 현재는 캐릭터 기본 데이터로 스탯을 다시 설정하고 업그레이드를 재적용하는 방식입니다.
+    InitCharacter(currentCharacterType);
+    ApplyUpgrades();
+    Debug.Log("Trait bonuses have been reset to character base stats.");
+  }
+
+  // TraitManager로부터 모든 특성 효과를 가져와 플레이어 스탯에 적용합니다.
+  public void ApplyAllTraitEffects()
+  {
+    if (TraitManager.Instance == null)
+    {
+      Debug.LogWarning("TraitManager instance not found. Cannot apply trait effects.");
+      return;
+    }
+
+    ResetTraitBonuses(); // 먼저 모든 보너스를 초기화
+
+    var acquiredTraits = TraitManager.Instance.playerTraitData.acquiredTraits;
+    // TODO: 현재 캐릭터 클래스를 GameManager 등에서 정확히 가져와야 합니다.
+    string characterClass = GameManager.Instance != null ? GameManager.Instance.GetSelectedCharacter().ToString() : "Hacker";
+
+    Debug.Log($"Applying all trait effects for {characterClass}. {acquiredTraits.Count} traits acquired.");
+
+    foreach (var entry in acquiredTraits)
+    {
+      Trait trait = TraitManager.Instance.GetTrait(entry.Key, characterClass);
+      if (trait != null && trait.effect != null)
+      {
+        ApplyTraitEffect(trait.effect, entry.Value);
+      }
+    }
+    UpdateInspectorStats(); // 변경된 스탯을 인스펙터에 반영
+  }
+
+  // 개별 특성 효과를 스탯에 적용하는 메서드
+  private void ApplyTraitEffect(TraitEffect effect, int level)
+  {
+    float totalValue = effect.value * level;
+
+    Stat targetStat = null;
+    switch (effect.stat)
+    {
+      // 공통
+      case "MaxHealth": targetStat = healthStat; break;
+      case "HealthRegen": /* Regen은 별도 처리 필요 */ break;
+      case "DodgeChance": /* 회피 로직에 적용 필요 */ break;
+      case "CritChance": /* 치명타 로직에 적용 필요 */ break;
+      case "CritDamage": /* 치명타 로직에 적용 필요 */ break;
+      case "GlobalCooldownReduction": /* 모든 무기 쿨다운에 적용 필요 */ break;
+      case "PickupRange": /* 아이템 픽업 스크립트에 적용 필요 */ break;
+      case "ExpGain": /* 경험치 획득 로직에 적용 필요 */ break;
+      case "CreditGain": /* 크레딧 획득 로직에 적용 필요 */ break;
+      case "MoveSpeed": targetStat = moveSpeed; break;
+      case "DashCooldown": /* 대시 스킬에 적용 필요 */ break;
+      case "DashDistance": /* 대시 스킬에 적용 필요 */ break;
+      case "DashCharges": /* 대시 스킬에 적용 필요 */ break;
+
+      // 해커
+      case "AttackSpeed": targetStat = attackSpeed; break;
+      case "CooldownReduction": /* 스킬 쿨다운 스탯에 적용 필요 */ break;
+      case "ProjectileDamage": targetStat = attackDamage; break;
+      case "SummonDuration": /* 소환수 지속시간에 적용 필요 */ break;
+      case "ProjectileRange": targetStat = attackRange; break;
+      case "ProjectileSize": /* 투사체 크기 조절 로직에 적용 필요 */ break;
+
+      // 사이보그
+      case "BaseDamage": targetStat = attackDamage; break;
+      case "DamageReduction": /* 받는 데미지 계산 시 적용 필요 */ break;
+      case "AttackRange": targetStat = attackRange; break;
+      case "DotTickSpeed": /* 도트 데미지 로직에 적용 필요 */ break;
+      case "StatusEffectUp": /* 상태이상 로직에 적용 필요 */ break;
+
+      default:
+        // Stat으로 처리되지 않는 특수 효과들
+        ApplySpecialTraitEffect(effect.stat, level);
+        return;
+    }
+
+    if (targetStat != null)
+    {
+      if (effect.type == "Percentage")
+      {
+        targetStat.AddPercentModifier(totalValue / 100f);
+        Debug.Log($"Applied {effect.stat}: +{totalValue}% to {targetStat}");
+      }
+      else // Flat
+      {
+        targetStat.AddFixedModifier(totalValue);
+        Debug.Log($"Applied {effect.stat}: +{totalValue} flat to {targetStat}");
+      }
+    }
+  }
+
+  // Stat으로 직접 처리되지 않는 특수 효과들을 처리하는 메서드
+  private void ApplySpecialTraitEffect(string effectStat, int level)
+  {
+    // TODO: 여기에 각 특수 효과에 대한 실제 로직을 구현해야 합니다.
+    // 예를 들어, 도탄 횟수 증가, 소환수 강화, 특정 조건부 데미지 증가 등
+    Debug.Log($"Applying special effect: {effectStat}, Level: {level}. Implementation needed.");
+    switch (effectStat)
+    {
+      case "ExtraLife":
+        // TODO: 부활 기능 구현
+        break;
+      case "ProjectileBounce":
+        // TODO: 무기 시스템에 튕기는 횟수 전달
+        break;
+      case "SummonEnhancement":
+        // TODO: 소환수 관리 시스템에 강화 효과 전달
+        break;
+        // ... 기타 등등
+    }
+  }
+
+  // TraitManager가 초기화된 후 특성 효과를 적용하기 위한 코루틴
+  private System.Collections.IEnumerator ApplyTraitsAfterManagerInit()
+  {
+    // TraitManager 싱글톤 인스턴스가 준비될 때까지 한 프레임 대기
+    yield return new WaitUntil(() => TraitManager.Instance != null);
+    ApplyAllTraitEffects();
+  }
 }

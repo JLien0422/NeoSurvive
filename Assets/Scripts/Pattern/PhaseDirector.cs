@@ -111,6 +111,7 @@ public class PhaseDirector : MonoBehaviour
     if (Input.GetKeyDown(KeyCode.Alpha3)) JumpToPhase(3);
     if (Input.GetKeyDown(KeyCode.Alpha4)) JumpToPhase(4);
     if (Input.GetKeyDown(KeyCode.Alpha5)) JumpToPhase(5);
+    if (Input.GetKeyDown(KeyCode.Alpha6)) JumpToPhase(6); // 보스 직전 (14분 50초)
   }
 
   private void JumpToPhase(int phase)
@@ -120,6 +121,7 @@ public class PhaseDirector : MonoBehaviour
     if (phase >= 3) siege2Done = true; // ***** 추가
     if (phase >= 4) siege3Done = true; // ***** 추가
     if (phase >= 5) siege4Done = true; // ***** 추가
+    if (phase >= 6) siege5Done = true; // 보스 직전 점프 시 Phase5도 완료 처리
     // siege5Done은 false여야 Phase5가 발동됨 (그대로 둠)
 
     float targetElapsed = phase switch
@@ -129,6 +131,7 @@ public class PhaseDirector : MonoBehaviour
       3 => phase3Time,
       4 => phase4Time,
       5 => phase5Time,
+      6 => 890f,  // 14분 50초 - 보스 스폰 직전 테스트용
       _ => 0f
     };
 

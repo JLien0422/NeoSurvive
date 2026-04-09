@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
-using NeoSurvive.Network;
 
 // GameManager 클래스는 게임의 전반적인 흐름과 상태를 관리합니다.
 public class GameManager : MonoBehaviour
@@ -26,9 +25,6 @@ public class GameManager : MonoBehaviour
   [Header("캐릭터 선택")]
   private CharacterType selectedCharacter = CharacterType.Hacker;
 
-  [Header("서버 연동")]
-  [SerializeField] private GameServerAPI serverAPI;
-
   private float startTime = 0f;
 
   private void Awake()
@@ -52,30 +48,21 @@ public class GameManager : MonoBehaviour
 
     startTime = Time.time;
 
-    bool isMultiplayer = UDPClient.Instance != null;
-
-    if (isMultiplayer)
+    Debug.Log("[GameManager] 로컬 모드");
+    GameObject playerObject = GameObject.FindWithTag("Player");
+    if (playerObject != null)
     {
-      Debug.Log("[GameManager] 멀티플레이 모드: 카메라는 자동으로 LocalPlayer를 추적합니다");
+      playerTransform = playerObject.transform;
+
+      CameraController cam = FindObjectOfType<CameraController>();
+      if (cam != null) cam.SetTarget(playerTransform);
+
+      var mapManager = FindObjectOfType<MapManager>();
+      if (mapManager != null) mapManager.SetTarget(playerTransform);
     }
     else
     {
-      Debug.Log("[GameManager] 싱글플레이 모드");
-      GameObject playerObject = GameObject.FindWithTag("Player");
-      if (playerObject != null)
-      {
-        playerTransform = playerObject.transform;
-
-        CameraController cam = FindObjectOfType<CameraController>();
-        if (cam != null) cam.SetTarget(playerTransform);
-
-        var mapManager = FindObjectOfType<NeoSurvive.UI.Map.MapManager>();
-        if (mapManager != null) mapManager.SetTarget(playerTransform);
-      }
-      else
-      {
-        Debug.LogError("플레이어를 찾을 수 없습니다! 'Player' 태그가 설정되었는지 확인해주세요.");
-      }
+      Debug.LogError("플레이어를 찾을 수 없습니다! 'Player' 태그가 설정되었는지 확인해주세요.");
     }
   }
 

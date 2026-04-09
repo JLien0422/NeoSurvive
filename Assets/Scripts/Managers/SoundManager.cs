@@ -1,49 +1,108 @@
+using System.Collections.Generic;
+using NeoSurvive.Weapon;
 using UnityEngine;
-using System.Collections; // Coroutines를 사용하기 위해 필요합니다.
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-// SoundManager 클래스는 게임의 사운드(배경음악, 효과음 등)를 관리합니다.
-// 이 컴포넌트는 씬에 하나의 오브젝트만 존재해야 합니다.
+[DisallowMultipleComponent]
 [RequireComponent(typeof(AudioSource))]
 public class SoundManager : MonoBehaviour
 {
-    // 싱글톤 인스턴스: 다른 스크립트에서 SoundManager에 쉽게 접근할 수 있도록 합니다.
     public static SoundManager Instance { get; private set; }
 
-    // 인스펙터에서 할당할 배경음악(BGM) 클립들의 배열입니다.
-    [SerializeField]
-    private AudioClip[] bgmClips;
+    public const string KeyUiHover = "ui.hover";
+    public const string KeyUiClick = "ui.click";
+    public const string KeyUiCancel = "ui.cancel";
+    public const string KeyUiConfirm = "ui.confirm";
+    public const string KeyUiBack = "ui.back";
+    public const string KeyUiTabSwitch = "ui.tab.switch";
+    public const string KeyUiPanelOpen = "ui.panel.open";
+    public const string KeyUiPanelClose = "ui.panel.close";
 
-    // BGM을 재생할 AudioSource 컴포넌트에 대한 참조입니다.
-    private AudioSource audioSource;
-    // 현재 재생 중인 BGM 클립의 인덱스입니다.
+    public const string KeyPlayerHit = "player.hit";
+    public const string KeyPlayerDeath = "player.death";
+    public const string KeyEnemyHit = "enemy.hit";
+    public const string KeyEnemyDeath = "enemy.death";
+    public const string KeyChestOpened = "pickup.chest.opened";
+    public const string KeyItemPickup = "pickup.item";
+    public const string KeyGoldPickup = "pickup.gold";
+    public const string KeyExpPickup = "pickup.exp";
+    public const string KeyDataChipPickup = "pickup.datachip";
+    public const string KeyPsychoCorruptionPickup = "pickup.psycho";
+
+    public const string KeyWeaponEquipGeneric = "weapon.generic.equip";
+    public const string KeyWeaponLevelUpGeneric = "weapon.generic.levelup";
+    public const string KeyWeaponUseGeneric = "weapon.generic.use";
+    public const string KeyWeaponHitGeneric = "weapon.generic.hit";
+
+    public const string KeyError = "system.error";
+
+    [Header("BGM")]
+    [SerializeField] private AudioClip[] bgmClips;
     private int currentBgmIndex = 0;
+    private AudioSource bgmSource;
 
-    // 컴포넌트가 처음 활성화될 때 호출됩니다.
+    [Header("SFX")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField, Range(0f, 1f)] private float masterSfxVolume = 1f;
+
+    [Header("Game SFX Catalog (ScriptableObject)")]
+    [SerializeField] private List<GameSoundEventDefinition> eventDefinitions = new List<GameSoundEventDefinition>();
+    [SerializeField] private bool autoLoadEventDefinitionsFromAssets = true;
+    [SerializeField] private string eventDefinitionsAssetsPath = "Assets/Data/Sounds/Ingame";
+
+    [Header("Weapon SFX Catalog (ScriptableObject)")]
+    [SerializeField] private List<WeaponSoundProfileDefinition> weaponSoundProfiles = new List<WeaponSoundProfileDefinition>();
+    [SerializeField] private bool autoLoadWeaponProfilesFromAssets = true;
+    [SerializeField] private string weaponProfilesAssetsPath = "Assets/Data/Sounds/Ingame";
+
+    private readonly Dictionary<string, GameSoundEventDefinition> eventMap = new Dictionary<string, GameSoundEventDefinition>();
+    private readonly Dictionary<int, WeaponSoundProfileDefinition> weaponProfileMap = new Dictionary<int, WeaponSoundProfileDefinition>();
+
     private void Awake()
     {
-        // 싱글톤 패턴 구현
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(transform.root.gameObject);
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        // AudioSource 컴포넌트를 가져옵니다.
-        audioSource = GetComponent<AudioSource>();
-        audioSource.spatialBlend = 0; // BGM은 2D 사운드입니다.
-        audioSource.playOnAwake = false; // 스크립트에서 제어합니다.
-        audioSource.loop = false; // 다음 곡으로 넘어가야 하므로 루프는 끕니다.
+        bgmSource = GetComponent<AudioSource>();
+        bgmSource.spatialBlend = 0f;
+        bgmSource.playOnAwake = false;
+        bgmSource.loop = false;
+
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        sfxSource.spatialBlend = 0f;
+
+        RebuildMaps();
     }
 
-    // 게임이 시작될 때 한 번 호출됩니다.
+    private void OnValidate()
+    {
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            RefreshCatalogsFromAssets();
+        }
+#endif
+        RebuildMaps();
+    }
+
     private void Start()
     {
-        // 시작할 때 SettingsManager로부터 현재 볼륨 값을 가져와 적용합니다.
         UpdateVolume();
 
         if (bgmClips != null && bgmClips.Length > 0)
@@ -56,38 +115,264 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // 매 프레임마다 호출됩니다.
     private void Update()
     {
-        if (!audioSource.isPlaying && bgmClips != null && bgmClips.Length > 0)
+        if (bgmSource != null && !bgmSource.isPlaying && bgmClips != null && bgmClips.Length > 0)
         {
             PlayNextBgm();
         }
     }
 
-    // 다음 BGM을 재생하는 메서드입니다.
+    private void RebuildMaps()
+    {
+        eventMap.Clear();
+        RegisterEventDefinitions(eventDefinitions);
+
+        weaponProfileMap.Clear();
+        RegisterWeaponProfiles(weaponSoundProfiles);
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("Refresh Sound Catalogs From Assets Path")]
+    private void RefreshCatalogsFromAssets()
+    {
+        bool changed = false;
+
+        if (autoLoadEventDefinitionsFromAssets)
+        {
+            var loadedEvents = LoadAssetsInFolder<GameSoundEventDefinition>(eventDefinitionsAssetsPath, nameof(eventDefinitionsAssetsPath));
+            if (!ReferenceEquals(loadedEvents, null))
+            {
+                eventDefinitions = loadedEvents;
+                changed = true;
+            }
+        }
+
+        if (autoLoadWeaponProfilesFromAssets)
+        {
+            var loadedProfiles = LoadAssetsInFolder<WeaponSoundProfileDefinition>(weaponProfilesAssetsPath, nameof(weaponProfilesAssetsPath));
+            if (!ReferenceEquals(loadedProfiles, null))
+            {
+                weaponSoundProfiles = loadedProfiles;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            EditorUtility.SetDirty(this);
+        }
+    }
+
+    private static List<T> LoadAssetsInFolder<T>(string rawPath, string fieldName) where T : UnityEngine.Object
+    {
+        if (string.IsNullOrWhiteSpace(rawPath))
+        {
+            Debug.LogWarning($"[SoundManager] {fieldName}가 비어 있습니다. Assets 기준 폴더 경로를 입력하세요.");
+            return new List<T>();
+        }
+
+        string path = rawPath.Trim().Replace('\\', '/');
+        if (!path.StartsWith("Assets/"))
+        {
+            Debug.LogWarning($"[SoundManager] {fieldName}는 Assets/로 시작해야 합니다: {rawPath}");
+            return new List<T>();
+        }
+
+        if (!AssetDatabase.IsValidFolder(path))
+        {
+            Debug.LogWarning($"[SoundManager] 경로가 유효한 폴더가 아닙니다: {path}");
+            return new List<T>();
+        }
+
+        string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { path });
+        var list = new List<T>(guids.Length);
+
+        for (int i = 0; i < guids.Length; i++)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+            T asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            if (asset != null)
+            {
+                list.Add(asset);
+            }
+        }
+
+        list.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+        return list;
+    }
+#endif
+
+    private void RegisterEventDefinitions(IList<GameSoundEventDefinition> definitions)
+    {
+        if (definitions == null) return;
+
+        for (int i = 0; i < definitions.Count; i++)
+        {
+            GameSoundEventDefinition def = definitions[i];
+            if (def == null) continue;
+
+            string key = NormalizeKey(def.EventKey);
+            if (string.IsNullOrEmpty(key)) continue;
+
+            eventMap[key] = def;
+        }
+    }
+
+    private void RegisterWeaponProfiles(IList<WeaponSoundProfileDefinition> profiles)
+    {
+        if (profiles == null) return;
+
+        for (int i = 0; i < profiles.Count; i++)
+        {
+            WeaponSoundProfileDefinition profile = profiles[i];
+            if (profile == null || profile.WeaponId <= 0) continue;
+            weaponProfileMap[profile.WeaponId] = profile;
+        }
+    }
+
+    private static string NormalizeKey(string key)
+    {
+        return string.IsNullOrWhiteSpace(key) ? string.Empty : key.Trim().ToLowerInvariant();
+    }
+
     private void PlayNextBgm()
     {
+        if (bgmSource == null || bgmClips == null || bgmClips.Length == 0) return;
+
         if (currentBgmIndex >= bgmClips.Length)
         {
             currentBgmIndex = 0;
         }
 
-        audioSource.clip = bgmClips[currentBgmIndex];
-        audioSource.Play();
-
-        Debug.Log($"BGM 재생 시작: {audioSource.clip.name} (인덱스: {currentBgmIndex})");
-
+        bgmSource.clip = bgmClips[currentBgmIndex];
+        bgmSource.Play();
         currentBgmIndex++;
     }
 
-    // SettingsManager에서 호출할 볼륨 업데이트 메서드
     public void UpdateVolume()
     {
+        if (bgmSource == null) return;
+
         if (SettingsManager.Instance != null)
         {
-            audioSource.volume = SettingsManager.Instance.bgmVolume;
-            Debug.Log($"BGM 볼륨이 {audioSource.volume}으로 설정되었습니다.");
+            bgmSource.volume = SettingsManager.Instance.bgmVolume;
         }
+        else
+        {
+            bgmSource.volume = 1f;
+        }
+    }
+
+    public void Play(string eventKey)
+    {
+        if (sfxSource == null) return;
+
+        string normalizedKey = NormalizeKey(eventKey);
+        if (string.IsNullOrEmpty(normalizedKey))
+            return;
+
+        if (!eventMap.TryGetValue(normalizedKey, out var eventDef) || eventDef == null)
+            return;
+
+        AudioClip clip = eventDef.PickClip();
+        if (clip == null) return;
+
+        PlayOneShot(clip, eventDef.Volume, eventDef.PickPitch());
+    }
+
+    public void Play(GameSoundEventDefinition eventDefinition)
+    {
+        if (eventDefinition == null)
+            return;
+
+        Play(eventDefinition.EventKey);
+    }
+
+    public void PlayWeaponEquip(WeaponBase weapon)
+    {
+        if (!TryPlayWeapon(weapon?.weaponId ?? 0, WeaponSoundProfileDefinition.WeaponSoundType.Equip))
+            Play(KeyWeaponEquipGeneric);
+    }
+
+    public void PlayWeaponLevelUp(WeaponBase weapon)
+    {
+        if (!TryPlayWeapon(weapon?.weaponId ?? 0, WeaponSoundProfileDefinition.WeaponSoundType.LevelUp))
+            Play(KeyWeaponLevelUpGeneric);
+    }
+
+    public void PlayWeaponUse(WeaponBase weapon)
+    {
+        if (!TryPlayWeapon(weapon?.weaponId ?? 0, WeaponSoundProfileDefinition.WeaponSoundType.Use))
+            Play(KeyWeaponUseGeneric);
+    }
+
+    public void PlayWeaponUseById(int weaponId)
+    {
+        if (!TryPlayWeapon(weaponId, WeaponSoundProfileDefinition.WeaponSoundType.Use))
+            Play(KeyWeaponUseGeneric);
+    }
+
+    public void PlayWeaponHit(WeaponBase weapon)
+    {
+        if (!TryPlayWeapon(weapon?.weaponId ?? 0, WeaponSoundProfileDefinition.WeaponSoundType.Hit))
+            Play(KeyWeaponHitGeneric);
+    }
+
+    private bool TryPlayWeapon(int weaponId, WeaponSoundProfileDefinition.WeaponSoundType type)
+    {
+        if (sfxSource == null || weaponId <= 0) return false;
+        if (!weaponProfileMap.TryGetValue(weaponId, out var profile) || profile == null) return false;
+
+        AudioClip clip = profile.PickClip(type);
+        if (clip == null) return false;
+
+        PlayOneShot(clip, profile.Volume, profile.PickPitch());
+        return true;
+    }
+
+    private void PlayOneShot(AudioClip clip, float slotVolume, float pitch)
+    {
+        float settingsSfx = SettingsManager.Instance != null ? SettingsManager.Instance.sfxVolume : 1f;
+
+        float prevPitch = sfxSource.pitch;
+        sfxSource.pitch = pitch;
+        sfxSource.PlayOneShot(clip, slotVolume * masterSfxVolume * settingsSfx);
+        sfxSource.pitch = prevPitch;
+    }
+
+    // UI wrappers
+    public void PlayHover() => Play(KeyUiHover);
+    public void PlayClick() => Play(KeyUiClick);
+    public void PlayCancel() => Play(KeyUiCancel);
+    public void PlayConfirm() => Play(KeyUiConfirm);
+    public void PlayBack() => Play(KeyUiBack);
+    public void PlayTabSwitch() => Play(KeyUiTabSwitch);
+    public void PlayPanelOpen() => Play(KeyUiPanelOpen);
+    public void PlayPanelClose() => Play(KeyUiPanelClose);
+
+    // Game wrappers
+    public void PlayPlayerHit() => Play(KeyPlayerHit);
+    public void PlayPlayerDeath() => Play(KeyPlayerDeath);
+    public void PlayEnemyHit() => Play(KeyEnemyHit);
+    public void PlayEnemyDeath() => Play(KeyEnemyDeath);
+    public void PlayChestOpened() => Play(KeyChestOpened);
+    public void PlayItemPickup() => Play(KeyItemPickup);
+    public void PlayGoldPickup() => Play(KeyGoldPickup);
+    public void PlayExpPickup() => Play(KeyExpPickup);
+    public void PlayDataChipPickup() => Play(KeyDataChipPickup);
+    public void PlayPsychoCorruptionPickup() => Play(KeyPsychoCorruptionPickup);
+    public void PlayError() => Play(KeyError);
+
+    public bool HasClip(string eventKey)
+    {
+        string normalizedKey = NormalizeKey(eventKey);
+        if (string.IsNullOrEmpty(normalizedKey))
+            return false;
+
+        if (!eventMap.TryGetValue(normalizedKey, out var eventDef) || eventDef == null)
+            return false;
+
+        return eventDef.HasClip;
     }
 }

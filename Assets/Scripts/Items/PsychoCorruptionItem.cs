@@ -1,6 +1,4 @@
 using UnityEngine;
-using NeoSurvive.Network;
-using NeoSurvive.Network.Protocol;
 
 /// <summary>
 /// 사이코 잠식도 아이템 - 획득 시 사이코 잠식도 증가
@@ -38,13 +36,6 @@ public class PsychoCorruptionItem : MonoBehaviour, IPickupable
     public void Pickup(Player player)
     {
         if (player == null) return;
-
-        if (player.IsLocal && UDPClient.Instance != null)
-        {
-            var networkItem = GetComponent<NetworkItem>();
-            if (networkItem != null)
-                UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
-        }
 
         player.AddPsychoCorruption(corruptionAmount);
         SoundManager.Instance?.PlayPsychoCorruptionPickup();

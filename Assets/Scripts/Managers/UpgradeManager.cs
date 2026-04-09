@@ -44,7 +44,7 @@ public class UpgradeManager : MonoBehaviour
 
     private async void Start()
     {
-        // GameServerAPI 초기화 대기 후 데이터 로드
+        // 저장 데이터 로드
         await LoadUpgradesAsync();
     }
 

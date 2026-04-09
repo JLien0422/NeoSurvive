@@ -1,7 +1,5 @@
 using UnityEngine;
 using System;
-using NeoSurvive.Network;
-using NeoSurvive.Network.Protocol;
 
 /// <summary>
 /// 상자 픽업 - 획득 시 무기 선택 UI 표시
@@ -40,13 +38,6 @@ public class ChestPickup : MonoBehaviour, IPickupable
     public void Pickup(Player player)
     {
         if (opened || player == null) return;
-
-        if (player.IsLocal && UDPClient.Instance != null)
-        {
-            var networkItem = GetComponent<NetworkItem>();
-            if (networkItem != null)
-                UDPClient.Instance.SendAction(ActionType.ObjectInteract, networkItem.ItemId);
-        }
 
         opened = true;
         Open();

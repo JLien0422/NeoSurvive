@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq; // ***** (추가) Distinct/Where/ToList
-using NeoSurvive.Network.Protocol;
 
 public enum WeaponType
 {
@@ -170,21 +169,7 @@ namespace NeoSurvive.Weapon
       RaiseWeaponChanged();
             Debug.Log(string.Join("," , activeWeapons));
 
-      // [Coop] 로컬 플레이어인 경우 서버에 무기 장착 알림
-      if (sendToServer)
-      {
-        if (player == null) player = GetComponent<Player>();
-        if (player != null && player.IsLocal && UDPClient.Instance != null)
-        {
-          UDPClient.Instance.SendAction(
-            ActionType.WeaponEquip,
-            0,
-            Vector2.zero,
-            (uint)weaponData.weaponId,
-            weaponData.weaponId
-          );
-        }
-      }
+      // sendToServer는 네트워크 제거 이후 호환성 유지를 위해 유지합니다.
     }
 
     // 기존 호환성을 위한 오버로드 (필요시)
@@ -215,7 +200,7 @@ namespace NeoSurvive.Weapon
     }
 
     /// <summary>
-    /// [Coop] 특정 무기의 공격을 실행 (원격 동기화용)
+    /// 특정 무기의 공격을 실행합니다.
     /// </summary>
     public void ExecuteWeaponAttack(int weaponId, Vector3 direction)
     {
@@ -227,28 +212,16 @@ namespace NeoSurvive.Weapon
 
       if (data != null && spawnedWeapons.TryGetValue(data, out GameObject weaponObj))
       {
-        NeoSurvive.Network.NetworkDamageContext.BeginRemoteAction();
         weaponObj.SendMessage("ExecuteAttack", direction, SendMessageOptions.DontRequireReceiver);
-        NeoSurvive.Network.NetworkDamageContext.EndRemoteAction();
       }
     }
 
     /// <summary>
-    /// [Coop] 무기 공격을 서버로 전송 (로컬 플레이어용)
+    /// 네트워크 제거 이후 호환성용 메서드 (동작 없음)
     /// </summary>
     public void SendWeaponAttack(int weaponId, Vector3 direction)
     {
-      if (player == null) player = GetComponent<Player>();
-      if (player != null && player.IsLocal && UDPClient.Instance != null)
-      {
-        UDPClient.Instance.SendAction(
-          ActionType.WeaponUse,
-          0,
-          new Vector2(direction.x, direction.y),
-          (uint)weaponId,
-          weaponId
-        );
-      }
+      // Intentionally empty.
     }
 
     void Update()

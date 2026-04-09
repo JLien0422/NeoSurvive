@@ -1,6 +1,4 @@
 using UnityEngine;
-using NeoSurvive.Network;
-using NeoSurvive.Network.Protocol;
 
 /// <summary>
 /// 골드 픽업 아이템
@@ -35,14 +33,6 @@ public class GoldPickup : MonoBehaviour, IPickupable
     public void Pickup(Player player)
     {
         if (player == null) return;
-
-        // 멀티플레이: 로컬 플레이어만 서버에 픽업 전송
-        if (player.IsLocal && UDPClient.Instance != null)
-        {
-            var networkItem = GetComponent<NetworkItem>();
-            if (networkItem != null)
-                UDPClient.Instance.SendAction(ActionType.ItemPickup, networkItem.ItemId);
-        }
 
         if (GameManager.Instance != null)
             GameManager.Instance.AddGold(goldAmount);

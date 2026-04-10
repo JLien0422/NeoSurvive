@@ -29,11 +29,7 @@ public abstract class Character : MonoBehaviour
 
     _baseFlags = GetComponent<StatusFlags>(); // (추가)
     if (_baseFlags == null) _baseFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
-  }
 
-  protected virtual void Start()
-  {
-    currentHP = new Stat(maxHP.GetValue());
   }
 
   // 캐릭터의 사망 여부
@@ -93,7 +89,6 @@ public abstract class Character : MonoBehaviour
   {
     if (IsDead) return;
     IsDead = true;
-    Debug.Log($"{gameObject.name}이(가) 사망했습니다.");
   }
 
   /// <summary>

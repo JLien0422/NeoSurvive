@@ -36,7 +36,7 @@ public class PauseMenuController : MonoBehaviour
 
     [Header("무기 통계 패널")]
     [Tooltip("ESC 시 중앙에 배치할 WeaponStatsPanel. 비어 있으면 씬에서 WeaponStatsPanelUI 찾음")]
-    public RectTransform weaponStatsPanel;
+    public GameObject weaponStatsPanel;
 
     [Header("설정 연동")]
     [Tooltip("비어 있으면 씬에서 SettingsUI 찾음")]
@@ -64,13 +64,6 @@ public class PauseMenuController : MonoBehaviour
         {
             pauseMenuPanel.SetActive(false);
             pauseCanvas = pauseMenuPanel.GetComponentInParent<Canvas>();
-        }
-
-        if (weaponStatsPanel == null)
-        {
-            var w = FindObjectOfType<WeaponStatsPanelUI>();
-            if (w != null)
-                weaponStatsPanel = w.GetComponent<RectTransform>();
         }
 
         if (resumeButton != null)
@@ -135,7 +128,6 @@ public class PauseMenuController : MonoBehaviour
         if (pauseCanvas != null)
             pauseCanvas.sortingOrder = 99;
 
-        PlaceWeaponStatsPanelInCenter();
         Time.timeScale = 0f;
     }
 
@@ -146,47 +138,6 @@ public class PauseMenuController : MonoBehaviour
 
         isPauseMenuOpen = false;
         Time.timeScale = 1f;
-
-        RestoreWeaponStatsPanel();
-    }
-
-    private void PlaceWeaponStatsPanelInCenter()
-    {
-        if (weaponStatsPanel == null || pauseMenuPanel == null) return;
-
-        var rt = weaponStatsPanel;
-        // 원래 부모는 최초 1회만 저장 (이미 일시정지 패널 자식이면 덮어쓰지 않음)
-        if (rt.parent != pauseMenuPanel.transform)
-        {
-            weaponStatsOriginalParent = rt.parent as RectTransform;
-            weaponStatsOriginalAnchorMin = rt.anchorMin;
-            weaponStatsOriginalAnchorMax = rt.anchorMax;
-            weaponStatsOriginalAnchoredPos = rt.anchoredPosition;
-            weaponStatsOriginalSiblingIndex = rt.GetSiblingIndex();
-        }
-
-        rt.SetParent(pauseMenuPanel.transform, true);
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.pivot = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = Vector2.zero;
-        rt.SetAsLastSibling();
-
-        var ui = weaponStatsPanel.GetComponent<WeaponStatsPanelUI>();
-        if (ui != null)
-            ui.Refresh();
-    }
-
-    private void RestoreWeaponStatsPanel()
-    {
-        if (weaponStatsPanel == null || weaponStatsOriginalParent == null) return;
-
-        var rt = weaponStatsPanel;
-        rt.SetParent(weaponStatsOriginalParent, true);
-        rt.anchorMin = weaponStatsOriginalAnchorMin;
-        rt.anchorMax = weaponStatsOriginalAnchorMax;
-        rt.anchoredPosition = weaponStatsOriginalAnchoredPos;
-        rt.SetSiblingIndex(weaponStatsOriginalSiblingIndex);
     }
 
     private void OnResume()

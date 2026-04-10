@@ -151,7 +151,6 @@ public class Enemy : Character
     {
       // 현재 적의 위치에 골드 프리팹을 생성합니다.
       Instantiate(goldPrefab, transform.position, Quaternion.identity);
-      Debug.Log("골드를 드랍했습니다!");
     }
   }
 
@@ -166,7 +165,6 @@ public class Enemy : Character
     {
       // 현재 적의 위치에 사이코 잠식도 아이템 프리팹을 생성합니다.
       Instantiate(psychoCorruptionItemPrefab, transform.position, Quaternion.identity);
-      Debug.Log("사이코 잠식도 아이템을 드랍했습니다!");
     }
   }
 

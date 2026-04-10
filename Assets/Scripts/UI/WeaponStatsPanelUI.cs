@@ -23,25 +23,7 @@ public class WeaponStatsPanelUI : MonoBehaviour
 
     private void OnEnable()
     {
-        // 이 패널 배경이 레이캐스트를 막지 않도록 → 탭/버튼 클릭이 가능해짐
-        if (TryGetComponent<Image>(out var img))
-            img.raycastTarget = false;
         Refresh();
-        StartCoroutine(AutoRefresh());
-    }
-
-    private void OnDisable()
-    {
-        StopAllCoroutines();
-    }
-
-    private IEnumerator AutoRefresh()
-    {
-        while (true)
-        {
-            yield return new WaitForSecondsRealtime(0.5f);
-            Refresh();
-        }
     }
 
     public void Refresh()
@@ -49,9 +31,9 @@ public class WeaponStatsPanelUI : MonoBehaviour
         if (weaponStatRowsRoot == null) return;
 
         var stats = WeaponDamageStats.Instance;
-        var wm = weaponManager != null ? weaponManager : Object.FindObjectOfType<WeaponManager>();
-        if (stats == null || wm == null || wm.activeWeapons == null)
-            return;
+
+        if (weaponManager == null)
+            Debug.LogError("[WeaponStatsPanelUI] WeaponManager가 할당되지 않았습니다. 씬에서 WeaponManager를 찾습니다.");
 
         GameObject template = rowTemplate;
         if (template == null && weaponStatRowsRoot.childCount > 0)
@@ -66,17 +48,19 @@ public class WeaponStatsPanelUI : MonoBehaviour
         {
             var child = weaponStatRowsRoot.GetChild(i).gameObject;
             if (child == template) continue;
-            Object.Destroy(child);
+            Destroy(child);
         }
 
-        foreach (var weapon in wm.activeWeapons)
+        foreach (var weapon in weaponManager.activeWeapons)
         {
             if (weapon == null) continue;
 
             float total = stats.GetTotalDamage(weapon);
             float dpm = stats.GetDPM(weapon);
 
-            var row = Object.Instantiate(template, weaponStatRowsRoot);
+            Debug.Log($"[WeaponStatsPanelUI] 무기: {weapon.weaponName}, 총대미지: {total:F1}, DPM: {dpm:F1}");
+
+            var row = Instantiate(template, weaponStatRowsRoot);
             row.SetActive(true);
 
             var images = row.GetComponentsInChildren<Image>(true);
@@ -102,5 +86,7 @@ public class WeaponStatsPanelUI : MonoBehaviour
                 texts[2].text = dpm.ToString("F0");
             }
         }
+
+        Debug.Log("[WeaponStatsPanelUI] Refresh 완료. 무기 개수: " + weaponManager.activeWeapons.Count);
     }
 }

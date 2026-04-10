@@ -19,12 +19,10 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
     private float baseDamage;
-    private Player owner;
 
     private void Start()
     {
       baseDamage = damage;
-      owner = GetComponentInParent<Player>();
     }
 
     public void OnLevelUp(int level)
@@ -44,8 +42,6 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
-      // 로컬 플레이어만 자동 공격 시도
-      if (owner != null) return;
 
       fireTimer += Time.deltaTime;
       if (fireTimer >= fireRate)

@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; // ***** (추가) Distinct/Where/ToList
+using System.Linq;
 
 public enum WeaponType
 {
@@ -27,13 +27,6 @@ namespace NeoSurvive.Weapon
 
     public static event System.Action<List<WeaponBase>> OnWeaponChanged;
 
-    private void RaiseWeaponChanged()
-    {
-      int listenerCount = OnWeaponChanged?.GetInvocationList().Length ?? 0;
-      Debug.Log($"[WeaponManager] OnWeaponChanged invoke, listeners={listenerCount}, activeWeapons={activeWeapons.Count}");
-      OnWeaponChanged?.Invoke(activeWeapons);
-    }
-
     private Player player;
 
     private int maxWeapon = 6;
@@ -43,29 +36,25 @@ namespace NeoSurvive.Weapon
       return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId);
     }
 
-    // ***** (추가) 클래스별 무기 풀(= All Weapon Datas 템플릿)
-    [Header("Class Weapon Sets (Templates)")] // ***** (추가)
-    public List<WeaponBase> cyborgAllWeaponDatas = new(); // ***** (추가)
-    public List<WeaponBase> hackerAllWeaponDatas = new(); // ***** (추가)
+    [Header("Class Weapon Sets (Templates)")]
+    public List<WeaponBase> cyborgAllWeaponDatas = new();
+    public List<WeaponBase> hackerAllWeaponDatas = new();
 
-    // ***** (추가) 클래스별 시작 장착 무기(= Active Weapons 템플릿)
-    [Header("Class Start Weapons (Templates)")] // ***** (추가)
-    public List<WeaponBase> cyborgStartWeapons = new(); // ***** (추가) LaserSword만 넣기
-    public List<WeaponBase> hackerStartWeapons = new(); // ***** (추가) LinkPistol 등 넣기
+    [Header("Class Start Weapons (Templates)")]
+    public List<WeaponBase> cyborgStartWeapons = new();
+    public List<WeaponBase> hackerStartWeapons = new();
 
     private void Awake()
     {
-      ApplyClassLoadout(); // ***** (추가) 클래스에 맞게 allWeaponDatas / activeWeapons(시작목록) 구성
-      EquipStartWeapons(); // ***** (기존) activeWeapons(시작목록)을 AddWeapon으로 실제 장착
+      ApplyClassLoadout();
+      EquipStartWeapons();
     }
 
-    private void ApplyClassLoadout() // ***** (추가)
+    private void ApplyClassLoadout()
     {
-      // ***** (추가) PlayerClassTag가 있으면 그 값을 쓰고, 없으면 Hacker로 기본
-      var classTag = GetComponent<PlayerClassTag>(); // ***** (추가)
-      var classType = (classTag != null) ? classTag.classType : PlayerClassType.Hacker; // ***** (추가)
+      var classTag = GetComponent<PlayerClassTag>();
+      var classType = (classTag != null) ? classTag.classType : PlayerClassType.Hacker;
 
-      // ***** (추가) 클래스별 템플릿 선택
       List<WeaponBase> selectedAll = (classType == PlayerClassType.Cyborg)
         ? cyborgAllWeaponDatas
         : hackerAllWeaponDatas;
@@ -74,42 +63,36 @@ namespace NeoSurvive.Weapon
         ? cyborgStartWeapons
         : hackerStartWeapons;
 
-      // ***** (추가) 런타임 allWeaponDatas 구성 (이 순서가 weaponIndex 기준)
-      allWeaponDatas.Clear(); // ***** (추가)
+      allWeaponDatas.Clear();
       if (selectedAll != null)
-        allWeaponDatas.AddRange(selectedAll.Where(w => w != null)); // ***** (추가)
+        allWeaponDatas.AddRange(selectedAll.Where(w => w != null));
 
-      // ***** (추가) 런타임 시작무기 목록을 activeWeapons에 세팅
-      activeWeapons.Clear(); // ***** (추가)
+      activeWeapons.Clear();
       if (selectedStart != null)
-        activeWeapons.AddRange(selectedStart.Where(w => w != null)); // ***** (추가)
+        activeWeapons.AddRange(selectedStart.Where(w => w != null));
     }
 
-    // ***** (기존 + 약간 정리) 인스펙터(또는 ApplyClassLoadout)로 들어온 activeWeapons를 시작 장착
     private void EquipStartWeapons()
     {
       if (activeWeapons == null || activeWeapons.Count == 0) return;
 
-      // ***** (기존) Null 제거 + 중복 제거
       var startList = activeWeapons
         .Where(w => w != null)
         .Distinct()
         .ToList();
 
-      // ***** (기존) activeWeapons는 "실제 보유 무기"로 AddWeapon이 다시 채우게 하기 위해 비움
       activeWeapons.Clear();
 
-      // ***** (기존) 인덱스 상관없이 WeaponBase 자체로 장착
       foreach (var w in startList)
       {
-        AddWeapon(w, sendToServer: false); // ***** (기존) 시작 장착은 보통 서버 전송 안 함
+        AddWeapon(w);
       }
     }
 
     /// <summary>
     /// 새로운 무기 추가 또는 레벨업
     /// </summary>
-    public void AddWeapon(WeaponBase weaponData, bool sendToServer = true)
+    public void AddWeapon(WeaponBase weaponData)
     {
       Debug.Log($"[WeaponManager] AddWeapon called. weaponName={weaponData.weaponName}, prefab={(weaponData.weaponPrefab ? weaponData.weaponPrefab.name : "NULL")}");
 
@@ -118,13 +101,7 @@ namespace NeoSurvive.Weapon
       {
         // 레벨업 로직
         weaponData.level++;
-        RaiseWeaponChanged();
-
-        // 생성된 무기 오브젝트에 레벨업 알림
-        if (spawnedWeapons.TryGetValue(weaponData, out GameObject existingWeapon))
-        {
-          existingWeapon.SendMessage("OnLevelUp", weaponData.level, SendMessageOptions.DontRequireReceiver);
-        }
+        OnWeaponChanged?.Invoke(activeWeapons);
         return;
       }
 
@@ -166,37 +143,28 @@ namespace NeoSurvive.Weapon
         weaponObj.SendMessage("OnLevelUp", 1, SendMessageOptions.DontRequireReceiver);
       }
 
-      RaiseWeaponChanged();
+      OnWeaponChanged?.Invoke(activeWeapons);
       Debug.Log(string.Join(",", activeWeapons));
 
       // sendToServer는 네트워크 제거 이후 호환성 유지를 위해 유지합니다.
     }
 
-    // 기존 호환성을 위한 오버로드 (필요시)
-    public void AddWeapon(int index, bool sendToServer = true)
-    {
-      if (index >= 0 && index < allWeaponDatas.Count)
-      {
-        AddWeapon(allWeaponDatas[index], sendToServer);
-      }
-    }
-
-    public void AddWeaponById(int weaponId, bool sendToServer = true)
+    public void AddWeapon(int weaponId)
     {
       var weapon = FindWeaponById(weaponId);
       if (weapon != null)
       {
-        AddWeapon(weapon, sendToServer);
+        AddWeapon(weapon);
       }
     }
 
-    /// <summary>
-    /// [Coop] 원격 플레이어의 무기 장착 동기화
-    /// </summary>
-    public void SyncWeaponEquip(int weaponId)
+    public void AddWeaponById(int weaponId)
     {
-      // 서버에 재전송하지 않음
-      AddWeaponById(weaponId, sendToServer: false);
+      var weapon = FindWeaponById(weaponId);
+      if (weapon != null)
+      {
+        AddWeapon(weapon);
+      }
     }
 
     /// <summary>
@@ -216,14 +184,6 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    /// <summary>
-    /// 네트워크 제거 이후 호환성용 메서드 (동작 없음)
-    /// </summary>
-    public void SendWeaponAttack(int weaponId, Vector3 direction)
-    {
-      // Intentionally empty.
-    }
-
     void Update()
     {
       // 테스트용: allWeaponDatas 리스트의 인덱스를 사용하여 테스트
@@ -235,11 +195,7 @@ namespace NeoSurvive.Weapon
       if (Input.GetKeyDown(KeyCode.F6)) AddWeapon(5);
       if (Input.GetKeyDown(KeyCode.F7)) AddWeapon(6);
       if (Input.GetKeyDown(KeyCode.F8)) AddWeapon(7);
-      if (Input.GetKeyDown(KeyCode.F9))
-      {
-        Debug.Log("[WeaponManager] F9 pressed -> AddWeapon(8)");
-        AddWeapon(8);
-      }
+      if (Input.GetKeyDown(KeyCode.F9)) AddWeapon(8);
       if (Input.GetKeyDown(KeyCode.F10)) AddWeapon(9);
     }
   }

@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
-using UnityEngine.EventSystems;
-using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
@@ -31,6 +29,7 @@ public class UIManager : MonoBehaviour
 
   [Header("Player Health UI")]
   public Slider playerHealthSlider;
+  public TextMeshProUGUI playerHealthText;
 
   public GameManager gameManager;
 
@@ -67,7 +66,7 @@ public class UIManager : MonoBehaviour
   private Action<int> onWeaponChoicePicked;                // (추가)
 
   // ===== 상자 보상 선택 저장용 (추가) ===== //
-  private NeoSurvive.Weapon.WeaponBase[] currentChoices;
+  private WeaponBase[] currentChoices;
   private bool eventsRegistered = false;
 
 
@@ -92,46 +91,22 @@ public class UIManager : MonoBehaviour
         Debug.LogError("[UIManager] GameManager not found in the scene!");
       }
     }
-  }
 
-  private void Start()
-  {
-    // Start logic moved to Awake for singleton initialization, keeping Start empty or for other delayed init
-    RebindSceneReferences();
-    // UI 요소가 null이면 자동 생성
-    AutoCreateMissingUI();
     ForceRefreshWeaponUI();
     StartGameTimeCoroutineIfNeeded();
+    RegisterEvents();
   }
 
-  /// <summary>
-  /// 누락된 UI 요소들을 자동으로 생성합니다.
-  /// </summary>
-  private void AutoCreateMissingUI()
+  private void Update()
   {
-    // Canvas 찾기
-    Canvas canvas = FindObjectOfType<Canvas>();
-    if (canvas == null)
+    if (Input.GetKeyDown(KeyCode.F8))
     {
-      Debug.LogError("[UIManager] Canvas를 찾을 수 없습니다!");
-      return;
+      ShowWeaponChoice(
+        new Sprite[3] { null, null, null },
+        new string[3] { "AIDrone", "EmpField", "LinkPistol" },
+        (idx) => Debug.Log($"선택한 무기 인덱스: {idx}")
+      );
     }
-
-    // 기존 화면 노이즈 오버레이가 있으면 먼저 재연결
-    if (screenNoiseOverlay == null)
-    {
-      var existingOverlay = GameObject.Find("ScreenNoiseOverlay");
-      if (existingOverlay != null)
-        screenNoiseOverlay = existingOverlay;
-    }
-
-    // 화면 노이즈 오버레이 생성
-    if (screenNoiseOverlay == null)
-    {
-      CreateScreenNoiseOverlay(canvas.transform);
-    }
-
-    Debug.Log("[UIManager] 누락된 UI 요소 자동 생성 완료");
   }
 
   /// <summary>
@@ -156,21 +131,6 @@ public class UIManager : MonoBehaviour
     screenNoiseOverlay.SetActive(false); // 초기에는 비활성화
   }
 
-
-  private void OnEnable()
-  {
-    RegisterEvents();
-
-    // Coroutine을 사용하여 ShowGameTime을 호출
-    StartGameTimeCoroutineIfNeeded();
-
-  }
-
-  private void OnDisable()
-  {
-    UnregisterEvents();
-  }
-
   private void OnDestroy()
   {
     UnregisterEvents();
@@ -180,8 +140,7 @@ public class UIManager : MonoBehaviour
   private void RegisterEvents()
   {
     if (eventsRegistered) return;
-    Player p = FindObjectOfType<Player>();
-    if (p != null) p.CurrentHP.onValueChanged += UpdatePlayerHealthUI;
+    GameManager.onPlayerSpawned += HandlePlayerSpawned;
     WeaponManager.OnWeaponChanged += RefreshWeaponUI;
     Player.OnExpChanged += UpdateExpUI;
     Player.OnLevelUp += UpdateLevelUI;
@@ -194,15 +153,35 @@ public class UIManager : MonoBehaviour
     ChestPickup.OnChestOpened += HandleChestOpened;
     SceneManager.sceneLoaded += OnSceneLoaded;
     eventsRegistered = true;
+
+    Debug.Log("[UIManager] Events registered");
+  }
+
+  private void HandlePlayerSpawned()
+  {
+    Debug.Log("[UIManager] Player spawned event received");
+    playerTransform = FindObjectOfType<Player>()?.transform;
+    if (playerTransform == null)
+    {
+      Debug.LogError("[UIManager] Player transform not found after spawn!");
+      return;
+    }
+
+    Player p = playerTransform.GetComponent<Player>();
+    if (p != null)
+    {
+      p.CurrentHP.onValueChanged += UpdatePlayerHealthUI;
+    }
+
+    UpdatePlayerHealthUI(p != null ? p.CurrentHP.CurrentValue : 0, p != null ? p.MaxHP.CurrentValue : 100.0f);
+
+    CreateScreenNoiseOverlay(canvas); // 화면 노이즈 오버레이 생성
   }
 
   private void UnregisterEvents()
   {
     if (!eventsRegistered) return;
-
-    Player p = FindObjectOfType<Player>();
-    if (p != null) p.CurrentHP.onValueChanged -= UpdatePlayerHealthUI;
-
+    GameManager.onPlayerSpawned -= HandlePlayerSpawned;
     WeaponManager.OnWeaponChanged -= RefreshWeaponUI;
     Player.OnExpChanged -= UpdateExpUI;
     Player.OnLevelUp -= UpdateLevelUI;
@@ -221,8 +200,6 @@ public class UIManager : MonoBehaviour
   {
     // 씬 전환 이후 참조가 끊기는 문제를 방지
     Time.timeScale = 1f;
-    RebindSceneReferences();
-    AutoCreateMissingUI();
     ForceRefreshWeaponUI();
     ShowGameTime();
   }
@@ -234,64 +211,6 @@ public class UIManager : MonoBehaviour
     StartCoroutine(nameof(ShowGameTimeCoroutine));
   }
 
-  private void RebindSceneReferences()
-  {
-    if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
-
-    // if (weaponUIPanel == null)
-    // {
-    //   GameObject found = GameObject.Find("WeaponUIPanel");
-    //   if (found == null) found = GameObject.Find("WeaponUI");
-    //   if (found == null) found = GameObject.Find("WeaponPanel");
-    //   weaponUIPanel = found;
-    // }
-
-    if (expSlider == null) expSlider = FindSliderByNameContains("exp");
-    if (playerHealthSlider == null) playerHealthSlider = FindSliderByNameContains("health");
-    if (psychoCorruptionSlider == null)
-      psychoCorruptionSlider = FindSliderByNameContains("psycho", "overload", "corruption", "과부하");
-    if (neuralLinkSlider == null)
-      neuralLinkSlider = FindSliderByNameContains("neural", "link", "신경", "링크");
-
-    if (levelText == null) levelText = FindTMPByNameContains("level", "lv");
-    if (gameTimeText == null) gameTimeText = FindTMPByNameContains("time", "timer");
-    if (killCountText == null) killCountText = FindTMPByNameContains("kill", "count");
-    if (psychoCorruptionText == null) psychoCorruptionText = FindTMPByNameContains("psycho", "overload", "과부하");
-    if (neuralLinkText == null) neuralLinkText = FindTMPByNameContains("neural", "link", "신경", "링크");
-  }
-
-  private Slider FindSliderByNameContains(params string[] keywords)
-  {
-    var sliders = FindObjectsOfType<Slider>(true);
-    foreach (var s in sliders)
-    {
-      if (s == null) continue;
-      string n = s.gameObject.name.ToLowerInvariant();
-      foreach (var key in keywords)
-      {
-        if (!string.IsNullOrEmpty(key) && n.Contains(key.ToLowerInvariant()))
-          return s;
-      }
-    }
-    return null;
-  }
-
-  private TextMeshProUGUI FindTMPByNameContains(params string[] keywords)
-  {
-    var tmps = FindObjectsOfType<TextMeshProUGUI>(true);
-    foreach (var t in tmps)
-    {
-      if (t == null) continue;
-      string n = t.gameObject.name.ToLowerInvariant();
-      foreach (var key in keywords)
-      {
-        if (!string.IsNullOrEmpty(key) && n.Contains(key.ToLowerInvariant()))
-          return t;
-      }
-    }
-    return null;
-  }
-
   private void ForceRefreshWeaponUI()
   {
     var wm = GetBestWeaponManager();
@@ -301,13 +220,13 @@ public class UIManager : MonoBehaviour
     }
   }
 
-  private NeoSurvive.Weapon.WeaponManager GetBestWeaponManager()
+  private WeaponManager GetBestWeaponManager()
   {
     // 1) Player 태그 기준 우선
     GameObject playerObj = GameObject.FindWithTag("Player");
     if (playerObj != null)
     {
-      var wmOnPlayer = playerObj.GetComponent<NeoSurvive.Weapon.WeaponManager>();
+      var wmOnPlayer = playerObj.GetComponent<WeaponManager>();
       if (wmOnPlayer != null) return wmOnPlayer;
     }
 
@@ -317,13 +236,13 @@ public class UIManager : MonoBehaviour
     {
       if (p != null)
       {
-        var wm = p.GetComponent<NeoSurvive.Weapon.WeaponManager>();
+        var wm = p.GetComponent<WeaponManager>();
         if (wm != null) return wm;
       }
     }
 
     // 3) 최후 fallback
-    return FindObjectOfType<NeoSurvive.Weapon.WeaponManager>();
+    return FindObjectOfType<WeaponManager>();
   }
 
   // =========================
@@ -359,11 +278,11 @@ public class UIManager : MonoBehaviour
   }
 
   // allWeaponDatas에서 중복 없이 3개 랜덤 선택 (추가) 
-  private NeoSurvive.Weapon.WeaponBase[] Pick3RandomWeapons(List<NeoSurvive.Weapon.WeaponBase> all)
+  private WeaponBase[] Pick3RandomWeapons(List<WeaponBase> all)
   {
     if (all == null || all.Count < 3) return null;
 
-    List<NeoSurvive.Weapon.WeaponBase> temp = new List<NeoSurvive.Weapon.WeaponBase>(all);
+    List<WeaponBase> temp = new List<WeaponBase>(all);
 
     for (int i = 0; i < temp.Count; i++)
     {
@@ -371,11 +290,11 @@ public class UIManager : MonoBehaviour
       var t = temp[i]; temp[i] = temp[j]; temp[j] = t;
     }
 
-    return new NeoSurvive.Weapon.WeaponBase[] { temp[0], temp[1], temp[2] };
+    return new WeaponBase[] { temp[0], temp[1], temp[2] };
   }
 
   // WeaponBase 3개를 UI에 표시하고, 선택된 WeaponBase를 콜백으로 전달 (추가) 
-  public void ShowWeaponChoiceByData(NeoSurvive.Weapon.WeaponBase[] choices, Action<NeoSurvive.Weapon.WeaponBase> onPicked)
+  public void ShowWeaponChoiceByData(WeaponBase[] choices, Action<WeaponBase> onPicked)
   {
     if (weaponChoicePanel == null) return;
     if (choices == null || choices.Length != 3) return;
@@ -555,20 +474,6 @@ public class UIManager : MonoBehaviour
     }
   }
 
-  public void SetPlayerHealthBar(Player player)
-  {
-    if (playerHealthSlider == null) return;
-
-    // 기존 구독 해제 처리는 생략 (단일 플레이어 가정)
-    player.CurrentHP.onValueChanged += UpdatePlayerHealthUI;
-
-    // 추적 대상 설정
-    this.playerTransform = player.transform;
-
-    // 초기값 설정
-    UpdatePlayerHealthUI(player.CurrentHP.CurrentValue, player.MaxHP.CurrentValue);
-  }
-
   private void UpdatePlayerHealthUI(float current, float max)
   {
     Debug.Log("[UIManager] UpdatePlayerHealthUI called: " + current + " / " + max);
@@ -577,15 +482,10 @@ public class UIManager : MonoBehaviour
       playerHealthSlider.maxValue = max;
       playerHealthSlider.value = current;
     }
-  }
 
-  private void LateUpdate()
-  {
-    if (playerHealthSlider != null && playerTransform != null && Camera.main != null)
+    if (playerHealthText != null)
     {
-      // 월드 좌표(캐릭터 + 오프셋)를 스크린 좌표로 변환하여 Slider 위치 갱신
-      Vector3 worldPos = playerTransform.position + healthBarOffset;
-      playerHealthSlider.transform.position = Camera.main.WorldToScreenPoint(worldPos);
+      playerHealthText.text = $"{current:F0} / {max:F0}";
     }
   }
 
@@ -630,21 +530,6 @@ public class UIManager : MonoBehaviour
     weaponChoicePanel.SetActive(false);
     Time.timeScale = 1f;
     onWeaponChoicePicked = null;
-  }
-
-  // =========================
-  // 테스트용 (추가)
-  // =========================
-  private void Update()
-  {
-    if (Input.GetKeyDown(KeyCode.F8))
-    {
-      ShowWeaponChoice(
-        new Sprite[3] { null, null, null },
-        new string[3] { "AIDrone", "EmpField", "LinkPistol" },
-        (idx) => Debug.Log($"선택한 무기 인덱스: {idx}")
-      );
-    }
   }
 
   // ===================== 사이코 잠식도 UI =====================

@@ -95,10 +95,6 @@ public class GameClearUI : MonoBehaviour
 
         if (weaponStatsPanel != null)
         {
-            // 부모(SettingUI 등) 와 상관없이 Canvas 직속으로 이동시켜 단독 표시
-            Canvas rootCanvas = FindObjectOfType<Canvas>();
-            if (rootCanvas != null)
-                weaponStatsPanel.transform.SetParent(rootCanvas.transform, false);
 
             weaponStatsPanel.gameObject.SetActive(true);
             weaponStatsPanel.Refresh();

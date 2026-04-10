@@ -21,7 +21,6 @@ public class WeaponDamageStats : MonoBehaviour
     {
       Instance = this;
       gameStartTime = Time.time;
-      DontDestroyOnLoad(transform.root.gameObject);
     }
     else
     {

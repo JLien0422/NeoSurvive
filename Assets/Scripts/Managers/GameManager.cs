@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
   // 킬 카운트 변경 알림 이벤트
   public static event System.Action<int> OnKillCountChanged;
+  public static event System.Action onPlayerSpawned;
 
   [Header("적 스폰 설정")]
   private int killCount = 0;
@@ -64,6 +65,12 @@ public class GameManager : MonoBehaviour
     {
       Debug.LogError("플레이어를 찾을 수 없습니다! 'Player' 태그가 설정되었는지 확인해주세요.");
     }
+  }
+
+  public void NotifyPlayerSpawned()
+  {
+    onPlayerSpawned?.Invoke();
+    Debug.Log("[GameManager] 플레이어가 생성되었습니다. onPlayerSpawned 이벤트가 호출되었습니다.");
   }
 
   public void AddGold(int amount)

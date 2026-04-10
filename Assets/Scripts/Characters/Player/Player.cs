@@ -240,9 +240,10 @@ public class Player : Character
   }
 
   // 게임 시작 시 호출됩니다.
-  protected override void Awake()
+  private void Start()
   {
-    base.Awake(); // 부모 Awake 호출
+    InitCharacter(characterType);
+    GameManager.Instance.NotifyPlayerSpawned(); // GameManager에 플레이어 생성 알림
   }
 
   /// <summary>
@@ -318,17 +319,8 @@ public class Player : Character
     // R키로 신경링크 발동 (로컬 플레이어만)
     if (Input.GetKeyDown(KeyCode.R))
     {
-      ActivateNeuralLink();
+      ExecuteNeuralLink();
     }
-  }
-
-  // 게임 시작 시 캐릭터 타입 가져오기
-  protected override void Start()
-  {
-    base.Start();
-
-    InitCharacter(characterType);
-    // ApplyUpgrades();
   }
 
   // ===================== 레벨업 로직 =====================
@@ -587,25 +579,16 @@ public class Player : Character
   }
 
   /// <summary>
-  /// 신경링크를 발동합니다. (R키)
+  /// 실제 신경링크 로직을 실행 (로컬/원격 공용)
   /// </summary>
-  private void ActivateNeuralLink()
+  public void ExecuteNeuralLink()
   {
-    // 게이지가 100%가 아니면 발동 불가
     if (neuralLinkGauge < 100f)
     {
       Debug.Log($"신경링크 게이지 부족: {neuralLinkGauge:F1}% / 100%");
       return;
     }
 
-    ExecuteNeuralLink();
-  }
-
-  /// <summary>
-  /// 실제 신경링크 로직을 실행 (로컬/원격 공용)
-  /// </summary>
-  public void ExecuteNeuralLink()
-  {
     // 게이지 소모
     neuralLinkGauge = 0f;
     OnNeuralLinkGaugeChanged?.Invoke(neuralLinkGauge, 100f);

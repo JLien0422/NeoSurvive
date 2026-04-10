@@ -26,6 +26,7 @@ public class Stat
     set
     {
       baseValue = value;
+      Debug.Log("[Stat] BaseValue 변경: " + baseValue);
       onValueChanged?.Invoke(currentValue, baseValue); // 값이 변경될 때 이벤트 호출}
     }
   }
@@ -38,6 +39,7 @@ public class Stat
     set
     {
       currentValue = value;
+      Debug.Log("[Stat] CurrentValue 변경: " + currentValue);
       onValueChanged?.Invoke(currentValue, baseValue); // 값이 변경될 때 이벤트 호출
     }
   }
@@ -61,6 +63,7 @@ public class Stat
     this.currentValue = baseValue;
     this.fixedModifier = 0f;
     this.percentModifier = 0f;
+    onValueChanged?.Invoke(currentValue, baseValue); // 초기값 설정 시 이벤트 호출
   }
 
   // 생성자: 현재 값과 기본 값을 모두 지정하여 Stat 객체를 초기화합니다.
@@ -70,6 +73,7 @@ public class Stat
     this.baseValue = baseValue;
     this.fixedModifier = 0f;
     this.percentModifier = 0f;
+    onValueChanged?.Invoke(currentValue, baseValue); // 초기값 설정 시 이벤트 호출
   }
 
   public void AddFixedModifier(float value)

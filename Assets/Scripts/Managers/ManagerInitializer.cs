@@ -57,19 +57,6 @@ public class ManagerInitializer : MonoBehaviour
             Debug.Log("[ManagerInitializer] DataManager 컴포넌트 추가");
         }
 
-        // WeaponDamageStats 찾기 또는 생성 (무기별 대미지 통계)
-        GameObject weaponStatsObj = GameObject.Find("WeaponDamageStats");
-        if (weaponStatsObj == null)
-        {
-            weaponStatsObj = new GameObject("WeaponDamageStats");
-            Debug.Log("[ManagerInitializer] WeaponDamageStats GameObject 생성");
-        }
-        if (weaponStatsObj.GetComponent<WeaponDamageStats>() == null)
-        {
-            weaponStatsObj.AddComponent<WeaponDamageStats>();
-            Debug.Log("[ManagerInitializer] WeaponDamageStats 컴포넌트 추가");
-        }
-
         Debug.Log("[ManagerInitializer] 모든 매니저 초기화 완료");
     }
 }

@@ -11,10 +11,12 @@ GameObject:
   - component: {fileID: 8186934359076579900}
   - component: {fileID: 2268263436674627664}
   - component: {fileID: -6049673166769663174}
-  - component: {fileID: -1035345417808877174}
   - component: {fileID: -7401030046969844076}
   - component: {fileID: 1337953785412778772}
   - component: {fileID: -8954586827714942680}
+  - component: {fileID: -692092393769509334}
+  - component: {fileID: -330202846834953429}
+  - component: {fileID: 5989513886038450708}
   m_Layer: 7
   m_Name: Map1Boss
   m_TagString: Enemy
@@ -124,41 +126,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 2}
   m_Direction: 0
---- !u!70 &-1035345417808877174
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1863590038507068367}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
-  m_Direction: 0
 --- !u!50 &-7401030046969844076
 Rigidbody2D:
   serializedVersion: 4
@@ -198,10 +165,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 112e4ca1939fc964dbe5c44b59273b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthStat:
+  currentHP:
     baseValue: 10000
-  currentHealth: 0
-  bossNameForUI: "\uC4F0\uB808\uAE30\uC9D1\uD569\uCCB4"
+    currentValue: 0
+  maxHP:
+    baseValue: 10000
+    currentValue: 0
+  bossNameForUI: "\uC4F0\uB808\uAE30\uACE8\uB818"
 --- !u!114 &-8954586827714942680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,4 +185,92 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
+  patternsInOrder:
+  - {fileID: 5989513886038450708}
+  - {fileID: -330202846834953429}
+  - {fileID: -692092393769509334}
+  useSequentialPatternOrder: 0
+  delayBetweenPatterns: 2
   showGizmos: 1
+--- !u!114 &-692092393769509334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863590038507068367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2112dce50b7392e48aacd9ca21981f7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  telegraphCirclePrefab: {fileID: 3346588588444557245, guid: 8bd3c1d7c20f0bf43876191d98b71e6b, type: 3}
+  telegraphRectPrefab: {fileID: 1427111498198251542, guid: d575f543112aac141a0183432fa40669, type: 3}
+  telegraphSortingOrder: 80
+  chargeDuration: 0.6
+  dashSpeed: 12
+  dashMaxDuration: 1.2
+  playerHitRadius: 0.9
+  wallLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  wallCheckDistance: 0.6
+  jumpDelay: 0.35
+  shockwaveRadius: 3
+  shockwaveDamage: 15
+  ringTrashPrefab: {fileID: 5014514940975706079, guid: 5ab18ea166bd6174f9e80c1842a7b981, type: 3}
+  ringTrashCount: 8
+  ringRadius: 2.5
+  maxThrowsFromRing: 8
+  throwInterval: 0.25
+  thrownTrashSpeed: 8
+--- !u!114 &-330202846834953429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863590038507068367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ccb727fc578b7e4b9a600062a9c27db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  telegraphCirclePrefab: {fileID: 3346588588444557245, guid: 8bd3c1d7c20f0bf43876191d98b71e6b, type: 3}
+  telegraphRectPrefab: {fileID: 1427111498198251542, guid: d575f543112aac141a0183432fa40669, type: 3}
+  telegraphSortingOrder: 80
+  telegraphDuration: 1.5
+  comboDamage: 12
+  normalSwingCount: 2
+  normalHitBoxSize: {x: 2.2, y: 1.3}
+  normalHitDistance: 1.25
+  gapBetweenNormalSwings: 0.15
+  finalDashSpeed: 14
+  finalDashDuration: 0.4
+  finalHitBoxSize: {x: 3.2, y: 1.6}
+  finalHitDistance: 1.6
+  finalTrashClearWidth: 1.8
+--- !u!114 &5989513886038450708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863590038507068367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 431e56c8561af3449b5c6e4d90289ade, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  telegraphCirclePrefab: {fileID: 3346588588444557245, guid: 8bd3c1d7c20f0bf43876191d98b71e6b, type: 3}
+  telegraphRectPrefab: {fileID: 1427111498198251542, guid: d575f543112aac141a0183432fa40669, type: 3}
+  telegraphSortingOrder: 80
+  throwCount: 5
+  throwInterval: 0.7
+  telegraphDuration: 0.9
+  impactRadius: 1.35
+  impactDamage: 24
+  splitObstaclePrefab: {fileID: 5014514940975706079, guid: 5ab18ea166bd6174f9e80c1842a7b981, type: 3}
+  splitCount: 4
+  splitMinRadius: 0.8
+  splitMaxRadius: 2.2

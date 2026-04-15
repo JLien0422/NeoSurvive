@@ -536,7 +536,7 @@ MonoBehaviour:
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1345,7 +1345,7 @@ MonoBehaviour:
   m_text: QUIT
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3024,7 +3024,7 @@ MonoBehaviour:
   m_text: SETTING
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4509,6 +4509,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageTextPrefab: {fileID: 5492544405386956588, guid: 82332cbbe50f9334d8c5c72073e87a02, type: 3}
+  damageTextOffsetY: 1.5
   canvas: {fileID: 2079492508}
   weaponUIPanel: {fileID: 977936005}
   weaponIconPrefab: {fileID: 6931289576150443170, guid: f90abdd30d215f44caa32264cef75a37, type: 3}
@@ -4517,7 +4518,9 @@ MonoBehaviour:
   gameTimeText: {fileID: 1450491671}
   killCountText: {fileID: 2096946303}
   playerHealthSlider: {fileID: 0}
+  playerHealthText: {fileID: 0}
   gameManager: {fileID: 0}
+  goldText: {fileID: 0}
   characterChoicePanel: {fileID: 0}
   psychoCorruptionSlider: {fileID: 1103475452}
   psychoCorruptionText: {fileID: 860028446}
@@ -6169,7 +6172,7 @@ MonoBehaviour:
   m_text: "\uC2E0\uACBD \uB9C1\uD06C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6701,7 +6704,7 @@ MonoBehaviour:
   m_text: "\uACFC\uBD80\uD654"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

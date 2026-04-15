@@ -29,6 +29,7 @@ public abstract class Character : MonoBehaviour
 
     _baseFlags = GetComponent<StatusFlags>(); // (추가)
     if (_baseFlags == null) _baseFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
+    EnsureHpInitialized(refillToMax: true);
 
   }
 
@@ -43,6 +44,7 @@ public abstract class Character : MonoBehaviour
   public virtual void TakeDamage(float amount, WeaponBase sourceWeapon)
   {
     if (IsDead) return;
+    EnsureHpInitialized(refillToMax: false);
 
     // 무기별 대미지 통계 기록 (배율 적용 전 원본 수치로 기록)
     if (sourceWeapon != null && WeaponDamageStats.Instance != null)
@@ -80,6 +82,7 @@ public abstract class Character : MonoBehaviour
   public void Heal(float amount)
   {
     if (IsDead) return;
+    EnsureHpInitialized(refillToMax: false);
     currentHP.CurrentValue = Mathf.Min(currentHP.CurrentValue + amount, maxHP.GetValue());
 
     Debug.Log($"[Player] 체력 회복: +{amount} | 현재 HP: {currentHP.CurrentValue}/{maxHP.GetValue()}");
@@ -97,7 +100,38 @@ public abstract class Character : MonoBehaviour
   public virtual void Revive(float healthRatio = 1.0f)
   {
     IsDead = false;
+    EnsureHpInitialized(refillToMax: false);
     currentHP.CurrentValue = maxHP.GetValue() * healthRatio;
     Debug.Log($"{gameObject.name}이(가) 부활했습니다.");
+  }
+
+  /// <summary>
+  /// currentHP를 maxHP 기준으로 안전하게 초기화/동기화합니다.
+  /// </summary>
+  protected void EnsureHpInitialized(bool refillToMax)
+  {
+    // maxHP가 비어있으면 최소 기본값으로 생성
+    if (maxHP == null)
+      maxHP = new Stat(1f);
+
+    float maxValue = Mathf.Max(1f, maxHP.GetValue());
+
+    // currentHP가 비어있으면 maxHP를 기준으로 생성
+    if (currentHP == null)
+      currentHP = new Stat(maxValue, maxValue);
+
+    // 현재 체력을 즉시 최대치와 동기화해야 하는 시점(스폰/초기화)
+    if (refillToMax)
+    {
+      currentHP.BaseValue = maxValue;
+      currentHP.CurrentValue = maxValue;
+      return;
+    }
+
+    // 기존 값이 유효하면 유지하되 범위 보정
+    if (currentHP.BaseValue <= 0f)
+      currentHP.BaseValue = maxValue;
+
+    currentHP.CurrentValue = Mathf.Clamp(currentHP.CurrentValue, 0f, maxValue);
   }
 }

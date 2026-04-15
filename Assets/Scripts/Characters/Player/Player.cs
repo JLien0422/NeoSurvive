@@ -257,13 +257,13 @@ public class Player : Character
       string id = type.ToString().ToLower();   // ★ "Hacker" -> "hacker"
       if (CharacterBalanceLoader.DB.rows.TryGetValue(id, out var row))
       {
-        if (row.baseHealth > 0f) currentHP.BaseValue = row.baseHealth;
+        if (row.baseHealth > 0f) maxHP.BaseValue = row.baseHealth;
         if (row.baseAttackDamage > 0f) attackDamage.BaseValue = row.baseAttackDamage;
         if (row.baseAttackRange > 0f) attackRange.BaseValue = row.baseAttackRange;
         if (row.baseAttackSpeed > 0f) attackSpeed.BaseValue = row.baseAttackSpeed;
         if (row.baseMoveSpeed > 0f) moveSpeed.BaseValue = row.baseMoveSpeed;
 
-        Debug.Log($"[Player] CSV 적용 성공: {id} | HP={currentHP.BaseValue}, ATK={attackDamage.BaseValue}, RANGE={attackRange.BaseValue}, ASPD={attackSpeed.BaseValue}, MOVE={moveSpeed.BaseValue}");
+        Debug.Log($"[Player] CSV 적용 성공: {id} | HP={maxHP.BaseValue}, ATK={attackDamage.BaseValue}, RANGE={attackRange.BaseValue}, ASPD={attackSpeed.BaseValue}, MOVE={moveSpeed.BaseValue}");
       }
       else
       {
@@ -274,6 +274,9 @@ public class Player : Character
     {
       Debug.LogWarning("[Player] CharacterBalanceLoader.DB가 null입니다.");
     }
+
+    // HP는 maxHP 기준으로 즉시 동기화 (스폰 직후 currentHP=0 문제 방지)
+    EnsureHpInitialized(refillToMax: true);
 
     // TODO -> 특성 등 추가 시 여기에 초기화 코드 작성
 

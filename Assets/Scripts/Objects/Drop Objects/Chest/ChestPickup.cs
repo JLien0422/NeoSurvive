@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 /// <summary>
 /// 상자 픽업 - 획득 시 무기 선택 UI 표시

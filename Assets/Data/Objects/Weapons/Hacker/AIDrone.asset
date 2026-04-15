@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: AIDrone
   m_EditorClassIdentifier: 
-  weaponId: 4
+  weaponId: 3
   weaponName: "AI \uB4DC\uB860"
   weaponIcon: {fileID: 21300000, guid: 8852fa81682f2ad40b48e8ec52dfe286, type: 3}
   description: "\uD50C\uB808\uC774\uC5B4 \uC8FC\uBCC0\uC744 \uB530\uB77C\uB2E4\uB2C8\uB294
     \uC790\uB3D9 \uBC1C\uC0AC AI \uB4DC\uB860\uC785\uB2C8\uB2E4."
   weaponPrefab: {fileID: 8909741650533778054, guid: d4345f27cbd5179458a7b6711fd8de8c, type: 3}
-  level: 1
+  level: 22
   isIndependent: 1

@@ -137,14 +137,6 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
-      // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
-      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null && target != null)
-      {
-        Vector3 dir = (target.position - (transform.position + (Vector3)fireOffset)).normalized;
-        runtimeInfo.ReportProjectile(transform.position + (Vector3)fireOffset, dir, 20f, detectionRange, 0, 0);
-      }
-
       GameObject obj = Instantiate(projectilePrefab, transform.position + (Vector3)fireOffset, Quaternion.identity);
       if (obj.TryGetComponent<Projectile>(out var proj))
       {

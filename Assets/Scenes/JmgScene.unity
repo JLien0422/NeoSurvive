@@ -1723,7 +1723,7 @@ MonoBehaviour:
   m_text: "\uB85C\uBE44\uB85C \uB3CC\uC544\uAC00"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
-  m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
+  m_sharedMaterial: {fileID: -6085546255713535585, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

@@ -43,11 +43,6 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
-
-      // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
-      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null)
-        fireTimer += Time.deltaTime;
       if (fireTimer >= fireRate)
       {
         Attack();
@@ -63,13 +58,6 @@ namespace NeoSurvive.Weapon
       if (target != null)
       {
         forward = (target.position - transform.position).normalized;
-      }
-
-      // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
-      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null)
-      {
-        runtimeInfo.ReportCone(transform.position, forward, angle, range, duration);
       }
 
       // 시각적 효과 (디버그용)

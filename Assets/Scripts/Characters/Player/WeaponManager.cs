@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using NeoSurvive.Characters;
 
 public enum WeaponType
 {
@@ -27,13 +28,9 @@ namespace NeoSurvive.Weapon
 
     public static event System.Action<List<WeaponBase>> OnWeaponChanged;
 
-    private Player player;
-
-    private int maxWeapon = 6;
-
     private WeaponBase FindWeaponById(int weaponId)
     {
-      return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId);
+      return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId + 1);
     }
 
     [Header("Class Weapon Sets (Templates)")]
@@ -52,8 +49,10 @@ namespace NeoSurvive.Weapon
 
     private void ApplyClassLoadout()
     {
-      var classTag = GetComponent<PlayerClassTag>();
-      var classType = (classTag != null) ? classTag.classType : PlayerClassType.Hacker;
+      var player = GetComponent<Player>();
+      var classType = (player != null && player.CharacterType == CharacterType.Cyborg)
+        ? PlayerClassType.Cyborg
+        : PlayerClassType.Hacker;
 
       List<WeaponBase> selectedAll = (classType == PlayerClassType.Cyborg)
         ? cyborgAllWeaponDatas
@@ -130,17 +129,6 @@ namespace NeoSurvive.Weapon
         source.weaponData = weaponData;
 
         spawnedWeapons.Add(weaponData, weaponObj);
-
-        if (player == null) player = GetComponent<Player>();
-        if (player != null)
-        {
-          var runtimeInfo = weaponObj.GetComponent<WeaponRuntimeInfo>();
-          if (runtimeInfo == null) runtimeInfo = weaponObj.AddComponent<WeaponRuntimeInfo>();
-          runtimeInfo.Initialize(weaponData.weaponId, player, this);
-        }
-
-        // 초기화 알림
-        weaponObj.SendMessage("OnLevelUp", 1, SendMessageOptions.DontRequireReceiver);
       }
 
       OnWeaponChanged?.Invoke(activeWeapons);

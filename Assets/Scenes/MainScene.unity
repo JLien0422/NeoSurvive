@@ -2864,7 +2864,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 78.45581, y: 35.823242}
+  m_SizeDelta: {x: 400, y: 35.823242}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &235399447
 MonoBehaviour:
@@ -5939,17 +5939,17 @@ MonoBehaviour:
   healthBarOffset: {x: 0, y: 1, z: 0}
   weaponChoicePanel: {fileID: 741530869}
   weaponChoiceButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 547704283}
+  - {fileID: 1141533752}
+  - {fileID: 1480071887}
   weaponChoiceIcons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1560082442}
+  - {fileID: 1658298445}
+  - {fileID: 1179588922}
   weaponChoiceTexts:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 58121766}
+  - {fileID: 1559225330}
+  - {fileID: 1001679140}
 --- !u!1 &524172791
 GameObject:
   m_ObjectHideFlags: 0
@@ -17660,7 +17660,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -21508,11 +21508,11 @@ MonoBehaviour:
   spawnInterval: 0.2
   minSpawnRadius: 5
   maxSpawnRadius: 10
-  basicWeight: 0.5
-  shooterWeight: 0.15
-  rusherWeight: 0.15
-  bomberWeight: 0.2
-  tankerWeight: 0.1
+  basicWeight: 0
+  shooterWeight: 0
+  rusherWeight: 0
+  bomberWeight: 1
+  tankerWeight: 0
 --- !u!4 &1635127890
 Transform:
   m_ObjectHideFlags: 0
@@ -28536,19 +28536,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 714923196670910669, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: maxHP.baseValue
-      value: 500
+      value: 500000
       objectReference: {fileID: 0}
     - target: {fileID: 714923196670910669, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: maxHP.currentValue
-      value: 500
+      value: 500000
       objectReference: {fileID: 0}
     - target: {fileID: 714923196670910669, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: currentHP.baseValue
-      value: 500
+      value: 500000
       objectReference: {fileID: 0}
     - target: {fileID: 714923196670910669, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: currentHP.currentValue
-      value: 500
+      value: 500000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839440069817424593, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839440069817424593, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
+      propertyPath: m_BodyType
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1839440069817424593, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
       propertyPath: m_Constraints

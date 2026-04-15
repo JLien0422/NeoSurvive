@@ -51,13 +51,6 @@ namespace NeoSurvive.Weapon
       Vector2 randomPos = Random.insideUnitCircle * spawnRadius;
       Vector3 spawnPosition = transform.position + (Vector3)randomPos;
 
-      // [Coop] 서버에 장판 생성 보고 (로컬 플레이어일 때만)
-      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null)
-      {
-        runtimeInfo.ReportArea(spawnPosition, areaSize, duration, 0.5f, currentLevel >= 5);
-      }
-
       GameObject obj = Instantiate(empFieldPrefab, spawnPosition, Quaternion.identity);
 
       // 장판 초기화

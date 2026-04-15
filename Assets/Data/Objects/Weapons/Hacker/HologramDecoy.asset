@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: HologramDecoy
   m_EditorClassIdentifier: 
-  weaponId: 7
+  weaponId: 6
   weaponName: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
   weaponIcon: {fileID: 21300000, guid: 743d7fcf00f92bd449a0e1f6b998bcb5, type: 3}
   description: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
   weaponPrefab: {fileID: 474004203620960840, guid: ee74eca0d709c5f4ca664f9b96a9f05c, type: 3}
-  level: 5
+  level: 1
   isIndependent: 0

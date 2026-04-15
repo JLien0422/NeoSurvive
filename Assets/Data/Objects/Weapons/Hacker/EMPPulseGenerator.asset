@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
   m_Name: EMPPulseGenerator
   m_EditorClassIdentifier: 
-  weaponId: 6
+  weaponId: 5
   weaponName: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
   weaponIcon: {fileID: 21300000, guid: 2345a0e2f51b1f241a862f640f793ac7, type: 3}
   description: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
   weaponPrefab: {fileID: 4312614672909416783, guid: 404086b1bed71e0468d44900519eab58, type: 3}
-  level: 5
+  level: 9
   isIndependent: 0

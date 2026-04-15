@@ -18,5 +18,5 @@ MonoBehaviour:
   description: "\uC801\uC911 \uC2DC \uD45C\uC2DD\uC744 \uB0A8\uACA8 \uC801\uC744
     \uD3EC\uCEE4\uC2F1 \uD558\uB294 \uD574\uCEE4\uC758 \uAE30\uBCF8 \uBB34\uAE30\uC785\uB2C8\uB2E4."
   weaponPrefab: {fileID: 3802149021545454062, guid: b21e7737bf3b4f349bc26049aa49584a, type: 3}
-  level: 7
+  level: 15
   isIndependent: 0

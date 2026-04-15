@@ -59,13 +59,6 @@ namespace NeoSurvive.Weapon
       if (target == null) return;
       Vector3 dir = (target.transform.position - transform.position).normalized;
 
-      // [Coop] 서버에 공격 보고 (로컬 플레이어일 때만)
-      var runtimeInfo = GetComponent<WeaponRuntimeInfo>();
-      if (runtimeInfo != null)
-      {
-        runtimeInfo.ReportProjectile(transform.position, dir, bulletSpeed, range, 0, 0);
-      }
-
       ExecuteAttack(dir);
     }
 

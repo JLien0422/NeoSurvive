@@ -5,6 +5,12 @@ using NeoSurvive.Weapon;
 using NeoSurvive.Buff;
 using NeoSurvive.Exp; // (추가)
 
+public enum PlayerClassType
+{
+  Cyborg,
+  Hacker
+}
+
 // Player 클래스는 플레이어 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
@@ -37,9 +43,6 @@ public class Player : Character
   // 공격 범위
   [SerializeField]
   private Stat attackRange = new Stat(3f);
-  // 기본 공격 주기 (초)
-  [SerializeField]
-  private float baseAttackInterval = 1.0f;
   // 공격 속도 (1.0 = 100%)
   [SerializeField]
   private Stat attackSpeed = new Stat(1.0f);

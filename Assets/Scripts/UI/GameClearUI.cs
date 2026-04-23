@@ -89,6 +89,9 @@ public class GameClearUI : MonoBehaviour
     {
         if (clearPanel == null) return;
 
+        // 공용 WeaponStatsPanel을 쓰는 경우를 위해 먼저 클리어 패널을 켭니다.
+        clearPanel.SetActive(true);
+
         // WeaponStatsPanelUI 갱신 (None이면 씬에서 자동 탐색)
         if (weaponStatsPanel == null)
             weaponStatsPanel = FindObjectOfType<WeaponStatsPanelUI>(true);
@@ -99,9 +102,6 @@ public class GameClearUI : MonoBehaviour
             weaponStatsPanel.gameObject.SetActive(true);
             weaponStatsPanel.Refresh();
         }
-
-        // 패널 활성화 후 DOTween 페이드인
-        clearPanel.SetActive(true);
 
         if (canvasGroup != null)
         {

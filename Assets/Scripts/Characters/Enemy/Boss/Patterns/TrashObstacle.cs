@@ -8,6 +8,33 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class TrashObstacle : Character
 {
+  [Header("투척 충돌")]
+  [SerializeField] private float impactDamage = 12f;
+  [SerializeField] private float minImpactSpeed = 1.5f;
+
+  private Rigidbody2D rb;
+
+  protected override void Awake()
+  {
+    base.Awake();
+    rb = GetComponent<Rigidbody2D>();
+  }
+
+  private void OnCollisionEnter2D(Collision2D collision)
+  {
+    if (collision == null || IsDead)
+      return;
+    if (!collision.collider.CompareTag("Player"))
+      return;
+    if (rb == null || rb.velocity.sqrMagnitude < minImpactSpeed * minImpactSpeed)
+      return;
+
+    if (collision.collider.TryGetComponent<Player>(out var player))
+      player.TakeDamage(impactDamage);
+
+    Die();
+  }
+
   protected override void Die()
   {
     if (IsDead) return;

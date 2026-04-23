@@ -33,8 +33,11 @@ public class BossController : MonoBehaviour
 
   private float searchTimer;
   private const float SEARCH_INTERVAL = 1f;
+  private float collisionSyncTimer;
+  private const float COLLISION_SYNC_INTERVAL = 0.25f;
 
   private bool chaseEnabled = true;
+  private Collider2D[] bossColliders;
 
   /// <summary>직전에 실행한 <see cref="patternsInOrder"/> 인덱스. 랜덤 시 같은 패턴 연속 방지용.</summary>
   private int lastPatternIndex = -1;
@@ -43,6 +46,7 @@ public class BossController : MonoBehaviour
   {
     boss = GetComponent<Boss>();
     rb = GetComponent<Rigidbody2D>();
+    bossColliders = GetComponentsInChildren<Collider2D>(true);
     rb.gravityScale = 0f;
     rb.freezeRotation = true;
 
@@ -157,10 +161,18 @@ public class BossController : MonoBehaviour
   private void Update()
   {
     searchTimer += Time.deltaTime;
+    collisionSyncTimer += Time.deltaTime;
+
     if (searchTimer >= SEARCH_INTERVAL)
     {
       FindPlayer();
       searchTimer = 0f;
+    }
+
+    if (collisionSyncTimer >= COLLISION_SYNC_INTERVAL)
+    {
+      SyncBossTrashObstacleCollisionIgnore();
+      collisionSyncTimer = 0f;
     }
   }
 
@@ -192,6 +204,41 @@ public class BossController : MonoBehaviour
 
     Vector2 direction = (playerTarget.position - transform.position).normalized;
     rb.velocity = direction * moveSpeed;
+  }
+
+  /// <summary>
+  /// 보스와 TrashObstacle 사이 물리 충돌을 항상 무시합니다.
+  /// 패턴 상호작용은 패턴 스크립트의 쿼리(Cast/Overlap)로만 처리합니다.
+  /// </summary>
+  private void SyncBossTrashObstacleCollisionIgnore()
+  {
+    if (bossColliders == null || bossColliders.Length == 0)
+      return;
+
+    TrashObstacle[] obstacles = FindObjectsOfType<TrashObstacle>();
+    if (obstacles == null || obstacles.Length == 0)
+      return;
+
+    foreach (var obstacle in obstacles)
+    {
+      if (obstacle == null || obstacle.transform == transform)
+        continue;
+
+      Collider2D[] obstacleColliders = obstacle.GetComponentsInChildren<Collider2D>(true);
+      if (obstacleColliders == null || obstacleColliders.Length == 0)
+        continue;
+
+      foreach (var bossCollider in bossColliders)
+      {
+        if (bossCollider == null) continue;
+
+        foreach (var obstacleCollider in obstacleColliders)
+        {
+          if (obstacleCollider == null) continue;
+          Physics2D.IgnoreCollision(bossCollider, obstacleCollider, true);
+        }
+      }
+    }
   }
 
 #if UNITY_EDITOR

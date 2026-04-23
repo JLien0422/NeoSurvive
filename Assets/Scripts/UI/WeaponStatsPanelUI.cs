@@ -31,9 +31,21 @@ public class WeaponStatsPanelUI : MonoBehaviour
         if (weaponStatRowsRoot == null) return;
 
         var stats = WeaponDamageStats.Instance;
+        if (stats == null)
+        {
+            Debug.LogWarning("[WeaponStatsPanelUI] WeaponDamageStats.Instance가 없어 통계를 표시할 수 없습니다.");
+            return;
+        }
 
         if (weaponManager == null)
-            Debug.LogError("[WeaponStatsPanelUI] WeaponManager가 할당되지 않았습니다. 씬에서 WeaponManager를 찾습니다.");
+        {
+            weaponManager = FindObjectOfType<WeaponManager>(true);
+            if (weaponManager == null)
+            {
+                Debug.LogWarning("[WeaponStatsPanelUI] WeaponManager를 찾지 못해 통계를 표시할 수 없습니다.");
+                return;
+            }
+        }
 
         GameObject template = rowTemplate;
         if (template == null && weaponStatRowsRoot.childCount > 0)
@@ -49,6 +61,12 @@ public class WeaponStatsPanelUI : MonoBehaviour
             var child = weaponStatRowsRoot.GetChild(i).gameObject;
             if (child == template) continue;
             Destroy(child);
+        }
+
+        if (weaponManager.activeWeapons == null)
+        {
+            Debug.LogWarning("[WeaponStatsPanelUI] activeWeapons 목록이 null입니다.");
+            return;
         }
 
         foreach (var weapon in weaponManager.activeWeapons)

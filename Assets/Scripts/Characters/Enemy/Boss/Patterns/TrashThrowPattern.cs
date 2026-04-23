@@ -19,6 +19,8 @@ public class TrashThrowPattern : BossPatternBase
   [SerializeField] private int splitCount = 4;
   [SerializeField] private float splitMinRadius = 0.8f;
   [SerializeField] private float splitMaxRadius = 2.2f;
+  [SerializeField] private float minSpawnSpacing = 0.85f;
+  [SerializeField] private int maxSpawnAttemptsPerTrash = 8;
 
   public override IEnumerator RunPatternCoroutine()
   {
@@ -70,16 +72,49 @@ public class TrashThrowPattern : BossPatternBase
 
     for (int i = 0; i < count; i++)
     {
-      Vector2 dir = Random.insideUnitCircle.normalized;
-      if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
-      float r = Random.Range(minR, maxR);
-
-      Vector3 spawnPos = center + (Vector3)(dir * r);
-      spawnPos.z = 0f;
+      if (!TryFindNonOverlappingSplitPosition(center, minR, maxR, out Vector3 spawnPos))
+        continue;
 
       GameObject trash = Instantiate(splitObstaclePrefab, spawnPos, Quaternion.identity);
+      IgnoreCollisionWithBoss(trash);
       if (trash.TryGetComponent<Rigidbody2D>(out var rb))
         rb.velocity = Vector2.zero;
     }
+  }
+
+  private bool TryFindNonOverlappingSplitPosition(Vector3 center, float minR, float maxR, out Vector3 spawnPos)
+  {
+    int attempts = Mathf.Max(1, maxSpawnAttemptsPerTrash);
+    float spacing = Mathf.Max(0.1f, minSpawnSpacing);
+
+    for (int attempt = 0; attempt < attempts; attempt++)
+    {
+      Vector2 dir = Random.insideUnitCircle.normalized;
+      if (dir.sqrMagnitude < 0.0001f)
+        dir = Vector2.right;
+
+      float r = Random.Range(minR, maxR + (attempt * 0.1f));
+      spawnPos = center + (Vector3)(dir * r);
+      spawnPos.z = 0f;
+
+      if (!IsTrashOverlappingAt(spawnPos, spacing))
+        return true;
+    }
+
+    spawnPos = Vector3.zero;
+    return false;
+  }
+
+  private bool IsTrashOverlappingAt(Vector3 position, float checkRadius)
+  {
+    var overlaps = Physics2D.OverlapCircleAll(position, checkRadius);
+    foreach (var overlap in overlaps)
+    {
+      if (overlap == null)
+        continue;
+      if (overlap.TryGetComponent<TrashObstacle>(out _))
+        return true;
+    }
+    return false;
   }
 }

@@ -128,6 +128,7 @@ public class PauseMenuController : MonoBehaviour
         if (pauseCanvas != null)
             pauseCanvas.sortingOrder = 99;
 
+        ShowWeaponStatsPanel();
         Time.timeScale = 0f;
     }
 
@@ -136,6 +137,7 @@ public class PauseMenuController : MonoBehaviour
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(false);
 
+        HideWeaponStatsPanel();
         isPauseMenuOpen = false;
         Time.timeScale = 1f;
     }
@@ -149,10 +151,27 @@ public class PauseMenuController : MonoBehaviour
     {
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(false);
+        HideWeaponStatsPanel();
         isPauseMenuOpen = false;
         // 설정 패널이 열리면 Time.timeScale은 SettingsUI에서 0으로 둠
         if (settingsUI != null)
             settingsUI.OpenSettings();
+    }
+
+    private void ShowWeaponStatsPanel()
+    {
+        if (weaponStatsPanel == null) return;
+
+        weaponStatsPanel.SetActive(true);
+        var statsPanelUI = weaponStatsPanel.GetComponent<WeaponStatsPanelUI>();
+        if (statsPanelUI != null)
+            statsPanelUI.Refresh();
+    }
+
+    private void HideWeaponStatsPanel()
+    {
+        if (weaponStatsPanel == null) return;
+        weaponStatsPanel.SetActive(false);
     }
 
     /// <summary>

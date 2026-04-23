@@ -16,6 +16,7 @@ public class ChargeShockwavePattern : BossPatternBase
   [SerializeField] private float dashCollisionDamage = 12f;
   [SerializeField] private LayerMask wallLayers;
   [SerializeField] private float wallCheckDistance = 0.6f;
+  [SerializeField] private float minCheckDistanceMultiplier = 1.5f;
 
   [Header("점프/충격파")]
   [SerializeField] private float jumpDelay = 0.35f;
@@ -26,6 +27,8 @@ public class ChargeShockwavePattern : BossPatternBase
   [SerializeField] private GameObject ringTrashPrefab;
   [SerializeField] private int ringTrashCount = 8;
   [SerializeField] private float ringRadius = 2.5f;
+  [SerializeField] private float minSpawnSpacing = 0.85f;
+  [SerializeField] private int maxSpawnAttemptsPerTrash = 8;
   [SerializeField] private int maxThrowsFromRing = 8;
   [SerializeField] private float throwInterval = 0.25f;
   [SerializeField] private float thrownTrashSpeed = 8f;
@@ -50,31 +53,41 @@ public class ChargeShockwavePattern : BossPatternBase
     while (elapsed < dashMaxDuration && BossAlive)
     {
       elapsed += Time.deltaTime;
+      float checkDistance = GetEffectiveCheckDistance();
 
-      if (BossRb != null)
-        BossRb.velocity = dir * dashSpeed;
-
-      if (PlayerTarget != null)
+      if (TryHitPlayerDuringDash(checkDistance, out Player hitPlayer))
       {
-        float sqrDist = ((Vector2)PlayerTarget.position - (Vector2)transform.position).sqrMagnitude;
-        if (sqrDist <= playerHitRadius * playerHitRadius)
+        if (!dashDamageDealt && dashCollisionDamage > 0f && hitPlayer != null)
         {
-          if (!dashDamageDealt && dashCollisionDamage > 0f &&
-              PlayerTarget.TryGetComponent<Player>(out var hitPlayer))
-          {
-            hitPlayer.TakeDamage(dashCollisionDamage);
-            dashDamageDealt = true;
-          }
-          break;
+          hitPlayer.TakeDamage(dashCollisionDamage);
+          dashDamageDealt = true;
         }
+        if (BossRb != null)
+          BossRb.velocity = Vector2.zero;
+        break;
+      }
+
+      // 보스전에서는 TrashObstacle도 Enemy 태그를 사용하므로 Enemy 충돌 시 돌진 종료.
+      if (IsBlockedByEnemy(dir, checkDistance))
+      {
+        if (BossRb != null)
+          BossRb.velocity = Vector2.zero;
+        break;
       }
 
       if (wallLayers.value != 0)
       {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, wallCheckDistance, wallLayers);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, checkDistance, wallLayers);
         if (hit.collider != null)
+        {
+          if (BossRb != null)
+            BossRb.velocity = Vector2.zero;
           break;
+        }
       }
+
+      if (BossRb != null)
+        BossRb.velocity = dir * dashSpeed;
 
       yield return null;
     }
@@ -91,6 +104,53 @@ public class ChargeShockwavePattern : BossPatternBase
     // 주변 원형 Trash 생성 후 플레이어 방향 투척
     List<GameObject> ringTrash = SpawnRingTrash();
     yield return ThrowRingTrash(ringTrash);
+  }
+
+  private float GetEffectiveCheckDistance()
+  {
+    float predictedTravel = dashSpeed * Time.fixedDeltaTime * Mathf.Max(1f, minCheckDistanceMultiplier);
+    return Mathf.Max(wallCheckDistance, predictedTravel);
+  }
+
+  private bool TryHitPlayerDuringDash(float checkDistance, out Player hitPlayer)
+  {
+    hitPlayer = null;
+    float queryRadius = Mathf.Max(playerHitRadius, checkDistance);
+    var overlaps = Physics2D.OverlapCircleAll(transform.position, queryRadius);
+    foreach (var overlap in overlaps)
+    {
+      if (overlap == null || !overlap.CompareTag("Player"))
+        continue;
+
+      Vector2 closest = overlap.ClosestPoint(transform.position);
+      float sqrDist = ((Vector2)transform.position - closest).sqrMagnitude;
+      if (sqrDist > playerHitRadius * playerHitRadius)
+        continue;
+
+      overlap.TryGetComponent<Player>(out hitPlayer);
+      return true;
+    }
+
+    return false;
+  }
+
+  private bool IsBlockedByEnemy(Vector2 dashDir, float checkDistance)
+  {
+    var hits = Physics2D.CircleCastAll(transform.position, playerHitRadius, dashDir, checkDistance);
+    foreach (var hit in hits)
+    {
+      if (hit.collider == null)
+        continue;
+
+      Transform hitTransform = hit.collider.transform;
+      if (hitTransform == transform)
+        continue; // 자기 자신은 제외
+
+      if (hit.collider.CompareTag("Enemy"))
+        return true;
+    }
+
+    return false;
   }
 
   private void ApplyShockwaveDamage()
@@ -113,13 +173,48 @@ public class ChargeShockwavePattern : BossPatternBase
     int count = Mathf.Max(1, ringTrashCount);
     for (int i = 0; i < count; i++)
     {
-      float a = (Mathf.PI * 2f) * (i / (float)count);
-      Vector3 pos = transform.position + new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f) * ringRadius;
+      if (!TryFindNonOverlappingRingPosition(i, count, out Vector3 pos))
+        continue;
       GameObject trash = Instantiate(ringTrashPrefab, pos, Quaternion.identity);
+      IgnoreCollisionWithBoss(trash);
       list.Add(trash);
     }
 
     return list;
+  }
+
+  private bool TryFindNonOverlappingRingPosition(int index, int count, out Vector3 spawnPos)
+  {
+    int attempts = Mathf.Max(1, maxSpawnAttemptsPerTrash);
+    float spacing = Mathf.Max(0.1f, minSpawnSpacing);
+    float baseAngle = (Mathf.PI * 2f) * (index / (float)Mathf.Max(1, count));
+
+    for (int attempt = 0; attempt < attempts; attempt++)
+    {
+      float jitter = attempt == 0 ? 0f : Random.Range(-0.35f, 0.35f);
+      float angle = baseAngle + jitter;
+      float radius = ringRadius + (attempt * 0.12f);
+      spawnPos = transform.position + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * radius;
+
+      if (!IsTrashOverlappingAt(spawnPos, spacing))
+        return true;
+    }
+
+    spawnPos = Vector3.zero;
+    return false;
+  }
+
+  private bool IsTrashOverlappingAt(Vector3 position, float checkRadius)
+  {
+    var overlaps = Physics2D.OverlapCircleAll(position, checkRadius);
+    foreach (var overlap in overlaps)
+    {
+      if (overlap == null)
+        continue;
+      if (overlap.TryGetComponent<TrashObstacle>(out _))
+        return true;
+    }
+    return false;
   }
 
   private IEnumerator ThrowRingTrash(List<GameObject> ringTrash)

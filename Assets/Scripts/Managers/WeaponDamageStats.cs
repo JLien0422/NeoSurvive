@@ -8,24 +8,50 @@ using NeoSurvive.Weapon;
 /// </summary>
 public class WeaponDamageStats : MonoBehaviour
 {
-  public static WeaponDamageStats Instance { get; private set; }
+  private static WeaponDamageStats _instance;
+  public static WeaponDamageStats Instance
+  {
+    get
+    {
+      if (_instance != null) return _instance;
+
+      _instance = FindObjectOfType<WeaponDamageStats>(true);
+      if (_instance == null)
+      {
+        var go = new GameObject("WeaponDamageStats_Auto");
+        _instance = go.AddComponent<WeaponDamageStats>();
+        DontDestroyOnLoad(go);
+      }
+
+      _instance.InitializeIfNeeded();
+      return _instance;
+    }
+  }
 
   private Dictionary<WeaponBase, float> totalDamagePerWeapon = new Dictionary<WeaponBase, float>();
   private Dictionary<WeaponBase, int> debugLogCount = new Dictionary<WeaponBase, int>();
   private const int DEBUG_LOG_LIMIT = 5;
   private float gameStartTime;
+  private bool isInitialized;
 
   private void Awake()
   {
-    if (Instance == null)
+    if (_instance == null)
     {
-      Instance = this;
-      gameStartTime = Time.time;
+      _instance = this;
+      InitializeIfNeeded();
     }
-    else
+    else if (_instance != this)
     {
       Destroy(gameObject);
     }
+  }
+
+  private void InitializeIfNeeded()
+  {
+    if (isInitialized) return;
+    gameStartTime = Time.time;
+    isInitialized = true;
   }
 
   /// <summary>

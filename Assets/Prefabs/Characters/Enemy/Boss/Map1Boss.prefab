@@ -149,9 +149,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &1337953785412778772
 MonoBehaviour:
@@ -166,10 +166,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHP:
-    baseValue: 10000
+    baseValue: 100
     currentValue: 0
   maxHP:
-    baseValue: 10000
+    baseValue: 100
     currentValue: 0
   bossNameForUI: "\uC4F0\uB808\uAE30\uACE8\uB818"
 --- !u!114 &-8954586827714942680
@@ -216,12 +216,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   wallCheckDistance: 0.6
+  minCheckDistanceMultiplier: 1.5
   jumpDelay: 0.35
   shockwaveRadius: 3
   shockwaveDamage: 15
   ringTrashPrefab: {fileID: 5014514940975706079, guid: 5ab18ea166bd6174f9e80c1842a7b981, type: 3}
   ringTrashCount: 8
   ringRadius: 2.5
+  minSpawnSpacing: 0.85
+  maxSpawnAttemptsPerTrash: 8
   maxThrowsFromRing: 8
   throwInterval: 0.25
   thrownTrashSpeed: 8
@@ -275,3 +278,5 @@ MonoBehaviour:
   splitCount: 4
   splitMinRadius: 0.8
   splitMaxRadius: 2.2
+  minSpawnSpacing: 0.85
+  maxSpawnAttemptsPerTrash: 8

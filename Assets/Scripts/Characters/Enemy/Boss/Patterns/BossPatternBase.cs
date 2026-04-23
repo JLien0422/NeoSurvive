@@ -40,6 +40,27 @@ public abstract class BossPatternBase : MonoBehaviour
 
   protected bool BossAlive => BossRef != null && !BossRef.IsDead;
 
+  protected void IgnoreCollisionWithBoss(GameObject spawnedObject)
+  {
+    if (spawnedObject == null || BossRef == null)
+      return;
+
+    Collider2D[] bossColliders = BossRef.GetComponentsInChildren<Collider2D>(true);
+    Collider2D[] spawnedColliders = spawnedObject.GetComponentsInChildren<Collider2D>(true);
+    if (bossColliders == null || spawnedColliders == null)
+      return;
+
+    foreach (var bossCollider in bossColliders)
+    {
+      if (bossCollider == null) continue;
+      foreach (var spawnedCollider in spawnedColliders)
+      {
+        if (spawnedCollider == null) continue;
+        Physics2D.IgnoreCollision(bossCollider, spawnedCollider, true);
+      }
+    }
+  }
+
   /// <summary>원형 텔레그래프. 지름 1유닛 스프라이트 가정 시 스케일 = 2×반경.</summary>
   protected IEnumerator PlayTelegraphCircle(Vector3 worldCenter, float radius, float duration)
   {

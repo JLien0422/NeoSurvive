@@ -42,6 +42,8 @@ public class EnemyController : MonoBehaviour
 
   private StatusFlags statusFlags; // (추가)
 
+  private KnockbackDebuff knockbackDebuff;
+
   // 컴포넌트가 처음 활성화될 때 호출됩니다.
   private void Awake()
   {
@@ -56,6 +58,10 @@ public class EnemyController : MonoBehaviour
 
     statusFlags = GetComponent<StatusFlags>(); // (추가)
     if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>(); // (추가)
+
+    knockbackDebuff = GetComponent<KnockbackDebuff>();
+    if (knockbackDebuff == null)
+        knockbackDebuff = gameObject.AddComponent<KnockbackDebuff>();
 
     UpdateTarget();
     InitializeMechanism();
@@ -122,6 +128,7 @@ public class EnemyController : MonoBehaviour
   // 게임 시작 시 호출됩니다.
   private void Start()
   {
+    ApplyEnemyControllerStatsFromCSV(); // (추가) CSV에서 EnemyController 관련 스탯 적용
     StartCoroutine(AttackCoroutine());
   }
 
@@ -171,10 +178,10 @@ public class EnemyController : MonoBehaviour
     Transform closest = null;
     float closestDist = float.MaxValue;
 
-    // 플레이어 거리 체크 (sqrMagnitude로 제곱근 없이 비교)
+    // 플레이어 거리 체크
     if (playerObj != null)
     {
-      float d = (transform.position - playerObj.transform.position).sqrMagnitude;
+      float d = Vector2.Distance(transform.position, playerObj.transform.position);
       if (d < closestDist)
       {
         closestDist = d;
@@ -187,7 +194,7 @@ public class EnemyController : MonoBehaviour
     {
       foreach (var decoy in decoys)
       {
-        float d = (transform.position - decoy.transform.position).sqrMagnitude;
+        float d = Vector2.Distance(transform.position, decoy.transform.position);
         if (d < closestDist)
         {
           closestDist = d;
@@ -217,7 +224,7 @@ public class EnemyController : MonoBehaviour
       if (e == null) continue;
       if (e == gameObject) continue; // 자기 자신 제외
 
-      float d = (transform.position - e.transform.position).sqrMagnitude;
+      float d = Vector2.Distance(transform.position, e.transform.position);
       if (d < closestDist)
       {
         closestDist = d;
@@ -271,7 +278,6 @@ public class EnemyController : MonoBehaviour
   /// </summary>
   public float GetMoveSpeed()
   {
-    // (추가) 슬로우/이속 버프 시스템 배율 반영
     float mul = (statusFlags != null) ? statusFlags.moveSpeedMul : 1f;
     return moveSpeed * mul;
   }
@@ -314,15 +320,17 @@ public class EnemyController : MonoBehaviour
 
       if (target != null)
       {
-        // sqrMagnitude로 제곱근 없이 거리 비교
-        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        float distanceToTarget = Vector2.Distance(transform.position, target.position);
 
-        if (sqrDist <= attackRange * attackRange)
+        if (distanceToTarget <= attackRange)
         {
+          // 대상이 Character(Player, Enemy, Decoy)인지 확인
           if (target.TryGetComponent<Character>(out var character))
           {
+            // (추가) 데미지 버프/디버프(가하는 피해) 적용
             float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
             float finalDamage = attackDamage * outMul;
+
             character.TakeDamage(finalDamage);
           }
         }
@@ -333,18 +341,17 @@ public class EnemyController : MonoBehaviour
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
   private void FixedUpdate()
   {
-    // 마그네틱 비컨 등 외부 강제 견인 중이면 AI 이동 무시하고 pullVelocity 적용
-    if (statusFlags != null && statusFlags.isPulled)
-    {
-      if (rb != null) rb.velocity = statusFlags.pullVelocity;
-      return;
-    }
-
     // (추가) 속박/기절 등 이동 불가면 즉시 정지
     if (statusFlags != null && statusFlags.moveBlocked)
     {
       if (rb != null) rb.velocity = Vector2.zero;
       return;
+    }
+
+    // 넉백 중이면 EnemyController의 AI 이동이 velocity를 덮어쓰지 않도록 중단
+    if (knockbackDebuff != null && knockbackDebuff.IsKnockbackActive)
+    {
+        return;
     }
 
     // 메커니즘이 있으면 메커니즘의 이동 로직 사용
@@ -358,13 +365,12 @@ public class EnemyController : MonoBehaviour
       // 기본 이동 로직
       if (target != null)
       {
-        // sqrMagnitude로 제곱근 없이 거리 비교
-        float sqrDist = (transform.position - target.position).sqrMagnitude;
+        float distanceToTarget = Vector2.Distance(transform.position, target.position);
 
-        if (sqrDist > attackRange * attackRange)
+        if (distanceToTarget > attackRange)
         {
           Vector2 direction = (target.position - transform.position).normalized;
-          rb.velocity = direction * moveSpeed;
+          rb.velocity = direction * GetMoveSpeed();
         }
         else
         {
@@ -390,4 +396,32 @@ public class EnemyController : MonoBehaviour
         }
     }
 #endif
+  private void ApplyEnemyControllerStatsFromCSV()
+  {
+    if (EnemyStatLoader.DB == null)
+    {
+      Debug.LogWarning("[EnemyController] EnemyStatLoader.DB가 null입니다.");
+      return;
+    }
+
+    if (enemy == null)
+    {
+      Debug.LogWarning("[EnemyController] Enemy 참조가 null입니다.");
+      return;
+    }
+
+    string key = enemy.EnemyId.Trim().ToLower();
+
+    if (!EnemyStatLoader.DB.rows.TryGetValue(key, out var row))
+    {
+      Debug.LogWarning($"[EnemyController] enemy_stats.csv에 '{key}'가 없습니다.");
+      return;
+    }
+
+    if (row.movespeed > 0f) moveSpeed = row.movespeed;
+    if (row.attackdamage > 0f) attackDamage = row.attackdamage;
+    if (row.attackrange > 0f) attackRange = row.attackrange;
+
+    Debug.Log($"[EnemyController] CSV 스탯 적용 완료: {key} | moveSpeed={moveSpeed}, attackDamage={attackDamage}, attackRange={attackRange}");
+  }
 }

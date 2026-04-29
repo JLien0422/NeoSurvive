@@ -1,0 +1,134 @@
+using System;
+using NeoSurvive.Weapon;
+using UnityEngine;
+
+public class WeaponChoiceUI : MonoBehaviour
+{
+    [Header("Root")]
+    [SerializeField] private GameObject rootPanel; // 패널 표시/숨김만 담당
+
+    [Header("Cards")]
+    [SerializeField] private WeaponChoiceCard[] cards = new WeaponChoiceCard[3]; // 카드 3장 관리만 담당
+
+    private Action<WeaponBase> onPicked;
+
+    private void Awake()
+    {
+        ValidateReferences();
+    }
+
+    /// <summary>
+    /// 무기 선택 패널을 열고 카드 3장을 채우는 기능만 담당
+    /// </summary>
+    public void Show(
+        WeaponBase[] choices,
+        Func<WeaponBase, string> nameProvider,
+        Func<WeaponBase, string> descProvider,
+        Func<WeaponBase, string> levelProvider,
+        Action<WeaponBase> pickedCallback)
+    {
+        ValidateReferences();
+
+        if (choices == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] choices is null.");
+            return;
+        }
+
+        if (choices.Length != 3)
+        {
+            Debug.LogError($"[WeaponChoiceUI] choices length must be 3. current={choices.Length}");
+            return;
+        }
+
+        if (nameProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] nameProvider is null.");
+            return;
+        }
+
+        if (descProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] descProvider is null.");
+            return;
+        }
+
+        if (levelProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] levelProvider is null.");
+            return;
+        }
+
+        if (pickedCallback == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] pickedCallback is null.");
+            return;
+        }
+
+        onPicked = pickedCallback;
+
+        for (int i = 0; i < cards.Length; i++)
+        {
+            if (cards[i] == null)
+            {
+                Debug.LogError($"[WeaponChoiceUI] cards[{i}] is null.");
+                return;
+            }
+
+            WeaponBase weapon = choices[i];
+
+            cards[i].Setup(
+                weapon,
+                nameProvider(weapon),
+                descProvider(weapon),
+                levelProvider(weapon),
+                HandlePicked
+            );
+        }
+
+        rootPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    /// <summary>
+    /// 무기 선택 패널을 닫는 기능만 담당
+    /// </summary>
+    public void Hide()
+    {
+        ValidateReferences();
+
+        rootPanel.SetActive(false);
+        Time.timeScale = 1f;
+        onPicked = null;
+    }
+
+    /// <summary>
+    /// 카드가 선택한 무기를 바깥으로 전달하는 기능만 담당
+    /// </summary>
+    private void HandlePicked(WeaponBase weapon)
+    {
+        if (weapon == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] picked weapon is null.");
+            return;
+        }
+
+        Hide();
+        onPicked?.Invoke(weapon);
+    }
+
+    private void ValidateReferences()
+    {
+        if (rootPanel == null)
+            Debug.LogError($"[WeaponChoiceUI] rootPanel is not assigned. object={name}");
+
+        if (cards == null)
+        {
+            Debug.LogError($"[WeaponChoiceUI] cards array is null. object={name}");
+            return;
+        }
+
+        if (cards.Length != 3)
+            Debug.LogError($"[WeaponChoiceUI] cards length must be 3. object={name}, current={cards.Length}");
+    }
+}

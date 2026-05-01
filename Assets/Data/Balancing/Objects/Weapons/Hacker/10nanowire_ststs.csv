@@ -1,6 +1,0 @@
-﻿weaponid,level,damage,duration,spawndistance,damageperlevel,durationperlevel,activationdelay,tickrate,hitradius
-nanowire,1,15,4,1,0.2,0.1,1,0.2,0.5
-nanowire,2,15,4,1,0.2,0.1,1,0.2,0.5
-nanowire,3,15,4,1,0.2,0.1,1,0.2,0.5
-nanowire,4,15,4,1,0.2,0.1,1,0.2,0.5
-nanowire,5,15,4,1,0.2,0.1,1,0.2,0.5

@@ -1,11 +1,11 @@
-using System;
-using System.IO;
-using System.Text;
 using UnityEngine;
 
 public class EnemyStatLoader : MonoBehaviour
 {
     public static EnemyStatDB DB { get; private set; }
+
+    [Header("CSV")]
+    [SerializeField] private TextAsset enemyStatCsv;
 
     private void Awake()
     {
@@ -17,30 +17,15 @@ public class EnemyStatLoader : MonoBehaviour
     {
         DB = new EnemyStatDB();
 
-        string path = Path.Combine(Application.dataPath, "Scripts/Balancing/Enemy/enemy_stats.csv");
-        Debug.Log("[EnemyStatLoader] path = " + path);
-
-        if (!File.Exists(path))
+        if (enemyStatCsv == null)
         {
-            Debug.LogWarning($"[EnemyStatLoader] enemy_stats.csv 없음: {path}");
+            Debug.LogWarning("[EnemyStatLoader] enemyStatCsv가 할당되지 않았습니다.");
             return;
         }
 
-        string csv = null;
+        Debug.Log($"[EnemyStatLoader] csv = {enemyStatCsv.name}");
 
-        try
-        {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
-            {
-                csv = sr.ReadToEnd();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[EnemyStatLoader] CSV 읽기 실패: {e.Message}");
-            return;
-        }
+        string csv = enemyStatCsv.text;
 
         var parsed = SimpleCsv.Parse(csv);
 

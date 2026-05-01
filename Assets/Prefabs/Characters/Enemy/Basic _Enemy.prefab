@@ -102,11 +102,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHP:
-    baseValue: 0
-    currentValue: 0
+    baseValue: 100
+    currentValue: 100
   maxHP:
-    baseValue: 0
-    currentValue: 0
+    baseValue: 100
+    currentValue: 100
   experienceToGive: 10
   expOrbPrefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}
   dropCount: 1

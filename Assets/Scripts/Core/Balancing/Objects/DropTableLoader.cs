@@ -1,11 +1,11 @@
-using System;
-using System.IO;
-using System.Text;
 using UnityEngine;
 
 public class DropTableLoader : MonoBehaviour
 {
     public static DropTableDB DB { get; private set; }
+
+    [Header("CSV")]
+    [SerializeField] private TextAsset dropTableCsv;
 
     private void Awake()
     {
@@ -17,30 +17,15 @@ public class DropTableLoader : MonoBehaviour
     {
         DB = new DropTableDB();
 
-        string path = Path.Combine(Application.dataPath, "Scripts/Balancing/Objects/enemy_drops.csv");
-        Debug.Log("[DropTableLoader] path = " + path);
-
-        if (!File.Exists(path))
+        if (dropTableCsv == null)
         {
-            Debug.LogWarning($"[DropTableLoader] enemy_drops.csv 없음: {path}");
+            Debug.LogWarning("[DropTableLoader] dropTableCsv가 할당되지 않았습니다.");
             return;
         }
 
-        string csv = null;
+        Debug.Log($"[DropTableLoader] csv = {dropTableCsv.name}");
 
-        try
-        {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
-            {
-                csv = sr.ReadToEnd();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[DropTableLoader] CSV 읽기 실패: {e.Message}");
-            return;
-        }
+        string csv = dropTableCsv.text;
 
         var parsed = SimpleCsv.Parse(csv);
 

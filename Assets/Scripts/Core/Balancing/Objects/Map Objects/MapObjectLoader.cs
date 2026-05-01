@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +7,15 @@ namespace NeoSurvive.Balancing.Map
     public class MapObjectLoader : MonoBehaviour
     {
         public static MapObjectDB DB { get; private set; }
+
+        [Header("CSV - Map1")]
+        [SerializeField] private TextAsset map1ObjectCsv;
+
+        [Header("CSV - Map2")]
+        [SerializeField] private TextAsset map2ObjectCsv;
+
+        [Header("CSV - Map3")]
+        [SerializeField] private TextAsset map3ObjectCsv;
 
         private void Awake()
         {
@@ -21,38 +28,28 @@ namespace NeoSurvive.Balancing.Map
         {
             DB = new MapObjectDB();
 
-            string basePath = Path.Combine(Application.dataPath, "Scripts/Balancing/Map/Map1");
-            Debug.Log("[MapObjectLoader] basePath = " + basePath);
-
-            string[] files = Directory.GetFiles(basePath, "*.csv", SearchOption.AllDirectories);
-
-            foreach (var file in files)
-            {
-                if (!file.Contains("map1_map_objects")) continue;
-
-                LoadSingleCSV(file);
-            }
+            LoadMapCsv("Map1", map1ObjectCsv);
+            LoadMapCsv("Map2", map2ObjectCsv);
+            LoadMapCsv("Map3", map3ObjectCsv);
 
             Debug.Log($"[MapObjectLoader] 전체 로드 완료: {DB.Count}");
         }
 
-        private void LoadSingleCSV(string path)
+        private void LoadMapCsv(string mapName, TextAsset csvFile)
         {
-            string csv = "";
-
-            try
+            if (csvFile == null)
             {
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
-                {
-                    csv = sr.ReadToEnd();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[MapObjectLoader] CSV 읽기 실패: {path} | {e.Message}");
+                Debug.LogWarning($"[MapObjectLoader] {mapName} 오브젝트 CSV가 할당되지 않았습니다.");
                 return;
             }
+
+            Debug.Log($"[MapObjectLoader] {mapName} csv = {csvFile.name}");
+            LoadSingleCSV(csvFile);
+        }
+
+        private void LoadSingleCSV(TextAsset csvFile)
+        {
+            string csv = csvFile.text;
 
             var parsed = SimpleCsv.Parse(csv);
 
@@ -100,7 +97,7 @@ namespace NeoSurvive.Balancing.Map
                 Debug.Log($"[MapObjectLoader] 로드됨 | {row.mapId} / {row.id} / HP={row.maxHp}");
             }
 
-            Debug.Log($"[MapObjectLoader] CSV 완료: {Path.GetFileName(path)}");
+            Debug.Log($"[MapObjectLoader] CSV 완료: {csvFile.name}");
         }
 
         // ------------------------

@@ -3,9 +3,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Buff;
-using NeoSurvive.Map.Map2.Core;
-using NeoSurvive.Map.Map2.EnvironmentGimmicks;
-using NeoSurvive.Map.Map1.MapObjects;
+// using NeoSurvive.Map.Map2.Core;
+// using NeoSurvive.Map.Map2.EnvironmentGimmicks;
+// using NeoSurvive.Map.Map1.MapObjects;
 
 namespace NeoSurvive.Weapon
 {
@@ -38,7 +38,7 @@ namespace NeoSurvive.Weapon
     private bool initialized = false;
     private bool exploded = false;
 
-    private bool canHitToxicValve = false;
+    // private bool canHitToxicValve = false;
 
     public void Initialize(
       GameObject owner,
@@ -63,7 +63,7 @@ namespace NeoSurvive.Weapon
       this.enemyMask = enemyMask;
       this.enemyTag = enemyTag;
 
-      Player player = owner != null ? owner.GetComponent<Player>() : null;
+      // Player player = owner != null ? owner.GetComponent<Player>() : null;
     /*
       if (player != null)
       {
@@ -130,6 +130,7 @@ namespace NeoSurvive.Weapon
         if (hit == null)
           continue;
 
+        /*
         // ===== ToxicValve 처리 =====
         ToxicValve valve = hit.GetComponent<ToxicValve>();
         if (valve == null)
@@ -200,7 +201,7 @@ namespace NeoSurvive.Weapon
           continue;
         }
 
-        // ===== MalfunctionVendingMachine 처리 ★ 추가 =====
+        // ===== MalfunctionVendingMachine 처리 =====
         MalfunctionVendingMachine vendingMachine = hit.GetComponent<MalfunctionVendingMachine>();
         if (vendingMachine == null)
           vendingMachine = hit.GetComponentInParent<MalfunctionVendingMachine>();
@@ -215,6 +216,7 @@ namespace NeoSurvive.Weapon
           vendingMachine.TakeDamage(damage);
           continue;
         }
+        */
 
         // ===== Enemy 처리 =====
         Enemy enemy = hit.GetComponent<Enemy>();

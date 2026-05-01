@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
-  m_Name: HologramDecoy
+  m_Name: 03_DataScrambler
   m_EditorClassIdentifier: 
-  weaponId: 6
-  weaponName: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
-  weaponIcon: {fileID: 21300000, guid: 743d7fcf00f92bd449a0e1f6b998bcb5, type: 3}
-  description: "\uD640\uB85C\uADF8\uB7A8 \uB514\uCF54\uC774"
-  weaponPrefab: {fileID: 474004203620960840, guid: ee74eca0d709c5f4ca664f9b96a9f05c, type: 3}
+  weaponId: 3
+  weaponName: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"
+  weaponIcon: {fileID: 21300000, guid: 3147f15f68c81034b8e4313f7f1b8da4, type: 3}
+  description: "\uB370\uC774\uD130 \uC2A4\uD06C\uB7A8\uBE14\uB7EC"
+  weaponPrefab: {fileID: 4091422144095359421, guid: 8aad8b6a5b94bd2478ae540ba9ad1b8e, type: 3}
   level: 1
   isIndependent: 0

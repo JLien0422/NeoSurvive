@@ -99,7 +99,7 @@ public class UIManager : MonoBehaviour
 
   private void Update()
   {
-    if (Input.GetKeyDown(KeyCode.F8))
+    if (Input.GetKeyDown(KeyCode.F12))
     {
       ShowWeaponChoice(
         new Sprite[3] { null, null, null },

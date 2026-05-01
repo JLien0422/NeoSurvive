@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
-  m_Name: EMPPulseGenerator
+  m_Name: 02_PlasmaRifle
   m_EditorClassIdentifier: 
-  weaponId: 5
-  weaponName: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
-  weaponIcon: {fileID: 21300000, guid: 2345a0e2f51b1f241a862f640f793ac7, type: 3}
-  description: "EMP \uD384\uC2A4 \uC0DD\uC131\uAE30"
-  weaponPrefab: {fileID: 4312614672909416783, guid: 404086b1bed71e0468d44900519eab58, type: 3}
-  level: 9
+  weaponId: 2
+  weaponName: "\uD50C\uB77C\uC988\uB9C8 \uB77C\uC774\uD50C"
+  weaponIcon: {fileID: 21300000, guid: 3d7d960dfceee864599165fc26fe324d, type: 3}
+  description: "\uD50C\uB77C\uC988\uB9C8 \uB77C\uC774\uD50C"
+  weaponPrefab: {fileID: 7631013138892754734, guid: edf941af68ec4094bbc098097374bd2c, type: 3}
+  level: 2
   isIndependent: 0

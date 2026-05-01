@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +7,15 @@ namespace NeoSurvive.Balancing.Map
     public class MapEnvironmentGimmickLoader : MonoBehaviour
     {
         public static MapEnvironmentGimmickDB DB { get; private set; }
+
+        [Header("CSV - Map1")]
+        [SerializeField] private TextAsset map1EnvironmentGimmickCsv;
+
+        [Header("CSV - Map2")]
+        [SerializeField] private TextAsset map2EnvironmentGimmickCsv;
+
+        [Header("CSV - Map3")]
+        [SerializeField] private TextAsset map3EnvironmentGimmickCsv;
 
         private void Awake()
         {
@@ -22,42 +29,28 @@ namespace NeoSurvive.Balancing.Map
         {
             DB = new MapEnvironmentGimmickDB();
 
-            string basePath = Path.Combine(Application.dataPath, "Scripts/Balancing/Map/Map1");
-            Debug.Log("[MapLoader] basePath = " + basePath);
-
-            if (!Directory.Exists(basePath))
-            {
-                Debug.LogWarning("[MapLoader] Map1 폴더 없음: " + basePath);
-                return;
-            }
-
-            string[] files = Directory.GetFiles(basePath, "*.csv", SearchOption.AllDirectories);
-
-            foreach (string file in files)
-            {
-                LoadSingleCSV(file);
-            }
+            LoadMapCsv("Map1", map1EnvironmentGimmickCsv);
+            LoadMapCsv("Map2", map2EnvironmentGimmickCsv);
+            LoadMapCsv("Map3", map3EnvironmentGimmickCsv);
 
             Debug.Log($"[MapLoader] 전체 로드 완료: {DB.Count}");
         }
 
-        private void LoadSingleCSV(string path)
+        private void LoadMapCsv(string mapName, TextAsset csvFile)
         {
-            string csv = null;
-
-            try
+            if (csvFile == null)
             {
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
-                {
-                    csv = sr.ReadToEnd();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[MapLoader] CSV 읽기 실패: {path} | {e.Message}");
+                Debug.LogWarning($"[MapLoader] {mapName} 환경 기믹 CSV가 할당되지 않았습니다.");
                 return;
             }
+
+            Debug.Log($"[MapLoader] {mapName} csv = {csvFile.name}");
+            LoadSingleCSV(csvFile);
+        }
+
+        private void LoadSingleCSV(TextAsset csvFile)
+        {
+            string csv = csvFile.text;
 
             var parsed = SimpleCsv.Parse(csv);
 
@@ -115,7 +108,7 @@ namespace NeoSurvive.Balancing.Map
                 );
             }
 
-            Debug.Log($"[MapLoader] CSV 로드 완료: {Path.GetFileName(path)}");
+            Debug.Log($"[MapLoader] CSV 로드 완료: {csvFile.name}");
         }
 
         private bool GetBool(Dictionary<string, string> row, string key)

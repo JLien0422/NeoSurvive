@@ -140,10 +140,19 @@ namespace NeoSurvive.Weapon
     public void AddWeapon(int weaponId)
     {
       var weapon = FindWeaponById(weaponId);
+      if (weapon == null && weaponId >= 0 && weaponId < allWeaponDatas.Count)
+      {
+        // weaponId 매칭 실패 시, 테스트 키(F1~F10)는 리스트 인덱스로도 동작하도록 fallback
+        weapon = allWeaponDatas[weaponId];
+      }
+
       if (weapon != null)
       {
         AddWeapon(weapon);
+        return;
       }
+
+      Debug.LogWarning($"[WeaponManager] AddWeapon failed. weaponId={weaponId}, allWeaponDatas.Count={allWeaponDatas.Count}");
     }
 
     public void AddWeaponById(int weaponId)

@@ -1,9 +1,11 @@
-using System.IO;
 using UnityEngine;
 
 public class CharacterBalanceLoader : MonoBehaviour
 {
     public static CharacterBalanceDB DB { get; private set; }
+
+    [Header("CSV")]
+    [SerializeField] private TextAsset characterCsv;
 
     private void Awake()
     {
@@ -15,16 +17,15 @@ public class CharacterBalanceLoader : MonoBehaviour
     {
         DB = new CharacterBalanceDB();
 
-        string path = Path.Combine(Application.dataPath, "Scripts/Balancing/Player/characters.csv");
-        Debug.Log("[CharacterBalanceLoader] path = " + path);
-
-        if (!File.Exists(path))
+        if (characterCsv == null)
         {
-            Debug.LogWarning($"[CharacterBalanceLoader] characters.csv 없음: {path}");
+            Debug.LogWarning("[CharacterBalanceLoader] characterCsv가 할당되지 않았습니다.");
             return;
         }
 
-        string csv = File.ReadAllText(path);
+        Debug.Log($"[CharacterBalanceLoader] csv = {characterCsv.name}");
+
+        string csv = characterCsv.text;
         var parsed = SimpleCsv.Parse(csv);
 
         foreach (var r in parsed)

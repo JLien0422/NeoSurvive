@@ -1,11 +1,15 @@
-using System;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponStatLoader : MonoBehaviour
 {
     public static WeaponStatDB DB { get; private set; }
+
+    [Header("CSV - Hacker")]
+    [SerializeField] private List<TextAsset> hackerWeaponStatCsvFiles = new();
+
+    [Header("CSV - Cyborg")]
+    [SerializeField] private List<TextAsset> cyborgWeaponStatCsvFiles = new();
 
     private void Awake()
     {
@@ -17,42 +21,44 @@ public class WeaponStatLoader : MonoBehaviour
     {
         DB = new WeaponStatDB();
 
-        string basePath = Path.Combine(Application.dataPath, "Scripts/Balancing/Weapons");
-        Debug.Log("[WeaponStatLoader] basePath = " + basePath);
+        bool hasHacker = hackerWeaponStatCsvFiles != null && hackerWeaponStatCsvFiles.Count > 0;
+        bool hasCyborg = cyborgWeaponStatCsvFiles != null && cyborgWeaponStatCsvFiles.Count > 0;
 
-        if (!Directory.Exists(basePath))
+        if (!hasHacker && !hasCyborg)
         {
-            Debug.LogWarning("[WeaponStatLoader] Weapons 폴더가 없습니다: " + basePath);
+            Debug.LogWarning("[WeaponStatLoader] Hacker/Cyborg 무기 CSV가 모두 비어 있습니다.");
             return;
         }
 
-        string[] files = Directory.GetFiles(basePath, "*.csv", SearchOption.AllDirectories);
-
-        foreach (string file in files)
-        {
-            LoadSingleCSV(file);
-        }
+        LoadCsvGroup("Hacker", hackerWeaponStatCsvFiles);
+        LoadCsvGroup("Cyborg", cyborgWeaponStatCsvFiles);
 
         Debug.Log($"[WeaponStatLoader] 전체 로드 완료: {DB.rows.Count} weapons");
     }
 
-    private void LoadSingleCSV(string path)
+    private void LoadCsvGroup(string groupName, List<TextAsset> csvFiles)
     {
-        string csv = null;
-
-        try
+        if (csvFiles == null || csvFiles.Count == 0)
         {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
-            {
-                csv = sr.ReadToEnd();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[WeaponStatLoader] CSV 읽기 실패: {path} | {e.Message}");
+            Debug.LogWarning($"[WeaponStatLoader] {groupName} 무기 CSV가 비어 있습니다.");
             return;
         }
+
+        foreach (TextAsset csvFile in csvFiles)
+        {
+            if (csvFile == null)
+            {
+                Debug.LogWarning($"[WeaponStatLoader] {groupName} CSV 목록에 비어 있는 항목이 있습니다.");
+                continue;
+            }
+
+            LoadSingleCSV(csvFile);
+        }
+    }
+
+    private void LoadSingleCSV(TextAsset csvFile)
+    {
+        string csv = csvFile.text;
 
         var parsed = SimpleCsv.Parse(csv);
 
@@ -261,7 +267,7 @@ public class WeaponStatLoader : MonoBehaviour
 
             if (SimpleCsv.TryGetFloat(r, "penetration", out float penetration))
                 row.penetration = Mathf.RoundToInt(penetration);
-            
+
             // HologramDecoy 전용 스탯
             SimpleCsv.TryGetFloat(r, "hp", out row.hp);
             SimpleCsv.TryGetFloat(r, "cooldown", out row.cooldown);
@@ -280,7 +286,7 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "arcHeight", out row.archeight);
             SimpleCsv.TryGetFloat(r, "travelTime", out row.traveltime);
 
-                        // DataOptimization 전용 스탯
+            // DataOptimization 전용 스탯
             SimpleCsv.TryGetFloat(r, "fieldduration", out row.fieldduration);
             SimpleCsv.TryGetFloat(r, "fieldwidth", out row.fieldwidth);
             SimpleCsv.TryGetFloat(r, "fieldheight", out row.fieldheight);
@@ -302,6 +308,6 @@ public class WeaponStatLoader : MonoBehaviour
             DB.rows[weaponId][level] = row;
         }
 
-        Debug.Log($"[WeaponStatLoader] 로드됨: {Path.GetFileName(path)}");
+        Debug.Log($"[WeaponStatLoader] 로드됨: {csvFile.name}");
     }
 }

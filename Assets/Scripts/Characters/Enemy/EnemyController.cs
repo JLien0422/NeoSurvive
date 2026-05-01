@@ -410,7 +410,7 @@ public class EnemyController : MonoBehaviour
       return;
     }
 
-    string key = enemy.EnemyId.Trim().ToLower();
+    string key = mechanismType.ToString().Trim().ToLowerInvariant();
 
     if (!EnemyStatLoader.DB.rows.TryGetValue(key, out var row))
     {

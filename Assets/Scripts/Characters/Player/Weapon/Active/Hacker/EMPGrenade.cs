@@ -339,6 +339,7 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public void OnLevelUp(int level)
     {
+      Debug.Log($"[EMPGrenade] OnLevelUp 호출됨 | level={level}");
       ApplyStatsFromCSV(level);
     }
 

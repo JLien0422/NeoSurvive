@@ -11,27 +11,27 @@ namespace NeoSurvive.Weapon
     public class HologramDecoyGenerator : MonoBehaviour
     {
         [Header("Stats")]
-        public GameObject decoyPrefab; // HologramDecoy 스크립트가 붙은 프리팹
+        public GameObject decoyPrefab;
 
         public float hp = 50f;
         public float cooldown = 15f;
-
-        // 데이터 감옥 지속 시간 (Lv.5 이상)
         public float prisonDuration = 3f;
+
+        // ★ 추가: CSV prisonrange 적용용
+        public float prisonRange = 3f;
 
         private float timer;
         private int currentLevel = 1;
 
-        // Base Stats
-        private float baseHp;
-        private float baseCooldown;
+        // ★ 추가: CSV weaponid
+        private readonly string weaponId = "hologramdecoy";
 
         private void Start()
         {
-            baseHp = hp;
-            baseCooldown = cooldown;
+            // ★ 수정: 시작 시 Lv1 CSV 적용
+            ApplyStatsFromCSV(1);
 
-            // 시작 시 즉시 쿨타임 완료 상태로 시작? 
+            // 시작 시 즉시 쿨타임 완료 상태
             timer = cooldown;
         }
 
@@ -49,32 +49,71 @@ namespace NeoSurvive.Weapon
         {
             if (decoyPrefab == null) return;
 
-            // 플레이어 위치에 소환
             GameObject obj = Instantiate(decoyPrefab, transform.position, Quaternion.identity);
 
             if (obj.TryGetComponent<HologramDecoy>(out var decoy))
             {
                 bool spawnPrison = (currentLevel >= 5);
-                decoy.Initialize(hp, spawnPrison, prisonDuration);
+
+                // ★ 수정: prisonRange까지 전달
+                decoy.Initialize(hp, spawnPrison, prisonDuration, prisonRange);
             }
         }
 
         public void OnLevelUp(int level)
         {
-            currentLevel = level;
-            if (baseHp == 0 && hp > 0) baseHp = hp;
-            if (baseCooldown == 0 && cooldown > 0) baseCooldown = cooldown;
+            currentLevel = Mathf.Clamp(level, 1, 5);
 
-            // 레벨업: 체력 20% 증가, 쿨타임 10% 감소
-            hp = baseHp * (1f + (level - 1) * 0.2f);
+            // ★ 수정: CSV 적용
+            ApplyStatsFromCSV(currentLevel);
 
-            // 쿨타임 감소는 점감법 적용 (10%씩 계속 까면 0됨. 복리 or 단순 합?)
-            // 기획: "쿨감". 단순하게 10%씩 감소로. (최대 50% 제한 등 두면 좋음).
-            // 여기선 base * (1 - 0.05 * level) 정도로 완만하게.
-            cooldown = baseCooldown * (1f - (level - 1) * 0.05f); // 렙당 5% 감소
+            Debug.Log($"[Hologram Decoy] CSV 적용 | Lv={currentLevel}, HP={hp}, Cooldown={cooldown}, PrisonDuration={prisonDuration}, PrisonRange={prisonRange}, Prison={currentLevel >= 5}");
+        }
+
+        // ★ 추가: CSV 적용 함수
+        private void ApplyStatsFromCSV(int level)
+        {
+            if (WeaponStatLoader.DB == null)
+            {
+                Debug.LogWarning("[Hologram Decoy] WeaponStatLoader.DB 없음");
+                return;
+            }
+
+            if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+            {
+                Debug.LogWarning($"[Hologram Decoy] weaponId 없음: {weaponId}");
+                return;
+            }
+
+            if (!levelDict.TryGetValue(level, out var row))
+            {
+                Debug.LogWarning($"[Hologram Decoy] level 데이터 없음: {level}");
+                return;
+            }
+
+            WeaponStatDB.Row baseRow = row;
+            if (levelDict.TryGetValue(1, out var levelOneRow))
+            {
+                baseRow = levelOneRow;
+            }
+
+            float hpPer = row.hpperlevel > 0f ? row.hpperlevel : baseRow.hpperlevel;
+            float cooldownReduction = row.cooldownreductionperlevel > 0f
+                ? row.cooldownreductionperlevel
+                : baseRow.cooldownreductionperlevel;
+
+            // hp = Lv1 hp 기준 + hpperlevel 증가
+            hp = baseRow.hp * (1f + (level - 1) * hpPer);
+
+            // cooldown = Lv1 cooldown 기준 - cooldownreductionperlevel 감소
+            cooldown = baseRow.cooldown * (1f - (level - 1) * cooldownReduction);
             if (cooldown < 1f) cooldown = 1f;
 
-            Debug.Log($"[Hologram Decoy] Lv.{level} : HP {hp}, Cooldown {cooldown}, Prison: {level >= 5}");
+            // 그대로 쓰는 값
+            prisonDuration = row.prisonduration;
+            prisonRange = row.prisonrange;
+
+            Debug.Log($"[Hologram Decoy] CSV 적용 | Lv={level}, HP={hp}, Cooldown={cooldown}, PrisonDuration={prisonDuration}, PrisonRange={prisonRange}");
         }
     }
 }

@@ -44,13 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03296f11afe2e8345b72959fa981f9d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataFieldPrefab: {fileID: 2380440144791872430, guid: 4f078cf4cc5f24547a5f2a1915e49818, type: 3}
-  fireRate: 6
+  fieldPrefab: {fileID: 2380440144791872430, guid: 4f078cf4cc5f24547a5f2a1915e49818, type: 3}
   fieldDuration: 3
-  fieldSize: {x: 4, y: 2.5}
+  fieldWidth: 0
+  fieldHeight: 0
   damageBuffMultiplier: 1.2
   buffDuration: 5
   masterSlowMultiplier: 0.7
   masterSlowDuration: 1
-  forwardOffset: 2
-  debugLog: 0
+  fireRate: 6

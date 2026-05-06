@@ -98,8 +98,36 @@ namespace NeoSurvive.Weapon
       // 이미 보유 중인 무기인지 확인
       if (activeWeapons.Contains(weaponData))
       {
+        // ★ 추가: 무기 최대 레벨 제한
+        const int maxWeaponLevel = 5;
+
+        if (weaponData.level >= maxWeaponLevel)
+        {
+          Debug.Log($"[WeaponManager] 이미 최대 레벨입니다 | {weaponData.weaponName} Lv.{weaponData.level}");
+          OnWeaponChanged?.Invoke(activeWeapons);
+          return;
+        }
+
         // 레벨업 로직
         weaponData.level++;
+
+        // ★ [추가] 실제 생성된 무기 오브젝트를 찾기 위한 변수
+        GameObject weaponObj;
+
+        if (spawnedWeapons.TryGetValue(weaponData, out weaponObj) && weaponObj != null)
+        {
+          // ★ [핵심 추가]
+          // WeaponManager는 레벨만 올리고,
+          // 실제 CSV 스탯 적용은 각 무기의 OnLevelUp(level)에서 처리한다.
+          // 예: EMPGrenade.OnLevelUp → ApplyStatsFromCSV(level)
+          weaponObj.SendMessage("OnLevelUp", weaponData.level, SendMessageOptions.DontRequireReceiver);
+          Debug.Log($"[WeaponManager] 무기 레벨업 적용 | {weaponData.weaponName} Lv.{weaponData.level}");
+        }
+        else
+        {
+          Debug.LogWarning($"[WeaponManager] 레벨업할 무기 오브젝트를 찾지 못함 | {weaponData.weaponName}");
+        }
+
         OnWeaponChanged?.Invoke(activeWeapons);
         return;
       }
@@ -109,26 +137,33 @@ namespace NeoSurvive.Weapon
       // 초기 레벨 설정 (혹시 모르니)
       weaponData.level = 1;
 
-      GameObject weaponObj = null;
+      // ★ [수정] 위 레벨업 구간의 weaponObj와 이름 충돌을 피하기 위해 newWeaponObj 사용
+      GameObject newWeaponObj = null;
       if (weaponData.weaponPrefab != null)
       {
         if (weaponData.isIndependent)
         {
-          weaponObj = Instantiate(weaponData.weaponPrefab, transform.position, Quaternion.identity);
-          var sourceIndep = weaponObj.GetComponent<WeaponSource>();
-          if (sourceIndep == null) sourceIndep = weaponObj.AddComponent<WeaponSource>();
+          newWeaponObj = Instantiate(weaponData.weaponPrefab, transform.position, Quaternion.identity);
+          var sourceIndep = newWeaponObj.GetComponent<WeaponSource>();
+          if (sourceIndep == null) sourceIndep = newWeaponObj.AddComponent<WeaponSource>();
           sourceIndep.weaponData = weaponData;
         }
         else
         {
-          weaponObj = Instantiate(weaponData.weaponPrefab, transform);
+          newWeaponObj = Instantiate(weaponData.weaponPrefab, transform);
         }
 
-        var source = weaponObj.GetComponent<WeaponSource>();
-        if (source == null) source = weaponObj.AddComponent<WeaponSource>();
+        var source = newWeaponObj.GetComponent<WeaponSource>();
+        if (source == null) source = newWeaponObj.AddComponent<WeaponSource>();
         source.weaponData = weaponData;
 
-        spawnedWeapons.Add(weaponData, weaponObj);
+        spawnedWeapons.Add(weaponData, newWeaponObj);
+
+        // ★ [추가]
+        // 새 무기 생성 직후에도 Lv1 CSV 스탯을 확실히 적용한다.
+        // 기존에는 Start()에서만 CSV를 읽는 무기도 있었고,
+        // 무기마다 초기화 시점이 달라 적용 누락이 생길 수 있었다.
+        newWeaponObj.SendMessage("OnLevelUp", weaponData.level, SendMessageOptions.DontRequireReceiver);
       }
 
       OnWeaponChanged?.Invoke(activeWeapons);

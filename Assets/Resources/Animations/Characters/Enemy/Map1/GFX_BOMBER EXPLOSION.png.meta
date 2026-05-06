@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d23d619f15d684044ace847c4bda683e
+guid: a65b2cdffde38b740b2510faab80d15d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_0
+      name: GFX_BOMBER EXPLOSION_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 64
-        height: 64
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -111,41 +111,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8f90db549f330fe4587add77b4347c4d
-      internalID: -1427911293
+      spriteID: 31ba8b4a363791f448edbc07c5bf0709
+      internalID: -882009636
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bbc940b52aa391e428708dfbfd645383
-      internalID: -1859646688
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_2
+      name: GFX_BOMBER EXPLOSION_1
       rect:
         serializedVersion: 2
         x: 128
         y: 0
-        width: 64
-        height: 64
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,41 +132,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 21fadb155c25b4642bde94d4226e6e9a
-      internalID: 1557902527
+      spriteID: daffac197c36b144a83e9a3bbdb29d95
+      internalID: 169310551
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_3
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b8a91d8afefbc3e4cb80e8b9218263b2
-      internalID: 633022654
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_4
+      name: GFX_BOMBER EXPLOSION_2
       rect:
         serializedVersion: 2
         x: 256
         y: 0
-        width: 64
-        height: 64
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -195,20 +153,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c2eacda99373ee2458a2fdfc18190348
-      internalID: -447575307
+      spriteID: af4b8e8d63031bc419daf0bd321abba4
+      internalID: 180906562
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TestMonster_Spider_WH64px_5
+      name: GFX_BOMBER EXPLOSION_3
       rect:
         serializedVersion: 2
-        x: 320
+        x: 384
         y: 0
-        width: 64
-        height: 64
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -216,8 +174,113 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a7626aa1c36ec994dbcdd0488499e487
-      internalID: -661466553
+      spriteID: 52bc65b69f033ea47af9d6eba2043b51
+      internalID: -846095303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GFX_BOMBER EXPLOSION_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7759dfcc6333a6848b27f5612995e18e
+      internalID: 339444543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GFX_BOMBER EXPLOSION_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ddc8315e95d76042a1e72ded200c8e1
+      internalID: -499699619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GFX_BOMBER EXPLOSION_6
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5936ae81701607342b708d1c20f3295d
+      internalID: -400933954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GFX_BOMBER EXPLOSION_7
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb8c9249c35825943970dda4e7b6fccb
+      internalID: -97695718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GFX_BOMBER EXPLOSION_8
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da79eb489d0551440ae062d0b8f87571
+      internalID: -1377339461
       vertices: []
       indices: 
       edges: []
@@ -233,12 +296,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      TestMonster_Spider_WH64px_0: -1427911293
-      TestMonster_Spider_WH64px_1: -1859646688
-      TestMonster_Spider_WH64px_2: 1557902527
-      TestMonster_Spider_WH64px_3: 633022654
-      TestMonster_Spider_WH64px_4: -447575307
-      TestMonster_Spider_WH64px_5: -661466553
+      GFX_BOMBER EXPLOSION_0: -882009636
+      GFX_BOMBER EXPLOSION_1: 169310551
+      GFX_BOMBER EXPLOSION_2: 180906562
+      GFX_BOMBER EXPLOSION_3: -846095303
+      GFX_BOMBER EXPLOSION_4: 339444543
+      GFX_BOMBER EXPLOSION_5: -499699619
+      GFX_BOMBER EXPLOSION_6: -400933954
+      GFX_BOMBER EXPLOSION_7: -97695718
+      GFX_BOMBER EXPLOSION_8: -1377339461
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

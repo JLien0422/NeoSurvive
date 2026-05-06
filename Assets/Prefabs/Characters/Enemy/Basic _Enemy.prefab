@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 11.35, y: 6.3999996, z: -10}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -107,7 +107,7 @@ MonoBehaviour:
   maxHP:
     baseValue: 100
     currentValue: 100
-  experienceToGive: 10
+  experienceToGive: 1000
   expOrbPrefab: {fileID: 7499127168641198578, guid: 5093d2d9ff78b1148a0eda08955a3664, type: 3}
   dropCount: 1
   scatterRadius: 0.5
@@ -206,7 +206,7 @@ Animator:
   m_GameObject: {fileID: 7400146637964007656}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5cffaa9c92c898c408499b9cff2f6444, type: 2}
+  m_Controller: {fileID: 9100000, guid: d71c228f56556de45a0491a45617c373, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

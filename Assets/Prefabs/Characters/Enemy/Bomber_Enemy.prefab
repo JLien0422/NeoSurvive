@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -8502513226738148078}
   - component: {fileID: 131606114133515448}
   - component: {fileID: 4512565800273065164}
+  - component: {fileID: -6635561851809224260}
   m_Layer: 7
   m_Name: Bomber_Enemy
   m_TagString: Enemy
@@ -32,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 14.45, y: 5.39, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -79,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.437675, g: 0, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -208,8 +209,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d27857efcc32678439159b834ea049b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionRadius: 10
+  fuseTriggerRadius: 2.75
+  fuseProximityCheckPeriod: 0.1
+  fuseOverlapMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  explosionRadius: 1
   explosionDamage: 30
   explosionDelay: 1
-  explosionEffectPrefab: {fileID: 0}
+  explosionDamageMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  explosionEffectPrefab: {fileID: 4018446544282667927, guid: ad0442aa692ea3a4e9e2093089239b6d, type: 3}
   warningEffectPrefab: {fileID: 3346588588444557245, guid: 8bd3c1d7c20f0bf43876191d98b71e6b, type: 3}
+  warningDangerZonePrefabWorldDiameter: 1
+--- !u!95 &-6635561851809224260
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2388062192151467424}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7f4a10a724fd75142b0c3a363570f323, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

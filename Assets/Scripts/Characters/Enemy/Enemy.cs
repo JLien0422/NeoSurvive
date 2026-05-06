@@ -68,6 +68,18 @@ public class Enemy : Character
   [SerializeField]
   private GameObject dataChipPrefab;
 
+  /// <summary>
+  /// BomberMechanism 같은 메커니즘에서 직접 사망 플로우를 요청할 때 사용합니다.
+  /// TakeDamage 경로를 타지 않고도 Enemy 고유 Die() 처리(드랍/킬카운트/OnEnemyDeath)를 수행합니다.
+  /// </summary>
+  public void RequestDeathViaMechanism()
+  {
+    if (IsDead) return;
+    EnsureHpInitialized(refillToMax: false);
+    currentHP.CurrentValue = 0f;
+    Die();
+  }
+
   // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
   // 적에게 특화된 죽음 처리 로직을 구현합니다.
   protected override void Die()
@@ -106,6 +118,37 @@ public class Enemy : Character
     {
       Destroy(gameObject);
     }
+  }
+
+  // (추가) CSV 체력 적용용
+  public void ApplyMaxHpFromCSV(float maxHp)
+  {
+      if (maxHp <= 0f) return;
+
+      maxHP.BaseValue = maxHp;
+      currentHP.BaseValue = maxHp;
+      currentHP.CurrentValue = maxHp;
+
+      Debug.Log($"[Enemy] CSV 체력 적용 완료 | maxHp={maxHp}");
+  }
+
+  public void ApplyDropTableFromCSV(DropTableDB.Row row)
+  {
+      if (row == null)
+      {
+          Debug.LogWarning("[Enemy] DropTable row가 null입니다.");
+          return;
+      }
+
+      experienceToGive = row.experienceToGive;
+      dropCount = row.dropCount;
+      scatterRadius = row.scatterRadius;
+
+      goldDropChance = row.goldDropChance;
+      psychoCorruptionDropChance = row.psychoCorruptionDropChance;
+      dataChipDropChance = row.dataChipDropChance;
+
+      Debug.Log($"[Enemy] 드랍 CSV 적용 완료 | exp={experienceToGive}, dropCount={dropCount}, scatterRadius={scatterRadius}");
   }
 
   // 경험치 오브 드랍 메서드

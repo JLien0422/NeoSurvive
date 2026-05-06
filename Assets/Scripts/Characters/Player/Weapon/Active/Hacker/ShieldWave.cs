@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using NeoSurvive.Core;
 using NeoSurvive.Buff;
 
 namespace NeoSurvive.Weapon
@@ -69,50 +70,74 @@ namespace NeoSurvive.Weapon
             {
                 if (hit == null) continue;
 
+                // =========================
+                // 1. 기존 Enemy 처리
+                // =========================
                 Enemy enemy = hit.GetComponent<Enemy>();
                 if (enemy == null)
                     enemy = hit.GetComponentInParent<Enemy>();
 
-                if (enemy == null) continue;
-                if (!enemy.CompareTag(enemyTag)) continue;
-                if (processed.Contains(enemy)) continue;
-
-                processed.Add(enemy);
-
-                Vector3 origin = (owner != null) ? owner.transform.position : transform.position;
-                Vector2 knockDir = (enemy.transform.position - origin).normalized;
-                if (knockDir.sqrMagnitude < 0.0001f)
-                    knockDir = Vector2.right;
-
-                enemy.TakeDamage(damage, null);
-
-                KnockbackDebuff knockback = enemy.GetComponent<KnockbackDebuff>();
-
-                if (knockback == null)
-                    knockback = enemy.gameObject.AddComponent<KnockbackDebuff>();
-
-                knockback.ApplyKnockback(knockDir * knockbackForce, knockbackDuration);
-
-                if (isMaster)
+                if (enemy != null && enemy.CompareTag(enemyTag))
                 {
-                    ShieldKnockbackCarrier carrier = enemy.GetComponent<ShieldKnockbackCarrier>();
-                    if (carrier == null)
-                        carrier = enemy.gameObject.AddComponent<ShieldKnockbackCarrier>();
+                    if (processed.Contains(enemy)) continue;
 
-                    carrier.Initialize(
-                        enemy,
-                        collisionDamage,
-                        collisionDetectRadius,
-                        collisionImpactRadius,
-                        collisionCarrierDuration,
-                        enemyTag,
-                        debugLog
-                    );
+                    processed.Add(enemy);
+
+                    Vector3 origin = (owner != null) ? owner.transform.position : transform.position;
+                    Vector2 knockDir = (enemy.transform.position - origin).normalized;
+                    if (knockDir.sqrMagnitude < 0.0001f)
+                        knockDir = Vector2.right;
+
+                    enemy.TakeDamage(damage, null);
+
+                    KnockbackDebuff knockback = enemy.GetComponent<KnockbackDebuff>();
+
+                    if (knockback == null)
+                        knockback = enemy.gameObject.AddComponent<KnockbackDebuff>();
+
+                    knockback.ApplyKnockback(knockDir * knockbackForce, knockbackDuration);
+
+                    if (isMaster)
+                    {
+                        ShieldKnockbackCarrier carrier = enemy.GetComponent<ShieldKnockbackCarrier>();
+                        if (carrier == null)
+                            carrier = enemy.gameObject.AddComponent<ShieldKnockbackCarrier>();
+
+                        carrier.Initialize(
+                            enemy,
+                            collisionDamage,
+                            collisionDetectRadius,
+                            collisionImpactRadius,
+                            collisionCarrierDuration,
+                            enemyTag,
+                            debugLog
+                        );
+                    }
+
+                    if (debugLog)
+                    {
+                        Debug.Log($"[ShieldWave] 원형 판정 타격 | target={enemy.name} | damage={damage}");
+                    }
+
+                    continue;
                 }
+
+                // =========================
+                // 2. 추가: IDamageable 자판기 처리
+                // =========================
+                IDamageable damageable = hit.GetComponent<IDamageable>();
+
+                if (damageable == null)
+                    damageable = hit.GetComponentInParent<IDamageable>();
+
+                if (damageable == null)
+                    continue;
+
+                damageable.TakeDamage(damage);
 
                 if (debugLog)
                 {
-                    Debug.Log($"[ShieldWave] 원형 판정 타격 | target={enemy.name} | damage={damage}");
+                    Debug.Log($"[ShieldWave] MapObject 타격 | target={hit.name} | damage={damage}");
                 }
             }
         }
@@ -125,4 +150,4 @@ namespace NeoSurvive.Weapon
         }
 #endif
     }
-}
+}   

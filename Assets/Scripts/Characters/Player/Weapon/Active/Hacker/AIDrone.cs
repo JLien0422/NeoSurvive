@@ -3,112 +3,194 @@ using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 자동 전투 드론
-  /// </summary>
   public class AIDrone : MonoBehaviour
   {
-
     public Animator anim;
     public AnimationClip attackClip;
-
-    /// <summary>
-    /// 발사체 프리팹
-    /// </summary>
     public GameObject projectilePrefab;
 
     [Header("AI 드론 설정")]
-    /// <summary>
-    /// 플레이어 따라가는 거리
-    /// </summary>
     public float followDistance = 2f;
-
-    /// <summary>
-    /// 플레이어 따라가는 속도
-    /// </summary>
     public float followSpeed = 1f;
-
-    /// <summary>
-    /// 플레이어 게임오브젝트
-    /// </summary>
     public GameObject player;
-
-    /// <summary>
-    /// 플레이어와의 거리 오프셋
-    /// </summary>
     public Vector3 offset;
-
-    /// <summary>
-    /// 캐릭터 기준 감지 범위
-    /// </summary>
     public float detectionRange = 10f;
-
-    /// <summary>
-    /// 공격 속도 (초당 발사 횟수)
-    /// </summary>
     public float attackSpeed = 5f;
+    public float projectileSpeed = 20f;
 
     public float fireElapsed = 0f;
-
     public Transform target;
-
     public Vector2 fireOffset;
 
     public float damage = 5f;
-    private float baseDamage;
-    private System.Collections.Generic.List<AIDrone> subDrones = new System.Collections.Generic.List<AIDrone>();
+
+    private readonly string weaponId = "aidrone";
+    private const int maxLevel = 5;
+
+    private int currentLevel = 1;
+    private bool isSubDrone = false;
+
+    private System.Collections.Generic.List<AIDrone> subDrones =
+      new System.Collections.Generic.List<AIDrone>();
 
     private void Start()
     {
-      baseDamage = damage;
+      player = GameObject.FindWithTag("Player");
+      anim = GetComponent<Animator>();
 
       offset = Random.insideUnitCircle.normalized * followDistance;
 
-      player = GameObject.FindWithTag("Player");
-
-      anim = GetComponent<Animator>();
+      // ★ 메인 드론만 CSV 적용
+      if (!isSubDrone)
+      {
+        ApplyStatsFromCSV(1);
+      }
 
       UpdateAnimationSpeed();
     }
 
     public void OnLevelUp(int level)
     {
-      if (baseDamage == 0 && damage > 0) baseDamage = damage;
+      // ★ 서브 드론은 레벨업 처리 금지
+      if (isSubDrone)
+        return;
 
-      // 데미지 20% 증가
-      damage = baseDamage * (1f + (level - 1) * 0.2f);
+      // ★ Lv5 이후는 더 이상 증가 금지
+      int clampedLevel = Mathf.Clamp(level, 1, maxLevel);
 
-      // 기존 서브 드론들 스탯 업데이트
-      for (int i = subDrones.Count - 1; i >= 0; i--)
+      if (currentLevel >= maxLevel && clampedLevel >= maxLevel)
       {
-        if (subDrones[i] == null) subDrones.RemoveAt(i);
-        else subDrones[i].damage = damage;
+        Debug.Log("[AIDrone] 이미 마스터 레벨입니다. 추가 레벨업 무시");
+        return;
       }
 
-      // 드론 개수 증가 (레벨당 1마리 추가 생성)
-      // Lv 1: 1 (Main)
-      // Lv 2: 2 (Main + 1 Sub)
-      int desiredSubCount = level - 1;
+      currentLevel = clampedLevel;
+
+      ApplyStatsFromCSV(currentLevel);
+      SyncSubDroneStats();
+      UpdateSubDroneCount(currentLevel);
+
+      Debug.Log($"[AIDrone] CSV 적용 | Lv={currentLevel}, Total Drones={1 + subDrones.Count}, Damage={damage}");
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+      {
+        Debug.LogWarning("[AIDrone] WeaponStatLoader.DB 없음");
+        return;
+      }
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+      {
+        Debug.LogWarning($"[AIDrone] weaponId 없음: {weaponId}");
+        return;
+      }
+
+      if (!levelDict.TryGetValue(level, out var row))
+      {
+        Debug.LogWarning($"[AIDrone] level 데이터 없음: {level}");
+        return;
+      }
+
+      WeaponStatDB.Row levelOneRow = row;
+      if (levelDict.TryGetValue(1, out var baseRow))
+      {
+        levelOneRow = baseRow;
+      }
+
+      float perLevel = row.damageperlevel > 0f
+        ? row.damageperlevel
+        : levelOneRow.damageperlevel;
+
+      damage = levelOneRow.damage * (1f + (level - 1) * perLevel);
+
+      followDistance = row.followdistance;
+      followSpeed = row.followspeed;
+      detectionRange = row.detectionrange;
+      attackSpeed = row.attackspeed;
+      projectileSpeed = row.projectilespeed;
+
+      UpdateAnimationSpeed();
+    }
+
+    private int GetSubDroneCountFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+        return Mathf.Clamp(level - 1, 0, 4);
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+        return Mathf.Clamp(level - 1, 0, 4);
+
+      if (!levelDict.TryGetValue(level, out var row))
+        return Mathf.Clamp(level - 1, 0, 4);
+
+      return Mathf.Clamp(row.subdronecount, 0, 4);
+    }
+
+    private void UpdateSubDroneCount(int level)
+    {
+      int desiredSubCount = GetSubDroneCountFromCSV(level);
+
+      for (int i = subDrones.Count - 1; i >= 0; i--)
+      {
+        if (subDrones[i] == null)
+          subDrones.RemoveAt(i);
+      }
+
       int currentSubCount = subDrones.Count;
+
+      if (currentSubCount >= desiredSubCount)
+        return;
 
       for (int i = 0; i < desiredSubCount - currentSubCount; i++)
       {
-        // 자신을 복제
         GameObject clone = Instantiate(gameObject, transform.position, Quaternion.identity);
+
         if (clone.TryGetComponent<AIDrone>(out var cloneScript))
         {
-          cloneScript.damage = damage;
-          // 복제된 드론의 Start()가 호출되면서 offset이 랜덤하게 재설정되어 겹치지 않음
+          cloneScript.isSubDrone = true;
+          cloneScript.ApplyStatsFromMainDrone(this);
+
           subDrones.Add(cloneScript);
         }
       }
+    }
 
-      Debug.Log($"[AIDrone] Lv.{level}, Total Drones: {1 + subDrones.Count}, Damage: {damage}");
+    private void SyncSubDroneStats()
+    {
+      for (int i = subDrones.Count - 1; i >= 0; i--)
+      {
+        if (subDrones[i] == null)
+        {
+          subDrones.RemoveAt(i);
+          continue;
+        }
+
+        subDrones[i].ApplyStatsFromMainDrone(this);
+      }
+    }
+
+    private void ApplyStatsFromMainDrone(AIDrone main)
+    {
+      damage = main.damage;
+      followDistance = main.followDistance;
+      followSpeed = main.followSpeed;
+      detectionRange = main.detectionRange;
+      attackSpeed = main.attackSpeed;
+      projectileSpeed = main.projectileSpeed;
+      projectilePrefab = main.projectilePrefab;
+      attackClip = main.attackClip;
+
+      player = GameObject.FindWithTag("Player");
+      anim = GetComponent<Animator>();
+      offset = Random.insideUnitCircle.normalized * followDistance;
+
+      UpdateAnimationSpeed();
     }
 
     protected void Update()
     {
-      // 플레이어 주변 따라다니기
       if (player != null)
       {
         Vector3 targetPos = player.transform.position + offset;
@@ -118,7 +200,6 @@ namespace NeoSurvive.Weapon
       {
         player = GameObject.FindWithTag("Player");
       }
-
 
       if (target != null)
       {
@@ -137,19 +218,27 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
+      if (projectilePrefab == null) return;
+      if (target == null) return;
+
       GameObject obj = Instantiate(projectilePrefab, transform.position + (Vector3)fireOffset, Quaternion.identity);
+
       if (obj.TryGetComponent<Projectile>(out var proj))
       {
-        proj.Initialize(transform.right, damage, 20f);
+        proj.Initialize(transform.right, damage, projectileSpeed);
         proj.SetTarget(target);
+
         var src = GetComponentInParent<WeaponSource>();
         if (src != null) proj.SetSourceWeapon(src.weaponData);
       }
-      anim.SetTrigger("doAttack");
+
+      if (anim != null)
+        anim.SetTrigger("doAttack");
     }
 
     private void UpdateAnimationSpeed()
     {
+      if (anim == null) return;
       if (attackClip == null) return;
 
       float multiplier = attackClip.length * attackSpeed;
@@ -160,9 +249,10 @@ namespace NeoSurvive.Weapon
     {
       Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, detectionRange, LayerMask.GetMask("Enemy"));
       if (hitEnemies.Length == 0) return null;
-      GameObject closestEnemy = null;
 
+      GameObject closestEnemy = null;
       float minDistance = detectionRange;
+
       for (int i = 0; i < hitEnemies.Length; i++)
       {
         float distance = Vector3.Distance(transform.position, hitEnemies[i].transform.position);
@@ -173,14 +263,9 @@ namespace NeoSurvive.Weapon
         }
       }
 
-      if (closestEnemy == null) return null;
-      return closestEnemy.transform;
+      return closestEnemy != null ? closestEnemy.transform : null;
     }
 
-
-    /// <summary>
-    /// 감지 범위 시각화
-    /// </summary>
     private void OnDrawGizmos()
     {
       Gizmos.color = Color.red;

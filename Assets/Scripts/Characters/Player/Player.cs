@@ -4,6 +4,7 @@ using NeoSurvive.Characters;
 using NeoSurvive.Weapon;
 using NeoSurvive.Buff;
 using NeoSurvive.Exp; // (추가)
+using NeoSurvive.Balancing.Player; // 경험치CSV
 
 public enum PlayerClassType
 {
@@ -26,9 +27,27 @@ public class Player : Character
   public float Experience => experience;
 
   // 다음 레벨업에 필요한 경험치
-  [SerializeField] private int requiredExpForNextLevel = 5;
-  // 경험치 요구량 증가 배율
-  [SerializeField] private float growthMultiplier = 1.25f;
+  [Header("Level Up Settings (CSV)")]
+  [SerializeField] private int fallbackRequiredExpForNextLevel = 125;
+  [SerializeField] private int fallbackMaxLevel = 30;
+
+  public int RequiredExpForNextLevel
+  {
+      get
+      {
+          return PlayerExpLoader.GetRequiredExp(level, fallbackRequiredExpForNextLevel);
+      }
+  }
+
+  public int MaxLevel
+  {
+      get
+      {
+          return PlayerExpLoader.GetMaxLevel(fallbackMaxLevel);
+      }
+  }
+
+  public bool IsMaxLevel => level >= MaxLevel;
 
   // 플레이어의 레벨을 저장하는 변수입니다.
   [SerializeField]
@@ -308,12 +327,19 @@ public class Player : Character
   }
 
   // 플레이어가 경험치를 얻었을 때 호출되는 메서드입니다.
-  public void GainExperience(int amount)
+  public void GainExperience(int amount) //경험치CSV 기반 경험치 획득 처리
   {
-    experience += amount;
-    OnExpChanged?.Invoke(experience, requiredExpForNextLevel);
+    if (IsMaxLevel)
+    {
+        experience = 0;
+        OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
+        return;
+    }
 
-    // 경험치가 충분한지 확인하고 레벨업 처리
+    experience += amount;
+
+    OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
+
     CheckLevelUp();
   }
 
@@ -331,25 +357,29 @@ public class Player : Character
 
   // ===================== 레벨업 로직 =====================
 
-  private void CheckLevelUp()
+  private void CheckLevelUp() //경험치CSV 기반 레벨업 체크
   {
-    while (experience >= requiredExpForNextLevel)
+    while (!IsMaxLevel && experience >= RequiredExpForNextLevel)
     {
-      experience -= requiredExpForNextLevel;
-      LevelUpInternal();
+        experience -= RequiredExpForNextLevel;
+        LevelUpInternal();
     }
 
-    OnExpChanged?.Invoke(experience, requiredExpForNextLevel);
+    if (IsMaxLevel)
+    {
+        experience = 0;
+    }
+
+    OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
   }
 
-  private void LevelUpInternal()
+  private void LevelUpInternal() // 경험치CSV 기반 레벨업 처리
   {
+    if (IsMaxLevel) return;
+
     level++;
 
-    requiredExpForNextLevel =
-      Mathf.CeilToInt(requiredExpForNextLevel * growthMultiplier);
-
-    Debug.Log($"🎉 레벨업! 현재 레벨: {level}");
+    Debug.Log($"🎉 레벨업! 현재 레벨: {level} / 최대 레벨: {MaxLevel} | 다음 필요 경험치: {RequiredExpForNextLevel}");
 
     OnLevelUp?.Invoke(level);
   }
@@ -675,8 +705,7 @@ public class Player : Character
         EnemyController enemyController = col.GetComponent<EnemyController>();
         if (enemyController != null)
         {
-          // 스턴 효과 적용 (이동 속도 0으로)
-          enemyController.ApplySlow(0f, duration);
+          BuffUtil.Apply(enemyController.gameObject, new SlowDebuff(0f, duration)); //변경: StunDebuff -> SlowDebuff(0f)로 대체
         }
       }
     }
@@ -697,8 +726,7 @@ public class Player : Character
         EnemyController enemyController = col.GetComponent<EnemyController>();
         if (enemyController != null)
         {
-          // 마비 효과 적용 (이동 속도 0으로)
-          enemyController.ApplySlow(0f, duration);
+          BuffUtil.Apply(enemyController.gameObject, new SlowDebuff(0f, duration));
         }
       }
     }

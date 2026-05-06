@@ -1,4 +1,4 @@
 ﻿mapId,id,name,type,isActive,canHack,pulseInterval,damage,hackHoldTime,effectType,effectValue,effectDuration,hackedEffectType,hackedEffectValue,hackedEffectDuration,areaWidth,areaHeight,firstDelay,warningDuration,intervalMin,intervalMax,blink,blinkSpeed,impactWidth,impactHeight,playerDamage,enemyDamage,impactDestroyAfter,notes
-Map1,electric_leak,전기 누출 구역,ElectricLeak,TRUE,TRUE,2,10,1.5,damage,10,0,stun,10,1.25,0,0,0,0,0,0,FALSE,0,0,0,0,0,0,전기 펄스 구역
-Map1,steam_vent,증기 환풍구,SteamVent,TRUE,TRUE,0.25,0,1.5,slow,0.5,0.35,stun,0,1.25,0,0,0,0,0,0,FALSE,0,0,0,0,0,0,증기 슬로우 구역
+Map1,electric_leak,전기 누출 구역,ElectricLeak,TRUE,TRUE,2,10,0,damage,10,0,stun,10,1.25,0,0,0,0,0,0,FALSE,0,0,0,0,0,0,전기 펄스 구역
+Map1,steam_vent,증기 환풍구,SteamVent,TRUE,TRUE,0.25,0,0,slow,0.5,0.35,stun,0,1.25,0,0,0,0,0,0,FALSE,0,0,0,0,0,0,증기 슬로우 구역
 Map1,cargo_drop_crane,화물 낙하 크레인,CargoDropCrane,TRUE,FALSE,0,0,0,none,0,0,none,0,0,12,8,2,3,6,10,TRUE,8,2.5,2.5,99999,99999,0.5,랜덤 위치 경고 후 컨테이너 낙하

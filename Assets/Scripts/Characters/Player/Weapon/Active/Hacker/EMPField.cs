@@ -65,11 +65,31 @@ namespace NeoSurvive.Weapon
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
       foreach (var hit in hits)
       {
+        if (hit == null)
+          continue;
+
         if (hit.CompareTag("Enemy"))
         {
           if (hit.TryGetComponent<Character>(out var character))
             character.TakeDamage(damage, sourceWeapon);
+
+          continue;
         }
+
+        // =========================
+        // 2. 추가: IDamageable 맵오브젝트 처리
+        // - 자판기 같은 오브젝트가 여기서 데미지를 받음
+        // - Enemy는 위에서 이미 처리했으므로 제외
+        // =========================
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if (damageable == null)
+          continue;
+
+        damageable.TakeDamage(damage);
       }
     }
 

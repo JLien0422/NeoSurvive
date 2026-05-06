@@ -3,163 +3,101 @@ using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-    /// <summary>
-    /// 해커 무기: 데이터 최적화
-    /// - 주기적으로 필드를 생성
-    /// - 필드를 통과한 플레이어 투사체는 피해 증가 버프 획득
-    /// - Lv5(마스터)일 때만 필드에 닿은 적에게 슬로우
-    /// - 수치는 CSV에서 로드
-    /// </summary>
     public class DataOptimization : MonoBehaviour
     {
-        [Header("Field Prefab")]
-        [SerializeField] private GameObject dataFieldPrefab;
+        public GameObject fieldPrefab;
 
-        [Header("Runtime Stats (CSV 적용값)")]
-        [SerializeField] private float fireRate = 6f;
-        [SerializeField] private float fieldDuration = 3f;
-        [SerializeField] private Vector2 fieldSize = new Vector2(20f, 1f);
-        [SerializeField] private float damageBuffMultiplier = 1.2f;
-        [SerializeField] private float buffDuration = 5f;
-        [SerializeField] private float masterSlowMultiplier = 0.5f;
-        [SerializeField] private float masterSlowDuration = 3f;
+        public float fieldDuration;
+        public float fieldWidth;
+        public float fieldHeight;
 
-        [Header("Placement")]
-        [SerializeField] private float forwardOffset = 0f;
+        public float damageBuffMultiplier;
+        public float buffDuration;
 
-        [Header("Debug")]
-        [SerializeField] private bool debugLog = false;
+        public float masterSlowMultiplier;
+        public float masterSlowDuration;
 
-        private const string weaponId = "dataoptimization";
+        public float fireRate = 5f;
 
-        private Player owner;
-        private int level = 1;
-        private float timer = 0f;
+        private float timer;
+        private int currentLevel = 1;
 
-        private void Awake()
+        private readonly string weaponId = "dataoptimization";
+
+        private void Start()
         {
-            owner = GetComponentInParent<Player>();
-            if (owner == null)
-                owner = GetComponent<Player>();
-
-            ApplyStatsFromCSV(level);
+            ApplyStatsFromCSV(1);
         }
 
         private void Update()
         {
+            // 🔥 [추가] firerate 0 방어 (CSV 누락 대비)
+            if (fireRate <= 0f) return;
+
             timer += Time.deltaTime;
 
-            float actualFireRate = GetActualFireRate();
-            if (timer >= actualFireRate)
+            if (timer >= fireRate)
             {
                 timer = 0f;
                 SpawnField();
             }
         }
 
-        private float GetActualFireRate()
-        {
-            if (owner == null) return fireRate;
-            return owner.ApplyWeaponFireRate(fireRate);
-        }
-
         private void SpawnField()
         {
-            if (dataFieldPrefab == null)
+            if (fieldPrefab == null) return;
+
+            GameObject obj = Instantiate(fieldPrefab, transform.position, Quaternion.identity);
+
+            if (obj.TryGetComponent<DataField>(out var field))
             {
-                if (debugLog)
-                    Debug.LogWarning("[DataOptimization] dataFieldPrefab이 비어 있음");
-                return;
-            }
+                Vector2 fieldSize = new Vector2(fieldWidth, fieldHeight); // 🔥 [추가] 필드 크기 계산
 
-            Vector3 basePos = (owner != null) ? owner.transform.position : transform.position;
-            Vector3 spawnPos = basePos + Vector3.right * forwardOffset;
+                field.Initialize(
+                    fieldSize,                     // 🔥 [수정] fieldSize 전달하도록 변경
+                    damageBuffMultiplier,
+                    buffDuration,
+                    currentLevel >= 5,
+                    masterSlowMultiplier,
+                    masterSlowDuration,
+                    srcWeapon: null
+                );
 
-            GameObject obj = Instantiate(dataFieldPrefab, spawnPos, Quaternion.identity);
-            DataField field = obj.GetComponent<DataField>();
+                // ❌ [삭제] 기존 transform.localScale 방식 제거
+                // obj.transform.localScale = new Vector3(fieldWidth, fieldHeight, 1f);
 
-            if (field == null)
-            {
-                if (debugLog)
-                    Debug.LogWarning("[DataOptimization] DataField 컴포넌트가 프리팹에 없음");
-                return;
-            }
-
-            field.Initialize(
-                owner,
-                fieldDuration,
-                fieldSize,
-                damageBuffMultiplier,
-                buffDuration,
-                level >= 5,
-                masterSlowMultiplier,
-                masterSlowDuration,
-                debugLog
-            );
-
-            if (debugLog)
-            {
-                Debug.Log($"[DataOptimization] 필드 생성 | Lv={level} | fireRate={fireRate} | size={fieldSize} | dmgBuff={damageBuffMultiplier}");
+                Destroy(obj, fieldDuration);
             }
         }
 
-        public void OnLevelUp(int newLevel)
+        public void OnLevelUp(int level)
         {
-            level = Mathf.Max(1, newLevel);
-            ApplyStatsFromCSV(level);
-
-            if (debugLog)
-            {
-                Debug.Log($"[DataOptimization] OnLevelUp | level={level}");
-            }
+            currentLevel = Mathf.Clamp(level, 1, 5);
+            ApplyStatsFromCSV(currentLevel);
         }
 
-        private void ApplyStatsFromCSV(int targetLevel)
+        private void ApplyStatsFromCSV(int level)
         {
-            if (WeaponStatLoader.DB == null)
-            {
-                if (debugLog)
-                    Debug.LogWarning("[DataOptimization] WeaponStatLoader.DB가 null이라 기본값 사용");
-                return;
-            }
+            if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var dict)) return;
+            if (!dict.TryGetValue(level, out var row)) return;
 
-            if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levels))
-            {
-                if (debugLog)
-                    Debug.LogWarning($"[DataOptimization] CSV에 weaponId={weaponId} 없음");
-                return;
-            }
+            fieldDuration = row.fieldduration;
+            fieldWidth = row.fieldwidth;
+            fieldHeight = row.fieldheight;
 
-            if (!levels.TryGetValue(targetLevel, out var row))
-            {
-                if (debugLog)
-                    Debug.LogWarning($"[DataOptimization] CSV에 level={targetLevel} 행 없음");
-                return;
-            }
+            damageBuffMultiplier = row.damagebuffmultiplier;
+            buffDuration = row.buffduration;
 
-            if (row.firerate > 0f) fireRate = row.firerate;
-            if (row.fieldduration > 0f) fieldDuration = row.fieldduration;
+            masterSlowMultiplier = row.masterslowmul;       // 🔥 [수정] slowmultiplier → masterslowmul
+            masterSlowDuration = row.masterslowduration;    // 🔥 [수정] slowduration → masterslowduration
 
-            if (row.fieldwidth > 0f || row.fieldheight > 0f)
-            {
-                float width = (row.fieldwidth > 0f) ? row.fieldwidth : fieldSize.x;
-                float height = (row.fieldheight > 0f) ? row.fieldheight : fieldSize.y;
-                fieldSize = new Vector2(width, height);
-            }
+            // 🔥 [추가] firerate 0 방어
+            if (row.firerate > 0f)
+                fireRate = row.firerate;
 
-            if (row.damagebuffmultiplier > 0f) damageBuffMultiplier = row.damagebuffmultiplier;
-            if (row.buffduration > 0f) buffDuration = row.buffduration;
-
-            if (targetLevel >= 5)
-            {
-                if (row.masterslowmul > 0f) masterSlowMultiplier = row.masterslowmul;
-                if (row.masterslowduration > 0f) masterSlowDuration = row.masterslowduration;
-            }
-
-            if (debugLog)
-            {
-                Debug.Log($"[DataOptimization] CSV 적용 | Lv={targetLevel} | fireRate={fireRate} | fieldDuration={fieldDuration} | fieldSize={fieldSize} | buffMul={damageBuffMultiplier}");
-            }
+            Debug.Log($"[DataOptimization] Lv={level}, fireRate={fireRate}");
         }
     }
 }
+
+// CSV안에 firerate를 넣어둠 (값은 6으로 통일)

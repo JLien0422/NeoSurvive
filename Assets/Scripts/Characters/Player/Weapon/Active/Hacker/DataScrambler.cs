@@ -1,48 +1,52 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NeoSurvive.Core;
-using NeoSurvive.Buff; // (추가) FrenzyDebuff / BuffUtil
+using NeoSurvive.Buff;
 
 namespace NeoSurvive.Weapon
 {
   /// <summary>
   /// 3번 무기: 데이터 스크램블러
-  /// 부채꼴 범위에 교란 신호 방사. 혼란에 걸린 적은 일정 시간 후 폭발하여 광역 피해.
+  /// 부채꼴 범위에 교란 신호 방사.
+  /// 혼란에 걸린 적은 일정 시간 후 폭발하여 광역 피해.
   /// Lv5: 혼란 대상에게 Frenzy(광란) 디버프도 함께 적용
   /// </summary>
   public class DataScrambler : MonoBehaviour
   {
     [Header("Stats")]
     public float damage = 10f;
-    public float range = 5f;       // 부채꼴 반지름
-    public float angle = 60f;      // 부채꼴 각도 (전체 각도)
+    public float range = 5f;
+    public float angle = 60f;
     public float fireRate = 2f;
-    public float duration = 3f;    // 혼란 지속 시간
+    public float duration = 3f;
 
-    // (추가) Lv5 Frenzy 설정
-    [Header("Lv5 Frenzy (추가)")]
-    public bool enableFrenzyAtLv5 = true; // (추가)
-    public float frenzyDuration = 2.5f;   // (추가) 광란 지속 시간(원하는 값으로)
+    [Header("Lv5 Frenzy")]
+    public bool enableFrenzyAtLv5 = true;
+    public float frenzyDuration = 2.5f;
+
+    [Header("Explosion")]
+    public float explosionRadius = 2.5f; // ★ 추가: CSV explosionradius 적용용
 
     private float fireTimer;
 
-    // 레벨업 기준 스탯
-    private float baseDamage = 10f;
-    private float baseRange = 5f;
-    private float baseDuration = 3f;
+    private int currentLevel = 1;
 
-    private int currentLevel = 1; // (추가) 현재 레벨 캐시
+    // ★ 추가: CSV weaponid
+    private readonly string weaponId = "datascrambler";
 
     private void Start()
     {
       Debug.Log("[DataScrambler] Initialized");
-      baseDamage = damage;
-      baseRange = range;
-      baseDuration = duration;
+
+      // ★ 수정: 시작 시 Lv1 CSV 적용
+      ApplyStatsFromCSV(1);
     }
 
     private void Update()
     {
+      // ★ 추가: 기존 코드에 이게 빠져 있었음
+      fireTimer += Time.deltaTime;
+
       if (fireTimer >= fireRate)
       {
         Attack();
@@ -52,42 +56,40 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
-      // 가장 가까운 적을 향해 발사 (없으면 오른쪽)
       Transform target = FindClosestEnemy();
       Vector3 forward = transform.right;
+
       if (target != null)
       {
         forward = (target.position - transform.position).normalized;
       }
 
-      // 시각적 효과 (디버그용)
       Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, angle / 2) * forward * range, Color.magenta, 0.5f);
       Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, -angle / 2) * forward * range, Color.magenta, 0.5f);
 
-      // 범위 내 적 감지
       Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range);
+
       foreach (var col in enemies)
       {
-        if (col == null) continue; // (추가) 안전
+        if (col == null) continue;
 
-        // (변경) 자식 콜라이더 구조 대응:
-        // col이 Enemy 태그가 아닐 수 있으므로, 부모 태그도 허용
         bool isEnemy =
           col.CompareTag("Enemy") ||
           (col.transform.parent != null && col.transform.parent.CompareTag("Enemy"));
 
         if (!isEnemy) continue;
 
-        // 부채꼴 범위 체크
         Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
+
         if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
         {
-          // 부채꼴 범위 안
           if (col.TryGetComponent<Character>(out var character))
           {
             var src = GetComponentInParent<WeaponSource>();
-            character.TakeDamage(damage, src != null ? src.weaponData : null); // 즉시 피해
-            if (character is Enemy) ApplyConfusion(col.gameObject);
+            character.TakeDamage(damage, src != null ? src.weaponData : null);
+
+            if (character is Enemy)
+              ApplyConfusion(col.gameObject);
           }
         }
       }
@@ -95,36 +97,74 @@ namespace NeoSurvive.Weapon
 
     private void ApplyConfusion(GameObject enemyObj)
     {
-      // 혼란 효과 컴포넌트 부착
       var confusion = enemyObj.GetComponent<ConfusionEffect>();
       if (confusion == null)
       {
         confusion = enemyObj.AddComponent<ConfusionEffect>();
       }
 
-      // 이미 있으면 시간/데미지 갱신
       var src = GetComponentInParent<WeaponSource>();
-      confusion.Initialize(damage, duration, src != null ? src.weaponData : null);
 
-      // (추가) Lv5일 때 FrenzyDebuff 같이 적용
+      // ★ 수정: explosionRadius도 같이 전달
+      confusion.Initialize(damage, duration, explosionRadius, src != null ? src.weaponData : null);
+
       if (enableFrenzyAtLv5 && currentLevel >= 5)
       {
-        BuffUtil.Apply(enemyObj, new FrenzyDebuff(frenzyDuration)); // (추가)
+        BuffUtil.Apply(enemyObj, new FrenzyDebuff(frenzyDuration));
       }
     }
 
     public void OnLevelUp(int level)
     {
-      currentLevel = Mathf.Clamp(level, 1, 5); // (추가)
+      currentLevel = Mathf.Clamp(level, 1, 5);
 
-      if (baseDamage == 0 && damage > 0) baseDamage = damage;
+      // ★ 수정: 레벨업 시 CSV 재적용
+      ApplyStatsFromCSV(currentLevel);
 
-      // 레벨업: 범위, 지속 시간 증가 + 데미지 10%씩 증가
-      range = baseRange * (1f + (currentLevel - 1) * 0.15f);
-      duration = baseDuration * (1f + (currentLevel - 1) * 0.2f);
-      damage = baseDamage * (1f + (currentLevel - 1) * 0.1f);
+      Debug.Log($"[DataScrambler] Lv.{currentLevel} : Dmg {damage}, Range {range}, Duration {duration}, ExplosionRadius {explosionRadius}");
+    }
 
-      Debug.Log($"[DataScrambler] Lv.{currentLevel} : Dmg {damage}, Range {range}, Duration {duration}");
+    // ★ 추가: CSV 적용 함수
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+      {
+        Debug.LogWarning("[DataScrambler] WeaponStatLoader.DB 없음");
+        return;
+      }
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+      {
+        Debug.LogWarning($"[DataScrambler] weaponId 없음: {weaponId}");
+        return;
+      }
+
+      if (!levelDict.TryGetValue(level, out var row))
+      {
+        Debug.LogWarning($"[DataScrambler] level 데이터 없음: {level}");
+        return;
+      }
+
+      WeaponStatDB.Row levelOneRow = row;
+      if (levelDict.TryGetValue(1, out var baseRow))
+      {
+        levelOneRow = baseRow;
+      }
+
+      float damagePerLevel = row.damageperlevel > 0f ? row.damageperlevel : levelOneRow.damageperlevel;
+      float rangePerLevel = row.rangeperlevel > 0f ? row.rangeperlevel : levelOneRow.rangeperlevel;
+      float durationPerLevel = row.durationperlevel > 0f ? row.durationperlevel : levelOneRow.durationperlevel;
+
+      damage = levelOneRow.damage * (1f + (level - 1) * damagePerLevel);
+      range = levelOneRow.range * (1f + (level - 1) * rangePerLevel);
+      duration = levelOneRow.duration * (1f + (level - 1) * durationPerLevel);
+
+      angle = row.angle;
+      fireRate = row.firerate;
+      frenzyDuration = row.frenzyduration;
+      explosionRadius = row.explosionradius;
+
+      Debug.Log($"[DataScrambler] CSV 적용 | Lv={level}, Damage={damage}, Range={range}, Duration={duration}, FireRate={fireRate}, ExplosionRadius={explosionRadius}");
     }
 
     private Transform FindClosestEnemy()
@@ -136,6 +176,7 @@ namespace NeoSurvive.Weapon
       foreach (GameObject enemy in enemies)
       {
         if (enemy == null) continue;
+
         float distance = Vector3.Distance(transform.position, enemy.transform.position);
         if (distance < closestDistance)
         {
@@ -143,6 +184,7 @@ namespace NeoSurvive.Weapon
           closest = enemy;
         }
       }
+
       return closest != null ? closest.transform : null;
     }
 
@@ -153,29 +195,28 @@ namespace NeoSurvive.Weapon
     }
   }
 
-  /// <summary>
-  /// 적에게 부착되어 일정 시간 후 폭발하는 혼란 효과
-  /// </summary>
   public class ConfusionEffect : MonoBehaviour
   {
     private float damage;
     private float timer;
+    private float explosionRadius = 2.5f; // ★ 추가
     private bool initialized = false;
     private WeaponBase sourceWeapon;
 
-    public void Initialize(float dmg, float duration, WeaponBase source = null)
+    // ★ 수정: explosionRadius 인자 추가
+    public void Initialize(float dmg, float duration, float explosionRadius, WeaponBase source = null)
     {
       this.damage = dmg;
       this.timer = duration;
+      this.explosionRadius = explosionRadius;
       this.sourceWeapon = source;
       this.initialized = true;
 
-      // (변경) SpriteRenderer가 자식에 있을 수도 있으니 InChildren 사용
       var sr = GetComponentInChildren<SpriteRenderer>();
       if (sr) sr.color = Color.magenta;
     }
 
-    void Update()
+    private void Update()
     {
       if (!initialized) return;
 
@@ -186,16 +227,37 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    void Explode()
+    private void Explode()
     {
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 2.5f);
+      // ★ 수정: 하드코딩 2.5f 대신 CSV explosionRadius 사용
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
+
       foreach (var h in hits)
       {
-        if (h.gameObject == gameObject) continue; // 나 자신 제외
+        if (h.gameObject == gameObject) continue;
+
         if (h.CompareTag("Enemy") && h.TryGetComponent<Enemy>(out var e))
         {
-          e.TakeDamage(damage, sourceWeapon); // 광역 피해
+          e.TakeDamage(damage, sourceWeapon);
+          continue;
         }
+        // =========================
+        // 2. 추가: IDamageable 맵오브젝트 폭발 데미지 처리
+        // - 자판기 같은 맵오브젝트만 맞게 함
+        // - Enemy는 위에서 이미 처리했으므로 여기서는 제외
+        // =========================
+        if (h.CompareTag("Enemy"))
+          continue;
+
+        IDamageable damageable = h.GetComponent<IDamageable>();
+
+        if (damageable == null)
+          damageable = h.GetComponentInParent<IDamageable>();
+
+        if (damageable == null)
+          continue;
+
+        damageable.TakeDamage(damage);
       }
 
       var sr = GetComponentInChildren<SpriteRenderer>();

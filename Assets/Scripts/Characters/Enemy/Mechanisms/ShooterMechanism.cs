@@ -29,12 +29,35 @@ public class ShooterMechanism : EnemyMechanismBase
     private float projectileDamage = 5f;
 
     [SerializeField]
-    [Tooltip("발사 위치 오프셋")]
+    [Tooltip("발사 위치 오프셋 (적 루트 로컬 공간; localScale.x 반전 시 TransformPoint로 같이 미러링됨)")]
     private Vector2 shootOffset = Vector2.zero;
+
+    [SerializeField]
+    [Tooltip("투사체 스프라이트 기본 전방 각도 보정값(도). 기본 아트가 오른쪽(+X)을 향하면 0")]
+    private float projectileForwardAngleOffset = 0f;
+
+    [SerializeField]
+    [Tooltip("공격 애니메이션을 재생할 총 Animator (미할당 시 자동 탐색)")]
+    private Animator gunAnimator;
+
+    [SerializeField]
+    [Tooltip("자동 탐색 시 사용할 총 오브젝트 이름")]
+    private string gunObjectName = "Shooter's Gun";
+
+    [SerializeField]
+    [Tooltip("몸 Walk 애니 재생 속도 제어용 (비우면 이 오브젝트의 Animator 사용)")]
+    private Animator bodyAnimator;
+
+    [SerializeField]
+    [Tooltip("이 속도 제곱 이하면 몸 Animator.speed = 0 (정지로 간주)")]
+    private float bodySpeedStopSqrThreshold = 0.0001f;
+
+    private static readonly int AttackTriggerHash = Animator.StringToHash("Attack");
 
     private float baseAttackRange;
     private float extendedAttackRange;
     private float lastAttackTime = 0f;
+    private bool pendingProjectileFromAttackAnim;
 
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
@@ -51,11 +74,18 @@ public class ShooterMechanism : EnemyMechanismBase
             baseAttackRange = 1.5f;
             extendedAttackRange = baseAttackRange * attackRangeMultiplier;
         }
+
+        ResolveGunAnimatorIfNeeded();
+        ResolveBodyAnimatorIfNeeded();
     }
 
     public override void UpdateMovement()
     {
-        if (target == null || rb == null) return;
+        if (target == null || rb == null)
+        {
+            ApplyBodyAnimatorPausedState(true);
+            return;
+        }
 
         // sqrMagnitude로 제곱근 없이 거리 비교
         float sqrDist = (transform.position - target.position).sqrMagnitude;
@@ -71,6 +101,8 @@ public class ShooterMechanism : EnemyMechanismBase
         {
             rb.velocity = Vector2.zero;
         }
+
+        ApplyBodyAnimatorPausedState(rb.velocity.sqrMagnitude <= bodySpeedStopSqrThreshold);
     }
 
     public override void UpdateAttack()
@@ -95,21 +127,50 @@ public class ShooterMechanism : EnemyMechanismBase
 
         if (sqrDist <= sqrRange && Time.time - lastAttackTime >= attackInterval)
         {
-            Shoot();
+            pendingProjectileFromAttackAnim = true;
             lastAttackTime = Time.time;
+            Shoot();
         }
     }
 
     private void Shoot()
     {
-        if (target == null) return;
+        // 발사 타이밍에 총 공격 애니메이션 재생
+        if (gunAnimator != null)
+        {
+            gunAnimator.ResetTrigger(AttackTriggerHash);
+            gunAnimator.SetTrigger(AttackTriggerHash);
+            return;
+        }
 
-        Vector2 shootPosition = (Vector2)transform.position + shootOffset;
+        // 총 Animator가 없으면 기존처럼 즉시 발사
+        FireProjectileNowFromAnimationEvent();
+    }
+
+    /// <summary>
+    /// Shooter_Attack 애니메이션 이벤트 프레임에서 호출.
+    /// pending 상태일 때만 1발 발사되어 중복 발사를 방지합니다.
+    /// </summary>
+    public void FireProjectileNowFromAnimationEvent()
+    {
+        if (!pendingProjectileFromAttackAnim)
+            return;
+
+        pendingProjectileFromAttackAnim = false;
+
+        if (target == null || projectilePrefab == null)
+            return;
+
+        // 로컬 오프셋 → 월드 (scale.x 부호 반전 시 총구 쪽도 같이 뒤집힘)
+        Vector3 shootWorld = transform.TransformPoint(new Vector3(shootOffset.x, shootOffset.y, 0f));
+        Vector2 shootPosition = new Vector2(shootWorld.x, shootWorld.y);
         Vector2 direction = ((Vector2)target.position - shootPosition).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + projectileForwardAngleOffset;
+        Quaternion projectileRotation = Quaternion.Euler(0f, 0f, angle);
 
         // 투사체 생성
-        GameObject projectile = Instantiate(projectilePrefab, shootPosition, Quaternion.identity);
-        
+        GameObject projectile = Instantiate(projectilePrefab, shootPosition, projectileRotation);
+
         // 투사체 초기화
         NeoSurvive.Weapon.Projectile proj = projectile.GetComponent<NeoSurvive.Weapon.Projectile>();
         if (proj != null)
@@ -137,6 +198,44 @@ public class ShooterMechanism : EnemyMechanismBase
         }
 
         Debug.Log($"[ShooterMechanism] {gameObject.name}이(가) 투사체를 발사했습니다.");
+    }
+
+    private void ResolveGunAnimatorIfNeeded()
+    {
+        if (gunAnimator != null) return;
+
+        if (!string.IsNullOrWhiteSpace(gunObjectName))
+        {
+            Transform gun = transform.Find(gunObjectName);
+            if (gun != null)
+            {
+                gunAnimator = gun.GetComponent<Animator>();
+            }
+        }
+
+        if (gunAnimator == null)
+        {
+            Animator[] animators = GetComponentsInChildren<Animator>(true);
+            foreach (Animator anim in animators)
+            {
+                if (anim == null) continue;
+                if (anim == GetComponent<Animator>()) continue; // 본체 Animator는 제외
+                gunAnimator = anim;
+                break;
+            }
+        }
+    }
+
+    private void ResolveBodyAnimatorIfNeeded()
+    {
+        if (bodyAnimator != null) return;
+        bodyAnimator = GetComponent<Animator>();
+    }
+
+    private void ApplyBodyAnimatorPausedState(bool paused)
+    {
+        if (bodyAnimator == null) return;
+        bodyAnimator.speed = paused ? 0f : 1f;
     }
 }
 

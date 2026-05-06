@@ -4,33 +4,27 @@ using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 6번 무기: EMP 펄스 생성기
-  /// 화면 내 무작위 위치에 지속 피해 장판 생성.
-  /// Lv.5 달성 시 생성 시점에 적 투사체 파괴.
-  /// </summary>
   public class EMPPulseGenerator : MonoBehaviour
   {
     [Header("Stats")]
-    public GameObject empFieldPrefab; // 장판 프리팹 (SpriteRenderer + EMPField 스크립트 필요)
+    public GameObject empFieldPrefab;
 
     public float damage = 5f;
-    public float areaSize = 2.0f;     // 장판 반지름 (LocalScale로 조정 or OverlapCircle 범위)
-    public float duration = 4f;       // 장판 지속 시간
-    public float fireRate = 3f;       // 장판 생성 주기
-    public float spawnRadius = 4.0f;  // 플레이어 주변 생성 반경
+    public float areaSize = 2.0f;
+    public float duration = 4f;
+    public float fireRate = 3f;
+    public float spawnRadius = 4.0f;
 
     private float fireTimer;
     private int currentLevel = 1;
 
-    // Base Stats
-    private float baseDamage = 2f;
-    private float baseAreaSize = 2f;
+    // ★ 추가: CSV weaponid
+    private readonly string weaponId = "emppulsegenerator";
 
     private void Start()
     {
-      baseDamage = damage;
-      baseAreaSize = areaSize;
+      // ★ 수정: 시작 시 Lv1 CSV 적용
+      ApplyStatsFromCSV(1);
     }
 
     private void Update()
@@ -47,33 +41,66 @@ namespace NeoSurvive.Weapon
     {
       if (empFieldPrefab == null) return;
 
-      // 플레이어 주변 무작위 위치
       Vector2 randomPos = Random.insideUnitCircle * spawnRadius;
       Vector3 spawnPosition = transform.position + (Vector3)randomPos;
 
       GameObject obj = Instantiate(empFieldPrefab, spawnPosition, Quaternion.identity);
 
-      // 장판 초기화
       if (obj.TryGetComponent<EMPField>(out var field))
       {
         var src = GetComponentInParent<WeaponSource>();
-        // Lv.5 이상이면 투사체 파괴 옵션 true, WeaponBase 전달로 DPM 기록
         field.Initialize(damage, areaSize, duration, currentLevel >= 5, src != null ? src.weaponData : null);
       }
     }
 
     public void OnLevelUp(int level)
     {
-      currentLevel = level;
-      if (baseDamage == 0 && damage > 0) baseDamage = damage;
+      currentLevel = Mathf.Clamp(level, 1, 5);
 
-      // 레벨업: 범위(areaSize) 증가 (기획) + 데미지도 10% 증가
-      areaSize = baseAreaSize * (1f + (level - 1) * 0.15f);
-      damage = baseDamage * (1f + (level - 1) * 0.1f);
+      // ★ 수정: CSV 적용
+      ApplyStatsFromCSV(currentLevel);
 
-      Debug.Log($"[EMP Pulse] Lv.{level} : Dmg {damage}, Area {areaSize}, ProjDestroy: {level >= 5}");
+      Debug.Log($"[EMP Pulse] CSV 적용 | Lv={currentLevel}, Dmg={damage}, Area={areaSize}, Duration={duration}, ProjDestroy={currentLevel >= 5}");
+    }
+
+    // ★ 추가: CSV 적용 함수
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+      {
+        Debug.LogWarning("[EMP Pulse] WeaponStatLoader.DB 없음");
+        return;
+      }
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+      {
+        Debug.LogWarning($"[EMP Pulse] weaponId 없음: {weaponId}");
+        return;
+      }
+
+      if (!levelDict.TryGetValue(level, out var row))
+      {
+        Debug.LogWarning($"[EMP Pulse] level 데이터 없음: {level}");
+        return;
+      }
+
+      WeaponStatDB.Row baseRow = row;
+      if (levelDict.TryGetValue(1, out var levelOneRow))
+      {
+        baseRow = levelOneRow;
+      }
+
+      float damagePer = row.damageperlevel > 0f ? row.damageperlevel : baseRow.damageperlevel;
+      float areaPer = row.areasizeperlevel > 0f ? row.areasizeperlevel : baseRow.areasizeperlevel;
+
+      damage = baseRow.damage * (1f + (level - 1) * damagePer);
+      areaSize = baseRow.areasize * (1f + (level - 1) * areaPer);
+
+      duration = row.duration;
+      fireRate = row.firerate;
+      spawnRadius = row.spawnradius;
+
+      Debug.Log($"[EMP Pulse] CSV 적용 | Lv={level}, Damage={damage}, Area={areaSize}, Duration={duration}, FireRate={fireRate}, SpawnRadius={spawnRadius}");
     }
   }
 }
-
-

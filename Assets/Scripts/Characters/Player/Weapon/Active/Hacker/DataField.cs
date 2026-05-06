@@ -1,65 +1,54 @@
-using System.Collections.Generic;
 using UnityEngine;
-using NeoSurvive.Core;
 using NeoSurvive.Buff;
+using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
     [RequireComponent(typeof(BoxCollider2D))]
     public class DataField : MonoBehaviour
     {
-        [Header("Enemy Filter")]
-        [SerializeField] private string enemyTag = "Enemy";
-
-        [Header("Visual")]
         [SerializeField] private Transform visualRoot;
         [SerializeField] private Vector2 visualSizeMultiplier = new Vector2(1.1f, 1.05f);
 
-        private Player owner;
-        private float duration;
-        private Vector2 fieldSize;
         private float damageMultiplier;
         private float buffDuration;
         private bool enableMasterSlow;
         private float slowMultiplier;
         private float slowDuration;
-        private bool debugLog;
 
-        private float lifeTimer = 0f;
         private BoxCollider2D boxCol;
 
-        private readonly HashSet<GameObject> buffedProjectiles = new();
-
+        private void Awake()
+        {
+            boxCol = GetComponent<BoxCollider2D>();
+            boxCol.isTrigger = true;
+        }
 
         public void Initialize(
-            Player owner,
-            float duration,
-            Vector2 fieldSize,
+            Vector2 fieldSize,          // 🔥 [추가] fieldSize를 직접 받도록 변경
             float damageMultiplier,
             float buffDuration,
             bool enableMasterSlow,
             float slowMultiplier,
             float slowDuration,
-            bool debugLog)
+            WeaponBase srcWeapon)
         {
-            this.owner = owner;
-            this.duration = duration;
-            this.fieldSize = fieldSize;
             this.damageMultiplier = damageMultiplier;
             this.buffDuration = buffDuration;
             this.enableMasterSlow = enableMasterSlow;
             this.slowMultiplier = slowMultiplier;
             this.slowDuration = slowDuration;
-            this.debugLog = debugLog;
 
             if (boxCol == null)
                 boxCol = GetComponent<BoxCollider2D>();
 
             boxCol.isTrigger = true;
+
+            // 🔥 [핵심 수정] 오브젝트 scale이 아니라 Collider 기준으로 크기 설정
             boxCol.size = fieldSize;
+            boxCol.offset = Vector2.zero;
 
-            transform.localScale = Vector3.one;
-
+            // 🔥 [추가] 시각 오브젝트도 동일한 기준으로 맞춤
             if (visualRoot != null)
             {
                 visualRoot.localScale = new Vector3(
@@ -70,93 +59,34 @@ namespace NeoSurvive.Weapon
             }
         }
 
-        private void Awake()
-        {
-            boxCol = GetComponent<BoxCollider2D>();
-            boxCol.isTrigger = true;
-        }
-
-        private void Update()
-        {
-            lifeTimer += Time.deltaTime;
-            if (lifeTimer >= duration)
-            {
-                Destroy(gameObject);
-            }
-        }
-
         private void OnTriggerEnter2D(Collider2D other)
         {
-            TryBuffProjectile(other);
-            TryApplyFieldSlow(other);
+            TryApplyBuff(other);
         }
 
-        private void TryBuffProjectile(Collider2D other)
+        private void TryApplyBuff(Collider2D other)
         {
-            if (other == null) return;
-
-            GameObject target = other.gameObject;
-
-            Projectile projectile = target.GetComponent<Projectile>();
-            if (projectile == null)
-                return;
-
-            if (buffedProjectiles.Contains(target))
-                return;
-
-            BuffHandler buffHandler = target.GetComponent<BuffHandler>();
-            if (buffHandler == null)
-                buffHandler = target.AddComponent<BuffHandler>();
-
-            StatusFlags flags = target.GetComponent<StatusFlags>();
-            if (flags == null)
-                flags = target.AddComponent<StatusFlags>();
-
-            buffHandler.AddBuff(new DataOptimizationDamageBuff(damageMultiplier, buffDuration));
-            buffedProjectiles.Add(target);
-
-            if (debugLog)
-            {
-                Debug.Log($"[DataField] 투사체 버프 적용 | projectile={target.name} | x{damageMultiplier:0.00}");
-            }
-        }
-
-        private void TryApplyFieldSlow(Collider2D other)
-        {
-            if (!enableMasterSlow || other == null)
-                return;
-
-            Enemy enemy = other.GetComponent<Enemy>();
-            if (enemy == null)
-                enemy = other.GetComponentInParent<Enemy>();
-
-            if (enemy == null)
-                return;
+            Enemy enemy = other.GetComponentInParent<Enemy>();
+            if (enemy == null) return;
 
             GameObject target = enemy.gameObject;
 
-            if (!target.CompareTag(enemyTag))
-                return;
-
             BuffHandler buffHandler = target.GetComponent<BuffHandler>();
             if (buffHandler == null)
                 buffHandler = target.AddComponent<BuffHandler>();
 
-            buffHandler.AddBuff(new SlowDebuff(slowMultiplier, slowDuration));
+            // 🔥 [핵심 수정] 기존 DataOptimizationDamageBuff → 제거
+            // 🔥 [변경] VulnerableDebuff 사용 (기존 Buff 시스템 활용)
+            buffHandler.AddBuff(new VulnerableDebuff(damageMultiplier, buffDuration));
 
-            if (debugLog)
+            // 🔥 [추가] Lv5 슬로우 → SlowDebuff로 처리
+            if (enableMasterSlow)
             {
-                Debug.Log($"[DataField] SlowDebuff 적용 | target={target.name} | multiplier={slowMultiplier:0.00} | duration={slowDuration:0.00}");
+                buffHandler.AddBuff(new SlowDebuff(slowMultiplier, slowDuration));
             }
-        }
 
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(Vector3.zero, new Vector3(fieldSize.x, fieldSize.y, 0.1f));
+            // ❌ [삭제] 기존 거리 기반 슬로우 판정 제거
+            // (slowRadius, distance 체크 로직 제거됨)
         }
-#endif
     }
 }

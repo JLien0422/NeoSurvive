@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using NeoSurvive.Core;
 using NeoSurvive.Buff;
 // using NeoSurvive.Map.Map2.Core;
 // using NeoSurvive.Map.Map2.EnvironmentGimmicks;
@@ -200,23 +201,28 @@ namespace NeoSurvive.Weapon
           cryo.TakeDamage(damage);
           continue;
         }
-
-        // ===== MalfunctionVendingMachine 처리 =====
-        MalfunctionVendingMachine vendingMachine = hit.GetComponent<MalfunctionVendingMachine>();
-        if (vendingMachine == null)
-          vendingMachine = hit.GetComponentInParent<MalfunctionVendingMachine>();
-
-        if (vendingMachine != null)
-        {
-          int id = vendingMachine.gameObject.GetInstanceID();
-          if (processedIds.Contains(id)) continue;
-          processedIds.Add(id);
-
-          Debug.Log($"[EMPGrenadeProjectile] VendingMachine 피격 | {vendingMachine.name} | damage={damage}");
-          vendingMachine.TakeDamage(damage);
-          continue;
-        }
         */
+
+        // ===== IDamageable MapObject 처리 =====
+        // 자판기 같은 맵오브젝트는 데미지만 받고 스턴은 받지 않음
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if (damageable != null)
+        {
+          MonoBehaviour mb = damageable as MonoBehaviour;
+          if (mb != null)
+          {
+            int id = mb.gameObject.GetInstanceID();
+            if (processedIds.Contains(id)) continue;
+            processedIds.Add(id);
+
+            damageable.TakeDamage(damage);
+            continue;
+          }
+        }
 
         // ===== Enemy 처리 =====
         Enemy enemy = hit.GetComponent<Enemy>();

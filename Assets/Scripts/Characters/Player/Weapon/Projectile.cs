@@ -1,4 +1,5 @@
 using UnityEngine;
+using NeoSurvive.Core;
 using NeoSurvive.UI;
 
 namespace NeoSurvive.Weapon
@@ -44,14 +45,33 @@ namespace NeoSurvive.Weapon
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
       // "Enemy" 태그로 적/보스 통합 체크 (Enemy, Boss 모두 태그가 "Enemy"임)
-      if (!collision.CompareTag("Enemy")) return;
+      if (collision.CompareTag("Enemy"))
+      {
+        // Character 베이스 컴포넌트로 TakeDamage 호출
+        if (!collision.gameObject.TryGetComponent(out Character character)) return;
 
-      // Character 베이스 컴포넌트로 TakeDamage 호출
-      if (!collision.gameObject.TryGetComponent(out Character character)) return;
+        character.TakeDamage(damage, sourceWeapon);
+        OnHitEvent?.Invoke();
+        OnHit();
+        return;
+      }
 
-      character.TakeDamage(damage, sourceWeapon);
+      // =========================
+      // 추가: IDamageable MapObject 처리
+      // =========================
+      IDamageable damageable = collision.GetComponent<IDamageable>();
+
+      if (damageable == null)
+          damageable = collision.GetComponentInParent<IDamageable>();
+
+      if (damageable == null)
+          return;
+
+      damageable.TakeDamage(damage);
+
       OnHitEvent?.Invoke();
       OnHit();
+
     }
 
     protected virtual void OnHit()

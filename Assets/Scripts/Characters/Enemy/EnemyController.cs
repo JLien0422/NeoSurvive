@@ -128,7 +128,10 @@ public class EnemyController : MonoBehaviour
   // 게임 시작 시 호출됩니다.
   private void Start()
   {
+    Debug.Log("[EnemyController] Start 실행됨");
+
     ApplyEnemyControllerStatsFromCSV(); // (추가) CSV에서 EnemyController 관련 스탯 적용
+    ApplyEnemyDropTableFromCSV(); // (추가) CSV에서 드랍 테이블 적용
     StartCoroutine(AttackCoroutine());
   }
 
@@ -232,20 +235,6 @@ public class EnemyController : MonoBehaviour
       }
     }
     return closest;
-  }
-
-  // 외부에서 이속 제어 (슬로우 효과)
-  public void ApplySlow(float multiplier, float duration)
-  {
-    StartCoroutine(SlowRoutine(multiplier, duration));
-  }
-
-  private IEnumerator SlowRoutine(float mult, float duration)
-  {
-    float original = moveSpeed;
-    moveSpeed *= mult;
-    yield return new WaitForSeconds(duration);
-    moveSpeed = original;
   }
 
   // 아군으로 전환 시 적을 타겟으로 설정
@@ -418,10 +407,41 @@ public class EnemyController : MonoBehaviour
       return;
     }
 
+    if (row.maxhp > 0f)
+    {
+        enemy.ApplyMaxHpFromCSV(row.maxhp);
+    }
+
     if (row.movespeed > 0f) moveSpeed = row.movespeed;
     if (row.attackdamage > 0f) attackDamage = row.attackdamage;
     if (row.attackrange > 0f) attackRange = row.attackrange;
 
     Debug.Log($"[EnemyController] CSV 스탯 적용 완료: {key} | moveSpeed={moveSpeed}, attackDamage={attackDamage}, attackRange={attackRange}");
+  }
+
+  private void ApplyEnemyDropTableFromCSV()
+  {
+      if (DropTableLoader.DB == null)
+      {
+          Debug.LogWarning("[EnemyController] DropTableLoader.DB가 null입니다.");
+          return;
+      }
+
+      if (enemy == null)
+      {
+          Debug.LogWarning("[EnemyController] Enemy 참조가 null입니다.");
+          return;
+      }
+
+      string key = mechanismType.ToString().Trim().ToLowerInvariant();
+
+      if (!DropTableLoader.DB.rows.TryGetValue(key, out var row))
+      {
+          return;
+      }
+
+      enemy.ApplyDropTableFromCSV(row);
+
+      Debug.Log($"[EnemyController] 드랍 CSV 적용 완료: {key}");
   }
 }

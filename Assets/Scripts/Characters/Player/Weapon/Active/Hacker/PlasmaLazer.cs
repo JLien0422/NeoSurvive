@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Weapon;
+using NeoSurvive.Core;
 
 public class PlasmaLazer : MonoBehaviour
 {
@@ -58,6 +59,41 @@ public class PlasmaLazer : MonoBehaviour
           Destroy(gameObject);
           return;
         }
+
+        continue;
+      }
+
+      // =========================
+      // 2. 추가: IDamageable 처리 (자판기 포함)
+      // =========================
+      IDamageable damageable = hit.collider.GetComponent<IDamageable>();
+
+      if (damageable == null)
+          damageable = hit.collider.GetComponentInParent<IDamageable>();
+
+      if (damageable == null)
+          continue;
+
+      // Enemy 제외 (중복 방지)
+      if (hit.collider.CompareTag("Enemy"))
+          continue;
+
+      MonoBehaviour mb = damageable as MonoBehaviour;
+      if (mb == null)
+          continue;
+
+      int objId = mb.GetInstanceID();
+      if (hitEnemyIds.Contains(objId))
+          continue;
+
+      damageable.TakeDamage(damage);
+      hitEnemyIds.Add(objId);
+      currentHitCount++;
+
+      if (currentHitCount > maxPenetration)
+      {
+          Destroy(gameObject);
+          return;
       }
     }
 

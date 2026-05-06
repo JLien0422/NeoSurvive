@@ -257,9 +257,13 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "duration", out row.duration);
 
             // EMPPulseGenerator 전용 스탯
+            SimpleCsv.TryGetFloat(r, "explosionradius", out row.explosionradius);
+            SimpleCsv.TryGetFloat(r, "stunduration", out row.stunduration);
+            SimpleCsv.TryGetFloat(r, "arcHeight", out row.archeight);
+            SimpleCsv.TryGetFloat(r, "travelTime", out row.traveltime);
             SimpleCsv.TryGetFloat(r, "areasize", out row.areasize);
-            SimpleCsv.TryGetFloat(r, "spawnradius", out row.spawnradius);
             SimpleCsv.TryGetFloat(r, "areasizeperlevel", out row.areasizeperlevel);
+            SimpleCsv.TryGetFloat(r, "spawnradius", out row.spawnradius);
 
             // PlasmaRifle 전용 스탯
             SimpleCsv.TryGetFloat(r, "bulletspeed", out row.bulletspeed);

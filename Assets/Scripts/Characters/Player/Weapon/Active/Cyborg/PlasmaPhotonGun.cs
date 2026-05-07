@@ -31,6 +31,8 @@ namespace NeoSurvive.Weapon
             Transform target = FindClosestEnemy();
             if (target == null) return;
 
+            if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayPlasmaPhotonGunFire();
+
             Vector2 dir = (target.position - (firePoint != null ? firePoint.position : transform.position)).normalized;
 
             var spawnPos = firePoint != null ? firePoint.position : transform.position;

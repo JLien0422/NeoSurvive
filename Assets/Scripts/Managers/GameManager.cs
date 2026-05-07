@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
   // 킬 카운트 변경 알림 이벤트
   public static event System.Action<int> OnKillCountChanged;
   public static event System.Action onPlayerSpawned;
+  public static event System.Action onGoldChanged;
 
   [Header("적 스폰 설정")]
   private int killCount = 0;
@@ -19,12 +20,17 @@ public class GameManager : MonoBehaviour
   [SerializeField] private int currentRunGold = 0;
   [SerializeField] private int totalGold = 0;
   public int TotalGold => totalGold;
+  public int CurrentRunGold => currentRunGold;
 
   private Transform playerTransform;
   private const string GOLD_SAVE_KEY = "TotalGold";
 
   [Header("캐릭터 선택")]
   private CharacterType selectedCharacter = CharacterType.Hacker;
+
+  [Header("플레이어 프리팹")]
+  [SerializeField] private GameObject hackerPlayerPrefab;
+  [SerializeField] private GameObject cyborgPlayerPrefab;
 
   private float startTime = 0f;
 
@@ -46,11 +52,15 @@ public class GameManager : MonoBehaviour
   private void Start()
   {
     LoadTotalGold();
+    ApplySavedCharacterSelection();
 
     startTime = Time.time;
 
     Debug.Log("[GameManager] 로컬 모드");
     GameObject playerObject = GameObject.FindWithTag("Player");
+
+    playerObject = EnsureSelectedPlayerPrefab(playerObject);
+
     if (playerObject != null)
     {
       playerTransform = playerObject.transform;
@@ -67,6 +77,44 @@ public class GameManager : MonoBehaviour
     }
   }
 
+  private void ApplySavedCharacterSelection()
+  {
+    var savedClass = PlayerClassSelection.Load();
+    selectedCharacter = savedClass == PlayerClassType.Cyborg
+      ? CharacterType.Cyborg
+      : CharacterType.Hacker;
+  }
+
+  private GameObject EnsureSelectedPlayerPrefab(GameObject currentPlayer)
+  {
+    GameObject targetPrefab = selectedCharacter == CharacterType.Cyborg
+      ? cyborgPlayerPrefab
+      : hackerPlayerPrefab;
+
+    if (targetPrefab == null)
+    {
+      Debug.LogError($"[GameManager] {selectedCharacter} 플레이어 프리팹이 비어 있습니다.");
+      return currentPlayer;
+    }
+
+    if (currentPlayer == null)
+    {
+      return Instantiate(targetPrefab, Vector3.zero, Quaternion.identity);
+    }
+
+    Player currentPlayerComponent = currentPlayer.GetComponent<Player>();
+    if (currentPlayerComponent != null && currentPlayerComponent.CharacterType == selectedCharacter)
+    {
+      return currentPlayer;
+    }
+
+    Vector3 spawnPosition = currentPlayer.transform.position;
+    Quaternion spawnRotation = currentPlayer.transform.rotation;
+    Destroy(currentPlayer);
+
+    return Instantiate(targetPrefab, spawnPosition, spawnRotation);
+  }
+
   public void NotifyPlayerSpawned()
   {
     onPlayerSpawned?.Invoke();
@@ -76,6 +124,7 @@ public class GameManager : MonoBehaviour
   public void AddGold(int amount)
   {
     currentRunGold += amount;
+    onGoldChanged?.Invoke();
     Debug.Log($"골드 {amount} 획득! 이번 판 총 골드: {currentRunGold}");
   }
 

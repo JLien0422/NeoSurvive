@@ -17,22 +17,41 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float bomberWeight = 0f;
     [SerializeField] private float tankerWeight = 0f;
 
-    private void Start()
+    private void Awake()
+    {
+        GameManager.onPlayerSpawned += OnPlayerSpawned;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.onPlayerSpawned -= OnPlayerSpawned;
+    }
+
+    private void OnPlayerSpawned()
     {
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null)
         {
-            Debug.LogError("Player를 찾을 수 없습니다.");
+            Debug.LogError("[EnemySpawner] Player를 찾을 수 없습니다.");
             return;
         }
 
         playerTransform = player.transform;
-        StartCoroutine(SpawnEnemies());
 
+        StopAllCoroutines();
+        StartCoroutine(SpawnEnemies());
+        Debug.Log("[EnemySpawner] 플레이어가 완전히 스폰된 것을 감지, 스폰 루틴 시작.");
+    }
+
+    private void Start()
+    {
         Camera cam = Camera.main;
-        float worldWidth = cam.orthographicSize * cam.aspect;
-        minSpawnRadius = worldWidth * 1.2f;
-        maxSpawnRadius = worldWidth * 1.4f;
+        if (cam != null)
+        {
+            float worldWidth = cam.orthographicSize * cam.aspect;
+            minSpawnRadius = worldWidth * 1.2f;
+            maxSpawnRadius = worldWidth * 1.4f;
+        }
 
         SetPhaseWeights(1); // ★ Phase1: Basic만
     }
@@ -48,6 +67,8 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
+        if (playerTransform == null) return;
+
         GameObject prefab = GetRandomEnemyPrefab();
         if (prefab == null) return;
 

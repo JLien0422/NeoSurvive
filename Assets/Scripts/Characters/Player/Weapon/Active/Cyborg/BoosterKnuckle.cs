@@ -75,8 +75,8 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      speed  = baseSpeed  * (1f + (currentLevel - 1) * speedPerLevel);
-      range  = baseRange; // 고정(원하면 증가)
+      speed = baseSpeed * (1f + (currentLevel - 1) * speedPerLevel);
+      range = baseRange; // 고정(원하면 증가)
       fireRate = baseFireRate; // 고정(원하면 감소)
 
       // 주먹 개수 증가: Lv1=1, Lv3=2, Lv5=3~4 (원하면 조절)
@@ -88,6 +88,7 @@ namespace NeoSurvive.Weapon
     private void Fire()
     {
       if (fistProjectilePrefab == null) return;
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBoosterKnuckleFire();
 
       Vector3 origin = firePoint ? firePoint.position : transform.position;
 

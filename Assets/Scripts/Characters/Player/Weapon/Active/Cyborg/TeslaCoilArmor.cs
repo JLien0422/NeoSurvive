@@ -112,6 +112,7 @@ namespace NeoSurvive.Weapon
     private void AuraTickDamage()
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, auraRadius, enemyMask);
+      bool didHit = false;
       foreach (var col in hits)
       {
         if (col == null) continue;
@@ -128,8 +129,11 @@ namespace NeoSurvive.Weapon
         {
           var src = GetComponentInParent<WeaponSource>();
           character.TakeDamage(auraDamage, src != null ? src.weaponData : null);
+          didHit = true;
         }
       }
+
+      if (didHit && InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayTeslaCoilArmorFire();
 
       if (debugDraw)
         Debug.DrawRay(transform.position, Vector3.right * 0.01f, Color.yellow, 0.1f);
@@ -176,6 +180,8 @@ namespace NeoSurvive.Weapon
 
         Character character = col.GetComponentInParent<Character>();
         if (character == null) continue;
+
+        if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayTeslaCoilArmorFire();
 
         float dmg = auraDamage * lightningDamageFactor;
         var src2 = GetComponentInParent<WeaponSource>();

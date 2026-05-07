@@ -1,5 +1,6 @@
 using UnityEngine;
 using NeoSurvive.Core;
+using NeoSurvive.UI;
 
 namespace NeoSurvive.Weapon
 {
@@ -20,6 +21,13 @@ namespace NeoSurvive.Weapon
     [Header("Target / Hit")]
     public LayerMask hitMask;         // Enemy 레이어
     public string enemyTag = "Enemy";
+
+    [Header("Sweep VFX (Sprite)")]
+    public GameObject sweepPrefab;                    // 기본 스프라이트 휩쓸기 이펙트 프리팹 (오른쪽이 기준)
+    public GameObject sweepPrefabEnhanced;            // Lv5 시 교체되는 강화 이펙트 프리팹
+    public float sweepDuration = 0.25f;               // 프리팹 유지 시간
+    public float sweepSpawnOffset = 0.6f;             // 생성 위치 오프셋(앞쪽)
+    public float sweepScale = 1.0f;                   // 프리팹 기본 스케일
 
     [Header("Master (Lv5) - Rift")]
     public bool enableMaster = true;
@@ -81,14 +89,15 @@ namespace NeoSurvive.Weapon
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage   = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      range    = baseRange  * (1f + (currentLevel - 1) * rangePerLevel);
+      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
+      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       fireRate = baseFireRate * Mathf.Pow(fireRateMulPerLevel, (currentLevel - 1));
     }
 
     private void Attack()
     {
       Debug.Log("[LaserSword] Attack!");
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayLaserSwordFire();
 
       // Player 방향 기준
       Transform target = FindClosestEnemy();
@@ -101,6 +110,9 @@ namespace NeoSurvive.Weapon
 
       // 디버그: 실제 공격 방향
       Debug.DrawRay(transform.position, forward * range, Color.red, 0.2f);
+
+      // Sprite 기반 훑기 이펙트 생성
+      SpawnSweepEffect(forward);
 
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range, hitMask);
       Debug.Log($"[LaserSword] hits={hits.Length}");
@@ -137,6 +149,19 @@ namespace NeoSurvive.Weapon
       {
         SpawnRift(forward);
       }
+    }
+
+    private void SpawnSweepEffect(Vector3 forward)
+    {
+      GameObject prefab = (currentLevel >= 5 && sweepPrefabEnhanced != null) ? sweepPrefabEnhanced : sweepPrefab;
+      if (prefab == null) return;
+
+      Vector3 spawnPos = transform.position + forward * sweepSpawnOffset;
+      float angleDeg = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+      GameObject go = Instantiate(prefab, spawnPos, Quaternion.Euler(0f, 0f, angleDeg));
+      go.transform.localScale = Vector3.one * sweepScale;
+
+      Destroy(go, sweepDuration);
     }
 
     private void SpawnRift(Vector3 forward)

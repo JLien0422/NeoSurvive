@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -17.80886, y: 1.8032496, z: -0.405843}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anim: {fileID: -7142267771287562896}
   attackClip: {fileID: 7400000, guid: 35807715569513342ba7148ca67bef88, type: 2}
-  projectilePrefab: {fileID: 3262128633114905044, guid: fc3eb1a5c7c034c4fb89f55ca906f6db, type: 3}
+  projectilePrefab: {fileID: 3262128633114905044, guid: 800706b81e6c7f142b21f93bfba7c6f7, type: 3}
   followDistance: 2
   followSpeed: 1
   player: {fileID: 0}
@@ -109,7 +109,7 @@ MonoBehaviour:
   attackSpeed: 5
   fireElapsed: 0
   target: {fileID: 0}
-  fireOffset: {x: 0.5, y: -0.1}
+  fireOffset: {x: 0.1, y: -0.25}
   damage: 5
 --- !u!95 &-7142267771287562896
 Animator:

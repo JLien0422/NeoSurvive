@@ -47,6 +47,7 @@ namespace NeoSurvive.Weapon
 
     private int currentLevel = 1;
     private int currentOrbCount = 1;
+    private float currentAngle = 0f;
 
     private void Start()
     {
@@ -59,10 +60,8 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
-      // 계속 회전
-      transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
-
-      // 회전 중에도 방패 위치 갱신(부모 회전 + local pos 고정이면 사실 필요없지만 안전)
+      // 부모의 방향이나 스케일 반전에 영향받지 않게 절대 각도 사용
+      currentAngle += rotationSpeed * Time.deltaTime;
       UpdateOrbPositions();
     }
 
@@ -94,6 +93,7 @@ namespace NeoSurvive.Weapon
         Debug.LogError("[EnergyShield] shieldOrbPrefab is NULL! ShieldOrb 프리팹을 넣어줘야 함");
         return;
       }
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayEnergyShieldFire();
 
       // 기존 오브 제거
       for (int i = orbs.Count - 1; i >= 0; i--)
@@ -137,10 +137,12 @@ namespace NeoSurvive.Weapon
       {
         if (orbs[i] == null) continue;
 
-        float ang = step * i;
-        Vector3 localPos = Quaternion.Euler(0, 0, ang) * (Vector3.right * radius);
-        orbs[i].transform.localPosition = localPos;
-        orbs[i].transform.localRotation = Quaternion.identity; // 오브 자체는 정면 유지(원하면 제거)
+        float ang = (currentAngle + step * i) * Mathf.Deg2Rad;
+        Vector3 offset = new Vector3(Mathf.Cos(ang), Mathf.Sin(ang), 0f) * radius;
+
+        // 로컬 포지션 대신 글로벌 포지션으로 강제 할당하여 캐릭터 좌우반전 스케일에 영향받지 않게 함
+        orbs[i].transform.position = transform.position + offset;
+        orbs[i].transform.rotation = Quaternion.identity; // 오브 자체는 정면 유지
       }
     }
 

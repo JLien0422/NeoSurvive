@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13bfb4b79e9db634d8f7c9efb0a1b49a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  empFieldPrefab: {fileID: 5146888078649358456, guid: b0cfaa564d63d794ab6ff84834ea43d6, type: 3}
+  empFieldPrefab: {fileID: 4982319945249317203, guid: 8caf8e03dc77ee147bf72f221df685bc, type: 3}
   damage: 5
   areaSize: 2
   duration: 4

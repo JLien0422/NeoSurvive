@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ebb58e0d049d143b315007cf970776, type: 3}
+  m_Name: 03_EnergyShield
+  m_EditorClassIdentifier: 
+  weaponId: 3
+  weaponName: "\uC5D0\uB108\uC9C0\uC274\uB4DC"
+  weaponIcon: {fileID: 21300000, guid: 530ce446e157ec04d9eb15bcd4f04a3e, type: 3}
+  description: "\uD50C\uB808\uC774\uC5B4 \uC8FC\uC704 \uB3CC\uBA74\uC11C \uD50C\uB808\uC774\uC5B4
+    \uBCF4\uD638"
+  weaponPrefab: {fileID: 5268448167553778572, guid: 43fa0e3e2b7f6b840a20a31ab6abbf6f, type: 3}
+  level: 1
+  isIndependent: 0

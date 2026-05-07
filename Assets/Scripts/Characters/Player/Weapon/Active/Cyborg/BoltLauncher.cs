@@ -97,6 +97,7 @@ namespace NeoSurvive.Weapon
     private void FireBurst()
     {
       if (boltProjectilePrefab == null) return;
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBoltLauncherFire();
 
       Vector3 origin = firePoint ? firePoint.position : transform.position;
 

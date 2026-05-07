@@ -82,6 +82,8 @@ namespace NeoSurvive.Weapon
       // 랜덤 초기 방향
       moveDir = Random.insideUnitCircle.normalized;
       if (moveDir.sqrMagnitude < 0.01f) moveDir = Vector2.right;
+
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayChainSawFire();
     }
 
     private void Update()
@@ -237,9 +239,9 @@ namespace NeoSurvive.Weapon
       Vector3 c = player.position;
 
       Vector3 a = c + new Vector3(-halfWidth, -halfHeight, 0);
-      Vector3 b = c + new Vector3( halfWidth, -halfHeight, 0);
-      Vector3 d = c + new Vector3(-halfWidth,  halfHeight, 0);
-      Vector3 e = c + new Vector3( halfWidth,  halfHeight, 0);
+      Vector3 b = c + new Vector3(halfWidth, -halfHeight, 0);
+      Vector3 d = c + new Vector3(-halfWidth, halfHeight, 0);
+      Vector3 e = c + new Vector3(halfWidth, halfHeight, 0);
 
       Debug.DrawLine(a, b, Color.yellow);
       Debug.DrawLine(b, e, Color.yellow);

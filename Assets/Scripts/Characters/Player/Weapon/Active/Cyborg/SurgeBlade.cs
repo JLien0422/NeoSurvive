@@ -27,6 +27,13 @@ namespace NeoSurvive.Weapon
     public int baseMaxTargets = 1;       // 기본 타격 인원
     public int maxTargetsAtLv5 = 3;      // Lv5에서 최대 타격 인원(원하면 조절)
 
+    [Header("VFX")]
+    public GameObject surgePrefab;               // 기본 시전/휩쓸기 프리팹
+    public GameObject surgePrefabEnhanced;       // Lv5 강화 시 사용할 프리팹
+    public float surgeDuration = 0.35f;
+    public float surgeSpawnOffset = 0.6f;
+    public float surgeScale = 1.0f;
+
     [Header("Master (Lv5)")]
     public bool enableMaster = true;
     public float masterMultiplier = 2.0f;   // 강화 공격 시 damage/range/angle 배수
@@ -83,8 +90,8 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      range  = baseRange  * (1f + (currentLevel - 1) * rangePerLevel);
-      angle  = baseAngle; // 기본은 고정(강화 공격에서만 배수 적용)
+      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
+      angle = baseAngle; // 기본은 고정(강화 공격에서만 배수 적용)
 
       // 타격 인원 증가 (Lv1=1, Lv3=2, Lv5=3 느낌)
       if (currentLevel <= 1) currentMaxTargets = baseMaxTargets;
@@ -95,6 +102,7 @@ namespace NeoSurvive.Weapon
     private void Attack()
     {
       attackCount++;
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlaySurgeBladeFire();
 
       // 기본 공격 파라미터
       float useRange = range;
@@ -157,6 +165,22 @@ namespace NeoSurvive.Weapon
 
       // ✅ 디버그(원하면 주석 처리)
       // Debug.Log($"[SurgeBlade] Attack#{attackCount} empowered={empowered} damaged={damaged} useDmg={useDamage} useRange={useRange}");
+
+      // VFX 생성
+      SpawnSurgeEffect(forward, empowered);
+    }
+
+    private void SpawnSurgeEffect(Vector3 forward, bool empowered)
+    {
+      GameObject prefab = (empowered && surgePrefabEnhanced != null) ? surgePrefabEnhanced : surgePrefab;
+      if (prefab == null) return;
+
+      Vector3 spawnPos = transform.position + forward * surgeSpawnOffset;
+      float angleDeg = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+      GameObject go = Instantiate(prefab, spawnPos, Quaternion.Euler(0f, 0f, angleDeg));
+      go.transform.localScale = Vector3.one * surgeScale;
+
+      Destroy(go, surgeDuration);
     }
 
     private Transform FindClosestEnemy(float searchRange)

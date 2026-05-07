@@ -2386,8 +2386,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1046040507}
-  - component: {fileID: 1046040506}
   - component: {fileID: 1046040505}
+  - component: {fileID: 1046040506}
+  - component: {fileID: 1046040508}
+  - component: {fileID: 1046040509}
+  - component: {fileID: 1046040510}
   m_Layer: 0
   m_Name: Sound Manager
   m_TagString: Untagged
@@ -2407,7 +2410,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.275
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2511,87 +2514,87 @@ MonoBehaviour:
     - {fileID: 8300000, guid: d27bc8e082a7b0f47b58635084029c2a, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 1
     clips:
     - {fileID: 8300000, guid: 65c5b5f73198e5b458a670af89804913, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0.5
-    pitchMax: 0.5
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 2
     clips:
     - {fileID: 8300000, guid: c6a287a685ae87d46a1b52dd92580bb8, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 3
     clips:
     - {fileID: 8300000, guid: f7c92f382cdb0c54383c203300cd9fbd, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 5
     clips:
     - {fileID: 8300000, guid: 65c5b5f73198e5b458a670af89804913, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 6
     clips: []
     volume: 0
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 7
     clips: []
     volume: 0
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 8
     clips:
     - {fileID: 8300000, guid: 99c0c89853e7d234d80abe71121674a8, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 9
     clips:
     - {fileID: 8300000, guid: 623ad2ff21901c24091e29946792d5a9, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 10
     clips: []
     volume: 0
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 19
     clips: []
     volume: 0
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 22
     clips: []
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
   - eventType: 21
     clips:
     - {fileID: 8300000, guid: a899474aca5b8464991cebd7b2cc379f, type: 3}
     volume: 1
     randomPitch: 0
-    pitchMin: 0
-    pitchMax: 0
+    pitchMin: 1
+    pitchMax: 1
 --- !u!4 &1046040507
 Transform:
   m_ObjectHideFlags: 0
@@ -2607,6 +2610,216 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1046040508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046040504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe4d8b0b2b988d340b3b9eb09c12f255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxSource: {fileID: 1046040505}
+  masterSfxVolume: 1
+  enableDebugLogs: 1
+  sfxSlots:
+  - eventType: 4
+    clips:
+    - {fileID: 8300000, guid: 4fe76aa546f6ed04a93bb7b15b187b98, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 5
+    clips:
+    - {fileID: 8300000, guid: c5e888c706b380e4f9d5af665d917448, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 6
+    clips:
+    - {fileID: 8300000, guid: d11ddeba602abfc4c80e11eb1bbce81b, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 7
+    clips:
+    - {fileID: 8300000, guid: c91cd56fe6ced514fa699df1190dcd08, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 9
+    clips:
+    - {fileID: 8300000, guid: 7f49ab30a30195c4cb92fe791f7b45f0, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 8
+    clips:
+    - {fileID: 8300000, guid: 57041d0cf5e6a884ab4f2ee5162208af, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 10
+    clips:
+    - {fileID: 8300000, guid: 19424d5021a50e748975566c8df828c9, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 11
+    clips:
+    - {fileID: 8300000, guid: cebdaa04fd052b644ac9ce48393964e9, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 12
+    clips:
+    - {fileID: 8300000, guid: b1d863a40a1baba4d86a00ecf03b77cb, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 13
+    clips: []
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 14
+    clips: []
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 15
+    clips: []
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 16
+    clips: []
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 17
+    clips:
+    - {fileID: 8300000, guid: 54475afc20099a64f86e6a83faa5cbde, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 18
+    clips:
+    - {fileID: 8300000, guid: dd85ea14fa89a76408632efbf978a2c8, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 19
+    clips:
+    - {fileID: 8300000, guid: 9ebeb3b6399502f4fad1a1a003042c1e, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+  - eventType: 20
+    clips:
+    - {fileID: 8300000, guid: 4acece5b878a7df4da6c16a9cfcedaa1, type: 3}
+    volume: 1
+    randomPitch: 0
+    pitchMin: 1
+    pitchMax: 1
+--- !u!114 &1046040509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046040504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ea0f5a81b0d5874595cf48e0df638b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgmClips: []
+  sfxSource: {fileID: 1046040505}
+  masterSfxVolume: 1
+  eventDefinitions:
+  - {fileID: 11400000, guid: bbafc91f695b32243b015c0100534c01, type: 2}
+  autoLoadEventDefinitionsFromAssets: 1
+  eventDefinitionsAssetsPath: Assets/Data/Sounds/Ingame
+  weaponSoundProfiles: []
+  autoLoadWeaponProfilesFromAssets: 1
+  weaponProfilesAssetsPath: Assets/Data/Sounds/Ingame
+--- !u!114 &1046040510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046040504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f3a4a66d1ea4ff4a90ca2b3ab5f8d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxSource: {fileID: 1046040505}
+  masterSfxVolume: 1
+  enableDebugLogs: 0
+  sfxSlots:
+  - eventType: 0
+    clips:
+    - {fileID: 8300000, guid: 08848fd838618d041998471ac424b2f4, type: 3}
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 1
+    clips: []
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 2
+    clips:
+    - {fileID: 8300000, guid: 20e3fd1f049ad1549a3145bc0822af1a, type: 3}
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 3
+    clips:
+    - {fileID: 8300000, guid: 21823dc9e46a4fc42bc511d933a2b465, type: 3}
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 4
+    clips:
+    - {fileID: 8300000, guid: 335eea91367ee854aaa9420d46f7f705, type: 3}
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
+  - eventType: 5
+    clips:
+    - {fileID: 8300000, guid: d9ae98c7fd245e844ba7b0ca9c8b9d39, type: 3}
+    volume: 0
+    randomPitch: 0
+    pitchMin: 0
+    pitchMax: 0
 --- !u!1 &1078138764
 GameObject:
   m_ObjectHideFlags: 0

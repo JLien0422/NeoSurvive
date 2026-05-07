@@ -38,6 +38,12 @@ namespace NeoSurvive.Weapon
     public float blackholePullRadius = 2.5f;
     public float blackholePullForce = 10f;
 
+    [Header("VFX")]
+    public GameObject strikePrefab;      // 망치 내려치는 이펙트 프리팹
+    public float strikeDuration = 0.4f;
+    public float strikeOffset = 1.5f;
+    public float strikeScale = 1.0f;
+
     [Header("Debug")]
     public bool debugLog = false;
     public bool debugDraw = true;
@@ -96,7 +102,7 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      range  = baseRange  * (1f + (currentLevel - 1) * rangePerLevel);
+      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       knockbackForce = baseKnockback * (1f + (currentLevel - 1) * knockbackPerLevel);
       fireRate = baseFireRate; // 원하면 레벨업 시 감소도 가능
     }
@@ -104,6 +110,7 @@ namespace NeoSurvive.Weapon
     private void Slam()
     {
       if (debugLog) Debug.Log("[GravityHammer] Slam!");
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayGravityHammerFire();
 
       // Player 방향 기준 (LaserSword와 동일)
       Transform target = FindClosestEnemy();
@@ -159,6 +166,16 @@ namespace NeoSurvive.Weapon
       {
         Vector3 center = transform.position + forward * Mathf.Min(range, 2.2f);
         SpawnBlackhole(center);
+      }
+
+      // 망치 내려치는 이펙트 생성
+      if (strikePrefab != null)
+      {
+        Vector3 spawnPos = transform.position + forward * strikeOffset;
+        float angleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+        GameObject vfx = Instantiate(strikePrefab, spawnPos, Quaternion.Euler(0, 0, angleZ));
+        vfx.transform.localScale = Vector3.one * strikeScale;
+        Destroy(vfx, strikeDuration);
       }
     }
 

@@ -83,6 +83,7 @@ namespace NeoSurvive.Weapon
     private void EmitBreath()
     {
       if (breathAreaPrefab == null) return;
+      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBlastBreathFire();
 
       // 1️⃣ 시작 위치
       Vector3 origin = firePoint ? firePoint.position : transform.position;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NeoSurvive.Weapon;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class WeaponChoiceController : MonoBehaviour
     [Header("References")]
     [SerializeField] private WeaponChoiceUI weaponChoiceUI; // 무기 선택 UI 호출만 담당
 
+    private const int MAX_WEAPON_COUNT = 6;
     private const int MAX_WEAPON_LEVEL = 5;
 
     private void Awake()
@@ -40,10 +42,10 @@ public class WeaponChoiceController : MonoBehaviour
             return;
         }
 
-        WeaponBase[] choices = Pick3RandomWeapons(weaponManager, weaponManager.allWeaponDatas);
-        if (choices == null)
+        WeaponBase[] choices = PickRandomWeaponsForChest(weaponManager);
+        if (choices == null || choices.Length == 0)
         {
-            Debug.LogWarning("[WeaponChoiceController] selectable weapon count is less than 3.");
+            Debug.LogWarning("[WeaponChoiceController] selectable weapon count is zero.");
             return;
         }
 
@@ -88,9 +90,9 @@ public class WeaponChoiceController : MonoBehaviour
     }
 
     /// <summary>
-    /// 마스터 무기를 제외하고 랜덤 3개를 고르는 기능만 담당
+    /// 상자에서 보여줄 무기 후보를 만든 뒤 최대 3개를 랜덤으로 반환한다.
     /// </summary>
-    private WeaponBase[] Pick3RandomWeapons(WeaponManager weaponManager, List<WeaponBase> allWeapons)
+    private WeaponBase[] PickRandomWeaponsForChest(WeaponManager weaponManager)
     {
         if (weaponManager == null)
         {
@@ -98,32 +100,10 @@ public class WeaponChoiceController : MonoBehaviour
             return null;
         }
 
-        if (allWeapons == null)
-        {
-            Debug.LogError("[WeaponChoiceController] allWeapons is null.");
-            return null;
-        }
+        List<WeaponBase> selectableWeapons = BuildSelectableWeapons(weaponManager);
 
-        List<WeaponBase> selectableWeapons = new List<WeaponBase>();
-
-        foreach (WeaponBase weapon in allWeapons)
-        {
-            if (weapon == null)
-            {
-                Debug.LogError("[WeaponChoiceController] allWeapons contains null weapon.");
-                continue;
-            }
-
-            if (IsWeaponSelectableForChest(weaponManager, weapon))
-            {
-                selectableWeapons.Add(weapon);
-            }
-        }
-
-        if (selectableWeapons.Count < 3)
-        {
-            return null;
-        }
+        if (selectableWeapons.Count == 0)
+            return new WeaponBase[0];
 
         for (int i = 0; i < selectableWeapons.Count; i++)
         {
@@ -134,12 +114,80 @@ public class WeaponChoiceController : MonoBehaviour
             selectableWeapons[j] = temp;
         }
 
-        return new WeaponBase[]
+        int count = Mathf.Min(3, selectableWeapons.Count);
+        return selectableWeapons.Take(count).ToArray();
+    }
+
+    /// <summary>
+    /// ★ 수정:
+    /// 무기 6개 미만이면 전체 무기 목록에서 후보를 만든다.
+    /// 무기 6개 이상이면 현재 보유 중인 6개 무기에서만 후보를 만든다.
+    ///
+    /// ★ 추가:
+    /// WeaponChoice에 같은 무기가 2개 이상 나오지 않도록
+    /// weaponName 기준으로 중복 후보를 제거한다.
+    /// </summary>
+    private List<WeaponBase> BuildSelectableWeapons(WeaponManager weaponManager)
+    {
+        List<WeaponBase> selectableWeapons = new List<WeaponBase>();
+        HashSet<string> addedWeaponNames = new HashSet<string>();
+
+        if (weaponManager.allWeaponDatas == null)
         {
-            selectableWeapons[0],
-            selectableWeapons[1],
-            selectableWeapons[2]
-        };
+            Debug.LogError("[WeaponChoiceController] allWeaponDatas is null.");
+            return selectableWeapons;
+        }
+
+        if (weaponManager.activeWeapons == null)
+        {
+            Debug.LogError("[WeaponChoiceController] activeWeapons is null.");
+            return selectableWeapons;
+        }
+
+        List<WeaponBase> sourceWeapons;
+
+        // ★ 수정:
+        // 무기 6개 이상부터는 새 무기를 더 이상 후보에 넣지 않고,
+        // 현재 가진 6개 무기 중 Lv.5 미만 무기만 후보로 사용한다.
+        if (weaponManager.activeWeapons.Count >= MAX_WEAPON_COUNT)
+        {
+            sourceWeapons = weaponManager.activeWeapons;
+        }
+        // ★ 수정:
+        // 무기 6개 미만일 때는 전체 무기 목록에서 후보를 만든다.
+        // 이 상태에서는 새 무기도 나오고, 이미 가진 무기도 레벨업 후보로 나올 수 있다.
+        else
+        {
+            sourceWeapons = weaponManager.allWeaponDatas;
+        }
+
+        foreach (WeaponBase weapon in sourceWeapons)
+        {
+            if (weapon == null)
+            {
+                Debug.LogError("[WeaponChoiceController] sourceWeapons contains null weapon.");
+                continue;
+            }
+
+            string weaponName = GetWeaponDisplayName(weapon);
+
+            if (string.IsNullOrWhiteSpace(weaponName))
+                continue;
+
+            // ★ 추가:
+            // 같은 이름의 무기가 이미 후보에 들어갔다면 다시 넣지 않는다.
+            // 무기가 6개가 되기 전까지 WeaponChoice에 같은 무기가 2개 이상 뜨는 문제를 막는다.
+            if (addedWeaponNames.Contains(weaponName))
+                continue;
+
+            if (IsWeaponSelectableForChest(weaponManager, weapon))
+            {
+                selectableWeapons.Add(weapon);
+                addedWeaponNames.Add(weaponName);
+            }
+        }
+
+        return selectableWeapons;
     }
 
     /// <summary>

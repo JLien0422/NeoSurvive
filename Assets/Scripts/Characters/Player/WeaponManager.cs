@@ -132,6 +132,16 @@ namespace NeoSurvive.Weapon
         return;
       }
 
+      // 무기 최대 보유 개수 제한
+      const int MAX_WEAPON_COUNT = 6;
+
+      if (activeWeapons.Count >= MAX_WEAPON_COUNT)
+      {
+          Debug.Log($"[WeaponManager] 무기 최대 보유 개수 도달 | {MAX_WEAPON_COUNT}개");
+          OnWeaponChanged?.Invoke(activeWeapons);
+          return;
+      }
+
       // 새로운 무기 추가
       activeWeapons.Add(weaponData);
       // 초기 레벨 설정 (혹시 모르니)

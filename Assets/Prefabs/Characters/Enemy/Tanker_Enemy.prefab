@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2894931586485687331}
   - component: {fileID: 3462322718290200017}
   - component: {fileID: -7563650197173675615}
+  - component: {fileID: 1678716262089402634}
   m_Layer: 7
   m_Name: Tanker_Enemy
   m_TagString: Enemy
@@ -58,7 +59,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: d1e8927ef498cec478fd0fb6877a41f1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -79,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -1056523333, guid: b0d5a923a3e7f5249bfa401697cc156b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -133,6 +134,7 @@ MonoBehaviour:
   moveSpeed: 3
   attackDamage: 1
   attackRange: 1.5
+  contactDamageTickInterval: 0.2
   showGizmos: 1
   mechanismType: 4
 --- !u!58 &-8767575411453145148
@@ -233,3 +235,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1678716262089402634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7370841270425998504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd11cd682360e34e8aae2d10c618a46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08
+  spriteRenderers: []

@@ -40,20 +40,13 @@ public class EnemySpawner : MonoBehaviour
 
         StopAllCoroutines();
         StartCoroutine(SpawnEnemies());
-        Debug.Log("[EnemySpawner] 플레이어가 완전히 스폰된 것을 감지, 스폰 루틴 시작.");
+        Debug.Log("[EnemySpawner] 플레이어 스폰 감지 → 스폰 루틴 시작");
     }
 
     private void Start()
     {
-        Camera cam = Camera.main;
-        if (cam != null)
-        {
-            float worldWidth = cam.orthographicSize * cam.aspect;
-            minSpawnRadius = worldWidth * 1.2f;
-            maxSpawnRadius = worldWidth * 1.4f;
-        }
-
-        SetPhaseWeights(1); // ★ Phase1: Basic만
+        // ★ 변경: CSV 기반으로 Phase 초기화
+        SetPhase(1);
     }
 
     private IEnumerator SpawnEnemies()
@@ -92,38 +85,48 @@ public class EnemySpawner : MonoBehaviour
 
         if (r < basicWeight) return enemyPrefabs[0];
         r -= basicWeight;
+
         if (r < shooterWeight) return enemyPrefabs[1];
         r -= shooterWeight;
+
         if (r < rusherWeight) return enemyPrefabs[2];
         r -= rusherWeight;
+
         if (r < bomberWeight) return enemyPrefabs[3];
+
         return enemyPrefabs[4];
     }
 
-    // 🔑 Phase별 가중치 설정
-    public void SetPhaseWeights(int phase)
+    // ★ 변경: CSV 기반 Phase 설정
+    public void SetPhase(int phase)
     {
-        switch (phase)
+        if (EnemySpawnLoader.DB == null)
         {
-            case 1: SetWeights(100, 0, 0, 0, 0); break;
-            case 2: SetWeights(60, 40, 0, 0, 0); break;
-            case 3: SetWeights(50, 30, 20, 0, 0); break;
-            case 4: SetWeights(40, 30, 15, 15, 0); break;
-            case 5: SetWeights(35, 25, 15, 15, 10); break;
+            Debug.LogWarning("[EnemySpawner] EnemySpawnLoader.DB가 null입니다.");
+            return;
         }
-    }
 
-    private void SetWeights(float b, float s, float r, float bo, float t)
-    {
-        basicWeight = b;
-        shooterWeight = s;
-        rusherWeight = r;
-        bomberWeight = bo;
-        tankerWeight = t;
+        if (!EnemySpawnLoader.DB.TryGetRow(phase, out var row))
+        {
+            Debug.LogWarning($"[EnemySpawner] CSV에 phase {phase} 없음");
+            return;
+        }
+
+        spawnInterval = row.spawnInterval;
+        minSpawnRadius = row.minSpawnRadius;
+        maxSpawnRadius = row.maxSpawnRadius;
+
+        basicWeight = row.basicWeight;
+        shooterWeight = row.shooterWeight;
+        rusherWeight = row.rusherWeight;
+        bomberWeight = row.bomberWeight;
+        tankerWeight = row.tankerWeight;
+
+        Debug.Log($"[EnemySpawner] Phase {phase} 적용 완료 | interval={spawnInterval}");
     }
 
     /// <summary>
-    /// 보스 등장 시 호출 - 적 스폰 코루틴을 완전히 중단합니다.
+    /// 보스 등장 시 호출 - 적 스폰 코루틴 중단
     /// </summary>
     public void StopSpawning()
     {

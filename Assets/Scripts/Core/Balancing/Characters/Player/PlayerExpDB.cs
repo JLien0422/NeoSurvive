@@ -18,7 +18,6 @@ namespace NeoSurvive.Balancing.Player
         {
             public int level;
             public int requiredExp;
-            public int totalExp;
         }
 
         private readonly Dictionary<int, Row> rows = new Dictionary<int, Row>();
@@ -41,10 +40,6 @@ namespace NeoSurvive.Balancing.Player
             return rows.TryGetValue(level, out var row) ? row.requiredExp : fallback;
         }
 
-        public int GetTotalExp(int level, int fallback = 0)
-        {
-            return rows.TryGetValue(level, out var row) ? row.totalExp : fallback;
-        }
 
         public int GetMaxLevel()
         {

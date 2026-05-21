@@ -15,13 +15,7 @@ public class TankerMechanism : EnemyMechanismBase
     [Tooltip("체력 배율 (기본 Enemy보다 높음)")]
     private float healthMultiplier = 2f;
 
-    [SerializeField]
-    [Tooltip("공격 범위 배율 (기본보다 넓음) - EnemyController 공격 판정 시 적용 예정")]
-    private float attackRangeMultiplier = 1.5f;
-
     private float baseMoveSpeed;
-    private float baseHealth;
-    private float baseAttackRange;
 
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
@@ -31,28 +25,17 @@ public class TankerMechanism : EnemyMechanismBase
         if (controller != null)
         {
             baseMoveSpeed = controller.GetMoveSpeed();
-            // 탱커 공격 범위는 기본 범위에 배율을 적용하여 계산
-            baseAttackRange = controller.GetAttackRange() * attackRangeMultiplier;
         }
         else
         {
             baseMoveSpeed = 3f;
-            baseAttackRange = 1.5f * attackRangeMultiplier;
         }
 
         // 체력 증가
         if (enemy != null && enemy.CurrentHP != null)
         {
-            baseHealth = enemy.CurrentHP.GetValue();
             enemy.CurrentHP.AddPercentModifier(healthMultiplier - 1f); // 예: 2배면 +100%
             enemy.TakeDamage(0f); // 체력 갱신
-        }
-
-        // 공격 범위 증가
-        if (controller != null)
-        {
-            // EnemyController의 attackRange를 직접 수정할 수 없으므로
-            // 메커니즘에서 공격 범위를 체크할 때 배율을 적용해야 함
         }
     }
 
@@ -69,8 +52,7 @@ public class TankerMechanism : EnemyMechanismBase
 
     public override void UpdateAttack()
     {
-        // 기본 근접 공격은 EnemyController에서 처리
-        // 탱커는 공격 범위가 넓음
+        // 접촉 틱 데미지는 EnemyController에서 처리합니다.
     }
 
     private void OnDrawGizmosSelected()

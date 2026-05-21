@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -1220392225880655557}
   - component: {fileID: 4229467250103036213}
   - component: {fileID: -1135589739777134316}
+  - component: {fileID: 2591787388124978219}
   m_Layer: 7
   m_Name: Basic _Enemy
   m_TagString: Enemy
@@ -57,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: d1e8927ef498cec478fd0fb6877a41f1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -1142938697, guid: 76b8de283c1af5c46b69b896ad69c2ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -132,6 +133,7 @@ MonoBehaviour:
   moveSpeed: 3
   attackDamage: 1
   attackRange: 1.5
+  contactDamageTickInterval: 0.2
   showGizmos: 1
   mechanismType: 0
 --- !u!58 &-1220392225880655557
@@ -217,3 +219,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2591787388124978219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7400146637964007656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd11cd682360e34e8aae2d10c618a46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08
+  spriteRenderers: []

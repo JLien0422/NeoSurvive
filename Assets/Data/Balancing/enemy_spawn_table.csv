@@ -1,0 +1,6 @@
+﻿phase,spawninterval,minspawnradius,maxspawnradius,basicweight,shooterweight,rusherweight,bomberweight,tankerweight
+1,2,5,10,100,0,0,0,0
+2,1.8,5,10,60,40,0,0,0
+3,1.6,5,10,50,30,20,0,0
+4,1.4,5,10,40,30,15,15,0
+5,1.2,5,10,35,25,15,15,10

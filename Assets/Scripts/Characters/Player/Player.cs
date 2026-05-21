@@ -16,6 +16,9 @@ public enum PlayerClassType
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
 {
+  /// <summary>플레이어 사망 시 발생 (GameOverUI 등에서 구독). Destroy 직전에 호출됩니다.</summary>
+  public static event System.Action OnPlayerDied;
+
   #region Variables
 
   #region Stats
@@ -320,7 +323,7 @@ public class Player : Character
       GameManager.Instance.OnPlayerDeath();
     }
 
-    // TODO -> 죽음 후 UI 처리, 리스폰 처리 등 추가
+    OnPlayerDied?.Invoke();
 
     // 싱글플레이인 경우 요청에 따라 게임 오브젝트를 파괴합니다.
     Destroy(gameObject);

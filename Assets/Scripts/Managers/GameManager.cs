@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using NeoSurvive.Characters;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // GameManager 클래스는 게임의 전반적인 흐름과 상태를 관리합니다.
 public class GameManager : MonoBehaviour
@@ -11,6 +14,9 @@ public class GameManager : MonoBehaviour
   // 킬 카운트 변경 알림 이벤트
   public static event System.Action<int> OnKillCountChanged;
   public static event System.Action onPlayerSpawned;
+  public static event System.Action<int> OnRunGoldChanged;
+  public static event System.Action<int> OnTotalGoldChanged;
+  // 호환용: 기존 구독 코드가 있을 수 있어 유지
   public static event System.Action onGoldChanged;
 
   [Header("적 스폰 설정")]
@@ -21,6 +27,41 @@ public class GameManager : MonoBehaviour
   [SerializeField] private int totalGold = 0;
   public int TotalGold => totalGold;
   public int CurrentRunGold => currentRunGold;
+
+#if UNITY_EDITOR
+  [Header("디버그 골드")]
+  [SerializeField] private bool enableDebugGoldCommitKey = true;
+  [SerializeField] private KeyCode debugGoldCommitKey = KeyCode.P;
+
+  [InitializeOnLoadMethod]
+  private static void RegisterEditorPlayModeCallback()
+  {
+    EditorApplication.playModeStateChanged -= HandleEditorPlayModeStateChanged;
+    EditorApplication.playModeStateChanged += HandleEditorPlayModeStateChanged;
+  }
+
+  private static void HandleEditorPlayModeStateChanged(PlayModeStateChange state)
+  {
+    if (state == PlayModeStateChange.EnteredEditMode)
+    {
+      EditorApplication.delayCall += RefreshEditorInspectorGoldFromSave;
+    }
+  }
+
+  private static void RefreshEditorInspectorGoldFromSave()
+  {
+    int savedTotalGold = ES3.Load<int>(GOLD_SAVE_KEY, 0);
+
+    foreach (GameManager manager in Resources.FindObjectsOfTypeAll<GameManager>())
+    {
+      if (manager == null || !manager.gameObject.scene.IsValid()) continue;
+
+      manager.currentRunGold = 0;
+      manager.totalGold = savedTotalGold;
+      EditorUtility.SetDirty(manager);
+    }
+  }
+#endif
 
   private Transform playerTransform;
   private const string GOLD_SAVE_KEY = "TotalGold";
@@ -77,6 +118,18 @@ public class GameManager : MonoBehaviour
     }
   }
 
+  private void Update()
+  {
+#if UNITY_EDITOR
+    if (enableDebugGoldCommitKey && Input.GetKeyDown(debugGoldCommitKey))
+    {
+      int committedGold = currentRunGold;
+      CommitRunGoldToTotal();
+      Debug.Log($"[GameManager] Debug gold commit key pressed. committed={committedGold}, totalGold={totalGold}");
+    }
+#endif
+  }
+
   private void ApplySavedCharacterSelection()
   {
     var savedClass = PlayerClassSelection.Load();
@@ -124,15 +177,38 @@ public class GameManager : MonoBehaviour
   public void AddGold(int amount)
   {
     currentRunGold += amount;
+    OnRunGoldChanged?.Invoke(currentRunGold);
     onGoldChanged?.Invoke();
     Debug.Log($"골드 {amount} 획득! 이번 판 총 골드: {currentRunGold}");
   }
 
+  public bool TrySpendTotalGold(int amount)
+  {
+    if (amount <= 0) return true;
+    if (totalGold < amount) return false;
+
+    totalGold -= amount;
+    SaveTotalGold();
+    OnTotalGoldChanged?.Invoke(totalGold);
+    return true;
+  }
+
+  public void CommitRunGoldToTotal()
+  {
+    if (currentRunGold != 0)
+    {
+      totalGold += currentRunGold;
+      currentRunGold = 0;
+      SaveTotalGold();
+      OnTotalGoldChanged?.Invoke(totalGold);
+      OnRunGoldChanged?.Invoke(currentRunGold);
+      onGoldChanged?.Invoke();
+    }
+  }
+
   public void OnPlayerDeath()
   {
-    totalGold += currentRunGold;
-    SaveTotalGold();
-    currentRunGold = 0;
+    CommitRunGoldToTotal();
     Debug.Log($"이번 판에 얻은 골드가 총 골드에 합산되었습니다. 현재 총 골드: {totalGold}");
   }
 
@@ -145,6 +221,7 @@ public class GameManager : MonoBehaviour
   private void LoadTotalGold()
   {
     totalGold = ES3.Load<int>(GOLD_SAVE_KEY, 0);
+    OnTotalGoldChanged?.Invoke(totalGold);
     Debug.Log($"총 골드 {totalGold}를 불러왔습니다.");
   }
 

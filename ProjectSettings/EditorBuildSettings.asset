@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LobbyScene.unity
     guid: 7c83da08cafef2b4d94fb4ea25c9563a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainScene_Temp.unity
     guid: 49a729afbf17eb740b52151189c3cbf4
   - enabled: 0
@@ -23,7 +23,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Trick2Scene.unity
     guid: 7bd5d323f0356cc4f99fa89238211862
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/JmgScene.unity
     guid: 2e5d1f275394fe545921442482af065e
   m_configObjects: {}

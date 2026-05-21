@@ -71,9 +71,8 @@ public class UpgradeManager : MonoBehaviour
     // ===================================================
     public bool BuyHealthUpgrade()
     {
-        if (TotalGold >= UPGRADE_COST)
+        if (GameManager.Instance != null && GameManager.Instance.TrySpendTotalGold(UPGRADE_COST))
         {
-            GameManager.Instance.AddGold(-UPGRADE_COST); // 골드 차감
             healthUpgradeLevel++;
             SaveUpgrades(); // 업그레이드 레벨 저장
             Debug.Log($"체력 업그레이드 완료! 레벨: {healthUpgradeLevel}, 남은 골드: {TotalGold}");
@@ -92,9 +91,8 @@ public class UpgradeManager : MonoBehaviour
     // ===================================================
     public bool BuyDamageUpgrade()
     {
-        if (TotalGold >= UPGRADE_COST)
+        if (GameManager.Instance != null && GameManager.Instance.TrySpendTotalGold(UPGRADE_COST))
         {
-            GameManager.Instance.AddGold(-UPGRADE_COST); // 골드 차감
             damageUpgradeLevel++;
             SaveUpgrades();
             Debug.Log($"공격력 업그레이드 완료! 레벨: {damageUpgradeLevel}, 남은 골드: {TotalGold}");
@@ -113,9 +111,8 @@ public class UpgradeManager : MonoBehaviour
     // ===================================================
     public bool BuyMoveSpeedUpgrade()
     {
-        if (TotalGold >= UPGRADE_COST)
+        if (GameManager.Instance != null && GameManager.Instance.TrySpendTotalGold(UPGRADE_COST))
         {
-            GameManager.Instance.AddGold(-UPGRADE_COST); // 골드 차감
             moveSpeedUpgradeLevel++;
             SaveUpgrades();
             Debug.Log($"이동속도 업그레이드 완료! 레벨: {moveSpeedUpgradeLevel}, 남은 골드: {TotalGold}");

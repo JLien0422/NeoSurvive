@@ -35,9 +35,9 @@ public class WeaponChoiceUI : MonoBehaviour
             return;
         }
 
-        if (choices.Length != 3)
+        if (choices.Length == 0)
         {
-            Debug.LogError($"[WeaponChoiceUI] choices length must be 3. current={choices.Length}");
+            Debug.LogError("[WeaponChoiceUI] choices is empty.");
             return;
         }
 
@@ -74,6 +74,19 @@ public class WeaponChoiceUI : MonoBehaviour
                 Debug.LogError($"[WeaponChoiceUI] cards[{i}] is null.");
                 return;
             }
+
+            // ✅ [수정]
+            // choices가 1개 또는 2개만 들어온 경우,
+            // 남는 카드는 숨긴다.
+            if (i >= choices.Length)
+            {
+                cards[i].gameObject.SetActive(false);
+                continue;
+            }
+
+            // ✅ [수정]
+            // 실제 선택 가능한 무기가 있는 카드만 켠다.
+            cards[i].gameObject.SetActive(true);
 
             WeaponBase weapon = choices[i];
 
@@ -113,8 +126,17 @@ public class WeaponChoiceUI : MonoBehaviour
             return;
         }
 
+        // ✅ [수정]
+        // Hide()를 먼저 호출하면 Hide() 안에서 onPicked가 null이 되어
+        // WeaponManager.AddWeapon(picked)가 실행되지 않는다.
+        // 그래서 콜백을 먼저 임시 변수에 저장한다.
+        Action<WeaponBase> pickedCallback = onPicked;
+
         Hide();
-        onPicked?.Invoke(weapon);
+
+        // ✅ [수정]
+        // Hide() 이후에도 저장해둔 콜백으로 무기 추가를 실행한다.
+        pickedCallback?.Invoke(weapon);
     }
 
     private void ValidateReferences()

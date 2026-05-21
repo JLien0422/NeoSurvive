@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7581988356183243723}
   - component: {fileID: 746260024445848468}
   - component: {fileID: 4266301198412341988}
+  - component: {fileID: 4984764304893578264}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -119,7 +120,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: d1e8927ef498cec478fd0fb6877a41f1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -164,17 +165,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allWeaponDatas:
-  - {fileID: 11400000, guid: 83cda564dc3cb144e97ef3632235d1ae, type: 2}
-  - {fileID: 11400000, guid: 7df53b8ddf24c90458d071f800a76818, type: 2}
   - {fileID: 11400000, guid: 1b2d6e2e44120ff45963297b2be3cf21, type: 2}
   - {fileID: 11400000, guid: 3a3577ff07b4bba4a82c2b4e8f427141, type: 2}
   - {fileID: 11400000, guid: 081ceadba6aa89341aa0d58339fc348e, type: 2}
+  - {fileID: 11400000, guid: 83cda564dc3cb144e97ef3632235d1ae, type: 2}
+  - {fileID: 11400000, guid: 7df53b8ddf24c90458d071f800a76818, type: 2}
   - {fileID: 11400000, guid: 5e7e143c64071aa47b0f8ee8ae15ff3e, type: 2}
+  - {fileID: 11400000, guid: 1b20290fd2ee7494f9793f24a1ae5c71, type: 2}
+  - {fileID: 11400000, guid: 012b5323549caa4459ffd77f801453e8, type: 2}
   - {fileID: 11400000, guid: 0c434d1dc19903445b2bceeb47c85fe0, type: 2}
-  - {fileID: 11400000, guid: 3d9f7ccefdb12b14a859358bf99dedb5, type: 2}
+  - {fileID: 11400000, guid: 91a34023f9f2db34b97ebd488ef9dcfa, type: 2}
   activeWeapons: []
   cyborgAllWeaponDatas: []
-  hackerAllWeaponDatas: []
+  hackerAllWeaponDatas:
+  - {fileID: 11400000, guid: 1b2d6e2e44120ff45963297b2be3cf21, type: 2}
+  - {fileID: 11400000, guid: 3a3577ff07b4bba4a82c2b4e8f427141, type: 2}
+  - {fileID: 11400000, guid: 081ceadba6aa89341aa0d58339fc348e, type: 2}
+  - {fileID: 11400000, guid: 83cda564dc3cb144e97ef3632235d1ae, type: 2}
+  - {fileID: 11400000, guid: 7df53b8ddf24c90458d071f800a76818, type: 2}
+  - {fileID: 11400000, guid: 5e7e143c64071aa47b0f8ee8ae15ff3e, type: 2}
+  - {fileID: 11400000, guid: 1b20290fd2ee7494f9793f24a1ae5c71, type: 2}
+  - {fileID: 11400000, guid: 012b5323549caa4459ffd77f801453e8, type: 2}
+  - {fileID: 11400000, guid: 0c434d1dc19903445b2bceeb47c85fe0, type: 2}
+  - {fileID: 11400000, guid: 91a34023f9f2db34b97ebd488ef9dcfa, type: 2}
   cyborgStartWeapons: []
   hackerStartWeapons: []
 --- !u!114 &746260024445848468
@@ -196,8 +209,8 @@ MonoBehaviour:
     baseValue: 0
     currentValue: 0
   experience: 0
-  requiredExpForNextLevel: 5
-  growthMultiplier: 1.25
+  fallbackRequiredExpForNextLevel: 125
+  fallbackMaxLevel: 30
   level: 1
   attackDamage:
     baseValue: 10
@@ -226,3 +239,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe2bad84ce9cafc4b958df4cb4d0e80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4984764304893578264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5889866553219824149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd11cd682360e34e8aae2d10c618a46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.08
+  spriteRenderers: []

@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Buff; // (추가)
 
@@ -16,16 +16,13 @@ public class EnemyController : MonoBehaviour
   // 적의 공격력입니다.
   [SerializeField]
   private float attackDamage = 5f;
-  // 적이 플레이어를 공격할 수 있는 범위입니다.
-  [SerializeField]
-  private float attackRange = 1.5f;
-  // 공격 주기 (3초로 고정)
-  private const float attackInterval = 3.0f;
 
-  [Header("기즈모 설정")]
-  // 에디터에서 감지 범위 기즈모를 항상 표시할지 여부를 설정합니다.
   [SerializeField]
-  private bool showGizmos = true;
+  [Tooltip("CSV enemy_stats.attackrange를 반영하는 공통 공격 사거리. Shooter 등 메커니즘이 참조합니다.")]
+  private float attackRange = 1.5f;
+
+  [Tooltip("Basic/Rusher/Tanker가 플레이어와 접촉 중일 때 데미지를 주는 간격")]
+  public float contactDamageTickInterval = 0.5f;
 
   [Header("메커니즘 설정")]
   [SerializeField]
@@ -39,6 +36,9 @@ public class EnemyController : MonoBehaviour
   private EnemyMechanismBase currentMechanism; // 현재 활성화된 메커니즘
 
   private float searchTimer;
+  private float contactDamageTimer;
+  private readonly HashSet<Character> contactDamageTargets = new HashSet<Character>();
+  private readonly List<Character> staleContactDamageTargets = new List<Character>();
 
   private StatusFlags statusFlags; // (추가)
 
@@ -132,7 +132,6 @@ public class EnemyController : MonoBehaviour
 
     ApplyEnemyControllerStatsFromCSV(); // (추가) CSV에서 EnemyController 관련 스탯 적용
     ApplyEnemyDropTableFromCSV(); // (추가) CSV에서 드랍 테이블 적용
-    StartCoroutine(AttackCoroutine());
   }
 
   private void Update()
@@ -150,6 +149,8 @@ public class EnemyController : MonoBehaviour
     {
       currentMechanism.UpdateAttack();
     }
+
+    UpdateContactDamage();
   }
 
   private void UpdateTarget()
@@ -271,9 +272,12 @@ public class EnemyController : MonoBehaviour
     return moveSpeed * mul;
   }
 
-  /// <summary>
-  /// 공격 범위 가져오기 (메커니즘에서 사용)
-  /// </summary>
+  public float GetAttackDamage(bool includeOutgoingMultiplier = true)
+  {
+    float mul = includeOutgoingMultiplier && statusFlags != null ? statusFlags.outgoingDamageMul : 1f;
+    return attackDamage * mul;
+  }
+
   public float GetAttackRange()
   {
     return attackRange;
@@ -295,36 +299,127 @@ public class EnemyController : MonoBehaviour
     return currentMechanism;
   }
 
-  // 일정 주기로 플레이어를 공격하는 코루틴입니다.
-  private IEnumerator AttackCoroutine()
+  private bool UsesContactDamage()
   {
-    while (true)
+    return mechanismType == EnemyMechanismType.Basic
+      || mechanismType == EnemyMechanismType.Rusher
+      || mechanismType == EnemyMechanismType.Tanker;
+  }
+
+  private bool HasContactDamageTarget()
+  {
+    return GetContactDamageTarget() != null;
+  }
+
+  private void UpdateContactDamage()
+  {
+    if (!UsesContactDamage()) return;
+    if (contactDamageTargets.Count == 0)
     {
-      yield return new WaitForSeconds(attackInterval);
-
-      // (추가) 기절 등으로 공격 불가면 패스
-      if (statusFlags != null && statusFlags.attackBlocked)
-        continue;
-
-
-      if (target != null)
-      {
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-        if (distanceToTarget <= attackRange)
-        {
-          // 대상이 Character(Player, Enemy, Decoy)인지 확인
-          if (target.TryGetComponent<Character>(out var character))
-          {
-            // (추가) 데미지 버프/디버프(가하는 피해) 적용
-            float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
-            float finalDamage = attackDamage * outMul;
-
-            character.TakeDamage(finalDamage);
-          }
-        }
-      }
+      contactDamageTimer = 0f;
+      return;
     }
+
+    float tickInterval = Mathf.Max(0.01f, contactDamageTickInterval);
+    contactDamageTimer += Time.deltaTime;
+    if (contactDamageTimer < tickInterval) return;
+
+    contactDamageTimer -= tickInterval;
+
+    if (statusFlags != null && statusFlags.attackBlocked) return;
+
+    Character contactTarget = GetContactDamageTarget();
+    if (contactTarget == null) return;
+
+    float outMul = (statusFlags != null) ? statusFlags.outgoingDamageMul : 1f;
+    float finalDamage = attackDamage * outMul;
+    contactTarget.TakeDamage(finalDamage);
+  }
+
+  private Character GetContactDamageTarget()
+  {
+    staleContactDamageTargets.Clear();
+    Character fallback = null;
+
+    foreach (Character character in contactDamageTargets)
+    {
+      if (character == null || character.IsDead)
+      {
+        staleContactDamageTargets.Add(character);
+        continue;
+      }
+
+      if (target != null && character.transform == target)
+        return character;
+
+      if (fallback == null)
+        fallback = character;
+    }
+
+    for (int i = 0; i < staleContactDamageTargets.Count; i++)
+    {
+      contactDamageTargets.Remove(staleContactDamageTargets[i]);
+    }
+
+    return fallback;
+  }
+
+  private void TryAddContactDamageTarget(Collider2D other)
+  {
+    if (!UsesContactDamage()) return;
+    Character character = GetValidContactDamageTarget(other);
+    if (character == null) return;
+
+    contactDamageTargets.Add(character);
+  }
+
+  private void TryRemoveContactDamageTarget(Collider2D other)
+  {
+    if (!UsesContactDamage()) return;
+    Character character = other != null ? other.GetComponentInParent<Character>() : null;
+    if (character == null) return;
+
+    contactDamageTargets.Remove(character);
+    if (contactDamageTargets.Count == 0)
+      contactDamageTimer = 0f;
+  }
+
+  private Character GetValidContactDamageTarget(Collider2D other)
+  {
+    if (other == null) return null;
+
+    Character character = other.GetComponentInParent<Character>();
+    if (character == null || character == enemy || character.IsDead) return null;
+
+    if (character.CompareTag("Player") || character.CompareTag("Decoy"))
+      return character;
+
+    if (statusFlags != null && statusFlags.frenzy && character.GetComponent<Enemy>() != null)
+      return character;
+
+    return null;
+  }
+
+  private void OnCollisionEnter2D(Collision2D collision)
+  {
+    TryAddContactDamageTarget(collision.collider);
+    TryAddContactDamageTarget(collision.otherCollider);
+  }
+
+  private void OnCollisionExit2D(Collision2D collision)
+  {
+    TryRemoveContactDamageTarget(collision.collider);
+    TryRemoveContactDamageTarget(collision.otherCollider);
+  }
+
+  private void OnTriggerEnter2D(Collider2D other)
+  {
+    TryAddContactDamageTarget(other);
+  }
+
+  private void OnTriggerExit2D(Collider2D other)
+  {
+    TryRemoveContactDamageTarget(other);
   }
 
   // 고정된 시간 간격으로 호출됩니다. 물리 및 AI 계산에 적합합니다.
@@ -343,6 +438,12 @@ public class EnemyController : MonoBehaviour
         return;
     }
 
+    if (UsesContactDamage() && HasContactDamageTarget())
+    {
+      rb.velocity = Vector2.zero;
+      return;
+    }
+
     // 메커니즘이 있으면 메커니즘의 이동 로직 사용
     if (currentMechanism != null)
     {
@@ -354,17 +455,8 @@ public class EnemyController : MonoBehaviour
       // 기본 이동 로직
       if (target != null)
       {
-        float distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-        if (distanceToTarget > attackRange)
-        {
-          Vector2 direction = (target.position - transform.position).normalized;
-          rb.velocity = direction * GetMoveSpeed();
-        }
-        else
-        {
-          rb.velocity = Vector2.zero;
-        }
+        Vector2 direction = (target.position - transform.position).normalized;
+        rb.velocity = direction * GetMoveSpeed();
       }
       else
       {
@@ -373,18 +465,6 @@ public class EnemyController : MonoBehaviour
     }
   }
 
-#if UNITY_EDITOR
-    // 에디터에서 감지 범위와 공격 범위를 시각적으로 보여줍니다.
-    private void OnDrawGizmos()
-    {
-        if (showGizmos)
-        {
-            // 공격 범위 (노란색)
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, attackRange);
-        }
-    }
-#endif
   private void ApplyEnemyControllerStatsFromCSV()
   {
     if (EnemyStatLoader.DB == null)

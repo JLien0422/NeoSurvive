@@ -69,6 +69,9 @@ public abstract class Character : MonoBehaviour
       UIManager.Instance.ShowDamageText(transform.position, amount);
     }
 
+    // SpriteHitFlash 컴포넌트가 있을 때만 피격 점멸 (적 프리팹 등)
+    GetComponent<SpriteHitFlash>()?.PlayFlash();
+
     if (currentHP.CurrentValue <= 0)
     {
       currentHP.CurrentValue = 0;

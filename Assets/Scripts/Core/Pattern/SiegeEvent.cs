@@ -23,23 +23,39 @@ public class SiegeEvent : MonoBehaviour
 
   [SerializeField] private float siegeDuration = 10f;
 
-  [Header("외곽 슈터 고정(선택)")]
-  [SerializeField] private bool freezeOuterShooters = true;
-
   private Transform player;
   private bool running;
   private Action onEnd;
 
+  private void Awake()
+  {
+    GameManager.onPlayerSpawned += RefreshPlayerReference;
+  }
+
   private void Start()
   {
-    player = GameObject.FindWithTag("Player")?.transform;
-    if (player == null)
-      Debug.LogError("[SiegeEvent] Player 태그를 찾지 못했습니다.");
+    RefreshPlayerReference();
+  }
+
+  private void OnDestroy()
+  {
+    GameManager.onPlayerSpawned -= RefreshPlayerReference;
   }
 
   public void BeginSiege(int phase, Action onEnded)
   {
-    if (running || player == null) return;
+    if (running) return;
+
+    if (player == null)
+    {
+      RefreshPlayerReference();
+    }
+
+    if (player == null)
+    {
+      Debug.LogWarning("[SiegeEvent] Player를 찾지 못해 포위 이벤트를 시작하지 못했습니다.");
+      return;
+    }
 
     if (enemyPrefabs == null || enemyPrefabs.Length < 5)
     {
@@ -54,6 +70,17 @@ public class SiegeEvent : MonoBehaviour
     SpawnOuterRingShooterOnly();
 
     StartCoroutine(EndRoutine());
+  }
+
+  private void RefreshPlayerReference()
+  {
+    GameObject playerObj = GameObject.FindWithTag("Player");
+    player = playerObj != null ? playerObj.transform : null;
+
+    if (player == null)
+    {
+      Debug.LogWarning("[SiegeEvent] Player 태그 오브젝트를 아직 찾지 못했습니다.");
+    }
   }
 
   private void SpawnInnerRingByPhaseWeights(int phase)
@@ -189,14 +216,7 @@ public class SiegeEvent : MonoBehaviour
       float angleDeg = (360f / outerCount) * i;
       Vector3 pos = player.position + AngleToVector(angleDeg) * outerRadius;
 
-      GameObject obj = Instantiate(enemyPrefabs[1], pos, Quaternion.identity); // Shooter
-
-      if (freezeOuterShooters)
-      {
-        var rb = obj.GetComponent<Rigidbody2D>();
-        if (rb != null)
-          rb.constraints = RigidbodyConstraints2D.FreezePosition;
-      }
+      Instantiate(enemyPrefabs[1], pos, Quaternion.identity); // Shooter
     }
 
     Debug.Log($"[SiegeEvent] OuterRing Shooter Spawned (count={outerCount})");

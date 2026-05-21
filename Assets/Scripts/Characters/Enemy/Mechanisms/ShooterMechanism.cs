@@ -9,8 +9,12 @@ public class ShooterMechanism : EnemyMechanismBase
 {
     [Header("원거리 공격 설정")]
     [SerializeField]
-    [Tooltip("공격 사거리 배율 (기본 EnemyController보다 길게)")]
-    private float attackRangeMultiplier = 5f;
+    [Tooltip("투사체를 발사하기 시작하는 사거리")]
+    private float attackRange = 7.5f;
+
+    [SerializeField]
+    [Tooltip("켜면 EnemyController가 CSV에서 읽은 attackdamage/attackrange를 우선 사용합니다.")]
+    private bool useControllerCombatStats = true;
 
     [SerializeField]
     [Tooltip("공격 주기 (초)")]
@@ -52,29 +56,33 @@ public class ShooterMechanism : EnemyMechanismBase
     [Tooltip("이 속도 제곱 이하면 몸 Animator.speed = 0 (정지로 간주)")]
     private float bodySpeedStopSqrThreshold = 0.0001f;
 
-    private static readonly int AttackTriggerHash = Animator.StringToHash("Attack");
+    [SerializeField]
+    [Tooltip("정지 중에도 Walk 프레임이 어색하면 끕니다. Idle 상태가 생기기 전까지는 false 권장")]
+    private bool pauseBodyAnimationWhenStopped = true;
 
-    private float baseAttackRange;
-    private float extendedAttackRange;
-    private float lastAttackTime = 0f;
+    [SerializeField]
+    [Tooltip("타겟이 좌우로 이동할 때 루트 스케일 X를 반전합니다. 기본 아트가 오른쪽을 본다는 전제입니다.")]
+    private bool faceTargetOnX = true;
+
+    [SerializeField]
+    [Tooltip("타겟과 X 차이가 이 값보다 작으면 좌우 반전을 유지합니다.")]
+    private float faceTargetDeadZone = 0.02f;
+
+    [SerializeField]
+    [Tooltip("애니메이션 이벤트가 누락되었을 때 대기 후 발사하는 안전장치 시간")]
+    private float attackEventFallbackDelay = 0.35f;
+
+    private static readonly int ShooterAttackStateHash = Animator.StringToHash("Shooter_Attack");
+
+    private float lastAttackTime = float.NegativeInfinity;
     private bool pendingProjectileFromAttackAnim;
+    private float defaultFacingScaleX = 1f;
+    private Coroutine attackEventFallbackRoutine;
 
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
         base.Initialize(enemyRef, controllerRef);
-        
-        // 기본 공격 범위 가져오기
-        if (controller != null)
-        {
-            baseAttackRange = controller.GetAttackRange();
-            extendedAttackRange = baseAttackRange * attackRangeMultiplier;
-        }
-        else
-        {
-            baseAttackRange = 1.5f;
-            extendedAttackRange = baseAttackRange * attackRangeMultiplier;
-        }
-
+        defaultFacingScaleX = Mathf.Abs(transform.localScale.x);
         ResolveGunAnimatorIfNeeded();
         ResolveBodyAnimatorIfNeeded();
     }
@@ -87,9 +95,12 @@ public class ShooterMechanism : EnemyMechanismBase
             return;
         }
 
+        FaceTargetIfNeeded();
+
         // sqrMagnitude로 제곱근 없이 거리 비교
         float sqrDist = (transform.position - target.position).sqrMagnitude;
-        float sqrRange = extendedAttackRange * extendedAttackRange;
+        float currentAttackRange = GetEffectiveAttackRange();
+        float sqrRange = currentAttackRange * currentAttackRange;
 
         if (sqrDist > sqrRange)
         {
@@ -115,6 +126,14 @@ public class ShooterMechanism : EnemyMechanismBase
             return;
         }
 
+        FaceTargetIfNeeded();
+
+        if (!CanAttack())
+        {
+            pendingProjectileFromAttackAnim = false;
+            return;
+        }
+
         if (projectilePrefab == null)
         {
             Debug.LogWarning("[ShooterMechanism] projectilePrefab이 비어 있어 투사체를 발사할 수 없습니다.", this);
@@ -123,7 +142,8 @@ public class ShooterMechanism : EnemyMechanismBase
 
         // sqrMagnitude로 제곱근 없이 거리 비교
         float sqrDist = (transform.position - target.position).sqrMagnitude;
-        float sqrRange = extendedAttackRange * extendedAttackRange;
+        float currentAttackRange = GetEffectiveAttackRange();
+        float sqrRange = currentAttackRange * currentAttackRange;
 
         if (sqrDist <= sqrRange && Time.time - lastAttackTime >= attackInterval)
         {
@@ -138,8 +158,8 @@ public class ShooterMechanism : EnemyMechanismBase
         // 발사 타이밍에 총 공격 애니메이션 재생
         if (gunAnimator != null)
         {
-            gunAnimator.ResetTrigger(AttackTriggerHash);
-            gunAnimator.SetTrigger(AttackTriggerHash);
+            gunAnimator.Play(ShooterAttackStateHash, 0, 0f);
+            RestartAttackEventFallback();
             return;
         }
 
@@ -158,6 +178,15 @@ public class ShooterMechanism : EnemyMechanismBase
 
         pendingProjectileFromAttackAnim = false;
 
+        if (attackEventFallbackRoutine != null)
+        {
+            StopCoroutine(attackEventFallbackRoutine);
+            attackEventFallbackRoutine = null;
+        }
+
+        if (!CanAttack())
+            return;
+
         if (target == null || projectilePrefab == null)
             return;
 
@@ -167,6 +196,7 @@ public class ShooterMechanism : EnemyMechanismBase
         Vector2 direction = ((Vector2)target.position - shootPosition).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + projectileForwardAngleOffset;
         Quaternion projectileRotation = Quaternion.Euler(0f, 0f, angle);
+        float damage = GetEffectiveProjectileDamage();
 
         // 투사체 생성
         GameObject projectile = Instantiate(projectilePrefab, shootPosition, projectileRotation);
@@ -175,7 +205,7 @@ public class ShooterMechanism : EnemyMechanismBase
         NeoSurvive.Weapon.Projectile proj = projectile.GetComponent<NeoSurvive.Weapon.Projectile>();
         if (proj != null)
         {
-            proj.Initialize(direction, projectileDamage, projectileSpeed);
+            proj.Initialize(direction, damage, projectileSpeed);
         }
         else
         {
@@ -194,7 +224,7 @@ public class ShooterMechanism : EnemyMechanismBase
             {
                 enemyProj = projectile.AddComponent<EnemyProjectile>();
             }
-            enemyProj.damage = projectileDamage;
+            enemyProj.damage = damage;
         }
 
         Debug.Log($"[ShooterMechanism] {gameObject.name}이(가) 투사체를 발사했습니다.");
@@ -235,7 +265,72 @@ public class ShooterMechanism : EnemyMechanismBase
     private void ApplyBodyAnimatorPausedState(bool paused)
     {
         if (bodyAnimator == null) return;
-        bodyAnimator.speed = paused ? 0f : 1f;
+        bodyAnimator.speed = pauseBodyAnimationWhenStopped && paused ? 0f : 1f;
+    }
+
+    private bool CanAttack()
+    {
+        return enemy == null || enemy.CanAttack;
+    }
+
+    private float GetEffectiveAttackRange()
+    {
+        if (useControllerCombatStats && controller != null)
+        {
+            float controllerAttackRange = controller.GetAttackRange();
+            if (controllerAttackRange > 0f)
+                return controllerAttackRange;
+        }
+
+        return attackRange;
+    }
+
+    private float GetEffectiveProjectileDamage()
+    {
+        if (useControllerCombatStats && controller != null)
+        {
+            float controllerDamage = controller.GetAttackDamage();
+            if (controllerDamage > 0f)
+                return controllerDamage;
+        }
+
+        return projectileDamage;
+    }
+
+    private void FaceTargetIfNeeded()
+    {
+        if (!faceTargetOnX || target == null) return;
+
+        float deltaX = target.position.x - transform.position.x;
+        if (Mathf.Abs(deltaX) <= faceTargetDeadZone) return;
+
+        Vector3 scale = transform.localScale;
+        float facingSign = deltaX >= 0f ? 1f : -1f;
+        scale.x = defaultFacingScaleX * facingSign;
+        transform.localScale = scale;
+    }
+
+    private void RestartAttackEventFallback()
+    {
+        if (attackEventFallbackDelay <= 0f) return;
+
+        if (attackEventFallbackRoutine != null)
+        {
+            StopCoroutine(attackEventFallbackRoutine);
+        }
+
+        attackEventFallbackRoutine = StartCoroutine(FireFromAnimationEventFallback());
+    }
+
+    private IEnumerator FireFromAnimationEventFallback()
+    {
+        yield return new WaitForSeconds(attackEventFallbackDelay);
+        attackEventFallbackRoutine = null;
+
+        if (pendingProjectileFromAttackAnim)
+        {
+            FireProjectileNowFromAnimationEvent();
+        }
     }
 }
 
@@ -245,6 +340,12 @@ public class ShooterMechanism : EnemyMechanismBase
 public class EnemyProjectile : MonoBehaviour
 {
     public float damage = 5f;
+    [SerializeField] private float lifeTime = 5f;
+
+    private void Start()
+    {
+        Destroy(gameObject, lifeTime);
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {

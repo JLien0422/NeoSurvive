@@ -24,15 +24,24 @@ public class PhaseDirector : MonoBehaviour
   // Phase별 특수패턴 "1회만" 실행 플래그
   private bool siege2Done, siege3Done, siege4Done, siege5Done;
 
+  private void Awake()
+  {
+    GameManager.onPlayerSpawned += RefreshPlayerReference;
+  }
+
   private void Start()
   {
-    player = GameObject.FindWithTag("Player")?.transform;
-
+    RefreshPlayerReference();
     if (siegeEvent == null) siegeEvent = GetComponent<SiegeEvent>();              // ***** 안정화
     enemySpawner = GetComponent<EnemySpawner>();                                  // ***** 안정화
     if (enemySpawner == null) enemySpawner = FindObjectOfType<EnemySpawner>();   // ***** 안정화
 
-    enemySpawner?.SetPhaseWeights(1);
+    //enemySpawner?.SetPhaseWeights(1);
+  }
+
+  private void OnDestroy()
+  {
+    GameManager.onPlayerSpawned -= RefreshPlayerReference;
   }
 
   private void Update()
@@ -66,7 +75,7 @@ public class PhaseDirector : MonoBehaviour
         // 포위 종료 후 해당 Phase 랜덤 가중치 적용
         if (enemySpawner != null)
         {
-          enemySpawner.SetPhaseWeights(phaseIndex);
+          //enemySpawner.SetPhaseWeights(phaseIndex);
           Debug.Log($"[PhaseDirector] Phase{phaseIndex} 랜덤 스폰 가중치 적용 완료");
         }
       });
@@ -81,7 +90,16 @@ public class PhaseDirector : MonoBehaviour
 
   private void SpawnRandomHackableNearPlayer()
   {
-    if (player == null) return;
+    if (player == null)
+    {
+      RefreshPlayerReference();
+    }
+
+    if (player == null)
+    {
+      Debug.LogWarning("[PhaseDirector] Player를 찾지 못해 해킹 오브젝트를 스폰하지 못했습니다.");
+      return;
+    }
 
     if (hackablePrefabs == null || hackablePrefabs.Length == 0)
     {
@@ -97,6 +115,17 @@ public class PhaseDirector : MonoBehaviour
 
     Instantiate(prefab, pos, Quaternion.identity);
     Debug.Log($"[PhaseDirector] Hackable spawned: {prefab.name}");
+  }
+
+  private void RefreshPlayerReference()
+  {
+    GameObject playerObj = GameObject.FindWithTag("Player");
+    player = playerObj != null ? playerObj.transform : null;
+
+    if (player == null)
+    {
+      Debug.LogWarning("[PhaseDirector] Player 태그 오브젝트를 아직 찾지 못했습니다.");
+    }
   }
 
   // ============================================================

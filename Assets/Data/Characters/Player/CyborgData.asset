@@ -18,7 +18,7 @@ MonoBehaviour:
     \uAC00\uC9C4 \uD0F1\uCEE4"
   characterIcon: {fileID: 0}
   characterPortrait: {fileID: 0}
-  baseHealth: 150
+  baseHealth: 15000
   baseAttackDamage: 20
   baseAttackRange: 2
   baseAttackSpeed: 0.8

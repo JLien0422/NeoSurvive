@@ -145,6 +145,7 @@ public class UIManager : MonoBehaviour
     Player.OnExpChanged += UpdateExpUI;
     Player.OnLevelUp += UpdateLevelUI;
     GameManager.OnKillCountChanged += UpdateKillCountUI;
+    GameManager.OnRunGoldChanged += UpdateRunGoldUI;
     Player.OnPsychoCorruptionChanged += UpdatePsychoCorruptionUI;
     Player.OnBerserkStarted += OnBerserkStarted;
     Player.OnBerserkEnded += OnBerserkEnded;
@@ -154,6 +155,7 @@ public class UIManager : MonoBehaviour
     SceneManager.sceneLoaded += OnSceneLoaded;
     eventsRegistered = true;
 
+    UpdateRunGoldUI(GameManager.Instance != null ? GameManager.Instance.CurrentRunGold : 0);
     Debug.Log("[UIManager] Events registered");
   }
 
@@ -186,6 +188,7 @@ public class UIManager : MonoBehaviour
     Player.OnExpChanged -= UpdateExpUI;
     Player.OnLevelUp -= UpdateLevelUI;
     GameManager.OnKillCountChanged -= UpdateKillCountUI;
+    GameManager.OnRunGoldChanged -= UpdateRunGoldUI;
     Player.OnPsychoCorruptionChanged -= UpdatePsychoCorruptionUI;
     Player.OnBerserkStarted -= OnBerserkStarted;
     Player.OnBerserkEnded -= OnBerserkEnded;
@@ -471,6 +474,14 @@ public class UIManager : MonoBehaviour
     if (killCountText != null)
     {
       killCountText.text = count.ToString();
+    }
+  }
+
+  private void UpdateRunGoldUI(int runGold)
+  {
+    if (goldText != null)
+    {
+      goldText.text = runGold.ToString();
     }
   }
 

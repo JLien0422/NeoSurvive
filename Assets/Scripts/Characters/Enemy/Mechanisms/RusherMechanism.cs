@@ -17,7 +17,7 @@ public class RusherMechanism : EnemyMechanismBase
     private float rushStartDistance = 5f;
 
     [SerializeField]
-    [Tooltip("가속 사용 여부 (true면 거리에 따라 속도 증가)")]
+    [Tooltip("가속 사용 여부 (true면 돌진 시간에 따라 속도 증가)")]
     private bool useAcceleration = true;
 
     [SerializeField]
@@ -25,13 +25,18 @@ public class RusherMechanism : EnemyMechanismBase
     private float maxAccelerationMultiplier = 2f;
 
     [SerializeField]
-    [Tooltip("방향 고정 여부 (true면 한 번 방향을 정하면 그대로 직진)")]
-    private bool lockDirection = false;
+    [Tooltip("한 번 돌진할 때 일직선으로 이동하는 시간")]
+    private float rushDuration = 0.8f;
+
+    [SerializeField]
+    [Tooltip("돌진 종료 후 다음 돌진까지 최소 대기 시간")]
+    private float rushCooldown = 0.5f;
 
     private float baseMoveSpeed;
     private bool isRushing = false;
     private Vector2 rushDirection = Vector2.zero;
     private float rushStartTime = 0f;
+    private float nextRushTime = 0f;
 
     public override void Initialize(Enemy enemyRef, EnemyController controllerRef)
     {
@@ -60,57 +65,45 @@ public class RusherMechanism : EnemyMechanismBase
     {
         if (target == null || rb == null) return;
 
-        // sqrMagnitude로 제곱근 없이 범위 비교
-        float sqrDist = (transform.position - target.position).sqrMagnitude;
-        // 가속도 계산에 실제 거리가 필요하므로 sqrt는 isRushing일 때만 계산
-        float distanceToTarget = isRushing ? Mathf.Sqrt(sqrDist) : 0f;
-
-        if (sqrDist <= rushStartDistance * rushStartDistance && !isRushing)
+        if (isRushing)
         {
-            // 돌진 시작 시 실제 거리 계산
-            distanceToTarget = Mathf.Sqrt(sqrDist);
+            float elapsed = Time.time - rushStartTime;
+            if (elapsed < rushDuration)
+            {
+                float currentSpeed = baseMoveSpeed * speedMultiplier;
+                if (useAcceleration)
+                {
+                    float accelerationFactor = Mathf.Lerp(1f, maxAccelerationMultiplier, Mathf.Clamp01(elapsed / Mathf.Max(0.01f, rushDuration)));
+                    currentSpeed *= accelerationFactor;
+                }
+
+                rb.velocity = rushDirection * currentSpeed;
+                return;
+            }
+
+            isRushing = false;
+            nextRushTime = Time.time + rushCooldown;
         }
 
-        // 돌진 시작 거리 내에 들어오면 돌진 시작
-        if (sqrDist <= rushStartDistance * rushStartDistance && !isRushing)
+        Vector2 toTarget = target.position - transform.position;
+        float sqrDist = toTarget.sqrMagnitude;
+
+        if (Time.time >= nextRushTime && sqrDist <= rushStartDistance * rushStartDistance)
         {
             isRushing = true;
             rushStartTime = Time.time;
+            rushDirection = toTarget.sqrMagnitude > 0.0001f ? toTarget.normalized : Vector2.right;
 
-            if (lockDirection)
-            {
-                // 방향 고정: 한 번 방향을 정하면 그대로 직진
-                rushDirection = (target.position - transform.position).normalized;
-            }
+            rb.velocity = rushDirection * baseMoveSpeed * speedMultiplier;
+            return;
         }
 
-        Vector2 direction;
-        if (lockDirection && isRushing)
-        {
-            // 고정된 방향으로 직진
-            direction = rushDirection;
-        }
-        else
-        {
-            // 매 프레임 플레이어 방향으로 추적
-            direction = (target.position - transform.position).normalized;
-        }
-
-        // 속도 계산
-        float currentSpeed = baseMoveSpeed * speedMultiplier;
-
-        if (useAcceleration && isRushing)
-        {
-            // 거리가 가까울수록 더 빠르게 (가속)
-            float accelerationFactor = 1f + (1f - Mathf.Clamp01(distanceToTarget / rushStartDistance)) * (maxAccelerationMultiplier - 1f);
-            currentSpeed *= accelerationFactor;
-        }
-
-        rb.velocity = direction * currentSpeed;
+        // 돌진 중이 아닐 때는 플레이어를 계속 추적합니다.
+        rb.velocity = toTarget.normalized * baseMoveSpeed * speedMultiplier;
     }
 
     public override void UpdateAttack()
     {
-        // 기본 근접 공격은 EnemyController에서 처리
+        // 접촉 틱 데미지는 EnemyController에서 처리합니다.
     }
 }

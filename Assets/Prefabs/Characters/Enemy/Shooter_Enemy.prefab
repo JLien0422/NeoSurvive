@@ -16,9 +16,10 @@ GameObject:
   - component: {fileID: -1938632625162848534}
   - component: {fileID: -8449839296783268908}
   - component: {fileID: 2545543105526479607}
-  m_Layer: 0
+  - component: {fileID: -2468061009048372041}
+  m_Layer: 7
   m_Name: Shooter_Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -81,11 +82,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   attackDamage: 5
-  attackRange: 3
-  showGizmos: 1
+  attackRange: 1.5
+  contactDamageTickInterval: 0.5
   mechanismType: 1
-  faceTargetOnX: 1
-  faceTargetDeadZone: 0.02
 --- !u!114 &-12537986020536342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,8 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3224a471f1952ae43a73a4af8ffc5228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRangeMultiplier: 2
-  attackInterval: 2
+  attackRange: 3
+  useControllerCombatStats: 0
+  attackInterval: 0.5
   projectilePrefab: {fileID: 5318986550965804440, guid: 61b30c4777e2a23418f58979164826d3, type: 3}
   projectileSpeed: 5
   projectileDamage: 5
@@ -109,6 +109,10 @@ MonoBehaviour:
   gunObjectName: Shooter's Gun
   bodyAnimator: {fileID: 0}
   bodySpeedStopSqrThreshold: 0.0001
+  pauseBodyAnimationWhenStopped: 1
+  faceTargetOnX: 1
+  faceTargetDeadZone: 0.02
+  attackEventFallbackDelay: 0.35
 --- !u!58 &-4175120532514377093
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -191,7 +195,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: d1e8927ef498cec478fd0fb6877a41f1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -244,6 +248,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-2468061009048372041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824642289109209911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd11cd682360e34e8aae2d10c618a46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08
+  spriteRenderers: []
 --- !u!1001 &2084801460296686680
 PrefabInstance:
   m_ObjectHideFlags: 0

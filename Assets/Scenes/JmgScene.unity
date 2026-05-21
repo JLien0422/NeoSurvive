@@ -14674,7 +14674,6 @@ MonoBehaviour:
   innerCountP4: 28
   innerCountP5: 32
   siegeDuration: 10
-  freezeOuterShooters: 1
 --- !u!1 &2079492504
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,29 +17,47 @@ public class PlasmaLazer : MonoBehaviour
   public TrailRenderer trailRenderer;
 
   private Vector3 direction;
+
+  private int maxPenetration = 0;
+  private int currentHitCount = 0;
+  private HashSet<int> hitEnemyIds = new HashSet<int>();
+
+  // DPM 기록용 소스 무기
+  private WeaponBase sourceWeapon;
+
+  // ★ 추가: PlasmaRifle Lv5 마스터 효과 여부
+  private bool isMaster = false;
+
+  // ★ 추가: 이 레이저가 분열을 만들 수 있는지 여부
+  // - 원본 레이저만 true
+  // - 분열 레이저는 false로 해서 무한 분열 방지
+  private bool canSplit = true;
+
+  [Header("Master Split Settings")]
+  [SerializeField] private int splitCount = 2;
+  [SerializeField] private float splitSearchRange = 5f;
+
   private void Start()
   {
     trailRenderer = GetComponent<TrailRenderer>();
   }
 
-  // Update is called once per frame
-  void Update()
+  private void Update()
   {
     elapsed += Time.deltaTime;
+
     if (elapsed >= duration)
     {
       Destroy(gameObject);
       return;
     }
 
-    // 시간 경과에 따른 알파 비율 (1 -> 0)
     alpha = 1f - (elapsed / duration);
 
     float moveDist = bulletSpeed * Time.deltaTime;
 
-    // RaycastAll로 경로상 모든 적 감지 후 관통 처리
     RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, direction, moveDist);
-    // 거리순 정렬
+
     System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
     foreach (var hit in hits)
@@ -47,13 +65,22 @@ public class PlasmaLazer : MonoBehaviour
       if (hit.collider != null && hit.collider.CompareTag("Enemy") && hit.collider.TryGetComponent<Character>(out var character))
       {
         int id = character.GetInstanceID();
-        if (hitEnemyIds.Contains(id)) continue;
+
+        if (hitEnemyIds.Contains(id))
+          continue;
 
         character.TakeDamage(damage, sourceWeapon);
         hitEnemyIds.Add(id);
         currentHitCount++;
 
-        // maxPenetration 만큼 추가 관통 가능
+        // ★ 추가: Lv5 마스터 효과
+        // - 적 관통/명중 시 주변 적 2명에게 분열 레이저 생성
+        // - 원본 레이저만 분열 가능
+        if (isMaster && canSplit)
+        {
+          SplitToNearbyEnemies(character.transform);
+        }
+
         if (currentHitCount > maxPenetration)
         {
           Destroy(gameObject);
@@ -63,28 +90,25 @@ public class PlasmaLazer : MonoBehaviour
         continue;
       }
 
-      // =========================
-      // 2. 추가: IDamageable 처리 (자판기 포함)
-      // =========================
       IDamageable damageable = hit.collider.GetComponent<IDamageable>();
 
       if (damageable == null)
-          damageable = hit.collider.GetComponentInParent<IDamageable>();
+        damageable = hit.collider.GetComponentInParent<IDamageable>();
 
       if (damageable == null)
-          continue;
+        continue;
 
-      // Enemy 제외 (중복 방지)
       if (hit.collider.CompareTag("Enemy"))
-          continue;
+        continue;
 
       MonoBehaviour mb = damageable as MonoBehaviour;
       if (mb == null)
-          continue;
+        continue;
 
       int objId = mb.GetInstanceID();
+
       if (hitEnemyIds.Contains(objId))
-          continue;
+        continue;
 
       damageable.TakeDamage(damage);
       hitEnemyIds.Add(objId);
@@ -92,31 +116,95 @@ public class PlasmaLazer : MonoBehaviour
 
       if (currentHitCount > maxPenetration)
       {
-          Destroy(gameObject);
-          return;
+        Destroy(gameObject);
+        return;
       }
     }
 
     transform.position += direction * moveDist;
   }
 
-  private int maxPenetration = 0;
-  private int currentHitCount = 0;
-  private HashSet<int> hitEnemyIds = new HashSet<int>();
-
-  // DPM 기록용 소스 무기
-  private WeaponBase sourceWeapon;
-
-  public void Initialize(Vector3 direction, float damage, int penetration, WeaponBase weaponBase = null)
+  public void Initialize(
+    Vector3 direction,
+    float damage,
+    int penetration,
+    WeaponBase weaponBase = null,
+    bool isMaster = false,
+    bool canSplit = true)
   {
-    this.direction = direction;
+    this.direction = direction.normalized;
     this.damage = damage;
     this.maxPenetration = penetration;
     this.sourceWeapon = weaponBase;
 
+    // ★ 추가
+    this.isMaster = isMaster;
+    this.canSplit = canSplit;
+
     if (trailRenderer != null)
     {
       trailRenderer.time = duration;
+    }
+  }
+
+  // ★ 추가: 주변 적 2명에게 분열 레이저 생성
+  private void SplitToNearbyEnemies(Transform hitTarget)
+  {
+    if (hitTarget == null)
+      return;
+
+    Collider2D[] enemies = Physics2D.OverlapCircleAll(
+      hitTarget.position,
+      splitSearchRange,
+      LayerMask.GetMask("Enemy")
+    );
+
+    int createdCount = 0;
+
+    foreach (Collider2D enemy in enemies)
+    {
+      if (enemy == null)
+        continue;
+
+      if (!enemy.CompareTag("Enemy"))
+        continue;
+
+      if (enemy.transform == hitTarget)
+        continue;
+
+      if (!enemy.TryGetComponent<Character>(out var character))
+        continue;
+
+      int id = character.GetInstanceID();
+
+      // 이미 이 레이저가 맞춘 적이면 제외
+      if (hitEnemyIds.Contains(id))
+        continue;
+
+      Vector3 splitDir = (enemy.transform.position - hitTarget.position).normalized;
+
+      if (splitDir == Vector3.zero)
+        continue;
+
+      GameObject splitObj = Instantiate(gameObject, hitTarget.position, Quaternion.identity);
+
+      if (splitObj.TryGetComponent<PlasmaLazer>(out var splitLaser))
+      {
+        // ★ 분열 레이저는 다시 분열하지 않음
+        splitLaser.Initialize(
+          splitDir,
+          damage,
+          0,
+          sourceWeapon,
+          false,
+          false
+        );
+      }
+
+      createdCount++;
+
+      if (createdCount >= splitCount)
+        break;
     }
   }
 }

@@ -19,24 +19,33 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
 
-    // ★ 추가: CSV 식별용 ID
+    // ★ CSV 식별용 ID
     private readonly string weaponId = "linkpistol";
+
+    // ★ 추가: 현재 무기 레벨 저장
+    private int currentLevel = 1;
+
+    // ★ 추가: Lv5 이상이면 마스터 효과 활성화
+    private bool IsMasterLevel => currentLevel >= 5;
 
     private void Start()
     {
-      // ★ 수정: 시작 시 Lv1 CSV 적용
-      ApplyStatsFromCSV(1);
+      // ★ 수정: 시작 시 Lv1 적용
+      currentLevel = 1;
+      ApplyStatsFromCSV(currentLevel);
     }
 
-    // ★ 수정: 레벨업 시 CSV 재적용
+    // ★ 수정: 레벨업 시 현재 레벨 저장
     public void OnLevelUp(int level)
     {
+      currentLevel = level;
+
       ApplyStatsFromCSV(level);
 
-      Debug.Log($"[LinkPistol] CSV 적용 완료 | Lv={level}, Damage={damage}");
+      Debug.Log($"[LinkPistol] CSV 적용 완료 | Lv={level}, Damage={damage}, Master={IsMasterLevel}");
     }
 
-    // ★ 핵심: CSV 적용 함수
+    // ★ CSV 적용
     private void ApplyStatsFromCSV(int level)
     {
       if (WeaponStatLoader.DB == null)
@@ -56,10 +65,6 @@ namespace NeoSurvive.Weapon
         Debug.LogWarning($"[LinkPistol] level 데이터 없음: {level}");
         return;
       }
-
-      // =========================
-      // ★ 핵심 수정 부분
-      // =========================
 
       // Lv1 기준 데미지 가져오기
       float baseDamage = row.damage;
@@ -92,6 +97,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       fireTimer += Time.deltaTime;
+
       if (fireTimer >= fireRate)
       {
         Attack();
@@ -122,12 +128,32 @@ namespace NeoSurvive.Weapon
       obj.SetActive(true);
 
       Projectile p = obj.GetComponent<Projectile>();
+
       if (p != null)
       {
         p.Initialize(direction, damage, bulletSpeed);
 
         var src = GetComponentInParent<WeaponSource>();
-        if (src != null) p.SetSourceWeapon(src.weaponData);
+
+        if (src != null)
+          p.SetSourceWeapon(src.weaponData);
+      }
+
+      // =========================
+      // ★ 추가: LinkPistol Lv5 마스터 효과
+      // - 탄환 적중 시 Enemy에게 표식 부여
+      // - Projectile.cs는 공용이므로 수정하지 않음
+      // =========================
+      if (IsMasterLevel)
+      {
+        LinkPistolMarkOnHit markOnHit = obj.GetComponent<LinkPistolMarkOnHit>();
+
+        if (markOnHit == null)
+        {
+          markOnHit = obj.AddComponent<LinkPistolMarkOnHit>();
+        }
+
+        markOnHit.Init(5f);
       }
     }
 
@@ -141,6 +167,7 @@ namespace NeoSurvive.Weapon
       foreach (GameObject enemy in enemies)
       {
         float distance = Vector3.Distance(transform.position, enemy.transform.position);
+
         if (distance < closestDistance)
         {
           closestDistance = distance;
@@ -150,30 +177,31 @@ namespace NeoSurvive.Weapon
 
       // =========================
       // 추가: IDamageable 자판기/맵오브젝트 탐색
-      // Enemy가 더 가까우면 Enemy 우선 유지
       // =========================
       MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
 
       foreach (MonoBehaviour behaviour in behaviours)
       {
-          if (behaviour == null)
-              continue;
+        if (behaviour == null)
+          continue;
 
-          if (behaviour.CompareTag("Enemy"))
-              continue;
+        if (behaviour.CompareTag("Enemy"))
+          continue;
 
-          IDamageable damageable = behaviour as IDamageable;
-          if (damageable == null)
-              continue;
+        IDamageable damageable = behaviour as IDamageable;
 
-          float distance = Vector3.Distance(transform.position, behaviour.transform.position);
+        if (damageable == null)
+          continue;
 
-          if (distance < closestDistance)
-          {
-              closestDistance = distance;
-              closest = behaviour.gameObject;
-          }
+        float distance = Vector3.Distance(transform.position, behaviour.transform.position);
+
+        if (distance < closestDistance)
+        {
+          closestDistance = distance;
+          closest = behaviour.gameObject;
+        }
       }
+
       return closest;
     }
   }

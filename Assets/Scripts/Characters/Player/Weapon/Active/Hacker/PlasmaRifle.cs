@@ -16,23 +16,33 @@ public class PlasmaRifle : MonoBehaviour
 
   private float fireTimer = 0f;
 
-  // ★ 추가
+  // ★ 추가: CSV 식별용 ID
   private readonly string weaponId = "plasmarifle";
 
   private int currentPenetration = 0;
 
+  // ★ 추가: 현재 레벨 저장
+  private int currentLevel = 1;
+
+  // ★ 추가: Lv5 이상이면 마스터 효과 활성화
+  private bool IsMasterLevel => currentLevel >= 5;
+
   private void Start()
   {
-    // ★ 추가: 시작 시 Lv1 적용
-    ApplyStatsFromCSV(1);
+    // ★ 수정: 시작 시 현재 레벨 저장 후 Lv1 적용
+    currentLevel = 1;
+    ApplyStatsFromCSV(currentLevel);
   }
 
   public void OnLevelUp(int level)
   {
-    // ★ 수정: CSV 기반으로 변경
-    ApplyStatsFromCSV(level);
+    // ★ 추가: 현재 레벨 저장
+    currentLevel = level;
 
-    Debug.Log($"[PlasmaRifle] Lv.{level}, Dmg:{damage}, Pen:{currentPenetration}");
+    // ★ 수정: CSV 기반으로 변경
+    ApplyStatsFromCSV(currentLevel);
+
+    Debug.Log($"[PlasmaRifle] Lv.{currentLevel}, Dmg:{damage}, Pen:{currentPenetration}, Master={IsMasterLevel}");
   }
 
   // ★ 핵심: CSV 적용 함수
@@ -56,10 +66,6 @@ public class PlasmaRifle : MonoBehaviour
       return;
     }
 
-    // =========================
-    // 🔥 데미지 계산 (LinkPistol 방식 동일)
-    // =========================
-
     float baseDamage = row.damage;
 
     if (levelDict.TryGetValue(1, out var levelOneRow))
@@ -76,14 +82,10 @@ public class PlasmaRifle : MonoBehaviour
 
     damage = baseDamage * (1f + (level - 1) * perLevel);
 
-    // =========================
-    // 🔥 나머지 값 CSV 그대로
-    // =========================
     range = row.range;
     fireRate = row.firerate;
     bulletSpeed = row.bulletspeed;
 
-    // 🔥 penetration은 CSV 그대로 사용
     currentPenetration = (int)row.penetration;
 
     Debug.Log($"[PlasmaRifle] CSV 적용 | Lv={level}, Dmg={damage}, Pen={currentPenetration}");
@@ -92,6 +94,7 @@ public class PlasmaRifle : MonoBehaviour
   private void Update()
   {
     fireTimer += Time.deltaTime;
+
     if (fireTimer >= fireRate)
     {
       Attack();
@@ -112,7 +115,16 @@ public class PlasmaRifle : MonoBehaviour
     if (obj.TryGetComponent<PlasmaLazer>(out var lazer))
     {
       var src = GetComponentInParent<NeoSurvive.Weapon.WeaponSource>();
-      lazer.Initialize(dir, damage, currentPenetration, src != null ? src.weaponData : null);
+
+      // ★ 수정: Lv5 마스터 여부 전달
+      lazer.Initialize(
+        dir,
+        damage,
+        currentPenetration,
+        src != null ? src.weaponData : null,
+        IsMasterLevel,
+        true
+      );
     }
   }
 
@@ -125,12 +137,14 @@ public class PlasmaRifle : MonoBehaviour
     foreach (GameObject enemy in enemies)
     {
       float distance = Vector3.Distance(transform.position, enemy.transform.position);
+
       if (distance < closestDistance)
       {
         closestDistance = distance;
         closest = enemy;
       }
     }
+
     return closest;
   }
 }

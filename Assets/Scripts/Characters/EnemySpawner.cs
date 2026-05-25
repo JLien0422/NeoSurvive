@@ -6,7 +6,11 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private GameObject[] enemyPrefabs;
 
-    [SerializeField] private float spawnInterval = 2f;
+    [Header("스폰 간격")]
+    [SerializeField] private float minSpawnInterval = 1.8f;
+    [SerializeField] private float maxSpawnInterval = 2.2f;
+
+    [Header("스폰 반경 - 카메라 기준 자동 계산")]
     [SerializeField] private float minSpawnRadius = 5f;
     [SerializeField] private float maxSpawnRadius = 10f;
 
@@ -45,6 +49,15 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        // ★ 추가: 스폰 반경은 CSV가 아니라 카메라 크기 기준으로 자동 계산
+        Camera cam = Camera.main;
+        if (cam != null)
+        {
+            float worldWidth = cam.orthographicSize * cam.aspect;
+            minSpawnRadius = worldWidth * 1.2f;
+            maxSpawnRadius = worldWidth * 1.4f;
+        }
+        
         // ★ 변경: CSV 기반으로 Phase 초기화
         SetPhase(1);
     }
@@ -53,7 +66,9 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(spawnInterval);
+            float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
+            yield return new WaitForSeconds(waitTime);
+
             SpawnEnemy();
         }
     }
@@ -112,9 +127,8 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        spawnInterval = row.spawnInterval;
-        minSpawnRadius = row.minSpawnRadius;
-        maxSpawnRadius = row.maxSpawnRadius;
+        minSpawnInterval = row.minSpawnInterval;
+        maxSpawnInterval = row.maxSpawnInterval;
 
         basicWeight = row.basicWeight;
         shooterWeight = row.shooterWeight;
@@ -122,7 +136,12 @@ public class EnemySpawner : MonoBehaviour
         bomberWeight = row.bomberWeight;
         tankerWeight = row.tankerWeight;
 
-        Debug.Log($"[EnemySpawner] Phase {phase} 적용 완료 | interval={spawnInterval}");
+        Debug.Log(
+            $"[EnemySpawner] Phase {phase} 적용 완료 | " +
+            $"interval={minSpawnInterval}~{maxSpawnInterval} | " +
+            $"radius={minSpawnRadius}~{maxSpawnRadius} | " +
+            $"weights={basicWeight}/{shooterWeight}/{rusherWeight}/{bomberWeight}/{tankerWeight}"
+        );
     }
 
     /// <summary>

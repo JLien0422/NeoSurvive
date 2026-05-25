@@ -21,18 +21,28 @@ namespace NeoSurvive.Weapon
     // ★ 추가
     private readonly string weaponId = "autoturret";
 
+    // ★ 추가: 현재 레벨 저장
+    private int currentLevel = 1;
+
+    // ★ 추가: Lv5 이상이면 마스터 포탑으로 설치
+    private bool IsMasterLevel => currentLevel >= 5;
+
     private void Start()
     {
-      // ★ 수정: CSV 적용
-      ApplyStatsFromCSV(1);
+      // ★ 수정: 현재 레벨 저장 후 CSV 적용
+      currentLevel = 1;
+      ApplyStatsFromCSV(currentLevel);
     }
 
     public void OnLevelUp(int level)
     {
-      // ★ 수정: CSV 적용
-      ApplyStatsFromCSV(level);
+      // ★ 추가: 현재 레벨 저장
+      currentLevel = level;
 
-      Debug.Log($"[AutoTurret] CSV 적용 | Lv={level}, Damage={damage}, Range={range}, LifeTime={lifeTime}");
+      // ★ 수정: CSV 적용
+      ApplyStatsFromCSV(currentLevel);
+
+      Debug.Log($"[AutoTurret] CSV 적용 | Lv={currentLevel}, Damage={damage}, Range={range}, LifeTime={lifeTime}, Master={IsMasterLevel}");
     }
 
     // ★ 핵심
@@ -91,6 +101,12 @@ namespace NeoSurvive.Weapon
 
       DeployedTurret deployedTurret = drone.GetComponent<DeployedTurret>();
 
+      if (deployedTurret == null)
+      {
+        Debug.LogWarning("[AutoTurret] DeployedTurret 컴포넌트 없음");
+        return;
+      }
+
       var src = GetComponentInParent<WeaponSource>();
 
       deployedTurret.Initialize(
@@ -99,7 +115,8 @@ namespace NeoSurvive.Weapon
         fireRate,
         lifeTime,
         projectilePrefab,
-        src != null ? src.weaponData : null
+        src != null ? src.weaponData : null,
+        IsMasterLevel
       );
 
       elpased = 0f;

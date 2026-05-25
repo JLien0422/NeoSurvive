@@ -24,24 +24,15 @@ public class PhaseDirector : MonoBehaviour
   // Phase별 특수패턴 "1회만" 실행 플래그
   private bool siege2Done, siege3Done, siege4Done, siege5Done;
 
-  private void Awake()
-  {
-    GameManager.onPlayerSpawned += RefreshPlayerReference;
-  }
-
   private void Start()
   {
-    RefreshPlayerReference();
+    player = GameObject.FindWithTag("Player")?.transform;
+
     if (siegeEvent == null) siegeEvent = GetComponent<SiegeEvent>();              // ***** 안정화
     enemySpawner = GetComponent<EnemySpawner>();                                  // ***** 안정화
     if (enemySpawner == null) enemySpawner = FindObjectOfType<EnemySpawner>();   // ***** 안정화
 
-    //enemySpawner?.SetPhaseWeights(1);
-  }
-
-  private void OnDestroy()
-  {
-    GameManager.onPlayerSpawned -= RefreshPlayerReference;
+    enemySpawner?.SetPhase(1); // ★ 변경
   }
 
   private void Update()
@@ -66,40 +57,38 @@ public class PhaseDirector : MonoBehaviour
 
   private void TriggerSiegeOnce(int phaseIndex)
   {
-    Debug.Log($"[PhaseDirector] Phase{phaseIndex} 특수패턴(포위) 1회 발동");
+      Debug.Log($"[PhaseDirector] Phase{phaseIndex} 특수패턴(포위) 1회 발동");
 
-    if (siegeEvent != null)
-    {
-      siegeEvent.BeginSiege(phaseIndex, () =>
+      // ★ 변경: 포위 이벤트 시작과 동시에 해당 Phase 스폰률 적용
+      if (enemySpawner != null)
       {
-        // 포위 종료 후 해당 Phase 랜덤 가중치 적용
-        if (enemySpawner != null)
-        {
-          //enemySpawner.SetPhaseWeights(phaseIndex);
-          Debug.Log($"[PhaseDirector] Phase{phaseIndex} 랜덤 스폰 가중치 적용 완료");
-        }
-      });
-    }
-    else
-    {
-      Debug.LogWarning("[PhaseDirector] siegeEvent가 null입니다. 같은 오브젝트에 SiegeEvent를 붙이거나 인스펙터 연결을 하세요.");
-    }
+          enemySpawner.SetPhase(phaseIndex);
+          Debug.Log($"[PhaseDirector] Phase{phaseIndex} CSV 스폰 가중치 즉시 적용 완료");
+      }
+      else
+      {
+          Debug.LogWarning("[PhaseDirector] enemySpawner가 null입니다.");
+      }
 
-    SpawnRandomHackableNearPlayer();
+      if (siegeEvent != null)
+      {
+          siegeEvent.BeginSiege(phaseIndex, () =>
+          {
+              // ★ 변경: 스폰률 적용은 위에서 이미 했으므로 여기서는 종료 로그만 남김
+              Debug.Log($"[PhaseDirector] Phase{phaseIndex} 포위 이벤트 종료");
+          });
+      }
+      else
+      {
+          Debug.LogWarning("[PhaseDirector] siegeEvent가 null입니다. 같은 오브젝트에 SiegeEvent를 붙이거나 인스펙터 연결을 하세요.");
+      }
+
+      SpawnRandomHackableNearPlayer();
   }
 
   private void SpawnRandomHackableNearPlayer()
   {
-    if (player == null)
-    {
-      RefreshPlayerReference();
-    }
-
-    if (player == null)
-    {
-      Debug.LogWarning("[PhaseDirector] Player를 찾지 못해 해킹 오브젝트를 스폰하지 못했습니다.");
-      return;
-    }
+    if (player == null) return;
 
     if (hackablePrefabs == null || hackablePrefabs.Length == 0)
     {
@@ -115,17 +104,6 @@ public class PhaseDirector : MonoBehaviour
 
     Instantiate(prefab, pos, Quaternion.identity);
     Debug.Log($"[PhaseDirector] Hackable spawned: {prefab.name}");
-  }
-
-  private void RefreshPlayerReference()
-  {
-    GameObject playerObj = GameObject.FindWithTag("Player");
-    player = playerObj != null ? playerObj.transform : null;
-
-    if (player == null)
-    {
-      Debug.LogWarning("[PhaseDirector] Player 태그 오브젝트를 아직 찾지 못했습니다.");
-    }
   }
 
   // ============================================================

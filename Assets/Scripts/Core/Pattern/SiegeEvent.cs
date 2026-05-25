@@ -63,13 +63,27 @@ public class SiegeEvent : MonoBehaviour
       return;
     }
 
+    if (EnemySpawnLoader.DB == null)
+    {
+      Debug.LogError("[SiegeEvent] EnemySpawnLoader.DB가 null입니다.");
+      onEnded?.Invoke();
+      return;
+    }
+
+    if (!EnemySpawnLoader.DB.TryGetRow(phase, out var row))
+    {
+      Debug.LogError($"[SiegeEvent] CSV에 phase {phase} 데이터가 없습니다.");
+      onEnded?.Invoke();
+      return;
+    }
+
     running = true;
     onEnd = onEnded;
 
-    SpawnInnerRingByPhaseWeights(phase);
-    SpawnOuterRingShooterOnly();
+    SpawnInnerRing(row);
+    SpawnOuterRing(row);
 
-    StartCoroutine(EndRoutine());
+    StartCoroutine(EndRoutine(row.siegeDuration));
   }
 
   private void RefreshPlayerReference()
@@ -81,6 +95,56 @@ public class SiegeEvent : MonoBehaviour
     {
       Debug.LogWarning("[SiegeEvent] Player 태그 오브젝트를 아직 찾지 못했습니다.");
     }
+  }
+
+  private void SpawnInnerRing(EnemySpawnDB.Row row)
+  {
+    var weights = BuildWeightsFromRow(row);
+    List<int> innerTypes = BuildExactTypeList(row.siegeInnerCount, weights);
+
+    for (int i = 0; i < innerTypes.Count; i++)
+    {
+      float angleDeg = (360f / innerTypes.Count) * i;
+      Vector3 pos = player.position + AngleToVector(angleDeg) * row.siegeInnerRadius;
+
+      int typeIdx = innerTypes[i];
+      Instantiate(enemyPrefabs[typeIdx], pos, Quaternion.identity);
+    }
+
+    Debug.Log($"[SiegeEvent] InnerRing Spawned phase={row.phase} count={innerTypes.Count}");
+  }
+
+  private void SpawnOuterRing(EnemySpawnDB.Row row)
+  {
+    for (int i = 0; i < row.siegeOuterCount; i++)
+    {
+      float angleDeg = (360f / row.siegeOuterCount) * i;
+      Vector3 pos = player.position + AngleToVector(angleDeg) * row.siegeOuterRadius;
+
+      GameObject obj = Instantiate(enemyPrefabs[1], pos, Quaternion.identity); // Shooter
+
+      if (row.freezeOuterShooters)
+      {
+        var rb = obj.GetComponent<Rigidbody2D>();
+        if (rb != null)
+          rb.constraints = RigidbodyConstraints2D.FreezePosition;
+      }
+    }
+
+    Debug.Log($"[SiegeEvent] OuterRing Shooter Spawned count={row.siegeOuterCount}");
+  }
+
+  private Dictionary<int, float> BuildWeightsFromRow(EnemySpawnDB.Row row)
+  {
+    Dictionary<int, float> weights = new();
+
+    weights[0] = row.basicWeight;
+    weights[1] = row.shooterWeight;
+    weights[2] = row.rusherWeight;
+    weights[3] = row.bomberWeight;
+    weights[4] = row.tankerWeight;
+
+    return weights;
   }
 
   private void SpawnInnerRingByPhaseWeights(int phase)
@@ -225,6 +289,16 @@ public class SiegeEvent : MonoBehaviour
   private IEnumerator EndRoutine()
   {
     yield return new WaitForSeconds(siegeDuration);
+    running = false;
+
+    Debug.Log("[SiegeEvent] Siege End");
+    onEnd?.Invoke();
+    onEnd = null;
+  }
+
+  private IEnumerator EndRoutine(float duration)
+  {
+    yield return new WaitForSeconds(duration);
     running = false;
 
     Debug.Log("[SiegeEvent] Siege End");

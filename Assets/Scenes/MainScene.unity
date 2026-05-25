@@ -22012,7 +22012,8 @@ MonoBehaviour:
   - {fileID: 1149695538210919475, guid: af73f41edfd07a149ad9302d71a60828, type: 3}
   - {fileID: 2388062192151467424, guid: 95de08d3d257f6045b6316c45e21d641, type: 3}
   - {fileID: 7370841270425998504, guid: acaca08da3fa73a4b85d21f18908e61f, type: 3}
-  spawnInterval: 0.2
+  minSpawnInterval: 1.8
+  maxSpawnInterval: 2.2
   minSpawnRadius: 5
   maxSpawnRadius: 10
   basicWeight: 0

@@ -166,10 +166,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHP:
-    baseValue: 100
+    baseValue: 100000
     currentValue: 0
   maxHP:
-    baseValue: 100
+    baseValue: 100000
     currentValue: 0
   bossNameForUI: "\uC4F0\uB808\uAE30\uACE8\uB818"
 --- !u!114 &-8954586827714942680

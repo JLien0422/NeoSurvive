@@ -1,26 +1,31 @@
 using UnityEngine;
+using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 10번 무기: 블래스트 브레스
-  /// - 플레이어 앞에서 발사
-  /// - 가장 가까운 적을 향해 자동 조준
-  /// - Lv5 마스터: 냉기 브레스로 전환
-  /// </summary>
   public class BlastBreath : MonoBehaviour
   {
     [Header("Breath Prefab")]
-    public GameObject breathAreaPrefab;   // BreathArea가 붙은 프리팹
-    public Transform firePoint;           // 선택: 총구 위치
+    public GameObject breathAreaPrefab;
+    public Transform firePoint;
+
+    [Header("VFX")]
+    public GameObject normalVfxPrefab;      // ★ 추가: 기본 브레스 VFX
+    public GameObject masterVfxPrefab;      // ★ 추가: 마스터 브레스 VFX
+    public float vfxDurationOffset = 0.05f; // ★ 추가: VFX 삭제 보정 시간
+    public float vfxScale = 1.0f;           // ★ 추가: VFX 크기
+
+    [Header("Spawn Tuning")]
+    public float spawnForwardOffset = 0.3f;
+    public float areaCenterOffset = 0.8f;
 
     [Header("Stats")]
     public float damagePerTick = 4f;
     public float range = 4.5f;
     public float width = 2.2f;
-    public float tickInterval = 0.25f;
-    public float areaDuration = 0.8f;
-    public float fireRate = 1.1f;
+    public float tickInterval = 0.08f;
+    public float areaDuration = 0.35f;
+    public float fireRate = 0.12f;
 
     [Header("Level Scaling")]
     public float damagePerLevel = 0.18f;
@@ -34,28 +39,22 @@ namespace NeoSurvive.Weapon
     [Header("Targeting")]
     public float aimRange = 8f;
     public LayerMask enemyMask;
+    public string enemyTag = "Enemy";
+
+    private const string weaponId = "blastbreath";
 
     private float timer;
-
-    // base stat cache
-    private float baseDamage;
-    private float baseRange;
-    private float baseWidth;
-
     private int currentLevel = 1;
 
     private void Start()
     {
-      baseDamage = damagePerTick;
-      baseRange = range;
-      baseWidth = width;
-
       ApplyLevel(1);
     }
 
     private void Update()
     {
       timer += Time.deltaTime;
+
       if (timer >= fireRate)
       {
         EmitBreath();
@@ -71,71 +70,171 @@ namespace NeoSurvive.Weapon
     private void ApplyLevel(int level)
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
-
-      damagePerTick = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
-      width = baseWidth * (1f + (currentLevel - 1) * widthPerLevel);
+      ApplyStatsFromCSV(currentLevel);
     }
 
-    /// <summary>
-    /// 브레스 발사
-    /// </summary>
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+      {
+        Debug.LogWarning("[BlastBreath] WeaponStatLoader.DB 없음");
+        return;
+      }
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+      {
+        Debug.LogWarning($"[BlastBreath] weaponId 없음: {weaponId}");
+        return;
+      }
+
+      if (!levelDict.TryGetValue(level, out var row))
+      {
+        Debug.LogWarning($"[BlastBreath] level 데이터 없음: {level}");
+        return;
+      }
+
+      levelDict.TryGetValue(1, out var baseRow);
+
+      float baseDamage = row.damagepertick;
+      float baseRange = row.range;
+      float baseWidth = row.width;
+
+      if (baseRow != null)
+      {
+        baseDamage = baseRow.damagepertick;
+        baseRange = baseRow.range;
+        baseWidth = baseRow.width;
+      }
+
+      damagePerLevel = row.damageperlevel;
+      rangePerLevel = row.rangeperlevel;
+      widthPerLevel = row.widthperlevel;
+
+      if (damagePerLevel <= 0f && baseRow != null)
+        damagePerLevel = baseRow.damageperlevel;
+
+      if (rangePerLevel <= 0f && baseRow != null)
+        rangePerLevel = baseRow.rangeperlevel;
+
+      if (widthPerLevel <= 0f && baseRow != null)
+        widthPerLevel = baseRow.widthperlevel;
+
+      damagePerTick = baseDamage * (1f + (level - 1) * damagePerLevel);
+      range = baseRange * (1f + (level - 1) * rangePerLevel);
+      width = baseWidth * (1f + (level - 1) * widthPerLevel);
+
+      tickInterval = row.tickinterval;
+      areaDuration = row.areaduration;
+      fireRate = row.firerate;
+      aimRange = row.aimrange;
+    }
+
     private void EmitBreath()
     {
       if (breathAreaPrefab == null) return;
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBlastBreathFire();
 
-      // 1️⃣ 시작 위치
-      Vector3 origin = firePoint ? firePoint.position : transform.position;
+      Vector3 aimOrigin = firePoint ? firePoint.position : transform.position;
 
-      // 2️⃣ 가장 가까운 적 찾기
-      Transform target = FindClosestEnemy(origin);
+      Transform target = FindClosestTarget(aimOrigin);
 
-      // 3️⃣ 방향 결정
       Vector3 forward = target != null
-        ? (target.position - origin).normalized
+        ? (target.position - aimOrigin).normalized
         : transform.right;
 
-      // 4️⃣ 브레스 영역 중심
-      Vector3 center = origin + forward * (range * 0.5f);
+      Vector3 origin = firePoint
+        ? firePoint.position
+        : transform.position + forward * spawnForwardOffset;
 
-      // 5️⃣ 회전
+      Vector3 center = origin + forward * areaCenterOffset;
+
       float angleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-      Quaternion rot = Quaternion.Euler(0, 0, angleZ);
+      Quaternion rot = Quaternion.Euler(0f, 0f, angleZ);
 
-      // 6️⃣ 생성
+      bool cold = enableMaster && currentLevel >= 5 && masterColdMode;
+
       GameObject obj = Instantiate(breathAreaPrefab, center, rot);
 
-      var area = obj.GetComponent<BreathArea>();
+      var area = obj.GetComponentInChildren<BreathArea>();
+
       if (area != null)
       {
-        bool cold = enableMaster && currentLevel >= 5 && masterColdMode;
-        area.Initialize(damagePerTick, tickInterval, areaDuration, range, width, cold);
+        area.Initialize(
+          damagePerTick,
+          tickInterval,
+          areaDuration,
+          range,
+          width,
+          cold,
+          enemyMask,
+          enemyTag
+        );
       }
 
       Destroy(obj, areaDuration + 0.05f);
+
+      SpawnBreathVFX(center, rot, cold);
     }
 
-    /// <summary>
-    /// 가장 가까운 적 탐색
-    /// </summary>
-    private Transform FindClosestEnemy(Vector3 origin)
+    // ★ 추가: 브레스 VFX 생성
+    private void SpawnBreathVFX(Vector3 center, Quaternion rot, bool cold)
     {
-      Collider2D[] hits =
-        Physics2D.OverlapCircleAll(origin, aimRange, enemyMask);
+      GameObject prefab =
+        cold && masterVfxPrefab != null
+        ? masterVfxPrefab
+        : normalVfxPrefab;
+
+      if (prefab == null) return;
+
+      GameObject vfx = Instantiate(prefab, center, rot);
+
+      vfx.transform.localScale = Vector3.one * vfxScale;
+
+      Destroy(vfx, areaDuration + vfxDurationOffset);
+    }
+
+    private Transform FindClosestTarget(Vector3 origin)
+    {
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, aimRange);
 
       Transform closest = null;
       float minDist = float.MaxValue;
 
       foreach (var h in hits)
       {
-        if (!h.CompareTag("Enemy")) continue;
+        if (h == null) continue;
 
-        float d = Vector2.Distance(origin, h.transform.position);
+        bool isInEnemyMask = ((1 << h.gameObject.layer) & enemyMask.value) != 0;
+
+        bool isEnemy =
+          !string.IsNullOrEmpty(enemyTag) &&
+          (
+            h.CompareTag(enemyTag) ||
+            (h.transform.parent != null && h.transform.parent.CompareTag(enemyTag))
+          );
+
+        IDamageable damageable = h.GetComponent<IDamageable>();
+
+        if (damageable == null)
+          damageable = h.GetComponentInParent<IDamageable>();
+
+        if ((!isInEnemyMask || !isEnemy) && damageable == null)
+          continue;
+
+        Transform targetTransform = h.transform;
+
+        Enemy enemy = h.GetComponentInParent<Enemy>();
+
+        if (enemy != null)
+          targetTransform = enemy.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
+
+        float d = Vector2.Distance(origin, targetTransform.position);
+
         if (d < minDist)
         {
           minDist = d;
-          closest = h.transform;
+          closest = targetTransform;
         }
       }
 

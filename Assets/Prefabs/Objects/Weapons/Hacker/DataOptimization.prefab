@@ -45,6 +45,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fieldPrefab: {fileID: 2380440144791872430, guid: 4f078cf4cc5f24547a5f2a1915e49818, type: 3}
+  startVfxPrefab: {fileID: 5430226051933152450, guid: f5f9a6816efba3148b3c767ca9c73a22, type: 3}
+  middleVfxPrefab: {fileID: 3042523198471717592, guid: f2d9e36a0297ffb40a6717365bf72012, type: 3}
+  endVfxPrefab: {fileID: 1328612333489983442, guid: 387c5904c28c29f4fbc3d5661db12606, type: 3}
+  startVfxDuration: 0.5
+  middleMinDuration: 1
+  endVfxDuration: 0.5
+  vfxScale: 5
   fieldDuration: 3
   fieldWidth: 0
   fieldHeight: 0

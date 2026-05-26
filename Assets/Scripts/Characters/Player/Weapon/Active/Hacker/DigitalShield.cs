@@ -4,15 +4,18 @@ namespace NeoSurvive.Weapon
 {
     /// <summary>
     /// 해커 무기: 디지털 실드
-    /// - 가로 직사각형 웨이브 1개 생성
-    /// - 실제 판정은 원형
-    /// - Lv5(마스터)일 때 넉백된 적이 다른 적과 충돌 시 추가 피해
-    /// - 수치는 CSV에서 로드
+    /// - shieldWavePrefab: 판정/데미지/넉백 전용
+    /// - shieldWaveVfxPrefab: 애니메이션 전용
     /// </summary>
     public class DigitalShield : MonoBehaviour
     {
         [Header("Prefab")]
         [SerializeField] private GameObject shieldWavePrefab;
+
+        [Header("VFX")]
+        [SerializeField] private GameObject shieldWaveVfxPrefab;
+        [SerializeField] private float vfxLifetime = 0.5f;
+        [SerializeField] private float vfxScale = 1.0f;
 
         [Header("Runtime Stats (CSV 적용값)")]
         [SerializeField] private float fireRate = 4.0f;
@@ -72,8 +75,11 @@ namespace NeoSurvive.Weapon
                 return;
             }
 
-            Vector3 spawnPos = (owner != null) ? owner.transform.position : transform.position;
+            Vector3 spawnPos = owner != null ? owner.transform.position : transform.position;
 
+            // =========================
+            // 기능/판정 프리팹 생성
+            // =========================
             GameObject obj = Instantiate(shieldWavePrefab, spawnPos, Quaternion.identity);
             ShieldWave wave = obj.GetComponent<ShieldWave>();
 
@@ -84,7 +90,10 @@ namespace NeoSurvive.Weapon
                 return;
             }
 
-            float finalDamage = (owner != null) ? owner.ApplyWeaponDamageMultiplier(damage) : damage;
+            float finalDamage = owner != null
+                ? owner.ApplyWeaponDamageMultiplier(damage)
+                : damage;
+
             bool isMaster = level >= 5;
 
             wave.InitializeCircle(
@@ -102,10 +111,45 @@ namespace NeoSurvive.Weapon
                 debugLog
             );
 
+            // =========================
+            // ★ 추가: 애니메이션 전용 VFX 생성
+            // =========================
+            SpawnShieldWaveVFX(
+                spawnPos,
+                owner != null ? owner.transform : transform
+            );
+
             if (debugLog)
             {
-                Debug.Log($"[DigitalShield] 발동 | Lv={level} | dmg={finalDamage} | hitRadius={hitRadius} | kb={knockbackForce}");
+                Debug.Log(
+                    $"[DigitalShield] 발동 | Lv={level} | dmg={finalDamage} | hitRadius={hitRadius} | kb={knockbackForce}"
+                );
             }
+        }
+
+        // =========================
+        // ★ 수정: 플레이어를 따라다니는 VFX
+        // =========================
+        private void SpawnShieldWaveVFX(Vector3 spawnPos, Transform followTarget)
+        {
+            if (shieldWaveVfxPrefab == null) return;
+
+            GameObject vfx = Instantiate(
+                shieldWaveVfxPrefab,
+                spawnPos,
+                Quaternion.identity
+            );
+
+            vfx.transform.localScale = Vector3.one * vfxScale;
+
+            // ★ 추가: 플레이어를 따라가도록 부모 설정
+            if (followTarget != null)
+            {
+                vfx.transform.SetParent(followTarget);
+                vfx.transform.localPosition = Vector3.zero;
+            }
+
+            Destroy(vfx, vfxLifetime);
         }
 
         public void OnLevelUp(int newLevel)
@@ -150,15 +194,24 @@ namespace NeoSurvive.Weapon
 
             if (targetLevel >= 5)
             {
-                if (row.collisiondamagemultiplier > 0f) collisionDamageMultiplier = row.collisiondamagemultiplier;
-                if (row.collisiondetectradius > 0f) collisionDetectRadius = row.collisiondetectradius;
-                if (row.collisionimpactradius > 0f) collisionImpactRadius = row.collisionimpactradius;
-                if (row.collisioncarrierduration > 0f) collisionCarrierDuration = row.collisioncarrierduration;
+                if (row.collisiondamagemultiplier > 0f)
+                    collisionDamageMultiplier = row.collisiondamagemultiplier;
+
+                if (row.collisiondetectradius > 0f)
+                    collisionDetectRadius = row.collisiondetectradius;
+
+                if (row.collisionimpactradius > 0f)
+                    collisionImpactRadius = row.collisionimpactradius;
+
+                if (row.collisioncarrierduration > 0f)
+                    collisionCarrierDuration = row.collisioncarrierduration;
             }
 
             if (debugLog)
             {
-                Debug.Log($"[DigitalShield] CSV 적용 | Lv={targetLevel} | fireRate={fireRate} | damage={damage} | hitRadius={hitRadius} | knockbackForce={knockbackForce}");
+                Debug.Log(
+                    $"[DigitalShield] CSV 적용 | Lv={targetLevel} | fireRate={fireRate} | damage={damage} | hitRadius={hitRadius} | knockbackForce={knockbackForce}"
+                );
             }
         }
     }

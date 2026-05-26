@@ -202,8 +202,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 91a34023f9f2db34b97ebd488ef9dcfa, type: 2}
   cyborgStartWeapons:
   - {fileID: 11400000, guid: f1006bc8dd749404c91f8d923c649abb, type: 2}
-  hackerStartWeapons:
-  - {fileID: 11400000, guid: 1b2d6e2e44120ff45963297b2be3cf21, type: 2}
+  hackerStartWeapons: []
 --- !u!114 &714923196670910669
 MonoBehaviour:
   m_ObjectHideFlags: 0

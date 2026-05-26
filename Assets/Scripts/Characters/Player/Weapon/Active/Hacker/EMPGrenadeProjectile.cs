@@ -21,6 +21,7 @@ namespace NeoSurvive.Weapon
   {
     [Header("Optional Visual")]
     [SerializeField] private GameObject explosionEffectPrefab;
+    [SerializeField] private float explosionEffectLifetime = 0.7f; // ★ 추가
     [SerializeField] private bool rotateWhileFlying = true;
     [SerializeField] private float rotateSpeed = 540f;
 
@@ -120,7 +121,8 @@ namespace NeoSurvive.Weapon
 
       if (explosionEffectPrefab != null)
       {
-        Instantiate(explosionEffectPrefab, explodePos, Quaternion.identity);
+        GameObject effect = Instantiate(explosionEffectPrefab, explodePos, Quaternion.identity); // ★ 수정
+        Destroy(effect, explosionEffectLifetime); // ★ 추가
       }
 
       Collider2D[] hits = Physics2D.OverlapCircleAll(explodePos, explosionRadius);

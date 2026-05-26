@@ -1,14 +1,10 @@
 using UnityEngine;
 using NeoSurvive.Core;
-using NeoSurvive.Buff; // (추가)
+using NeoSurvive.Buff;
+using System.Collections.Generic;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 블래스트 브레스 방사 영역
-  /// - 일정 시간 동안 tick마다 범위 내 적에게 피해
-  /// - (Lv5 coldMode) 냉기: 닿는 즉시 빙결(속박/기절) 적용
-  /// </summary>
   public class BreathArea : MonoBehaviour
   {
     [Header("Filter")]
@@ -25,28 +21,25 @@ namespace NeoSurvive.Weapon
     private float life;
     private float timer;
 
-    // ===================== 냉기(빙결) 옵션 (추가) =====================
+    [Header("Cold Settings")]
+    public bool freezeOnHit = true;
+    public float freezeDuration = 1.25f;
+    public bool freezeAsStun = false;
 
-    [Header("Cold (Freeze) Settings (추가)")]
-    [Tooltip("coldMode일 때 즉시 빙결 적용 여부")]
-    public bool freezeOnHit = true; // (추가)
+    [Header("Cold Slow Optional")]
+    public bool applySlowInCold = false;
+    [Range(0.05f, 1f)] public float slowMul = 0.7f;
+    public float slowDuration = 0.35f;
 
-    [Tooltip("빙결 지속 시간(초)")]
-    public float freezeDuration = 1.25f; // (추가)
-
-    [Tooltip("빙결을 '속박'으로 할지, '기절'로 할지 선택")]
-    public bool freezeAsStun = false; // (추가)
-    // true  -> StunDebuff(freezeDuration)
-    // false -> RootDebuff(freezeDuration)
-
-    [Header("Cold (Slow) Optional (추가)")]
-    public bool applySlowInCold = false; // (추가) 원하면 켜
-    [Range(0.05f, 1f)] public float slowMul = 0.7f; // (추가)
-    public float slowDuration = 0.35f; // (추가) 틱마다 갱신용(짧게)
-
-    // ================================================================
-
-    public void Initialize(float damagePerTick, float tickInterval, float duration, float range, float width, bool coldMode)
+    public void Initialize(
+      float damagePerTick,
+      float tickInterval,
+      float duration,
+      float range,
+      float width,
+      bool coldMode,
+      LayerMask enemyMask,
+      string enemyTag)
     {
       this.damagePerTick = damagePerTick;
       this.tickInterval = tickInterval;
@@ -54,14 +47,11 @@ namespace NeoSurvive.Weapon
       this.range = range;
       this.width = width;
       this.coldMode = coldMode;
+      this.enemyMask = enemyMask;
+      this.enemyTag = enemyTag;
 
       life = 0f;
       timer = 0f;
-
-      // 보기용(선택): 냉기 모드면 색상 바꿈
-      var sr = GetComponent<SpriteRenderer>();
-      if (sr != null)
-        sr.color = coldMode ? Color.cyan : new Color(1f, 0.4f, 0.1f);
     }
 
     private void Update()
@@ -83,56 +73,92 @@ namespace NeoSurvive.Weapon
 
     private void TickDamage()
     {
-      // 직사각 범위(회전 포함) = OverlapBoxAll
       Vector2 boxSize = new Vector2(range, width);
       float angleZ = transform.eulerAngles.z;
 
-      Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, angleZ, enemyMask);
+      Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxSize, angleZ);
+
+      HashSet<Enemy> damagedEnemies = new HashSet<Enemy>();
+      HashSet<Component> damagedMapObjects = new HashSet<Component>();
+
       foreach (var col in hits)
       {
         if (col == null) continue;
 
-        // 태그 필터(유지)
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
+        Enemy enemy = GetValidEnemy(col);
+
+        if (enemy != null)
         {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
+          if (damagedEnemies.Contains(enemy))
             continue;
-        }
 
-        Enemy enemy = col.GetComponentInParent<Enemy>();
-        if (enemy == null) continue;
+          damagedEnemies.Add(enemy);
 
-        // 1) 데미지
-        var src = GetComponent<WeaponSource>();
-        enemy.TakeDamage(damagePerTick, src != null ? src.weaponData : null);
+          enemy.TakeDamage(damagePerTick);
 
-        // 2) Lv5 냉기 모드: 닿는 즉시 빙결 (추가)
-        if (coldMode)
-        {
-          GameObject target = enemy.gameObject;
-
-          // (옵션) 냉기 슬로우도 같이 주고 싶으면
-          if (applySlowInCold)
+          if (coldMode)
           {
-            BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration));
+            if (applySlowInCold)
+              BuffUtil.Apply(enemy.gameObject, new SlowDebuff(slowMul, slowDuration));
+
+            if (freezeOnHit)
+            {
+              if (freezeAsStun)
+                BuffUtil.Apply(enemy.gameObject, new StunDebuff(freezeDuration));
+              else
+                BuffUtil.Apply(enemy.gameObject, new RootDebuff(freezeDuration));
+            }
           }
 
-          // 즉시 빙결
-          if (freezeOnHit)
-          {
-            if (freezeAsStun)
-              BuffUtil.Apply(target, new StunDebuff(freezeDuration));
-            else
-              BuffUtil.Apply(target, new RootDebuff(freezeDuration));
-          }
+          continue;
         }
+
+        IDamageable damageable = col.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = col.GetComponentInParent<IDamageable>();
+
+        if (damageable == null)
+          continue;
+
+        Component damageableComponent = damageable as Component;
+        if (damageableComponent != null && damagedMapObjects.Contains(damageableComponent))
+          continue;
+
+        if (damageableComponent != null)
+          damagedMapObjects.Add(damageableComponent);
+
+        damageable.TakeDamage(damagePerTick);
       }
+    }
+
+    private Enemy GetValidEnemy(Collider2D col)
+    {
+      if (col == null) return null;
+
+      bool isInEnemyMask = ((1 << col.gameObject.layer) & enemyMask.value) != 0;
+      if (!isInEnemyMask)
+        return null;
+
+      if (!string.IsNullOrEmpty(enemyTag))
+      {
+        bool self = col.CompareTag(enemyTag);
+        bool parent = col.transform.parent != null && col.transform.parent.CompareTag(enemyTag);
+
+        if (!self && !parent)
+          return null;
+      }
+
+      return col.GetComponentInParent<Enemy>();
     }
 
     private void OnDrawGizmosSelected()
     {
       Gizmos.color = Color.white;
-      Gizmos.DrawWireCube(transform.position, new Vector3(range, width, 1f));
+
+      Matrix4x4 oldMatrix = Gizmos.matrix;
+      Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+      Gizmos.DrawWireCube(Vector3.zero, new Vector3(range, width, 1f));
+      Gizmos.matrix = oldMatrix;
     }
   }
 }

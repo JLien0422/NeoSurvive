@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using NeoSurvive.Core;
 
@@ -6,6 +7,16 @@ namespace NeoSurvive.Weapon
     public class DataOptimization : MonoBehaviour
     {
         public GameObject fieldPrefab;
+
+        [Header("VFX")]
+        public GameObject startVfxPrefab;
+        public GameObject middleVfxPrefab;
+        public GameObject endVfxPrefab;
+
+        public float startVfxDuration = 0.5f;
+        public float middleMinDuration = 0.5f; // ★ 추가: Middle 최소 표시 시간
+        public float endVfxDuration = 0.5f;
+        public float vfxScale = 1.0f;
 
         public float fieldDuration;
         public float fieldWidth;
@@ -31,7 +42,6 @@ namespace NeoSurvive.Weapon
 
         private void Update()
         {
-            // 🔥 [추가] firerate 0 방어 (CSV 누락 대비)
             if (fireRate <= 0f) return;
 
             timer += Time.deltaTime;
@@ -47,14 +57,16 @@ namespace NeoSurvive.Weapon
         {
             if (fieldPrefab == null) return;
 
-            GameObject obj = Instantiate(fieldPrefab, transform.position, Quaternion.identity);
+            Vector3 spawnPos = transform.position;
+
+            GameObject obj = Instantiate(fieldPrefab, spawnPos, Quaternion.identity);
 
             if (obj.TryGetComponent<DataField>(out var field))
             {
-                Vector2 fieldSize = new Vector2(fieldWidth, fieldHeight); // 🔥 [추가] 필드 크기 계산
+                Vector2 fieldSize = new Vector2(fieldWidth, fieldHeight);
 
                 field.Initialize(
-                    fieldSize,                     // 🔥 [수정] fieldSize 전달하도록 변경
+                    fieldSize,
                     damageBuffMultiplier,
                     buffDuration,
                     currentLevel >= 5,
@@ -63,10 +75,45 @@ namespace NeoSurvive.Weapon
                     srcWeapon: null
                 );
 
-                // ❌ [삭제] 기존 transform.localScale 방식 제거
-                // obj.transform.localScale = new Vector3(fieldWidth, fieldHeight, 1f);
-
                 Destroy(obj, fieldDuration);
+            }
+
+            StartCoroutine(FieldVFXRoutine(spawnPos));
+        }
+
+        // ★ 수정: Start → Middle → End VFX 순차 실행
+        private IEnumerator FieldVFXRoutine(Vector3 spawnPos)
+        {
+            if (startVfxPrefab != null)
+            {
+                GameObject startVfx = Instantiate(startVfxPrefab, spawnPos, Quaternion.identity);
+                startVfx.transform.localScale = Vector3.one * vfxScale;
+                Destroy(startVfx, startVfxDuration);
+            }
+
+            yield return new WaitForSeconds(startVfxDuration);
+
+            GameObject middleVfx = null;
+
+            if (middleVfxPrefab != null)
+            {
+                middleVfx = Instantiate(middleVfxPrefab, spawnPos, Quaternion.identity);
+                middleVfx.transform.localScale = Vector3.one * vfxScale;
+            }
+
+            // ★ 수정: fieldDuration이 짧아도 Middle이 최소 시간은 보이도록 처리
+            float middleDuration = Mathf.Max(middleMinDuration, fieldDuration - startVfxDuration);
+
+            yield return new WaitForSeconds(middleDuration);
+
+            if (middleVfx != null)
+                Destroy(middleVfx);
+
+            if (endVfxPrefab != null)
+            {
+                GameObject endVfx = Instantiate(endVfxPrefab, spawnPos, Quaternion.identity);
+                endVfx.transform.localScale = Vector3.one * vfxScale;
+                Destroy(endVfx, endVfxDuration);
             }
         }
 
@@ -88,10 +135,9 @@ namespace NeoSurvive.Weapon
             damageBuffMultiplier = row.damagebuffmultiplier;
             buffDuration = row.buffduration;
 
-            masterSlowMultiplier = row.masterslowmul;       // 🔥 [수정] slowmultiplier → masterslowmul
-            masterSlowDuration = row.masterslowduration;    // 🔥 [수정] slowduration → masterslowduration
+            masterSlowMultiplier = row.masterslowmul;
+            masterSlowDuration = row.masterslowduration;
 
-            // 🔥 [추가] firerate 0 방어
             if (row.firerate > 0f)
                 fireRate = row.firerate;
 
@@ -99,5 +145,3 @@ namespace NeoSurvive.Weapon
         }
     }
 }
-
-// CSV안에 firerate를 넣어둠 (값은 6으로 통일)

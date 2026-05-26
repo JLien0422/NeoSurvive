@@ -45,19 +45,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shieldWavePrefab: {fileID: 1515475878241952546, guid: daea01269be94854e92daa9556af9c2a, type: 3}
+  shieldWaveVfxPrefab: {fileID: 1902381050476728993, guid: 808a8c49f4fd4c042a1f06be0dcda9bb, type: 3}
+  vfxLifetime: 0.5
+  vfxScale: 2.7
   fireRate: 4
   damage: 12
-  range: 2.5
-  forwardOffset: 1.5
+  hitRadius: 2.5
   knockbackForce: 9
   knockbackDuration: 0.45
-  damagePerLevel: 2
-  rangePerLevel: 0.25
-  knockbackForcePerLevel: 0.8
   collisionDamageMultiplier: 1
   collisionDetectRadius: 0.7
   collisionImpactRadius: 1.2
   collisionCarrierDuration: 0.8
-  directionSearchRadius: 8
-  enemyTag: Enemy
   debugLog: 0

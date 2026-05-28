@@ -31,14 +31,19 @@ public class UpgradeManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(transform.root.gameObject);
+            Destroy(Instance.gameObject);
         }
-        else
+
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
         {
-            Destroy(gameObject);
+            Instance = null;
         }
     }
 

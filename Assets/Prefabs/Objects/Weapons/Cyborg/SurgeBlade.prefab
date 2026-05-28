@@ -52,7 +52,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   enemyTag: Enemy
-  damagePerLevel: 0.25
   rangePerLevel: 0.05
   baseMaxTargets: 1
   maxTargetsAtLv5: 3

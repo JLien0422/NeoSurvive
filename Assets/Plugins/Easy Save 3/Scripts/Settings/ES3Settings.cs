@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using ES3Internal;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,6 +26,18 @@ public class ES3Settings : System.ICloneable
                 _defaultSettingsScriptableObject = Resources.Load<ES3Defaults>(defaultSettingsPath);
 
 #if UNITY_EDITOR
+                if (_defaultSettingsScriptableObject == null)
+                {
+                    var assetPath = PathToDefaultSettings();
+                    _defaultSettingsScriptableObject = AssetDatabase.LoadAssetAtPath<ES3Defaults>(assetPath);
+
+                    if (_defaultSettingsScriptableObject == null && System.IO.File.Exists(assetPath))
+                    {
+                        AssetDatabase.ImportAsset(assetPath);
+                        _defaultSettingsScriptableObject = AssetDatabase.LoadAssetAtPath<ES3Defaults>(assetPath);
+                    }
+                }
+
                 if (_defaultSettingsScriptableObject == null)
                 {
                     _defaultSettingsScriptableObject = ScriptableObject.CreateInstance<ES3Defaults>();

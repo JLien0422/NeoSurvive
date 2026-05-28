@@ -204,6 +204,11 @@ namespace NeoSurvive.Weapon
     /// </summary>
     private void SpawnGrenade(Vector2 startPos, Vector2 targetPos)
     {
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayEMPGrenadeAttack();
+      }
+
       GameObject grenadeObj = Instantiate(grenadeProjectilePrefab, startPos, Quaternion.identity);
 
       EMPGrenadeProjectile projectile = grenadeObj.GetComponent<EMPGrenadeProjectile>();
@@ -213,6 +218,8 @@ namespace NeoSurvive.Weapon
         Destroy(grenadeObj);
         return;
       }
+
+      WeaponSource src = GetComponentInParent<WeaponSource>();
 
       projectile.Initialize(
         gameObject,
@@ -224,7 +231,9 @@ namespace NeoSurvive.Weapon
         travelTime,
         arcHeight,
         enemyMask,
-        enemyTag
+        enemyTag,
+        currentLevel >= 5,
+        src != null ? src.weaponData : null
       );
     }
 

@@ -39,6 +39,13 @@ namespace NeoSurvive.Weapon
       {
         direction = (destination - transform.position).normalized;
       }
+
+      if (direction != Vector3.zero)
+      {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+      }
+
       transform.position += direction * speed * Time.deltaTime;
     }
 
@@ -62,10 +69,10 @@ namespace NeoSurvive.Weapon
       IDamageable damageable = collision.GetComponent<IDamageable>();
 
       if (damageable == null)
-          damageable = collision.GetComponentInParent<IDamageable>();
+        damageable = collision.GetComponentInParent<IDamageable>();
 
       if (damageable == null)
-          return;
+        return;
 
       damageable.TakeDamage(damage);
 

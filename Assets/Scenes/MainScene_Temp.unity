@@ -23571,7 +23571,6 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 06ba904dedf1cf847877e3fe088fc9db, type: 3}
   - {fileID: 4900000, guid: 0da56194f55ec59448ad8083035db42d, type: 3}
   - {fileID: 4900000, guid: f6c770c6348b1a94188cd94b9f21aed9, type: 3}
-  - {fileID: 4900000, guid: 6cdd772481aa8b44592f9be8b92597de, type: 3}
   - {fileID: 4900000, guid: 3c1400ac71aeb804a8fe9415f7070009, type: 3}
   cyborgWeaponStatCsvFiles:
   - {fileID: 4900000, guid: 07ba07a11ccd4564b9759d712d01724f, type: 3}

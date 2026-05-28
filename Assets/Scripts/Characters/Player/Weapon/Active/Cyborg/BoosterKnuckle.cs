@@ -3,26 +3,27 @@ using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 6번 무기: 부스터 너클
-  /// - 로켓 추진 주먹을 전방 발사
-  /// - Lv.Up: 주먹 속도/데미지/주먹 개수 증가
-  /// - Lv.5 마스터: 벽에 부딪히면 튕겨 나와 가장 가까운 적을 재추격(유도)
-  /// </summary>
   public class BoosterKnuckle : MonoBehaviour
   {
     [Header("Projectile")]
-    public GameObject fistProjectilePrefab;   // BoosterFistProjectile가 붙은 프리팹(필수)
-    public Transform firePoint;               // 없으면 transform.position에서 발사
+    public GameObject fistProjectilePrefab;
+    public Transform firePoint;
+
+    [Header("Muzzle VFX")]
+    public GameObject muzzleVfxPrefab;
+    public float muzzleVfxScale = 1f;
+    public float muzzleVfxDuration = 0.25f;
+
+    [Header("Fire Offset")]
+    [SerializeField] private float fireOffset = 0.8f;
 
     [Header("Stats")]
     public float damage = 14f;
-    public float range = 12f;      // 투사체 최대 이동거리
+    public float range = 12f;
     public float fireRate = 1.2f;
     public float speed = 18f;
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.18f;
     public float speedPerLevel = 0.12f;
     public int baseCount = 1;
     public int maxCount = 4;
@@ -34,9 +35,10 @@ namespace NeoSurvive.Weapon
     [Header("Master (Lv5)")]
     public bool enableMaster = true;
 
+    private const string weaponId = "boosterknuckle";
+
     private float timer;
 
-    private float baseDamage;
     private float baseSpeed;
     private float baseRange;
     private float baseFireRate;
@@ -46,7 +48,8 @@ namespace NeoSurvive.Weapon
 
     private void Start()
     {
-      baseDamage = damage;
+      ApplyStatsFromCSV(1);
+
       baseSpeed = speed;
       baseRange = range;
       baseFireRate = fireRate;
@@ -57,6 +60,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       timer += Time.deltaTime;
+
       if (timer >= fireRate)
       {
         Fire();
@@ -66,54 +70,190 @@ namespace NeoSurvive.Weapon
 
     public void OnLevelUp(int level)
     {
+      ApplyStatsFromCSV(level);
       ApplyLevel(level);
-      Debug.Log($"[BoosterKnuckle] Lv.{currentLevel} dmg={damage} speed={speed} count={currentCount}");
+
+      Debug.Log($"[BoosterKnuckle] Lv.{currentLevel} damage={damage}, speed={speed}, count={currentCount}");
     }
 
     private void ApplyLevel(int level)
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
       speed = baseSpeed * (1f + (currentLevel - 1) * speedPerLevel);
-      range = baseRange; // 고정(원하면 증가)
-      fireRate = baseFireRate; // 고정(원하면 감소)
+      range = baseRange;
+      fireRate = baseFireRate;
 
-      // 주먹 개수 증가: Lv1=1, Lv3=2, Lv5=3~4 (원하면 조절)
-      if (currentLevel <= 1) currentCount = baseCount;
-      else if (currentLevel <= 3) currentCount = Mathf.Min(2, maxCount);
-      else currentCount = Mathf.Min(3, maxCount);
+      if (damage <= 0f)
+        damage = 14f;
+
+      if (speed <= 0f)
+        speed = 18f;
+
+      if (currentLevel <= 1)
+        currentCount = baseCount;
+      else if (currentLevel <= 3)
+        currentCount = Mathf.Min(2, maxCount);
+      else
+        currentCount = Mathf.Min(3, maxCount);
     }
 
     private void Fire()
     {
       if (fistProjectilePrefab == null) return;
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBoosterKnuckleFire();
 
-      Vector3 origin = firePoint ? firePoint.position : transform.position;
+      Vector3 baseOrigin = firePoint != null ? firePoint.position : transform.position;
 
-      // 기본 발사 방향: 플레이어 오른쪽(게임에서 캐릭터 방향 시스템 있으면 거기로 교체)
-      Vector3 forward = transform.right;
+      Transform target = FindClosestEnemy(baseOrigin);
 
-      // 여러 발이면 살짝 퍼지게
-      float spread = (currentCount <= 1) ? 0f : 10f; // 각도 퍼짐
+      Vector3 forward = target != null
+        ? (target.position - baseOrigin).normalized
+        : transform.right;
+
+      Vector3 origin = baseOrigin + forward * fireOffset;
+
+      float angleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+      Quaternion muzzleRot = Quaternion.Euler(0f, 0f, angleZ);
+
+      SpawnMuzzleVFX(origin, muzzleRot);
+
+      float spread = currentCount <= 1 ? 0f : 10f;
+
       for (int i = 0; i < currentCount; i++)
       {
-        float t = (currentCount == 1) ? 0.5f : (float)i / (currentCount - 1);
+        float t = currentCount == 1 ? 0.5f : (float)i / (currentCount - 1);
         float ang = Mathf.Lerp(-spread, spread, t);
 
-        Vector3 dir = Quaternion.Euler(0, 0, ang) * forward;
+        Vector3 dir = Quaternion.Euler(0f, 0f, ang) * forward;
 
-        GameObject obj = Instantiate(fistProjectilePrefab, origin, Quaternion.identity);
-        var proj = obj.GetComponent<BoosterFistProjectile>();
-        if (proj != null)
+        float projectileAngleZ = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        Quaternion projectileRot = Quaternion.Euler(0f, 0f, projectileAngleZ);
+
+        GameObject obj = Instantiate(fistProjectilePrefab, origin, projectileRot);
+
+        BoosterFistProjectile proj = obj.GetComponent<BoosterFistProjectile>();
+        if (proj == null) continue;
+
+        bool master = enableMaster && currentLevel >= 5;
+
+        proj.Initialize(
+          gameObject,
+          dir,
+          damage,
+          speed,
+          range,
+          enemyMask,
+          enemyTag,
+          master
+        );
+
+        proj.ApplyStatsFromCSV(currentLevel);
+
+        WeaponSource src = GetComponent<WeaponSource>();
+        if (src != null)
+          proj.SetSourceWeapon(src.weaponData);
+      }
+    }
+
+    private void SpawnMuzzleVFX(Vector3 position, Quaternion rotation)
+    {
+      if (muzzleVfxPrefab == null) return;
+
+      GameObject vfx = Instantiate(muzzleVfxPrefab, position, rotation);
+
+      // ★ 핵심: Muzzle VFX는 시각 효과 전용이므로 물리 완전 비활성화
+      DisablePhysicsOnVFX(vfx);
+
+      vfx.transform.localScale = Vector3.one * muzzleVfxScale;
+
+      Destroy(vfx, muzzleVfxDuration);
+    }
+
+    private void DisablePhysicsOnVFX(GameObject obj)
+    {
+      if (obj == null) return;
+
+      Collider2D[] colliders = obj.GetComponentsInChildren<Collider2D>(true);
+      foreach (Collider2D col in colliders)
+      {
+        if (col == null) continue;
+        col.enabled = false;
+      }
+
+      Rigidbody2D[] rigidbodies = obj.GetComponentsInChildren<Rigidbody2D>(true);
+      foreach (Rigidbody2D rb in rigidbodies)
+      {
+        if (rb == null) continue;
+        rb.simulated = false;
+      }
+    }
+
+    private Transform FindClosestEnemy(Vector3 origin)
+    {
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range, enemyMask);
+
+      Transform closest = null;
+      float minDist = float.MaxValue;
+
+      foreach (Collider2D hit in hits)
+      {
+        if (hit == null) continue;
+
+        if (!hit.CompareTag(enemyTag))
+          continue;
+
+        Character character = hit.GetComponent<Character>();
+        if (character == null)
+          character = hit.GetComponentInParent<Character>();
+
+        if (character == null)
+          continue;
+
+        float dist = Vector3.Distance(origin, character.transform.position);
+
+        if (dist < minDist)
         {
-          bool master = enableMaster && currentLevel >= 5;
-          proj.Initialize(dir, damage, speed, range, enemyMask, enemyTag, master);
-          var src = GetComponentInParent<WeaponSource>();
-          if (src != null) proj.SetSourceWeapon(src.weaponData);
+          minDist = dist;
+          closest = character.transform;
         }
       }
+
+      return closest;
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+      {
+        Debug.LogWarning("[BoosterKnuckle] WeaponStatLoader.DB가 null입니다.");
+        return;
+      }
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var weaponLevels))
+      {
+        Debug.LogWarning($"[BoosterKnuckle] CSV에 '{weaponId}'가 없습니다.");
+        return;
+      }
+
+      int clampedLevel = Mathf.Clamp(level, 1, 5);
+
+      if (!weaponLevels.TryGetValue(clampedLevel, out var row))
+      {
+        Debug.LogWarning($"[BoosterKnuckle] '{weaponId}'의 level {clampedLevel} 데이터가 없습니다.");
+        return;
+      }
+
+      if (row.damage > 0f) damage = row.damage;
+      if (row.range > 0f) range = row.range;
+      if (row.firerate > 0f) fireRate = row.firerate;
+      if (row.speed > 0f) speed = row.speed;
+
+      if (row.speedperlevel > 0f) speedPerLevel = row.speedperlevel;
+
+      if (row.basecount > 0) baseCount = row.basecount;
+      if (row.maxcount > 0) maxCount = row.maxcount;
+
+      Debug.Log($"[BoosterKnuckle] CSV 적용 완료 | Lv={clampedLevel}, damage={damage}, range={range}, fireRate={fireRate}, speed={speed}, baseCount={baseCount}, maxCount={maxCount}");
     }
   }
 }

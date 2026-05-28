@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 
@@ -7,75 +8,68 @@ namespace NeoSurvive.Weapon
   {
     [Header("Visual")]
     [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private int circleSegmentCount = 96;
 
-    private Transform startPoint;
-    private Transform endPoint;
+    private List<Transform> dronePoints = new List<Transform>();
 
     private float damagePerTick;
     private float tickInterval;
     private float laserWidth;
     private float tickTimer;
 
+    private Vector3 circleCenter;
+    private float circleRadius;
+
     private WeaponBase sourceWeapon;
 
     public void Initialize(
-      Transform startPoint,
-      Transform endPoint,
+      List<Transform> dronePoints,
       float damagePerTick,
       float tickInterval,
       float laserWidth,
       WeaponBase sourceWeapon)
     {
-      this.startPoint = startPoint;
-      this.endPoint = endPoint;
+      this.dronePoints = dronePoints;
       this.damagePerTick = damagePerTick;
       this.tickInterval = tickInterval;
       this.laserWidth = laserWidth;
       this.sourceWeapon = sourceWeapon;
 
-      // =========================
-      // ★ LineRenderer 자동 연결
-      // =========================
       if (lineRenderer == null)
       {
         lineRenderer = GetComponent<LineRenderer>();
       }
 
-      // =========================
-      // ★ 레이저 기본 설정
-      // =========================
       if (lineRenderer != null)
       {
-        lineRenderer.positionCount = 2;
+        lineRenderer.positionCount = circleSegmentCount + 1;
         lineRenderer.startWidth = laserWidth;
         lineRenderer.endWidth = laserWidth;
         lineRenderer.useWorldSpace = true;
+        lineRenderer.loop = true;
+        lineRenderer.enabled = true;
+        lineRenderer.sortingOrder = 20;
+
+        if (lineRenderer.material == null)
+        {
+          lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        }
       }
     }
 
     private void Update()
     {
-      // =========================
-      // ★ 연결 대상이 사라지면 제거
-      // =========================
-      if (startPoint == null || endPoint == null)
+      RemoveNullDrones();
+
+      if (dronePoints.Count < 2)
       {
         Destroy(gameObject);
         return;
       }
 
-      // =========================
-      // ★ 레이저 위치 갱신
-      // =========================
-      if (lineRenderer != null)
-      {
-        lineRenderer.SetPosition(0, startPoint.position);
-        lineRenderer.SetPosition(1, endPoint.position);
-      }
+      UpdateCircleData();
+      DrawCircle();
 
-      // =========================
-      // ★ 지속딜 Tick 처리
-      // =========================
       tickTimer += Time.deltaTime;
 
       if (tickTimer >= tickInterval)
@@ -85,17 +79,69 @@ namespace NeoSurvive.Weapon
       }
     }
 
+    private void RemoveNullDrones()
+    {
+      for (int i = dronePoints.Count - 1; i >= 0; i--)
+      {
+        if (dronePoints[i] == null)
+        {
+          dronePoints.RemoveAt(i);
+        }
+      }
+    }
+
+    private void UpdateCircleData()
+    {
+      circleCenter = Vector3.zero;
+
+      for (int i = 0; i < dronePoints.Count; i++)
+      {
+        circleCenter += dronePoints[i].position;
+      }
+
+      circleCenter /= dronePoints.Count;
+
+      circleRadius = 0f;
+
+      for (int i = 0; i < dronePoints.Count; i++)
+      {
+        float distance = Vector3.Distance(
+          circleCenter,
+          dronePoints[i].position
+        );
+
+        if (distance > circleRadius)
+        {
+          circleRadius = distance;
+        }
+      }
+    }
+
+    private void DrawCircle()
+    {
+      if (lineRenderer == null)
+        return;
+
+      for (int i = 0; i <= circleSegmentCount; i++)
+      {
+        float angle =
+          ((float)i / circleSegmentCount) * Mathf.PI * 2f;
+
+        Vector3 pos = new Vector3(
+          circleCenter.x + Mathf.Cos(angle) * circleRadius,
+          circleCenter.y + Mathf.Sin(angle) * circleRadius,
+          circleCenter.z
+        );
+
+        lineRenderer.SetPosition(i, pos);
+      }
+    }
+
     private void ApplyLaserDamage()
     {
-      Vector2 a = startPoint.position;
-      Vector2 b = endPoint.position;
-
-      Vector2 center = (a + b) * 0.5f;
-      float halfLength = Vector2.Distance(a, b) * 0.5f;
-
       Collider2D[] enemies = Physics2D.OverlapCircleAll(
-        center,
-        halfLength + laserWidth,
+        circleCenter,
+        circleRadius + laserWidth,
         LayerMask.GetMask("Enemy")
       );
 
@@ -103,13 +149,14 @@ namespace NeoSurvive.Weapon
       {
         Vector2 enemyPos = enemy.transform.position;
 
-        float distanceToLine =
-          DistancePointToSegment(enemyPos, a, b);
+        float distanceFromCenter =
+          Vector2.Distance(enemyPos, circleCenter);
 
-        // =========================
-        // ★ 레이저 폭 안에 들어온 적만 피해
-        // =========================
-        if (distanceToLine > laserWidth)
+        float distanceToCircleLine =
+          Mathf.Abs(distanceFromCenter - circleRadius);
+
+        // ★ 원 안 전체가 아니라, 원형 선 근처에 있는 적만 피해
+        if (distanceToCircleLine > laserWidth)
           continue;
 
         if (enemy.TryGetComponent<Character>(out Character character))
@@ -117,25 +164,6 @@ namespace NeoSurvive.Weapon
           character.TakeDamage(damagePerTick, sourceWeapon);
         }
       }
-    }
-
-    private float DistancePointToSegment(Vector2 point, Vector2 a, Vector2 b)
-    {
-      Vector2 ab = b - a;
-
-      if (ab.sqrMagnitude <= 0.0001f)
-      {
-        return Vector2.Distance(point, a);
-      }
-
-      float t =
-        Vector2.Dot(point - a, ab) / ab.sqrMagnitude;
-
-      t = Mathf.Clamp01(t);
-
-      Vector2 closest = a + t * ab;
-
-      return Vector2.Distance(point, closest);
     }
   }
 }

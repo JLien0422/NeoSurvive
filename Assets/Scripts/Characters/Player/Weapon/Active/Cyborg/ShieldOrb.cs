@@ -1,25 +1,49 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 에너지 방패 오브 1개
-  /// - Trigger로 적/투사체를 막고(삭제), 적에 접촉딜
-  /// </summary>
   [RequireComponent(typeof(Collider2D))]
+  [RequireComponent(typeof(Rigidbody2D))]
   public class ShieldOrb : MonoBehaviour
   {
+    public static readonly List<ShieldOrb> ActiveShields = new();
+
     private float damage;
     private LayerMask enemyMask;
     private string enemyTag;
     private bool blockProjectiles;
     private string projectileTag;
 
+    private Rigidbody2D rb;
+
+    [Header("Projectile Block Radius")]
+    [SerializeField] private float projectileBlockRadius = 0.8f;
+
+    [Header("Enemy Projectile Name")]
+    [SerializeField] private string enemyProjectileObjectName = "Shooter_Projectile";
+
+    private void OnEnable()
+    {
+      if (!ActiveShields.Contains(this))
+        ActiveShields.Add(this);
+    }
+
+    private void OnDisable()
+    {
+      ActiveShields.Remove(this);
+    }
+
     private void Awake()
     {
-      var col = GetComponent<Collider2D>();
+      Collider2D col = GetComponent<Collider2D>();
       col.isTrigger = true;
+
+      rb = GetComponent<Rigidbody2D>();
+      rb.bodyType = RigidbodyType2D.Kinematic;
+      rb.gravityScale = 0f;
+      rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     public void Configure(
@@ -36,35 +60,93 @@ namespace NeoSurvive.Weapon
       this.projectileTag = projectileTag;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    public void SetWorldPosition(Vector2 pos)
     {
-      if (other == null) return;
+      if (rb != null)
+        rb.MovePosition(pos);
+      else
+        transform.position = pos;
+    }
 
-      // 1) 투사체 차단
-      if (blockProjectiles && !string.IsNullOrEmpty(projectileTag) && other.CompareTag(projectileTag))
+    private void Update()
+    {
+      CheckProjectiles();
+    }
+
+    private void CheckProjectiles()
+    {
+      if (!blockProjectiles)
+        return;
+
+      Collider2D[] hits = Physics2D.OverlapCircleAll(
+        transform.position,
+        projectileBlockRadius
+      );
+
+      for (int i = 0; i < hits.Length; i++)
       {
-        Destroy(other.gameObject);
+        Collider2D hit = hits[i];
+
+        if (hit == null)
+          continue;
+
+        if (hit.gameObject == gameObject)
+          continue;
+
+        GameObject target =
+          hit.attachedRigidbody != null
+            ? hit.attachedRigidbody.gameObject
+            : hit.gameObject;
+
+        if (target == gameObject)
+          continue;
+
+        string cleanName = target.name.Replace("(Clone)", "").Trim();
+
+        // ★ Shooter_Projectile만 적 투사체로 판정
+        if (cleanName != enemyProjectileObjectName)
+          continue;
+
+        Debug.Log($"[ShieldOrb] 적 투사체 차단: {target.name}");
+
+        Destroy(target);
         return;
       }
+    }
 
-      // 2) 적 접촉딜
-      // 레이어 마스크 체크(빨리 거름)
-      if (((1 << other.gameObject.layer) & enemyMask.value) == 0) return;
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+      if (other == null)
+        return;
 
-      // 태그 체크(자식 콜라이더 구조도 고려: parent도 허용)
-      if (!string.IsNullOrEmpty(enemyTag) && !other.CompareTag(enemyTag))
+      if (((1 << other.gameObject.layer) & enemyMask.value) == 0)
+        return;
+
+      if (!string.IsNullOrEmpty(enemyTag) &&
+          !other.CompareTag(enemyTag))
       {
-        if (other.transform.parent == null || !other.transform.parent.CompareTag(enemyTag))
+        if (other.transform.parent == null ||
+            !other.transform.parent.CompareTag(enemyTag))
           return;
       }
 
-      // Character 베이스로 Enemy/Boss 모두 처리
-      Character character = other.GetComponentInParent<Character>();
-      if (character != null)
+      Enemy enemy = other.GetComponentInParent<Enemy>();
+
+      if (enemy != null)
       {
-        var src = GetComponentInParent<WeaponSource>();
-        character.TakeDamage(damage, src != null ? src.weaponData : null);
+        WeaponSource src = GetComponent<WeaponSource>();
+
+        enemy.TakeDamage(
+          damage,
+          src != null ? src.weaponData : null
+        );
       }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+      Gizmos.color = Color.cyan;
+      Gizmos.DrawWireSphere(transform.position, projectileBlockRadius);
     }
   }
 }

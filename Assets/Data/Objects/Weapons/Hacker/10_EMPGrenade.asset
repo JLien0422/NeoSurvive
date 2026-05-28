@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 10_EMPGrenade
   m_EditorClassIdentifier: 
   weaponId: 10
-  weaponName: 10_EMPGrenade
-  weaponIcon: {fileID: 21300000, guid: 05c6fb9fb607c3649b378171100d0c00, type: 3}
+  weaponName: "EMP 수류탄"
+  weaponIcon: {fileID: 21300000, guid: b24de978f07a6a543be81de945a33696, type: 3}
   description: "EMP\uC218\uB958\uD0C4"
   weaponPrefab: {fileID: 2715464055673803077, guid: 39ea73beed294fc4e984f4de7b420741, type: 3}
   level: 1

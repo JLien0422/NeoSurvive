@@ -3,124 +3,158 @@ using UnityEngine;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 3번 무기: 에너지 방패
-  /// - 주변을 회전하며 적/투사체 방어 + 접촉딜
-  /// - Lv.Up: 방패 갯수, 데미지 증가
-  /// - Lv.5 마스터: 방패들이 연결된 완전한 원형(시각 효과 + 접촉딜 강화)
-  /// </summary>
   public class EnergyShield : MonoBehaviour
   {
     [Header("Orb Prefab")]
-    public GameObject shieldOrbPrefab;   // ShieldOrb가 붙은 프리팹(필수)
+    public GameObject shieldOrbPrefab;
+
+    [Header("Follow Target")]
+    [SerializeField] private Transform target;
 
     [Header("Stats")]
     public float damage = 8f;
-    public float radius = 1.6f;          // 플레이어 중심에서 방패 거리
-    public float rotationSpeed = 180f;   // deg/sec
-    public float fireRate = 0f;          // 사용 안함(연속형 무기라 Attack 없음)
+    public float radius = 2.0f;
+    public float rotationSpeed = 180f;
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.2f;  // 레벨당 +20%
-    public float radiusPerLevel = 0.05f; // 레벨당 +5%
     public int baseOrbCount = 1;
     public int maxOrbCount = 5;
 
     [Header("Collision Filter")]
-    public LayerMask enemyMask;          // Enemy 레이어
+    public LayerMask enemyMask;
     public string enemyTag = "Enemy";
 
     [Header("Projectile Block")]
     public bool blockProjectiles = true;
-    public string projectileTag = "Projectile"; // 팀 프로젝트에 맞게 변경 가능
+    public string projectileTag = "EnemyProjectile";
 
     [Header("Master (Lv5)")]
     public bool enableMaster = true;
-    public float masterDamageFactor = 1.5f; // Lv5 접촉딜 강화 배수
-    public bool drawRingGizmo = true;
+    public float masterDamageFactor = 1.5f;
 
     private readonly List<ShieldOrb> orbs = new();
-
-    // base stats
-    private float baseDamage;
-    private float baseRadius;
 
     private int currentLevel = 1;
     private int currentOrbCount = 1;
     private float currentAngle = 0f;
 
+    private const string weaponId = "energyshield";
+
+    private void Awake()
+    {
+      if (target == null)
+      {
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObj != null)
+          target = playerObj.transform;
+      }
+    }
+
     private void Start()
     {
-      baseDamage = damage;
-      baseRadius = radius;
-
       ApplyLevel(1);
       RebuildOrbs();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-      // 부모의 방향이나 스케일 반전에 영향받지 않게 절대 각도 사용
+      if (target == null) return;
+
       currentAngle += rotationSpeed * Time.deltaTime;
+
+      if (currentAngle >= 360f)
+        currentAngle -= 360f;
+
       UpdateOrbPositions();
     }
 
-    // WeaponManager가 SendMessage로 호출
+    // WeaponManager에서 호출
     public void OnLevelUp(int level)
     {
       ApplyLevel(level);
       RebuildOrbs();
 
-      Debug.Log($"[EnergyShield] Lv.{currentLevel} -> Orbs:{currentOrbCount}, Dmg:{damage}, Radius:{radius}");
+      Debug.Log($"[EnergyShield] Lv.{currentLevel} | Orbs={currentOrbCount}");
     }
 
     private void ApplyLevel(int level)
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
-      radius = baseRadius * (1f + (currentLevel - 1) * radiusPerLevel);
+      ApplyStatsFromCSV(currentLevel);
 
-      // 방패 개수 증가 규칙(원하면 변경 가능)
-      // Lv1=1, Lv2=2, Lv3=3, Lv4=4, Lv5=5(최대)
-      currentOrbCount = Mathf.Clamp(baseOrbCount + (currentLevel - 1), baseOrbCount, maxOrbCount);
+      currentOrbCount = Mathf.Clamp(
+        baseOrbCount + (currentLevel - 1),
+        baseOrbCount,
+        maxOrbCount
+      );
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+        return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+        return;
+
+      if (!levelDict.TryGetValue(level, out var row))
+        return;
+
+      if (row.damage > 0f) damage = row.damage;
+      if (row.radius > 0f) radius = row.radius;
+      if (row.rotationspeed > 0f) rotationSpeed = row.rotationspeed;
+      if (row.baseorbcount > 0) baseOrbCount = row.baseorbcount;
+      if (row.maxorbcount > 0) maxOrbCount = row.maxorbcount;
+      if (row.masterdamagefactor > 0f) masterDamageFactor = row.masterdamagefactor;
     }
 
     private void RebuildOrbs()
     {
       if (shieldOrbPrefab == null)
       {
-        Debug.LogError("[EnergyShield] shieldOrbPrefab is NULL! ShieldOrb 프리팹을 넣어줘야 함");
+        Debug.LogError("[EnergyShield] shieldOrbPrefab is NULL!");
         return;
       }
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayEnergyShieldFire();
 
       // 기존 오브 제거
       for (int i = orbs.Count - 1; i >= 0; i--)
       {
-        if (orbs[i] != null) Destroy(orbs[i].gameObject);
+        if (orbs[i] != null)
+          Destroy(orbs[i].gameObject);
       }
+
       orbs.Clear();
 
-      // 오브 생성
+      // 새 오브 생성
       for (int i = 0; i < currentOrbCount; i++)
       {
-        GameObject obj = Instantiate(shieldOrbPrefab, transform);
+        GameObject obj = Instantiate(shieldOrbPrefab);
         obj.name = $"ShieldOrb_{i}";
-        var orb = obj.GetComponent<ShieldOrb>();
+
+        ShieldOrb orb = obj.GetComponent<ShieldOrb>();
+
         if (orb == null)
         {
-          Debug.LogError("[EnergyShield] shieldOrbPrefab에 ShieldOrb 컴포넌트가 없음");
+          Debug.LogError("[EnergyShield] ShieldOrb 컴포넌트 없음");
           Destroy(obj);
           continue;
         }
 
-        // 오브 설정
-        float dmg = damage;
-        bool master = enableMaster && currentLevel >= 5;
-        if (master) dmg *= masterDamageFactor;
+        float finalDamage = damage;
 
-        orb.Configure(dmg, enemyMask, enemyTag, blockProjectiles, projectileTag);
+        // ★ 마스터 효과
+        if (enableMaster && currentLevel >= 5)
+          finalDamage *= masterDamageFactor;
+
+        orb.Configure(
+          finalDamage,
+          enemyMask,
+          enemyTag,
+          blockProjectiles,
+          projectileTag
+        );
 
         orbs.Add(orb);
       }
@@ -130,28 +164,43 @@ namespace NeoSurvive.Weapon
 
     private void UpdateOrbPositions()
     {
-      if (orbs.Count == 0) return;
+      if (target == null || orbs.Count == 0)
+        return;
 
       float step = 360f / orbs.Count;
+      Vector3 center = target.position;
+
       for (int i = 0; i < orbs.Count; i++)
       {
-        if (orbs[i] == null) continue;
+        if (orbs[i] == null)
+          continue;
 
-        float ang = (currentAngle + step * i) * Mathf.Deg2Rad;
-        Vector3 offset = new Vector3(Mathf.Cos(ang), Mathf.Sin(ang), 0f) * radius;
+        float ang = currentAngle + step * i;
+        float rad = ang * Mathf.Deg2Rad;
 
-        // 로컬 포지션 대신 글로벌 포지션으로 강제 할당하여 캐릭터 좌우반전 스케일에 영향받지 않게 함
-        orbs[i].transform.position = transform.position + offset;
-        orbs[i].transform.rotation = Quaternion.identity; // 오브 자체는 정면 유지
+        Vector3 offset = new Vector3(
+          Mathf.Cos(rad) * radius,
+          Mathf.Sin(rad) * radius,
+          0f
+        );
+
+        // ★ Rigidbody 기반 이동
+        orbs[i].SetWorldPosition(center + offset);
+
+        // ★ 오브 자체 회전 고정
+        orbs[i].transform.rotation = Quaternion.identity;
       }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDestroy()
     {
-      if (!drawRingGizmo) return;
+      for (int i = 0; i < orbs.Count; i++)
+      {
+        if (orbs[i] != null)
+          Destroy(orbs[i].gameObject);
+      }
 
-      Gizmos.color = (enableMaster && currentLevel >= 5) ? Color.magenta : Color.cyan;
-      Gizmos.DrawWireSphere(transform.position, radius);
+      orbs.Clear();
     }
   }
 }

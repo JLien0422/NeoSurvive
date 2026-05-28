@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Weapon;
@@ -17,29 +16,33 @@ public class PlasmaLazer : MonoBehaviour
   public TrailRenderer trailRenderer;
 
   private Vector3 direction;
+  private float traveledDistance = 0f;
+  private bool reachedMaxRange = false;
 
-  private int maxPenetration = 0;
   private int currentHitCount = 0;
-  private HashSet<int> hitEnemyIds = new HashSet<int>();
+  private int maxDamageTargets = 1;
+  private readonly HashSet<int> damagedEnemyIds = new HashSet<int>();
+  private readonly HashSet<int> damagedObjectIds = new HashSet<int>();
 
   // DPM 기록용 소스 무기
   private WeaponBase sourceWeapon;
 
-  // ★ 추가: PlasmaRifle Lv5 마스터 효과 여부
+  // ★ PlasmaRifle Lv5 마스터 효과 여부
   private bool isMaster = false;
 
-  // ★ 추가: 이 레이저가 분열을 만들 수 있는지 여부
+  // ★ 이 레이저가 분열을 만들 수 있는지 여부
   // - 원본 레이저만 true
   // - 분열 레이저는 false로 해서 무한 분열 방지
   private bool canSplit = true;
 
   [Header("Master Split Settings")]
   [SerializeField] private int splitCount = 2;
-  [SerializeField] private float splitSearchRange = 5f;
+  [SerializeField] private float splitSearchRange = 100f;
 
   private void Start()
   {
-    trailRenderer = GetComponent<TrailRenderer>();
+    if (trailRenderer == null)
+      trailRenderer = GetComponent<TrailRenderer>();
   }
 
   private void Update()
@@ -54,37 +57,45 @@ public class PlasmaLazer : MonoBehaviour
 
     alpha = 1f - (elapsed / duration);
 
+    if (reachedMaxRange)
+      return;
+
     float moveDist = bulletSpeed * Time.deltaTime;
+    float remainingRange = range > 0f ? range - traveledDistance : float.PositiveInfinity;
+
+    if (remainingRange <= 0f)
+    {
+      reachedMaxRange = true;
+      return;
+    }
+
+    moveDist = Mathf.Min(moveDist, remainingRange);
+
+    if (moveDist <= 0f)
+      return;
 
     RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, direction, moveDist);
-
     System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
     foreach (var hit in hits)
     {
-      if (hit.collider != null && hit.collider.CompareTag("Enemy") && hit.collider.TryGetComponent<Character>(out var character))
-      {
-        int id = character.GetInstanceID();
+      if (hit.collider == null)
+        continue;
 
-        if (hitEnemyIds.Contains(id))
+      Enemy enemy = hit.collider.GetComponentInParent<Enemy>();
+
+      if (enemy != null)
+      {
+        if (!CanApplyDamageToEnemy(enemy))
           continue;
 
-        character.TakeDamage(damage, sourceWeapon);
-        hitEnemyIds.Add(id);
+        enemy.TakeDamage(damage, sourceWeapon);
         currentHitCount++;
+        damagedEnemyIds.Add(enemy.GetInstanceID());
 
-        // ★ 추가: Lv5 마스터 효과
-        // - 적 관통/명중 시 주변 적 2명에게 분열 레이저 생성
-        // - 원본 레이저만 분열 가능
         if (isMaster && canSplit)
         {
-          SplitToNearbyEnemies(character.transform);
-        }
-
-        if (currentHitCount > maxPenetration)
-        {
-          Destroy(gameObject);
-          return;
+          SplitToNearbyEnemies(enemy, hit.point);
         }
 
         continue;
@@ -98,35 +109,32 @@ public class PlasmaLazer : MonoBehaviour
       if (damageable == null)
         continue;
 
-      if (hit.collider.CompareTag("Enemy"))
-        continue;
-
       MonoBehaviour mb = damageable as MonoBehaviour;
+
       if (mb == null)
         continue;
 
-      int objId = mb.GetInstanceID();
-
-      if (hitEnemyIds.Contains(objId))
+      if (!CanApplyDamageToObject(mb))
         continue;
 
       damageable.TakeDamage(damage);
-      hitEnemyIds.Add(objId);
       currentHitCount++;
-
-      if (currentHitCount > maxPenetration)
-      {
-        Destroy(gameObject);
-        return;
-      }
+      damagedObjectIds.Add(mb.GetInstanceID());
     }
 
     transform.position += direction * moveDist;
+    traveledDistance += moveDist;
+
+    if (range > 0f && traveledDistance >= range)
+      reachedMaxRange = true;
   }
 
   public void Initialize(
     Vector3 direction,
     float damage,
+    float range,
+    float bulletSpeed,
+    float duration,
     int penetration,
     WeaponBase weaponBase = null,
     bool isMaster = false,
@@ -134,66 +142,123 @@ public class PlasmaLazer : MonoBehaviour
   {
     this.direction = direction.normalized;
     this.damage = damage;
-    this.maxPenetration = penetration;
+    this.range = Mathf.Max(0f, range);
+    this.bulletSpeed = Mathf.Max(0f, bulletSpeed);
+    this.duration = Mathf.Max(0.01f, duration);
+    this.maxDamageTargets = Mathf.Max(1, penetration + 1);
     this.sourceWeapon = weaponBase;
 
-    // ★ 추가
     this.isMaster = isMaster;
     this.canSplit = canSplit;
 
+    elapsed = 0f;
+    alpha = 1f;
+    traveledDistance = 0f;
+    reachedMaxRange = false;
+    currentHitCount = 0;
+    damagedEnemyIds.Clear();
+    damagedObjectIds.Clear();
+
+    if (trailRenderer == null)
+      trailRenderer = GetComponent<TrailRenderer>();
+
     if (trailRenderer != null)
     {
+      trailRenderer.Clear();
       trailRenderer.time = duration;
     }
   }
 
-  // ★ 추가: 주변 적 2명에게 분열 레이저 생성
-  private void SplitToNearbyEnemies(Transform hitTarget)
+  private bool CanApplyDamageToEnemy(Enemy enemy)
   {
-    if (hitTarget == null)
+    if (enemy == null)
+      return false;
+
+    if (currentHitCount >= maxDamageTargets)
+      return false;
+
+    return !damagedEnemyIds.Contains(enemy.GetInstanceID());
+  }
+
+  private bool CanApplyDamageToObject(MonoBehaviour target)
+  {
+    if (target == null)
+      return false;
+
+    if (currentHitCount >= maxDamageTargets)
+      return false;
+
+    return !damagedObjectIds.Contains(target.GetInstanceID());
+  }
+
+  // ★ 수정:
+  // 원본 레이저가 이미 맞춘 적도 분열 대상으로 허용
+  private void SplitToNearbyEnemies(Enemy hitEnemy, Vector2 splitStartPoint)
+  {
+    if (hitEnemy == null)
       return;
 
-    Collider2D[] enemies = Physics2D.OverlapCircleAll(
-      hitTarget.position,
-      splitSearchRange,
-      LayerMask.GetMask("Enemy")
-    );
+    Enemy[] enemies = FindObjectsOfType<Enemy>();
 
-    int createdCount = 0;
+    List<Enemy> candidates = new List<Enemy>();
+    HashSet<int> candidateIds = new HashSet<int>();
 
-    foreach (Collider2D enemy in enemies)
+    foreach (Enemy enemy in enemies)
     {
       if (enemy == null)
         continue;
 
-      if (!enemy.CompareTag("Enemy"))
+      if (enemy == hitEnemy)
         continue;
 
-      if (enemy.transform == hitTarget)
+      if (enemy.IsDead)
         continue;
 
-      if (!enemy.TryGetComponent<Character>(out var character))
+      int id = enemy.GetInstanceID();
+
+      if (candidateIds.Contains(id))
         continue;
 
-      int id = character.GetInstanceID();
+      float distance = Vector2.Distance(splitStartPoint, enemy.transform.position);
 
-      // 이미 이 레이저가 맞춘 적이면 제외
-      if (hitEnemyIds.Contains(id))
+      if (distance > splitSearchRange)
         continue;
 
-      Vector3 splitDir = (enemy.transform.position - hitTarget.position).normalized;
+      candidates.Add(enemy);
+      candidateIds.Add(id);
+    }
+
+    candidates.Sort((a, b) =>
+      Vector2.Distance(splitStartPoint, a.transform.position)
+      .CompareTo(Vector2.Distance(splitStartPoint, b.transform.position))
+    );
+
+    int createdCount = 0;
+
+    foreach (Enemy targetEnemy in candidates)
+    {
+      if (targetEnemy == null)
+        continue;
+
+      Vector3 splitDir = (targetEnemy.transform.position - (Vector3)splitStartPoint).normalized;
 
       if (splitDir == Vector3.zero)
         continue;
 
-      GameObject splitObj = Instantiate(gameObject, hitTarget.position, Quaternion.identity);
+      GameObject splitObj = Instantiate(gameObject, splitStartPoint, Quaternion.identity);
+      splitObj.SetActive(true);
 
-      if (splitObj.TryGetComponent<PlasmaLazer>(out var splitLaser))
+      PlasmaLazer splitLaser = splitObj.GetComponent<PlasmaLazer>();
+
+      if (splitLaser != null)
       {
         // ★ 분열 레이저는 다시 분열하지 않음
         splitLaser.Initialize(
           splitDir,
           damage,
+          range,
+          bulletSpeed,
+          duration,
           0,
           sourceWeapon,
           false,

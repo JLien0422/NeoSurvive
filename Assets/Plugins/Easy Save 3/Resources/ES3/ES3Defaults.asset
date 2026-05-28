@@ -39,6 +39,7 @@ MonoBehaviour:
     - Assembly-CSharp-firstpass
     - Domain_Reload
     - endel.nativewebsocket
+    - GameAnalyticsSDK
     - MCPForUnity.Runtime
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0

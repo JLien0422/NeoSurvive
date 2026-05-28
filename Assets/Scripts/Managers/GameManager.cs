@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
 
   [Header("적 스폰 설정")]
   private int killCount = 0;
+  public int KillCount => killCount;
+  public int CurrentPhase { get; private set; } = 1;
 
   [Header("골드 관리")]
   [SerializeField] private int currentRunGold = 0;
@@ -243,6 +245,11 @@ public class GameManager : MonoBehaviour
   {
     killCount++;
     OnKillCountChanged?.Invoke(killCount);
+  }
+
+  public void SetCurrentPhase(int phase)
+  {
+    CurrentPhase = Mathf.Max(1, phase);
   }
 
   public void SetSelectedCharacter(CharacterType characterType)

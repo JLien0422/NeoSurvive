@@ -89,6 +89,8 @@ public class BossSpawner : MonoBehaviour
         }
 
         GameObject bossObj = Instantiate(prefab, spawnPos, Quaternion.identity);
+        Boss boss = bossObj.GetComponent<Boss>();
+        GameAnalyticsTracker.TrackBossReached(boss, prefab.name, selectedMapId, enemies.Length, spawnPos);
 
         // DOTween 페이드인 연출 (SpriteRenderer alpha 0 → 1)
         // 보스 스프라이트가 루트가 아니라 자식에 있는 경우도 대비해서 children에서 찾는다.
@@ -105,7 +107,6 @@ public class BossSpawner : MonoBehaviour
         BossHealthBar healthBar = FindObjectOfType<BossHealthBar>(true);
         if (healthBar != null)
         {
-            Boss boss = bossObj.GetComponent<Boss>();
             if (boss != null) healthBar.SetBoss(boss);
         }
 

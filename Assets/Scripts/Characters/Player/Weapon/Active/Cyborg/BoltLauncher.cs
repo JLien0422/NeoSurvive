@@ -3,17 +3,22 @@ using UnityEngine;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 8번 무기: 볼트 런처 (버스트형)
-  /// - Lv1: 9초마다 4발
-  /// - 레벨업마다: 대기시간 -1초, 발사 수 +1
-  /// - Lv5: 5초마다 8발
-  /// </summary>
   public class BoltLauncher : MonoBehaviour
   {
     [Header("Projectile")]
-    public GameObject boltProjectilePrefab;   // BoltArrowProjectile 프리팹
+    public GameObject boltProjectilePrefab;
     public Transform firePoint;
+
+    [Header("Muzzle VFX")]
+    public GameObject muzzleVfxPrefab;
+    public float muzzleVfxScale = 1f;
+    public float muzzleVfxDuration = 0.25f;
+
+    [Header("Fire Offset")]
+    [SerializeField] private float fireOffset = 0.8f;
+
+    [Header("Spawn Spread")]
+    [SerializeField] private float spawnSideOffset = 0.25f;
 
     [Header("Damage / Flight")]
     public float damage = 10f;
@@ -21,16 +26,16 @@ namespace NeoSurvive.Weapon
     public float speed = 16f;
     public float homingTurnSpeed = 540f;
 
-    [Header("Burst Spec (Fixed Design)")]
-    public float baseBurstInterval = 5f;   // Lv1
-    public int baseBurstCount = 4;         // Lv1
-    public float intervalDecreasePerLevel = 1f; // 레벨당 -1초
-    public int countIncreasePerLevel = 1;       // 레벨당 +1발
-    public float minBurstInterval = 1f;    // Lv5 하한
-    public int maxBurstCount = 8;          // Lv5 상한
+    [Header("Burst Spec")]
+    public float baseBurstInterval = 5f;
+    public int baseBurstCount = 4;
+    public float intervalDecreasePerLevel = 1f;
+    public int countIncreasePerLevel = 1;
+    public float minBurstInterval = 1f;
+    public int maxBurstCount = 8;
 
     [Header("Spread")]
-    public float spreadAngle = 22f;        // 여러 발 퍼짐 각도(전체 범위 느낌)
+    public float spreadAngle = 22f;
 
     [Header("Filter")]
     public LayerMask enemyMask;
@@ -51,8 +56,6 @@ namespace NeoSurvive.Weapon
     private void Start()
     {
       ApplyLevel(1);
-
-      // 무기 생성 시 자동 루프 시작
       loop = StartCoroutine(BurstLoop());
     }
 
@@ -65,7 +68,6 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    // WeaponManager가 SendMessage로 호출
     public void OnLevelUp(int level)
     {
       ApplyLevel(level);
@@ -76,11 +78,9 @@ namespace NeoSurvive.Weapon
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      // ✅ 요구사항 그대로 계산
       burstInterval = baseBurstInterval - (currentLevel - 1) * intervalDecreasePerLevel;
       burstCount = baseBurstCount + (currentLevel - 1) * countIncreasePerLevel;
 
-      // 안전장치(최종 레벨 고정)
       burstInterval = Mathf.Max(minBurstInterval, burstInterval);
       burstCount = Mathf.Min(maxBurstCount, burstCount);
     }
@@ -97,42 +97,136 @@ namespace NeoSurvive.Weapon
     private void FireBurst()
     {
       if (boltProjectilePrefab == null) return;
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayBoltLauncherFire();
 
-      Vector3 origin = firePoint ? firePoint.position : transform.position;
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayBoltLauncherFire();
 
-      // 동시에 여러 발
+      Vector3 baseOrigin = firePoint != null ? firePoint.position : transform.position;
+
+      // ★ 수정: 전 방향 대응. 가장 가까운 적 방향으로 발사 기준 잡기
+      Transform target = FindClosestEnemy(baseOrigin);
+
+      Vector3 forward = target != null
+        ? (target.position - baseOrigin).normalized
+        : transform.right.normalized;
+
+      Vector3 origin = baseOrigin + forward * fireOffset;
+
+      float muzzleAngleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+      Quaternion muzzleRot = Quaternion.Euler(0f, 0f, muzzleAngleZ);
+
+      // ★ Trigger/VFX도 적 방향으로 회전해서 생성
+      SpawnMuzzleVFX(origin, muzzleRot);
+
       float half = spreadAngle * 0.5f;
       bool master = enableMaster && currentLevel >= 5;
 
+      Vector3 perpendicular = new Vector3(-forward.y, forward.x, 0f).normalized;
+
       for (int i = 0; i < burstCount; i++)
       {
-        float t = (burstCount == 1) ? 0.5f : (float)i / (burstCount - 1);
+        float t = burstCount == 1 ? 0.5f : (float)i / (burstCount - 1);
         float ang = Mathf.Lerp(-half, half, t);
 
-        Vector3 dir = Quaternion.Euler(0, 0, ang) * transform.right;
+        Vector3 dir = Quaternion.Euler(0f, 0f, ang) * forward;
 
-        GameObject obj = Instantiate(boltProjectilePrefab, origin, Quaternion.identity);
-        var proj = obj.GetComponent<BoltArrowProjectile>();
-        if (proj != null)
+        float projectileAngleZ = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        Quaternion projectileRot = Quaternion.Euler(0f, 0f, projectileAngleZ);
+
+        float spawnT = burstCount == 1 ? 0f : Mathf.Lerp(-1f, 1f, i / (float)(burstCount - 1));
+        Vector3 spawnOrigin = origin + perpendicular * (spawnT * spawnSideOffset);
+
+        GameObject obj = Instantiate(boltProjectilePrefab, spawnOrigin, projectileRot);
+
+        BoltArrowProjectile proj = obj.GetComponent<BoltArrowProjectile>();
+        if (proj == null) continue;
+
+        proj.Initialize(
+          gameObject,
+          dir,
+          damage,
+          speed,
+          range,
+          homingTurnSpeed,
+          enemyMask,
+          enemyTag,
+          master,
+          overloadStacksToExplode,
+          overloadExplosionRadius,
+          overloadExplosionDamageFactor
+        );
+
+        WeaponSource src = GetComponentInParent<WeaponSource>();
+        if (src != null)
+          proj.SetSourceWeapon(src.weaponData);
+      }
+    }
+
+    private void SpawnMuzzleVFX(Vector3 position, Quaternion rotation)
+    {
+      if (muzzleVfxPrefab == null) return;
+
+      GameObject vfx = Instantiate(muzzleVfxPrefab, position, rotation);
+
+      DisablePhysicsOnVFX(vfx);
+
+      vfx.transform.localScale = Vector3.one * muzzleVfxScale;
+
+      Destroy(vfx, muzzleVfxDuration);
+    }
+
+    private void DisablePhysicsOnVFX(GameObject obj)
+    {
+      if (obj == null) return;
+
+      Collider2D[] colliders = obj.GetComponentsInChildren<Collider2D>(true);
+      foreach (Collider2D col in colliders)
+      {
+        if (col == null) continue;
+        col.enabled = false;
+      }
+
+      Rigidbody2D[] rigidbodies = obj.GetComponentsInChildren<Rigidbody2D>(true);
+      foreach (Rigidbody2D rb in rigidbodies)
+      {
+        if (rb == null) continue;
+        rb.simulated = false;
+      }
+    }
+
+    // ★ 추가: 가장 가까운 적 찾기
+    private Transform FindClosestEnemy(Vector3 origin)
+    {
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range, enemyMask);
+
+      Transform closest = null;
+      float minDist = float.MaxValue;
+
+      foreach (Collider2D hit in hits)
+      {
+        if (hit == null) continue;
+
+        if (!string.IsNullOrEmpty(enemyTag) && !hit.CompareTag(enemyTag))
+          continue;
+
+        Character character = hit.GetComponent<Character>();
+
+        if (character == null)
+          character = hit.GetComponentInParent<Character>();
+
+        if (character == null)
+          continue;
+
+        float dist = Vector3.Distance(origin, character.transform.position);
+
+        if (dist < minDist)
         {
-          proj.Initialize(
-            dir,
-            damage,
-            speed,
-            range,
-            homingTurnSpeed,
-            enemyMask,
-            enemyTag,
-            master,
-            overloadStacksToExplode,
-            overloadExplosionRadius,
-            overloadExplosionDamageFactor
-          );
-          var src = GetComponentInParent<WeaponSource>();
-          if (src != null) proj.SetSourceWeapon(src.weaponData);
+          minDist = dist;
+          closest = character.transform;
         }
       }
+
+      return closest;
     }
   }
 }

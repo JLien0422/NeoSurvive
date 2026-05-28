@@ -1,6 +1,6 @@
-﻿weaponid,level,hp,cooldown,prisonduration,hpperlevel,cooldownreductionperlevel,prisonrange
-hologramdecoy,1,50,15,3,0.2,0.05,3
-hologramdecoy,2,50,15,3,0.2,0.05,3
-hologramdecoy,3,50,15,3,0.2,0.05,3
-hologramdecoy,4,50,15,3,0.2,0.05,3
-hologramdecoy,5,50,15,3,0.2,0.05,3
+weaponid,level,hp,cooldown,prisonduration,prisonrange
+hologramdecoy,1,40,18,0,0
+hologramdecoy,2,55,16.5,0,0
+hologramdecoy,3,70,15,0,0
+hologramdecoy,4,85,13.5,0,0
+hologramdecoy,5,100,12,3.5,4

@@ -59,6 +59,14 @@ namespace NeoSurvive.Weapon
             }
         }
 
+        private void OnDestroy()
+        {
+            if (InGameSoundManager.Instance != null)
+            {
+                InGameSoundManager.Instance.PlayDataOptimizationDestroy();
+            }
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             TryApplyBuff(other);
@@ -68,6 +76,11 @@ namespace NeoSurvive.Weapon
         {
             Enemy enemy = other.GetComponentInParent<Enemy>();
             if (enemy == null) return;
+
+            if (InGameSoundManager.Instance != null)
+            {
+                InGameSoundManager.Instance.PlayDataOptimizationAttack();
+            }
 
             GameObject target = enemy.gameObject;
 

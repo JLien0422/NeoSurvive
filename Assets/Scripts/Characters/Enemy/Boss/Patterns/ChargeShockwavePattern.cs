@@ -59,6 +59,7 @@ public class ChargeShockwavePattern : BossPatternBase
       {
         if (!dashDamageDealt && dashCollisionDamage > 0f && hitPlayer != null)
         {
+          GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "dash_collision", dashCollisionDamage, hitPlayer);
           hitPlayer.TakeDamage(dashCollisionDamage);
           dashDamageDealt = true;
         }
@@ -160,7 +161,10 @@ public class ChargeShockwavePattern : BossPatternBase
     {
       if (c == null || !c.CompareTag("Player")) continue;
       if (c.TryGetComponent<Player>(out var p))
+      {
+        GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "shockwave", shockwaveDamage, p);
         p.TakeDamage(shockwaveDamage);
+      }
     }
   }
 

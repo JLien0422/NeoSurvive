@@ -82,7 +82,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   attackDamage: 5
-  attackRange: 1.5
   contactDamageTickInterval: 0.5
   mechanismType: 1
 --- !u!114 &-12537986020536342
@@ -97,8 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3224a471f1952ae43a73a4af8ffc5228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 3
-  useControllerCombatStats: 0
+  attackRange: 4
   attackInterval: 0.5
   projectilePrefab: {fileID: 5318986550965804440, guid: 61b30c4777e2a23418f58979164826d3, type: 3}
   projectileSpeed: 5

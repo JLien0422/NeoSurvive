@@ -24,6 +24,8 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class MarkedTarget : MonoBehaviour
   {
+    private const float HackerWeaponDamageMultiplier = 1.2f;
+
     // =========================
     // ★ 현재 활성화된 표식 대상
     // - 동시에 하나만 유지
@@ -32,8 +34,13 @@ namespace NeoSurvive.Weapon
 
     [Header("표식 유지 시간")]
     [SerializeField] private float duration = 5f;
+    [SerializeField] private Vector3 iconLocalOffset = new Vector3(0f, 1.2f, 0f);
+    [SerializeField] private Vector3 iconScale = new Vector3(0.45f, 0.45f, 1f);
+    [SerializeField] private int iconSortingOrder = 50;
 
     private float timer;
+    private GameObject iconObject;
+    private SpriteRenderer iconRenderer;
 
     private void OnEnable()
     {
@@ -75,13 +82,20 @@ namespace NeoSurvive.Weapon
       {
         Current = null;
       }
+
+      if (iconObject != null)
+      {
+        Destroy(iconObject);
+        iconObject = null;
+        iconRenderer = null;
+      }
     }
 
     /// <summary>
     /// 표식 유지시간 갱신
     /// - 이미 표식된 Enemy를 다시 맞췄을 때 사용
     /// </summary>
-    public void Refresh(float newDuration)
+    public void Refresh(float newDuration, Sprite markIcon)
     {
       // =========================
       // ★ 다른 대상에게 표식이 있다면 제거
@@ -96,6 +110,27 @@ namespace NeoSurvive.Weapon
 
       duration = newDuration;
       timer = duration;
+
+      UpdateIcon(markIcon);
+    }
+
+    private void UpdateIcon(Sprite markIcon)
+    {
+      if (markIcon == null)
+        return;
+
+      if (iconObject == null)
+      {
+        iconObject = new GameObject("PistolMasterMarkIcon");
+        iconObject.transform.SetParent(transform, false);
+        iconObject.transform.localPosition = iconLocalOffset;
+        iconObject.transform.localScale = iconScale;
+
+        iconRenderer = iconObject.AddComponent<SpriteRenderer>();
+        iconRenderer.sortingOrder = iconSortingOrder;
+      }
+
+      iconRenderer.sprite = markIcon;
     }
 
     /// <summary>
@@ -108,6 +143,17 @@ namespace NeoSurvive.Weapon
         return null;
 
       return Current.transform;
+    }
+
+    /// <summary>
+    /// LinkPistol 마스터 표식 대상은 피스톨을 제외한 보유 Active Weapon 피해를 20% 더 받습니다.
+    /// </summary>
+    public float ApplyHackerWeaponDamageBonus(float amount, WeaponBase sourceWeapon)
+    {
+      if (!WeaponManager.IsMarkedDamageBonusSource(sourceWeapon))
+        return amount;
+
+      return amount * HackerWeaponDamageMultiplier;
     }
   }
 }

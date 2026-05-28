@@ -52,18 +52,11 @@ namespace NeoSurvive.Weapon
         {
             timer += Time.deltaTime;
 
-            float actualFireRate = GetActualFireRate();
-            if (timer >= actualFireRate)
+            if (timer >= fireRate)
             {
                 timer = 0f;
                 Fire();
             }
-        }
-
-        private float GetActualFireRate()
-        {
-            if (owner == null) return fireRate;
-            return owner.ApplyWeaponFireRate(fireRate);
         }
 
         private void Fire()
@@ -73,6 +66,11 @@ namespace NeoSurvive.Weapon
                 if (debugLog)
                     Debug.LogWarning("[DigitalShield] shieldWavePrefab이 비어 있음");
                 return;
+            }
+
+            if (InGameSoundManager.Instance != null)
+            {
+                InGameSoundManager.Instance.PlayDigitalShieldSpawn();
             }
 
             Vector3 spawnPos = owner != null ? owner.transform.position : transform.position;
@@ -90,11 +88,11 @@ namespace NeoSurvive.Weapon
                 return;
             }
 
-            float finalDamage = owner != null
-                ? owner.ApplyWeaponDamageMultiplier(damage)
-                : damage;
+            float finalDamage = damage;
 
             bool isMaster = level >= 5;
+            WeaponSource source = GetComponentInParent<WeaponSource>();
+            WeaponBase sourceWeapon = source != null ? source.weaponData : null;
 
             wave.InitializeCircle(
                 owner,
@@ -108,7 +106,8 @@ namespace NeoSurvive.Weapon
                 collisionImpactRadius,
                 collisionCarrierDuration,
                 "Enemy",
-                debugLog
+                debugLog,
+                sourceWeapon
             );
 
             // =========================

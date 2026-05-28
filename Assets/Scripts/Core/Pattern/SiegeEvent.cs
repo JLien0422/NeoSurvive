@@ -11,6 +11,7 @@ public class SiegeEvent : MonoBehaviour
   [Header("포위 스폰 설정")]
   [SerializeField] private float innerRadius = 9.5f;
   [SerializeField] private float outerRadius = 14.5f;
+  [SerializeField] private int enemiesPerFrame = 1;
 
   [Header("외부 링(슈터) 수")]
   [SerializeField] private int outerCount = 10;
@@ -80,9 +81,7 @@ public class SiegeEvent : MonoBehaviour
     running = true;
     onEnd = onEnded;
 
-    SpawnInnerRing(row);
-    SpawnOuterRing(row);
-
+    StartCoroutine(SpawnSiegeRoutine(row));
     StartCoroutine(EndRoutine(row.siegeDuration));
   }
 
@@ -97,10 +96,18 @@ public class SiegeEvent : MonoBehaviour
     }
   }
 
-  private void SpawnInnerRing(EnemySpawnDB.Row row)
+  private IEnumerator SpawnSiegeRoutine(EnemySpawnDB.Row row)
+  {
+    yield return null;
+    yield return SpawnInnerRing(row);
+    yield return SpawnOuterRing(row);
+  }
+
+  private IEnumerator SpawnInnerRing(EnemySpawnDB.Row row)
   {
     var weights = BuildWeightsFromRow(row);
     List<int> innerTypes = BuildExactTypeList(row.siegeInnerCount, weights);
+    int spawnedThisFrame = 0;
 
     for (int i = 0; i < innerTypes.Count; i++)
     {
@@ -109,13 +116,22 @@ public class SiegeEvent : MonoBehaviour
 
       int typeIdx = innerTypes[i];
       Instantiate(enemyPrefabs[typeIdx], pos, Quaternion.identity);
+
+      spawnedThisFrame++;
+      if (spawnedThisFrame >= Mathf.Max(1, enemiesPerFrame))
+      {
+        spawnedThisFrame = 0;
+        yield return null;
+      }
     }
 
     Debug.Log($"[SiegeEvent] InnerRing Spawned phase={row.phase} count={innerTypes.Count}");
   }
 
-  private void SpawnOuterRing(EnemySpawnDB.Row row)
+  private IEnumerator SpawnOuterRing(EnemySpawnDB.Row row)
   {
+    int spawnedThisFrame = 0;
+
     for (int i = 0; i < row.siegeOuterCount; i++)
     {
       float angleDeg = (360f / row.siegeOuterCount) * i;
@@ -128,6 +144,13 @@ public class SiegeEvent : MonoBehaviour
         var rb = obj.GetComponent<Rigidbody2D>();
         if (rb != null)
           rb.constraints = RigidbodyConstraints2D.FreezePosition;
+      }
+
+      spawnedThisFrame++;
+      if (spawnedThisFrame >= Mathf.Max(1, enemiesPerFrame))
+      {
+        spawnedThisFrame = 0;
+        yield return null;
       }
     }
 

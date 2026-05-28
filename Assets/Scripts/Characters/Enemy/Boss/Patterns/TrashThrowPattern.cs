@@ -60,7 +60,10 @@ public class TrashThrowPattern : BossPatternBase
     {
       if (hit == null || !hit.CompareTag("Player")) continue;
       if (hit.TryGetComponent<Player>(out var p))
+      {
+        GameAnalyticsTracker.TrackBossPatternHit(nameof(TrashThrowPattern), "falling_trash", impactDamage, p);
         p.TakeDamage(impactDamage);
+      }
     }
   }
 

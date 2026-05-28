@@ -47,6 +47,9 @@ MonoBehaviour:
   dronePrefab: {fileID: 5241499299116337306, guid: 3265d1ef78c892442bb3fc7fef767d3e, type: 3}
   projectilePrefab: {fileID: 3262128633114905044, guid: 800706b81e6c7f142b21f93bfba7c6f7, type: 3}
   installCooldown: 5
+  deployVfxPrefab: {fileID: 5651733757901913938, guid: 77d200bfe4d6e2a48a43d994de9565bf, type: 3}
+  deployDuration: 0.7
+  deployVfxScale: 1
   lifeTime: 10
   damage: 5
   range: 5

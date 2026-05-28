@@ -141,9 +141,11 @@ public class LobbySoundManager : MonoBehaviour
         AudioClip clip = slot.PickClip();
         if (clip == null) return;
 
+        float settingsSfx = SettingsManager.Instance != null ? SettingsManager.Instance.sfxVolume : 1f;
+
         float prevPitch = uiSfxSource.pitch;
         uiSfxSource.pitch = slot.PickPitch();
-        uiSfxSource.PlayOneShot(clip, slot.volume * masterUiVolume);
+        uiSfxSource.PlayOneShot(clip, slot.volume * masterUiVolume * settingsSfx);
         uiSfxSource.pitch = prevPitch;
     }
 

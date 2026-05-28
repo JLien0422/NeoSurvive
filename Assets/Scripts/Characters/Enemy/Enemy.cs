@@ -1,5 +1,6 @@
 using UnityEngine;
 using NeoSurvive.Buff; // (추가)
+using NeoSurvive.Exp;
 
 // Enemy 클래스는 적 캐릭터를 나타냅니다.
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
@@ -177,8 +178,12 @@ public class Enemy : Character
 
       GameObject orb = Instantiate(expOrbPrefab, spawnPos, Quaternion.identity);
 
-      // 오브 이름에 경험치량을 포함시켜 데이터를 전달합니다.
       int amount = perOrb + (i == 0 ? remainder : 0); // 나머지는 첫 오브에 몰아줍니다.
+      if (orb.TryGetComponent<ExpOrb>(out var expOrb))
+      {
+        expOrb.SetAmount(amount);
+      }
+
       orb.name = $"ExpOrb_{amount}";
     }
   }

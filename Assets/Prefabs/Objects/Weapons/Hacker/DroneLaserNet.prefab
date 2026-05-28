@@ -42,10 +42,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8694115992042890356}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc8c95864be68714e81078eb066466a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 35c0357fd9abb954c9be8fff051869db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 3486777969655930452}
+  lineRenderer: {fileID: 0}
+  circleSegmentCount: 96
 --- !u!120 &3486777969655930452
 LineRenderer:
   serializedVersion: 2
@@ -67,7 +68,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0717aa86593b1de488ed48c0d714138c, type: 2}
+  - {fileID: 2100000, guid: 0beeb9e1faacc784698aa37375accef3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

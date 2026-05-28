@@ -316,6 +316,7 @@ public class Player : Character
     base.Die();
 
     Debug.Log($"{gameObject.name} (플레이어)가 죽었습니다!");
+    GameAnalyticsTracker.TrackPlayerDeath(this);
 
     // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
     if (GameManager.Instance != null)
@@ -408,12 +409,29 @@ public class Player : Character
   /// <param name="amount">증가할 양 (퍼센트)</param>
   public void AddPsychoCorruption(float amount)
   {
+    float previousPsychoCorruption = psychoCorruption;
     psychoCorruption = Mathf.Clamp(psychoCorruption + amount, 0f, 100f);
     OnPsychoCorruptionChanged?.Invoke(psychoCorruption, 100f);
+    TrackPsychoThresholds(previousPsychoCorruption, psychoCorruption, amount);
 
     UpdatePsychoCorruptionEffects();
 
     Debug.Log($"사이코 잠식도: {psychoCorruption:F1}%");
+  }
+
+  private void TrackPsychoThresholds(float previousValue, float currentValue, float addedAmount)
+  {
+    TrackPsychoThreshold(previousValue, currentValue, addedAmount, 30f);
+    TrackPsychoThreshold(previousValue, currentValue, addedAmount, 60f);
+    TrackPsychoThreshold(previousValue, currentValue, addedAmount, 100f);
+  }
+
+  private void TrackPsychoThreshold(float previousValue, float currentValue, float addedAmount, float threshold)
+  {
+    if (previousValue < threshold && currentValue >= threshold)
+    {
+      GameAnalyticsTracker.TrackPsychoThresholdReached(characterType, threshold, currentValue, addedAmount);
+    }
   }
 
   /// <summary>
@@ -628,6 +646,8 @@ public class Player : Character
       return;
     }
 
+    float gaugeBeforeUse = neuralLinkGauge;
+
     // 게이지 소모
     neuralLinkGauge = 0f;
     OnNeuralLinkGaugeChanged?.Invoke(neuralLinkGauge, 100f);
@@ -643,6 +663,7 @@ public class Player : Character
     }
 
     OnNeuralLinkActivated?.Invoke(characterType);
+    GameAnalyticsTracker.TrackNeuralLinkUsed(characterType, gaugeBeforeUse, 5f);
     Debug.Log($"신경링크 발동! ({characterType})");
   }
 

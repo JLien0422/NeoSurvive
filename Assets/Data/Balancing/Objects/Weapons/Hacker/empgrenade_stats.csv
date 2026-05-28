@@ -1,6 +1,0 @@
-﻿weaponid,level,damage,explosionradius,stunduration,range,arcHeight,travelTime,firerate
-empgrenade,1,20,2.5,1.5,8,1.7,0.65,2.2
-empgrenade,2,26,2.7,1.6,8.5,1.8,0.62,2.1
-empgrenade,3,32,3,1.8,9,1.9,0.6,2
-empgrenade,4,40,3.3,2,9.5,2,0.58,1.9
-empgrenade,5,50,3.7,2.3,10,2.2,0.55,1.7

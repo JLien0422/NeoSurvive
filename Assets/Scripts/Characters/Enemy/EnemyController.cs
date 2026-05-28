@@ -17,10 +17,6 @@ public class EnemyController : MonoBehaviour
   [SerializeField]
   private float attackDamage = 5f;
 
-  [SerializeField]
-  [Tooltip("CSV enemy_stats.attackrange를 반영하는 공통 공격 사거리. Shooter 등 메커니즘이 참조합니다.")]
-  private float attackRange = 1.5f;
-
   [Tooltip("Basic/Rusher/Tanker가 플레이어와 접촉 중일 때 데미지를 주는 간격")]
   public float contactDamageTickInterval = 0.5f;
 
@@ -278,11 +274,6 @@ public class EnemyController : MonoBehaviour
     return attackDamage * mul;
   }
 
-  public float GetAttackRange()
-  {
-    return attackRange;
-  }
-
   /// <summary>
   /// 현재 메커니즘 타입 가져오기
   /// </summary>
@@ -494,9 +485,8 @@ public class EnemyController : MonoBehaviour
 
     if (row.movespeed > 0f) moveSpeed = row.movespeed;
     if (row.attackdamage > 0f) attackDamage = row.attackdamage;
-    if (row.attackrange > 0f) attackRange = row.attackrange;
 
-    Debug.Log($"[EnemyController] CSV 스탯 적용 완료: {key} | moveSpeed={moveSpeed}, attackDamage={attackDamage}, attackRange={attackRange}");
+    Debug.Log($"[EnemyController] CSV 스탯 적용 완료: {key} | moveSpeed={moveSpeed}, attackDamage={attackDamage}");
   }
 
   private void ApplyEnemyDropTableFromCSV()

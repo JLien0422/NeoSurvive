@@ -28,7 +28,6 @@ namespace NeoSurvive.Weapon
     public float fireRate = 0.12f;
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.18f;
     public float rangePerLevel = 0.12f;
     public float widthPerLevel = 0.10f;
 
@@ -95,23 +94,17 @@ namespace NeoSurvive.Weapon
 
       levelDict.TryGetValue(1, out var baseRow);
 
-      float baseDamage = row.damagepertick;
       float baseRange = row.range;
       float baseWidth = row.width;
 
       if (baseRow != null)
       {
-        baseDamage = baseRow.damagepertick;
         baseRange = baseRow.range;
         baseWidth = baseRow.width;
       }
 
-      damagePerLevel = row.damageperlevel;
       rangePerLevel = row.rangeperlevel;
       widthPerLevel = row.widthperlevel;
-
-      if (damagePerLevel <= 0f && baseRow != null)
-        damagePerLevel = baseRow.damageperlevel;
 
       if (rangePerLevel <= 0f && baseRow != null)
         rangePerLevel = baseRow.rangeperlevel;
@@ -119,7 +112,7 @@ namespace NeoSurvive.Weapon
       if (widthPerLevel <= 0f && baseRow != null)
         widthPerLevel = baseRow.widthperlevel;
 
-      damagePerTick = baseDamage * (1f + (level - 1) * damagePerLevel);
+      damagePerTick = row.damagepertick;
       range = baseRange * (1f + (level - 1) * rangePerLevel);
       width = baseWidth * (1f + (level - 1) * widthPerLevel);
 

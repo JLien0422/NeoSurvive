@@ -22,7 +22,6 @@ namespace NeoSurvive.Weapon
     public string enemyTag = "Enemy";
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.25f; // 레벨당 데미지 +25%
     public float rangePerLevel = 0.05f;  // 레벨당 사거리 +5%
     public int baseMaxTargets = 1;       // 기본 타격 인원
     public int maxTargetsAtLv5 = 3;      // Lv5에서 최대 타격 인원(원하면 조절)
@@ -42,11 +41,11 @@ namespace NeoSurvive.Weapon
     private float fireTimer;
 
     // base stats
-    private float baseDamage;
     private float baseRange;
     private float baseAngle;
     private float baseFireRate;
 
+    private const string weaponId = "surgeblade";
     private int currentLevel = 1;
     private int currentMaxTargets = 1;
 
@@ -54,7 +53,6 @@ namespace NeoSurvive.Weapon
 
     private void Start()
     {
-      baseDamage = damage;
       baseRange = range;
       baseAngle = angle;
       baseFireRate = fireRate;
@@ -76,7 +74,6 @@ namespace NeoSurvive.Weapon
     public void OnLevelUp(int level)
     {
       // 안전장치(혹시 base가 0으로 깨진 경우)
-      if (baseDamage <= 0f && damage > 0f) baseDamage = damage;
       if (baseRange <= 0f && range > 0f) baseRange = range;
       if (baseAngle <= 0f && angle > 0f) baseAngle = angle;
       if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
@@ -89,7 +86,7 @@ namespace NeoSurvive.Weapon
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
+      ApplyStatsFromCSV(currentLevel);
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       angle = baseAngle; // 기본은 고정(강화 공격에서만 배수 적용)
 
@@ -97,6 +94,32 @@ namespace NeoSurvive.Weapon
       if (currentLevel <= 1) currentMaxTargets = baseMaxTargets;
       else if (currentLevel <= 3) currentMaxTargets = Mathf.Min(2, maxTargetsAtLv5);
       else currentMaxTargets = maxTargetsAtLv5;
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+        return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+        return;
+
+      if (!levelDict.TryGetValue(level, out var row))
+        return;
+
+      if (levelDict.TryGetValue(1, out var baseRow))
+      {
+        if (baseRow.range > 0f) baseRange = baseRow.range;
+        if (baseRow.angle > 0f) baseAngle = baseRow.angle;
+        if (baseRow.firerate > 0f) baseFireRate = baseRow.firerate;
+        if (baseRow.rangeperlevel > 0f) rangePerLevel = baseRow.rangeperlevel;
+        if (baseRow.basemaxtargets > 0) baseMaxTargets = baseRow.basemaxtargets;
+        if (baseRow.maxtargetsatlv5 > 0) maxTargetsAtLv5 = baseRow.maxtargetsatlv5;
+        if (baseRow.mastermultiplier > 0f) masterMultiplier = baseRow.mastermultiplier;
+      }
+
+      if (row.damage > 0f) damage = row.damage;
+      if (row.firerate > 0f) fireRate = row.firerate;
     }
 
     private void Attack()

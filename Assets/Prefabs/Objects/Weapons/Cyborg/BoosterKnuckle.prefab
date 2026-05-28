@@ -50,7 +50,6 @@ MonoBehaviour:
   range: 12
   fireRate: 1.2
   speed: 18
-  damagePerLevel: 0.18
   speedPerLevel: 0.12
   baseCount: 1
   maxCount: 4

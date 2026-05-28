@@ -1,6 +1,5 @@
-using UnityEngine;
 using System;
-using System.Collections;
+using UnityEngine;
 
 /// <summary>
 /// 상자 픽업 - 획득 시 무기 선택 UI 표시
@@ -48,7 +47,21 @@ public class ChestPickup : MonoBehaviour, IPickupable
     {
         Debug.Log("🎁 Chest Opened!");
         SoundManager.Instance?.PlayChestOpened();
-        OnChestOpened?.Invoke();
         Destroy(gameObject);
+
+        Action handlers = OnChestOpened;
+        if (handlers == null) return;
+
+        foreach (Action handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                handler?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
     }
 }

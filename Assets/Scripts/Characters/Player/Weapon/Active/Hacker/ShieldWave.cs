@@ -29,6 +29,7 @@ namespace NeoSurvive.Weapon
         private float collisionCarrierDuration;
         private string enemyTag;
         private bool debugLog;
+        private WeaponBase sourceWeapon;
 
         public void InitializeCircle(
             Player owner,
@@ -42,7 +43,8 @@ namespace NeoSurvive.Weapon
             float collisionImpactRadius,
             float collisionCarrierDuration,
             string enemyTag,
-            bool debugLog)
+            bool debugLog,
+            WeaponBase sourceWeapon)
         {
             this.owner = owner;
             this.damage = damage;
@@ -56,6 +58,7 @@ namespace NeoSurvive.Weapon
             this.collisionCarrierDuration = collisionCarrierDuration;
             this.enemyTag = enemyTag;
             this.debugLog = debugLog;
+            this.sourceWeapon = sourceWeapon;
 
             ProcessCircleHit();
             Destroy(gameObject, visibleLifetime);
@@ -65,6 +68,7 @@ namespace NeoSurvive.Weapon
         {
             HashSet<Enemy> processed = new HashSet<Enemy>();
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, hitRadius);
+            bool playedSound = false;
 
             foreach (var hit in hits)
             {
@@ -81,6 +85,12 @@ namespace NeoSurvive.Weapon
                 {
                     if (processed.Contains(enemy)) continue;
 
+                    if (!playedSound && InGameSoundManager.Instance != null)
+                    {
+                        InGameSoundManager.Instance.PlayDigitalShieldAttack();
+                        playedSound = true;
+                    }
+
                     processed.Add(enemy);
 
                     Vector3 origin = (owner != null) ? owner.transform.position : transform.position;
@@ -88,7 +98,7 @@ namespace NeoSurvive.Weapon
                     if (knockDir.sqrMagnitude < 0.0001f)
                         knockDir = Vector2.right;
 
-                    enemy.TakeDamage(damage, null);
+                    enemy.TakeDamage(damage, sourceWeapon);
 
                     KnockbackDebuff knockback = enemy.GetComponent<KnockbackDebuff>();
 
@@ -110,7 +120,8 @@ namespace NeoSurvive.Weapon
                             collisionImpactRadius,
                             collisionCarrierDuration,
                             enemyTag,
-                            debugLog
+                            debugLog,
+                            sourceWeapon
                         );
                     }
 

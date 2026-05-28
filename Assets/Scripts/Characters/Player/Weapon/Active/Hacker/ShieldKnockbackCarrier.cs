@@ -19,6 +19,7 @@ namespace NeoSurvive.Weapon
         private float duration;
         private string enemyTag;
         private bool debugLog;
+        private WeaponBase sourceWeapon;
 
         private float timer = 0f;
         private bool triggered = false;
@@ -30,7 +31,8 @@ namespace NeoSurvive.Weapon
             float collisionImpactRadius,
             float duration,
             string enemyTag,
-            bool debugLog)
+            bool debugLog,
+            WeaponBase sourceWeapon)
         {
             this.ownerEnemy = ownerEnemy;
             this.collisionDamage = collisionDamage;
@@ -39,6 +41,7 @@ namespace NeoSurvive.Weapon
             this.duration = duration;
             this.enemyTag = enemyTag;
             this.debugLog = debugLog;
+            this.sourceWeapon = sourceWeapon;
 
             rb = GetComponent<Rigidbody2D>();
             timer = 0f;
@@ -120,7 +123,7 @@ namespace NeoSurvive.Weapon
                 if (impacted.Contains(enemy)) continue;
 
                 impacted.Add(enemy);
-                enemy.TakeDamage(collisionDamage, null);
+                enemy.TakeDamage(collisionDamage, sourceWeapon);
 
                 if (debugLog)
                 {

@@ -1,6 +1,6 @@
-﻿weaponid,level,damage,radius,rotationspeed,firerate,damageperlevel,radiusperlevel,baseorbcount,maxorbcount,masterdamagefactor
-energyshield,1,8,0.8,180,0,0.2,0.05,1,5,1.5
-energyshield,2,8,0.8,180,0,0.2,0.05,1,5,1.5
-energyshield,3,8,0.8,180,0,0.2,0.05,1,5,1.5
-energyshield,4,8,0.8,180,0,0.2,0.05,1,5,1.5
-energyshield,5,8,0.8,180,0,0.2,0.05,1,5,1.5
+weaponid,level,damage,radius,rotationspeed,firerate,radiusperlevel,baseorbcount,maxorbcount,masterdamagefactor
+energyshield,1,8,0.8,180,0,0.05,1,5,1.5
+energyshield,2,9.6,0.8,180,0,0.05,1,5,1.5
+energyshield,3,11.2,0.8,180,0,0.05,1,5,1.5
+energyshield,4,12.8,0.8,180,0,0.05,1,5,1.5
+energyshield,5,14.4,0.8,180,0,0.05,1,5,1.5

@@ -168,6 +168,9 @@ public class SettingsManager : MonoBehaviour
       SoundManager.Instance.UpdateVolume();
     }
 
+    SetEffectOpacity(effectOpacity);
+    SetShowDamageNumbers(showDamageNumbers);
+
     Debug.Log("불러온 설정값을 게임에 모두 적용했습니다.");
 
     // BGM, SFX 볼륨은 각 오디오 소스나 AudioMixer에 개별적으로 적용해야 합니다.
@@ -238,9 +241,9 @@ public class SettingsManager : MonoBehaviour
   public void SetPostProcessing(bool enabled)
   {
     postProcessingEnabled = enabled;
-    
+
     // PostProcessVolume 컴포넌트를 찾아서 활성화/비활성화
-    #if UNITY_POST_PROCESSING_STACK_V2
+#if UNITY_POST_PROCESSING_STACK_V2
     UnityEngine.Rendering.PostProcessing.PostProcessVolume volume = FindObjectOfType<UnityEngine.Rendering.PostProcessing.PostProcessVolume>();
     if (volume != null)
     {
@@ -251,9 +254,9 @@ public class SettingsManager : MonoBehaviour
     {
       Debug.LogWarning("[SettingsManager] PostProcessVolume을 찾을 수 없습니다. 씬에 추가해 주세요.");
     }
-    #else
+#else
     Debug.LogWarning("[SettingsManager] Post Processing Stack V2가 설치되지 않았습니다.");
-    #endif
+#endif
   }
 
   public void SetShowDamageNumbers(bool show)
@@ -265,7 +268,13 @@ public class SettingsManager : MonoBehaviour
   public void SetEffectOpacity(float opacity)
   {
     effectOpacity = Mathf.Clamp01(opacity);
-    // 이펙트 매니저에서 처리
+
+    // 씬 내의 모든 EffectOpacityController에 알림
+    var controllers = UnityEngine.Object.FindObjectsOfType<NeoSurvive.Utils.EffectOpacityController>();
+    foreach (var c in controllers)
+    {
+      c.ApplyOpacity();
+    }
   }
 
   public void SetScreenShake(bool enabled)

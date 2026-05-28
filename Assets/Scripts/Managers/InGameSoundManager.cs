@@ -16,12 +16,22 @@ public class InGameSoundManager : MonoBehaviour
     WeaponUseGeneric,
     WeaponHitGeneric,
 
-    LinkPistolFire,
-    PlasmaRifleFire,
+    // Hacker
     AIDroneFire,
-    DataScramblerFire,
-    TacticalTurretFire,
-    EMPPulseGeneratorFire,
+    AIDroneSpawn,
+    AIDroneDestroy,
+    DataOptimizationSpawn,
+    DataOptimizationAttack,
+    DataOptimizationDestroy,
+    DataScramblerAttack,
+    DigitalShieldSpawn,
+    DigitalShieldAttack,
+    EMPPulseAttack,
+    EMPGrenadeAttack,
+    LinkPistolAttack,
+    PlasmaRifleAttack,
+    TacticalTurretSpawn,
+    TacticalTurretAttack,
 
     // Cyborg
     LaserSwordFire,
@@ -34,7 +44,12 @@ public class InGameSoundManager : MonoBehaviour
     PlasmaPhotonGunFire,
     SurgeBladeFire,
     TeslaCoilArmorFire,
-    EnergyShieldFire
+    EnergyShieldFire,
+
+    // New additions
+    EnergyShieldSpawn,
+    ProtectiveShieldSpawn,
+    Error
   }
 
   [Serializable]
@@ -78,6 +93,9 @@ public class InGameSoundManager : MonoBehaviour
   [SerializeField] private List<SfxSlot> sfxSlots = new List<SfxSlot>();
 
   private readonly Dictionary<InGameSfxEvent, SfxSlot> slotMap = new Dictionary<InGameSfxEvent, SfxSlot>();
+  
+  // (추가) 같은 사운드가 짧은 시간 내에 중첩되어 볼륨이 커지는 현상 방지
+  private readonly Dictionary<InGameSfxEvent, float> lastPlayTimes = new Dictionary<InGameSfxEvent, float>();
 
   private void Awake()
   {
@@ -140,6 +158,16 @@ public class InGameSoundManager : MonoBehaviour
       return;
     }
 
+    // 중첩 방지 (0.05초 이내에 동일한 사운드가 여러 번 재생되어 볼륨이 폭증하는 것 방지)
+    if (lastPlayTimes.TryGetValue(eventType, out float lastTime))
+    {
+        if (Time.unscaledTime - lastTime < 0.05f)
+        {
+            return; 
+        }
+    }
+    lastPlayTimes[eventType] = Time.unscaledTime;
+
     AudioClip clip = slot.PickClip();
     if (clip == null)
     {
@@ -162,7 +190,7 @@ public class InGameSoundManager : MonoBehaviour
   [ContextMenu("Debug/Test LinkPistolFire")]
   private void DebugTestLinkPistolFire()
   {
-    Play(InGameSfxEvent.LinkPistolFire);
+    Play(InGameSfxEvent.LinkPistolAttack);
   }
 
   // Weapon wrappers
@@ -177,12 +205,29 @@ public class InGameSoundManager : MonoBehaviour
   public void PlayWeaponUseGeneric() => Play(InGameSfxEvent.WeaponUseGeneric);
   public void PlayWeaponHitGeneric() => Play(InGameSfxEvent.WeaponHitGeneric);
 
-  public void PlayLinkPistolFire() => Play(InGameSfxEvent.LinkPistolFire);
-  public void PlayPlasmaRifleFire() => Play(InGameSfxEvent.PlasmaRifleFire);
   public void PlayAIDroneFire() => Play(InGameSfxEvent.AIDroneFire);
-  public void PlayDataScramblerFire() => Play(InGameSfxEvent.DataScramblerFire);
-  public void PlayTacticalTurretFire() => Play(InGameSfxEvent.TacticalTurretFire);
-  public void PlayEMPPulseGeneratorFire() => Play(InGameSfxEvent.EMPPulseGeneratorFire);
+  public void PlayAIDroneSpawn() => Play(InGameSfxEvent.AIDroneSpawn);
+  public void PlayAIDroneDestroy() => Play(InGameSfxEvent.AIDroneDestroy);
+
+  public void PlayDataOptimizationSpawn() => Play(InGameSfxEvent.DataOptimizationSpawn);
+  public void PlayDataOptimizationAttack() => Play(InGameSfxEvent.DataOptimizationAttack);
+  public void PlayDataOptimizationDestroy() => Play(InGameSfxEvent.DataOptimizationDestroy);
+
+  public void PlayDataScramblerAttack() => Play(InGameSfxEvent.DataScramblerAttack);
+
+  public void PlayDigitalShieldSpawn() => Play(InGameSfxEvent.DigitalShieldSpawn);
+  public void PlayDigitalShieldAttack() => Play(InGameSfxEvent.DigitalShieldAttack);
+
+  public void PlayEMPPulseAttack() => Play(InGameSfxEvent.EMPPulseAttack);
+
+  public void PlayEMPGrenadeAttack() => Play(InGameSfxEvent.EMPGrenadeAttack);
+
+  public void PlayLinkPistolAttack() => Play(InGameSfxEvent.LinkPistolAttack);
+
+  public void PlayPlasmaRifleAttack() => Play(InGameSfxEvent.PlasmaRifleAttack);
+
+  public void PlayTacticalTurretSpawn() => Play(InGameSfxEvent.TacticalTurretSpawn);
+  public void PlayTacticalTurretAttack() => Play(InGameSfxEvent.TacticalTurretAttack);
 
   // Cyborg
   public void PlayLaserSwordFire() => Play(InGameSfxEvent.LaserSwordFire);
@@ -196,6 +241,10 @@ public class InGameSoundManager : MonoBehaviour
   public void PlaySurgeBladeFire() => Play(InGameSfxEvent.SurgeBladeFire);
   public void PlayTeslaCoilArmorFire() => Play(InGameSfxEvent.TeslaCoilArmorFire);
   public void PlayEnergyShieldFire() => Play(InGameSfxEvent.EnergyShieldFire);
+
+  public void PlayEnergyShieldSpawn() => Play(InGameSfxEvent.EnergyShieldSpawn);
+  public void PlayProtectiveShieldSpawn() => Play(InGameSfxEvent.ProtectiveShieldSpawn);
+  public void PlayError() => Play(InGameSfxEvent.Error);
 
   public bool HasClip(InGameSfxEvent eventType)
   {

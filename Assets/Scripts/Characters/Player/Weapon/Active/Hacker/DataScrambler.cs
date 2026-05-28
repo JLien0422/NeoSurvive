@@ -5,12 +5,6 @@ using NeoSurvive.Buff;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 3번 무기: 데이터 스크램블러
-  /// 부채꼴 범위에 교란 신호 방사.
-  /// 혼란에 걸린 적은 일정 시간 후 폭발하여 광역 피해.
-  /// Lv5: 혼란 대상에게 Frenzy(광란) 디버프도 함께 적용
-  /// </summary>
   public class DataScrambler : MonoBehaviour
   {
     [Header("Stats")]
@@ -20,31 +14,37 @@ namespace NeoSurvive.Weapon
     public float fireRate = 2f;
     public float duration = 3f;
 
-    [Header("Lv5 Frenzy")]
+    [Header("Frenzy / Lv5 Death Explosion")]
     public bool enableFrenzyAtLv5 = true;
     public float frenzyDuration = 2.5f;
 
     [Header("Explosion")]
-    public float explosionRadius = 2.5f; // ★ 추가: CSV explosionradius 적용용
+    public float explosionRadius = 2.5f;
+
+    [Header("Attack VFX")]
+    public GameObject attackVfxPrefab;
+    public float attackVfxDuration = 0.5f;
+    public float attackVfxOffset = 1.0f;
+    public float attackVfxScale = 1.0f;
+
+    [Header("Explosion VFX")]
+    public GameObject explosionVfxPrefab;
+    public float explosionVfxLifetime = 0.7f;
+    public float explosionVfxScale = 1.0f;
 
     private float fireTimer;
-
     private int currentLevel = 1;
 
-    // ★ 추가: CSV weaponid
     private readonly string weaponId = "datascrambler";
 
     private void Start()
     {
       Debug.Log("[DataScrambler] Initialized");
-
-      // ★ 수정: 시작 시 Lv1 CSV 적용
       ApplyStatsFromCSV(1);
     }
 
     private void Update()
     {
-      // ★ 추가: 기존 코드에 이게 빠져 있었음
       fireTimer += Time.deltaTime;
 
       if (fireTimer >= fireRate)
@@ -56,6 +56,11 @@ namespace NeoSurvive.Weapon
 
     private void Attack()
     {
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayDataScramblerAttack();
+      }
+
       Transform target = FindClosestEnemy();
       Vector3 forward = transform.right;
 
@@ -64,8 +69,20 @@ namespace NeoSurvive.Weapon
         forward = (target.position - transform.position).normalized;
       }
 
-      Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, angle / 2) * forward * range, Color.magenta, 0.5f);
-      Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, -angle / 2) * forward * range, Color.magenta, 0.5f);
+      // ★ 공격 VFX 생성
+      SpawnAttackVFX(forward);
+
+      Debug.DrawRay(
+        transform.position,
+        Quaternion.Euler(0, 0, angle / 2) * forward * range,
+        Color.magenta,
+        0.5f);
+
+      Debug.DrawRay(
+        transform.position,
+        Quaternion.Euler(0, 0, -angle / 2) * forward * range,
+        Color.magenta,
+        0.5f);
 
       Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range);
 
@@ -75,18 +92,23 @@ namespace NeoSurvive.Weapon
 
         bool isEnemy =
           col.CompareTag("Enemy") ||
-          (col.transform.parent != null && col.transform.parent.CompareTag("Enemy"));
+          (col.transform.parent != null &&
+           col.transform.parent.CompareTag("Enemy"));
 
         if (!isEnemy) continue;
 
-        Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
+        Vector3 dirToEnemy =
+          (col.transform.position - transform.position).normalized;
 
         if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
         {
           if (col.TryGetComponent<Character>(out var character))
           {
             var src = GetComponentInParent<WeaponSource>();
-            character.TakeDamage(damage, src != null ? src.weaponData : null);
+
+            character.TakeDamage(
+              damage,
+              src != null ? src.weaponData : null);
 
             if (character is Enemy)
               ApplyConfusion(col.gameObject);
@@ -95,9 +117,44 @@ namespace NeoSurvive.Weapon
       }
     }
 
+    // ★ 수정: 전방향 회전 대응 공격 VFX
+    private void SpawnAttackVFX(Vector3 forward)
+    {
+      if (attackVfxPrefab == null) return;
+
+      // 방향 예외 방지
+      if (forward.sqrMagnitude <= 0.001f)
+        forward = transform.right;
+
+      forward.Normalize();
+
+      Vector3 spawnPos =
+        transform.position + forward * attackVfxOffset;
+
+      // ★ 방향 회전 계산
+      float angleZ =
+        Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
+
+      // ※ 만약 프리팹 기본 방향이 위쪽이면 -90f 추가
+      // angleZ -= 90f;
+
+      GameObject vfx = Instantiate(
+        attackVfxPrefab,
+        spawnPos,
+        Quaternion.Euler(0f, 0f, angleZ)
+      );
+
+      // ★ 기존 좌우반전 제거
+      vfx.transform.localScale =
+        Vector3.one * attackVfxScale;
+
+      Destroy(vfx, attackVfxDuration);
+    }
+
     private void ApplyConfusion(GameObject enemyObj)
     {
       var confusion = enemyObj.GetComponent<ConfusionEffect>();
+
       if (confusion == null)
       {
         confusion = enemyObj.AddComponent<ConfusionEffect>();
@@ -105,26 +162,34 @@ namespace NeoSurvive.Weapon
 
       var src = GetComponentInParent<WeaponSource>();
 
-      // ★ 수정: explosionRadius도 같이 전달
-      confusion.Initialize(damage, duration, explosionRadius, src != null ? src.weaponData : null);
+      confusion.Initialize(
+        damage,
+        duration,
+        explosionRadius,
+        enableFrenzyAtLv5 && currentLevel >= 5,
+        src != null ? src.weaponData : null,
+        explosionVfxPrefab,
+        explosionVfxLifetime,
+        explosionVfxScale
+      );
 
-      if (enableFrenzyAtLv5 && currentLevel >= 5)
-      {
-        BuffUtil.Apply(enemyObj, new FrenzyDebuff(frenzyDuration));
-      }
+      BuffUtil.Apply(
+        enemyObj,
+        new FrenzyDebuff(duration));
     }
 
     public void OnLevelUp(int level)
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      // ★ 수정: 레벨업 시 CSV 재적용
       ApplyStatsFromCSV(currentLevel);
 
-      Debug.Log($"[DataScrambler] Lv.{currentLevel} : Dmg {damage}, Range {range}, Duration {duration}, ExplosionRadius {explosionRadius}");
+      Debug.Log(
+        $"[DataScrambler] Lv.{currentLevel} : " +
+        $"Dmg {damage}, Range {range}, " +
+        $"Duration {duration}, ExplosionRadius {explosionRadius}");
     }
 
-    // ★ 추가: CSV 적용 함수
     private void ApplyStatsFromCSV(int level)
     {
       if (WeaponStatLoader.DB == null)
@@ -133,51 +198,57 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+      if (!WeaponStatLoader.DB.rows.TryGetValue(
+            weaponId,
+            out var levelDict))
       {
-        Debug.LogWarning($"[DataScrambler] weaponId 없음: {weaponId}");
+        Debug.LogWarning(
+          $"[DataScrambler] weaponId 없음: {weaponId}");
         return;
       }
 
       if (!levelDict.TryGetValue(level, out var row))
       {
-        Debug.LogWarning($"[DataScrambler] level 데이터 없음: {level}");
+        Debug.LogWarning(
+          $"[DataScrambler] level 데이터 없음: {level}");
         return;
       }
 
-      WeaponStatDB.Row levelOneRow = row;
-      if (levelDict.TryGetValue(1, out var baseRow))
-      {
-        levelOneRow = baseRow;
-      }
-
-      float damagePerLevel = row.damageperlevel > 0f ? row.damageperlevel : levelOneRow.damageperlevel;
-      float rangePerLevel = row.rangeperlevel > 0f ? row.rangeperlevel : levelOneRow.rangeperlevel;
-      float durationPerLevel = row.durationperlevel > 0f ? row.durationperlevel : levelOneRow.durationperlevel;
-
-      damage = levelOneRow.damage * (1f + (level - 1) * damagePerLevel);
-      range = levelOneRow.range * (1f + (level - 1) * rangePerLevel);
-      duration = levelOneRow.duration * (1f + (level - 1) * durationPerLevel);
-
+      damage = row.damage;
+      range = row.range;
+      duration = row.duration;
       angle = row.angle;
       fireRate = row.firerate;
       frenzyDuration = row.frenzyduration;
       explosionRadius = row.explosionradius;
 
-      Debug.Log($"[DataScrambler] CSV 적용 | Lv={level}, Damage={damage}, Range={range}, Duration={duration}, FireRate={fireRate}, ExplosionRadius={explosionRadius}");
+      Debug.Log(
+        $"[DataScrambler] CSV 적용 | " +
+        $"Lv={level}, Damage={damage}, " +
+        $"Range={range}, Duration={duration}, " +
+        $"FireRate={fireRate}, " +
+        $"ExplosionRadius={explosionRadius}");
     }
 
     private Transform FindClosestEnemy()
     {
-      GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+      GameObject[] enemies =
+        GameObject.FindGameObjectsWithTag("Enemy");
+
       GameObject closest = null;
-      float closestDistance = range > 0 ? (range * 1.5f) : 10f;
+
+      float closestDistance =
+        range > 0 ? (range * 1.5f) : 10f;
 
       foreach (GameObject enemy in enemies)
       {
         if (enemy == null) continue;
 
-        float distance = Vector3.Distance(transform.position, enemy.transform.position);
+        float distance =
+          Vector3.Distance(
+            transform.position,
+            enemy.transform.position);
+
         if (distance < closestDistance)
         {
           closestDistance = distance;
@@ -185,7 +256,9 @@ namespace NeoSurvive.Weapon
         }
       }
 
-      return closest != null ? closest.transform : null;
+      return closest != null
+        ? closest.transform
+        : null;
     }
 
     private void OnDrawGizmos()
@@ -199,60 +272,116 @@ namespace NeoSurvive.Weapon
   {
     private float damage;
     private float timer;
-    private float explosionRadius = 2.5f; // ★ 추가
+    private float explosionRadius = 2.5f;
+    private bool explodeOnDeath;
     private bool initialized = false;
+    private bool expired = false;
+    private bool hasExploded = false;
     private WeaponBase sourceWeapon;
+    private Enemy targetEnemy;
 
-    // ★ 수정: explosionRadius 인자 추가
-    public void Initialize(float dmg, float duration, float explosionRadius, WeaponBase source = null)
+    // ★ 폭발 VFX
+    private GameObject explosionVfxPrefab;
+    private float explosionVfxLifetime;
+    private float explosionVfxScale;
+
+    public void Initialize(
+      float dmg,
+      float duration,
+      float explosionRadius,
+      bool explodeOnDeath,
+      WeaponBase source = null,
+      GameObject explosionVfxPrefab = null,
+      float explosionVfxLifetime = 0.7f,
+      float explosionVfxScale = 1.0f)
     {
       this.damage = dmg;
       this.timer = duration;
       this.explosionRadius = explosionRadius;
+      this.explodeOnDeath = explodeOnDeath;
       this.sourceWeapon = source;
+      this.targetEnemy = GetComponent<Enemy>();
+
+      this.explosionVfxPrefab = explosionVfxPrefab;
+      this.explosionVfxLifetime = explosionVfxLifetime;
+      this.explosionVfxScale = explosionVfxScale;
+
       this.initialized = true;
+      this.expired = false;
+      this.hasExploded = false;
 
       var sr = GetComponentInChildren<SpriteRenderer>();
-      if (sr) sr.color = Color.magenta;
+
+      if (sr)
+        sr.color = Color.magenta;
     }
 
     private void Update()
     {
       if (!initialized) return;
 
-      timer -= Time.deltaTime;
-      if (timer <= 0)
+      if (explodeOnDeath && targetEnemy != null && targetEnemy.IsDead)
       {
         Explode();
+        return;
       }
+
+      timer -= Time.deltaTime;
+
+      if (timer <= 0)
+      {
+        expired = true;
+        Destroy(this);
+      }
+    }
+
+    private void OnDestroy()
+    {
+      if (!initialized || expired || hasExploded)
+        return;
+
+      if (explodeOnDeath && targetEnemy != null && targetEnemy.IsDead)
+        Explode();
     }
 
     private void Explode()
     {
-      // ★ 수정: 하드코딩 2.5f 대신 CSV explosionRadius 사용
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
+      if (hasExploded)
+        return;
+
+      hasExploded = true;
+
+      // ★ 혼란 폭발 VFX 생성
+      SpawnExplosionVFX();
+
+      Collider2D[] hits =
+        Physics2D.OverlapCircleAll(
+          transform.position,
+          explosionRadius);
 
       foreach (var h in hits)
       {
-        if (h.gameObject == gameObject) continue;
+        if (h.gameObject == gameObject)
+          continue;
 
-        if (h.CompareTag("Enemy") && h.TryGetComponent<Enemy>(out var e))
+        if (h.CompareTag("Enemy") &&
+            h.TryGetComponent<Enemy>(out var e))
         {
           e.TakeDamage(damage, sourceWeapon);
           continue;
         }
-        // =========================
-        // 2. 추가: IDamageable 맵오브젝트 폭발 데미지 처리
-        // - 자판기 같은 맵오브젝트만 맞게 함
-        // - Enemy는 위에서 이미 처리했으므로 여기서는 제외
-        // =========================
+
         if (h.CompareTag("Enemy"))
           continue;
 
-        IDamageable damageable = h.GetComponent<IDamageable>();
+        IDamageable damageable =
+          h.GetComponent<IDamageable>();
 
         if (damageable == null)
-          damageable = h.GetComponentInParent<IDamageable>();
+        {
+          damageable =
+            h.GetComponentInParent<IDamageable>();
+        }
 
         if (damageable == null)
           continue;
@@ -261,9 +390,29 @@ namespace NeoSurvive.Weapon
       }
 
       var sr = GetComponentInChildren<SpriteRenderer>();
-      if (sr) sr.color = Color.white;
+
+      if (sr)
+        sr.color = Color.white;
 
       Destroy(this);
+    }
+
+    // ★ 혼란 폭발 VFX 생성
+    private void SpawnExplosionVFX()
+    {
+      if (explosionVfxPrefab == null)
+        return;
+
+      GameObject vfx = Instantiate(
+        explosionVfxPrefab,
+        transform.position,
+        Quaternion.identity
+      );
+
+      vfx.transform.localScale =
+        Vector3.one * explosionVfxScale;
+
+      Destroy(vfx, explosionVfxLifetime);
     }
   }
 }

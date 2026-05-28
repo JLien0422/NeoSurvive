@@ -1,14 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 부스터 너클 투사체
-  /// - 직진 이동
-  /// - 적 충돌 시 피해 후 파괴
-  /// - 벽 충돌 시: (Lv5 마스터) 튕김 + 가장 가까운 적 유도
-  /// </summary>
   public class BoosterFistProjectile : MonoBehaviour
   {
     [Header("Runtime")]
@@ -21,22 +16,66 @@ namespace NeoSurvive.Weapon
     public string enemyTag = "Enemy";
 
     [Header("Collision")]
-    public LayerMask wallMask;     // 벽 레이어(프로젝트에 맞게 설정)
-    public bool useTrigger = true; // 콜라이더가 Trigger라면 true
+    public LayerMask wallMask;
 
     [Header("Master Homing")]
     public bool masterHoming = false;
-    public float homingTurnSpeed = 360f; // deg/sec
+    public float homingTurnSpeed = 360f;
     public float homingSearchRange = 10f;
+
+    [Header("Hit Detection")]
+    public float hitRadius = 0.1f; // ★ 수정: 플레이어 주변 오검출 방지용으로 축소
+
+    [Header("Rotation")]
+    public float spriteAngleOffset = 0f;
+
+    private const string weaponId = "boosterknuckle";
+    private int currentLevel = 1;
+
+    private GameObject owner;
+    private Transform ownerRoot;
 
     private Vector3 dir;
     private Vector3 startPos;
+
     private bool bounced = false;
+    private bool destroyed = false;
+
+    private Transform lastHitEnemy;
     private WeaponBase sourceWeapon;
 
-    public void Initialize(Vector3 dir, float damage, float speed, float maxDistance,
-      LayerMask enemyMask, string enemyTag, bool masterHoming)
+    private void Awake()
     {
+      // ★ 물리 충돌은 사용하지 않음
+      // 데미지 판정은 Physics2D.OverlapCircleAll로 직접 처리
+      Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
+      foreach (Collider2D col in colliders)
+      {
+        if (col == null) continue;
+        col.enabled = false;
+      }
+
+      Rigidbody2D[] rigidbodies = GetComponentsInChildren<Rigidbody2D>(true);
+      foreach (Rigidbody2D rb in rigidbodies)
+      {
+        if (rb == null) continue;
+        rb.simulated = false;
+      }
+    }
+
+    public void Initialize(
+      GameObject owner,
+      Vector3 dir,
+      float damage,
+      float speed,
+      float maxDistance,
+      LayerMask enemyMask,
+      string enemyTag,
+      bool masterHoming)
+    {
+      this.owner = owner;
+      this.ownerRoot = owner != null ? owner.transform.root : null;
+
       this.dir = dir.normalized;
       this.damage = damage;
       this.speed = speed;
@@ -46,6 +85,8 @@ namespace NeoSurvive.Weapon
       this.masterHoming = masterHoming;
 
       startPos = transform.position;
+
+      RotateToDirection();
     }
 
     public void SetSourceWeapon(WeaponBase weapon)
@@ -53,96 +94,270 @@ namespace NeoSurvive.Weapon
       sourceWeapon = weapon;
     }
 
+    public void ApplyStatsFromCSV(int level)
+    {
+      currentLevel = Mathf.Clamp(level, 1, 5);
+
+      if (WeaponStatLoader.DB == null)
+        return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var weaponLevels))
+        return;
+
+      if (!weaponLevels.TryGetValue(currentLevel, out var row))
+        return;
+
+      if (row.homingturnspeed > 0f)
+        homingTurnSpeed = row.homingturnspeed;
+
+      if (row.homingsearchrange > 0f)
+        homingSearchRange = row.homingsearchrange;
+    }
+
     private void Update()
     {
-      // 마스터 유도: 1회 튕긴 뒤부터 가장 가까운 적 방향으로 서서히 회전
+      if (destroyed)
+        return;
+
       if (masterHoming && bounced)
       {
-        Transform target = FindClosestEnemy(homingSearchRange);
+        Transform target = FindRandomEnemy(homingSearchRange, lastHitEnemy);
+
         if (target != null)
         {
           Vector3 desired = (target.position - transform.position).normalized;
-          float maxStep = homingTurnSpeed * Time.deltaTime;
-          dir = Vector3.RotateTowards(dir, desired, maxStep * Mathf.Deg2Rad, 0f).normalized;
+          float step = homingTurnSpeed * Mathf.Deg2Rad * Time.deltaTime;
+          dir = Vector3.RotateTowards(dir, desired, step, 0f).normalized;
         }
       }
 
-      transform.position += dir * (speed * Time.deltaTime);
+      RotateToDirection();
 
-      // 거리 제한
+      transform.position += dir * speed * Time.deltaTime;
+
+      CheckHitByOverlap();
+
       if (Vector3.Distance(startPos, transform.position) >= maxDistance)
       {
-        Destroy(gameObject);
+        DestroyProjectile();
       }
     }
 
-    // Trigger 기반(권장)
-    private void OnTriggerEnter2D(Collider2D other)
+    private void CheckHitByOverlap()
     {
-      if (!useTrigger) return;
-      HandleHit(other);
-    }
+      // ★ 핵심 수정:
+      // 전체 Collider를 검사하지 않고 enemyMask에 포함된 Collider만 검사
+      // 그래서 Player, Weapon, VFX, 기타 오브젝트를 건드리지 않음
+      Collider2D[] hits = Physics2D.OverlapCircleAll(
+        transform.position,
+        hitRadius,
+        enemyMask
+      );
 
-    // Collision 기반(필요하면 사용)
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-      if (useTrigger) return;
-      HandleHit(collision.collider);
-    }
-
-    private void HandleHit(Collider2D other)
-    {
-      if (other == null) return;
-
-      // 1) 벽 충돌
-      if (((1 << other.gameObject.layer) & wallMask.value) != 0)
+      foreach (Collider2D hit in hits)
       {
-        // 일반: 그냥 파괴 / 마스터: 튕김
-        if (!masterHoming)
+        if (hit == null)
+          continue;
+
+        if (owner != null)
         {
-          Destroy(gameObject);
-          return;
+          if (hit.gameObject == owner)
+            continue;
+
+          if (hit.transform.root == owner.transform.root)
+            continue;
         }
 
-        // 튕김: 현재 진행방향 반전(간단 반사)
-        dir = -dir;
-        bounced = true;
+        if (ownerRoot != null && hit.transform.root == ownerRoot)
+          continue;
+
+        if (!IsEnemy(hit))
+          continue;
+
+        Character character = hit.GetComponent<Character>();
+
+        if (character == null)
+          character = hit.GetComponentInParent<Character>();
+
+        if (character == null)
+          continue;
+
+        HandleEnemyHit(character);
         return;
       }
 
-      // 2) 적 충돌
-      if (((1 << other.gameObject.layer) & enemyMask.value) == 0) return;
-
-      if (!string.IsNullOrEmpty(enemyTag) && !other.CompareTag(enemyTag))
+      // ★ 벽은 별도 Mask가 있을 때만 검사
+      if (wallMask.value != 0)
       {
-        if (other.transform.parent == null || !other.transform.parent.CompareTag(enemyTag))
+        Collider2D[] wallHits = Physics2D.OverlapCircleAll(
+          transform.position,
+          hitRadius,
+          wallMask
+        );
+
+        foreach (Collider2D wall in wallHits)
+        {
+          if (wall == null)
+            continue;
+
+          HandleWallBounce();
           return;
-      }
-
-      Enemy enemy = other.GetComponentInParent<Enemy>();
-      if (enemy != null)
-      {
-        enemy.TakeDamage(damage, sourceWeapon);
-        Destroy(gameObject);
+        }
       }
     }
 
-    private Transform FindClosestEnemy(float searchRange)
+    private void HandleEnemyHit(Character character)
     {
-      GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
-      GameObject closest = null;
-      float minDist = searchRange > 0 ? searchRange : 10f;
+      if (character == null)
+        return;
 
-      foreach (var e in enemies)
+      character.TakeDamage(Mathf.Max(1f, damage), sourceWeapon);
+
+      if (!masterHoming)
       {
-        float d = Vector3.Distance(transform.position, e.transform.position);
-        if (d < minDist)
-        {
-          minDist = d;
-          closest = e;
-        }
+        DestroyProjectile();
+        return;
       }
-      return closest ? closest.transform : null;
+
+      if (!bounced)
+      {
+        bounced = true;
+        lastHitEnemy = character.transform;
+
+        dir = -dir;
+
+        Transform target = FindRandomEnemy(homingSearchRange, lastHitEnemy);
+
+        if (target != null)
+        {
+          dir = (target.position - transform.position).normalized;
+        }
+
+        RotateToDirection();
+        return;
+      }
+
+      DestroyProjectile();
+    }
+
+    private void HandleWallBounce()
+    {
+      if (!masterHoming)
+      {
+        DestroyProjectile();
+        return;
+      }
+
+      if (!bounced)
+      {
+        bounced = true;
+        dir = -dir;
+
+        Transform target = FindRandomEnemy(homingSearchRange, null);
+
+        if (target != null)
+        {
+          dir = (target.position - transform.position).normalized;
+        }
+
+        RotateToDirection();
+        return;
+      }
+
+      DestroyProjectile();
+    }
+
+    private void RotateToDirection()
+    {
+      if (dir.sqrMagnitude <= 0.0001f)
+        return;
+
+      float angleZ = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + spriteAngleOffset;
+      transform.rotation = Quaternion.Euler(0f, 0f, angleZ);
+    }
+
+    private bool IsEnemy(Collider2D other)
+    {
+      if (other == null)
+        return false;
+
+      if (!string.IsNullOrEmpty(enemyTag))
+      {
+        if (other.CompareTag(enemyTag))
+          return true;
+
+        if (other.transform.parent != null && other.transform.parent.CompareTag(enemyTag))
+          return true;
+      }
+
+      Character character = other.GetComponent<Character>();
+
+      if (character == null)
+        character = other.GetComponentInParent<Character>();
+
+      if (character == null)
+        return false;
+
+      if (!string.IsNullOrEmpty(enemyTag) && !character.CompareTag(enemyTag))
+        return false;
+
+      return true;
+    }
+
+    private Transform FindRandomEnemy(float searchRange, Transform excludeTarget)
+    {
+      Collider2D[] hits = Physics2D.OverlapCircleAll(
+        transform.position,
+        searchRange,
+        enemyMask
+      );
+
+      List<Transform> candidates = new List<Transform>();
+
+      foreach (Collider2D hit in hits)
+      {
+        if (hit == null)
+          continue;
+
+        if (!IsEnemy(hit))
+          continue;
+
+        Character character = hit.GetComponent<Character>();
+
+        if (character == null)
+          character = hit.GetComponentInParent<Character>();
+
+        if (character == null)
+          continue;
+
+        Transform target = character.transform;
+
+        if (excludeTarget != null && target == excludeTarget)
+          continue;
+
+        if (!candidates.Contains(target))
+          candidates.Add(target);
+      }
+
+      if (candidates.Count == 0)
+        return null;
+
+      return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    private void DestroyProjectile()
+    {
+      if (destroyed)
+        return;
+
+      destroyed = true;
+      Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+      Gizmos.color = Color.yellow;
+      Gizmos.DrawWireSphere(transform.position, hitRadius);
     }
   }
 }

@@ -10,6 +10,7 @@ public class PlasmaRifle : MonoBehaviour
   public float range = 10f;
   public float fireRate = 1f;
   public float bulletSpeed = 20f;
+  public float duration = 1f;
 
   [Header("Lazer Settings")]
   public GameObject lazerPrefab;
@@ -66,29 +67,15 @@ public class PlasmaRifle : MonoBehaviour
       return;
     }
 
-    float baseDamage = row.damage;
-
-    if (levelDict.TryGetValue(1, out var levelOneRow))
-    {
-      baseDamage = levelOneRow.damage;
-    }
-
-    float perLevel = row.damageperlevel;
-
-    if (perLevel <= 0f && levelDict.TryGetValue(1, out var baseRow))
-    {
-      perLevel = baseRow.damageperlevel;
-    }
-
-    damage = baseDamage * (1f + (level - 1) * perLevel);
-
+    damage = row.damage;
     range = row.range;
     fireRate = row.firerate;
     bulletSpeed = row.bulletspeed;
+    duration = row.duration;
 
     currentPenetration = (int)row.penetration;
 
-    Debug.Log($"[PlasmaRifle] CSV 적용 | Lv={level}, Dmg={damage}, Pen={currentPenetration}");
+    Debug.Log($"[PlasmaRifle] CSV 적용 | Lv={level}, Dmg={damage}, Range={range}, Duration={duration}, Pen={currentPenetration}");
   }
 
   private void Update()
@@ -107,6 +94,11 @@ public class PlasmaRifle : MonoBehaviour
     GameObject target = FindClosestEnemy();
     if (target == null) return;
 
+    if (InGameSoundManager.Instance != null)
+    {
+      InGameSoundManager.Instance.PlayPlasmaRifleAttack();
+    }
+
     Vector3 dir = (target.transform.position - transform.position).normalized;
 
     GameObject obj = Instantiate(lazerPrefab, transform.position, Quaternion.identity);
@@ -120,6 +112,9 @@ public class PlasmaRifle : MonoBehaviour
       lazer.Initialize(
         dir,
         damage,
+        range,
+        bulletSpeed,
+        duration,
         currentPenetration,
         src != null ? src.weaponData : null,
         IsMasterLevel,

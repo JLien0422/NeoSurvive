@@ -1,13 +1,8 @@
 using UnityEngine;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace NeoSurvive.Weapon
 {
-    /// <summary>
-    /// 9번 무기: 홀로그램 디코이 생성기
-    /// 적을 유인하는 분신 소환.
-    /// Lv.5 달성 시 분신 파괴될 때 데이터 감옥(속박) 발동.
-    /// </summary>
     public class HologramDecoyGenerator : MonoBehaviour
     {
         [Header("Stats")]
@@ -15,62 +10,129 @@ namespace NeoSurvive.Weapon
 
         public float hp = 50f;
         public float cooldown = 15f;
-        public float prisonDuration = 3f;
 
-        // ★ 추가: CSV prisonrange 적용용
+        public float prisonDuration = 3f;
         public float prisonRange = 3f;
+
+        [Header("Base VFX")]
+        public GameObject baseStartVfxPrefab;
+        public GameObject baseEndVfxPrefab;
+
+        [Header("Field VFX")]
+        public GameObject fieldStartVfxPrefab;
+        public GameObject fieldMiddleVfxPrefab;
+        public GameObject fieldEndVfxPrefab;
+
+        [Header("Body VFX")]
+        public GameObject bodyVfxPrefab;
+
+        [Header("VFX Timing")]
+        public float baseStartDuration = 0.35f;
+        public float fieldStartDuration = 0.35f;
+        public float fieldMiddleDuration = 0.7f;
+
+        public float fieldEndLifetime = 0.4f;
+        public float baseEndLifetime = 0.4f;
+
+        [Header("VFX Scale")]
+        public float vfxScale = 1f;
+        public float bodyVfxScale = 1f;
 
         private float timer;
         private int currentLevel = 1;
+        private bool spawning = false;
 
-        // ★ 추가: CSV weaponid
         private readonly string weaponId = "hologramdecoy";
 
         private void Start()
         {
-            // ★ 수정: 시작 시 Lv1 CSV 적용
             ApplyStatsFromCSV(1);
-
-            // 시작 시 즉시 쿨타임 완료 상태
             timer = cooldown;
         }
 
         private void Update()
         {
             timer += Time.deltaTime;
-            if (timer >= cooldown)
+
+            if (timer >= cooldown && !spawning)
             {
-                SpawnDecoy();
+                StartCoroutine(SpawnDecoyRoutine());
                 timer = 0f;
             }
         }
 
-        private void SpawnDecoy()
+        private IEnumerator SpawnDecoyRoutine()
+        {
+            spawning = true;
+
+            Vector3 spawnPos = transform.position;
+
+            SpawnOneShotVFX(baseStartVfxPrefab, spawnPos, baseStartDuration, vfxScale);
+            yield return new WaitForSeconds(baseStartDuration);
+
+            SpawnOneShotVFX(fieldStartVfxPrefab, spawnPos, fieldStartDuration, vfxScale);
+            yield return new WaitForSeconds(fieldStartDuration);
+
+            SpawnOneShotVFX(fieldMiddleVfxPrefab, spawnPos, fieldMiddleDuration, vfxScale);
+            yield return new WaitForSeconds(fieldMiddleDuration);
+
+            SpawnDecoy(spawnPos);
+
+            spawning = false;
+        }
+
+        private void SpawnDecoy(Vector3 spawnPos)
         {
             if (decoyPrefab == null) return;
 
-            GameObject obj = Instantiate(decoyPrefab, transform.position, Quaternion.identity);
+            GameObject obj =
+                Instantiate(decoyPrefab, spawnPos, Quaternion.identity);
 
             if (obj.TryGetComponent<HologramDecoy>(out var decoy))
             {
-                bool spawnPrison = (currentLevel >= 5);
+                bool spawnPrison = currentLevel >= 5;
 
-                // ★ 수정: prisonRange까지 전달
-                decoy.Initialize(hp, spawnPrison, prisonDuration, prisonRange);
+                decoy.Initialize(
+                    hp,
+                    spawnPrison,
+                    prisonDuration,
+                    prisonRange,
+                    bodyVfxPrefab,
+                    fieldEndVfxPrefab,
+                    baseEndVfxPrefab,
+                    fieldEndLifetime,
+                    baseEndLifetime,
+                    vfxScale,
+                    bodyVfxScale
+                );
             }
+        }
+
+        private void SpawnOneShotVFX(
+            GameObject prefab,
+            Vector3 pos,
+            float lifetime,
+            float scale)
+        {
+            if (prefab == null) return;
+
+            GameObject vfx = Instantiate(prefab, pos, Quaternion.identity);
+            vfx.transform.localScale = Vector3.one * scale;
+
+            Destroy(vfx, lifetime);
         }
 
         public void OnLevelUp(int level)
         {
             currentLevel = Mathf.Clamp(level, 1, 5);
-
-            // ★ 수정: CSV 적용
             ApplyStatsFromCSV(currentLevel);
 
-            Debug.Log($"[Hologram Decoy] CSV 적용 | Lv={currentLevel}, HP={hp}, Cooldown={cooldown}, PrisonDuration={prisonDuration}, PrisonRange={prisonRange}, Prison={currentLevel >= 5}");
+            Debug.Log(
+                $"[Hologram Decoy] CSV 적용 | Lv={currentLevel}, HP={hp}, Cooldown={cooldown}, " +
+                $"PrisonDuration={prisonDuration}, PrisonRange={prisonRange}, Prison={currentLevel >= 5}"
+            );
         }
 
-        // ★ 추가: CSV 적용 함수
         private void ApplyStatsFromCSV(int level)
         {
             if (WeaponStatLoader.DB == null)
@@ -91,29 +153,18 @@ namespace NeoSurvive.Weapon
                 return;
             }
 
-            WeaponStatDB.Row baseRow = row;
-            if (levelDict.TryGetValue(1, out var levelOneRow))
-            {
-                baseRow = levelOneRow;
-            }
+            hp = row.hp;
+            cooldown = row.cooldown;
+            if (cooldown < 1f)
+                cooldown = 1f;
 
-            float hpPer = row.hpperlevel > 0f ? row.hpperlevel : baseRow.hpperlevel;
-            float cooldownReduction = row.cooldownreductionperlevel > 0f
-                ? row.cooldownreductionperlevel
-                : baseRow.cooldownreductionperlevel;
-
-            // hp = Lv1 hp 기준 + hpperlevel 증가
-            hp = baseRow.hp * (1f + (level - 1) * hpPer);
-
-            // cooldown = Lv1 cooldown 기준 - cooldownreductionperlevel 감소
-            cooldown = baseRow.cooldown * (1f - (level - 1) * cooldownReduction);
-            if (cooldown < 1f) cooldown = 1f;
-
-            // 그대로 쓰는 값
             prisonDuration = row.prisonduration;
             prisonRange = row.prisonrange;
 
-            Debug.Log($"[Hologram Decoy] CSV 적용 | Lv={level}, HP={hp}, Cooldown={cooldown}, PrisonDuration={prisonDuration}, PrisonRange={prisonRange}");
+            Debug.Log(
+                $"[Hologram Decoy] CSV 적용 | Lv={level}, HP={hp}, Cooldown={cooldown}, " +
+                $"PrisonDuration={prisonDuration}, PrisonRange={prisonRange}"
+            );
         }
     }
 }

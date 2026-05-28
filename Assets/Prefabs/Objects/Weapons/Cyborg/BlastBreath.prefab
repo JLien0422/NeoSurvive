@@ -58,7 +58,6 @@ MonoBehaviour:
   tickInterval: 0.25
   areaDuration: 0.8
   fireRate: 1.1
-  damagePerLevel: 0.18
   rangePerLevel: 0.12
   widthPerLevel: 0.1
   enableMaster: 1

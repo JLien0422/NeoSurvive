@@ -10,11 +10,7 @@ public class ShooterMechanism : EnemyMechanismBase
     [Header("원거리 공격 설정")]
     [SerializeField]
     [Tooltip("투사체를 발사하기 시작하는 사거리")]
-    private float attackRange = 7.5f;
-
-    [SerializeField]
-    [Tooltip("켜면 EnemyController가 CSV에서 읽은 attackdamage/attackrange를 우선 사용합니다.")]
-    private bool useControllerCombatStats = true;
+    private float attackRange = 4f;
 
     [SerializeField]
     [Tooltip("공격 주기 (초)")]
@@ -201,33 +197,29 @@ public class ShooterMechanism : EnemyMechanismBase
         // 투사체 생성
         GameObject projectile = Instantiate(projectilePrefab, shootPosition, projectileRotation);
 
-        // 투사체 초기화
-        NeoSurvive.Weapon.Projectile proj = projectile.GetComponent<NeoSurvive.Weapon.Projectile>();
-        if (proj != null)
+        // Shooter 탄환은 플레이어 무기용 Projectile이 아니라 적 전용 EnemyProjectile로 처리합니다.
+        NeoSurvive.Weapon.Projectile playerProjectile = projectile.GetComponent<NeoSurvive.Weapon.Projectile>();
+        if (playerProjectile != null)
         {
-            proj.Initialize(direction, damage, projectileSpeed);
-        }
-        else
-        {
-            // Projectile 컴포넌트가 없으면 직접 이동 처리
-            Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
-            if (projRb == null)
-            {
-                projRb = projectile.AddComponent<Rigidbody2D>();
-                projRb.gravityScale = 0;
-            }
-            projRb.velocity = direction * projectileSpeed;
-
-            // 대미지 처리용 컴포넌트 추가
-            EnemyProjectile enemyProj = projectile.GetComponent<EnemyProjectile>();
-            if (enemyProj == null)
-            {
-                enemyProj = projectile.AddComponent<EnemyProjectile>();
-            }
-            enemyProj.damage = damage;
+            playerProjectile.enabled = false;
         }
 
-        Debug.Log($"[ShooterMechanism] {gameObject.name}이(가) 투사체를 발사했습니다.");
+        Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
+        if (projRb == null)
+        {
+            projRb = projectile.AddComponent<Rigidbody2D>();
+        }
+
+        projRb.gravityScale = 0f;
+        projRb.velocity = direction * projectileSpeed;
+
+        EnemyProjectile enemyProj = projectile.GetComponent<EnemyProjectile>();
+        if (enemyProj == null)
+        {
+            enemyProj = projectile.AddComponent<EnemyProjectile>();
+        }
+
+        enemyProj.Initialize(direction, damage, projectileSpeed);
     }
 
     private void ResolveGunAnimatorIfNeeded()
@@ -275,19 +267,12 @@ public class ShooterMechanism : EnemyMechanismBase
 
     private float GetEffectiveAttackRange()
     {
-        if (useControllerCombatStats && controller != null)
-        {
-            float controllerAttackRange = controller.GetAttackRange();
-            if (controllerAttackRange > 0f)
-                return controllerAttackRange;
-        }
-
         return attackRange;
     }
 
     private float GetEffectiveProjectileDamage()
     {
-        if (useControllerCombatStats && controller != null)
+        if (controller != null)
         {
             float controllerDamage = controller.GetAttackDamage();
             if (controllerDamage > 0f)
@@ -341,26 +326,95 @@ public class EnemyProjectile : MonoBehaviour
 {
     public float damage = 5f;
     [SerializeField] private float lifeTime = 5f;
+    private static readonly int WallLayer = LayerMask.NameToLayer("Wall");
+    private static readonly int ObstacleLayer = LayerMask.NameToLayer("Obstacle");
+    private Vector2 direction;
+    private float speed;
+    private bool initialized;
+    private bool hasHit;
+    private Rigidbody2D rb;
+
+    public void Initialize(Vector2 direction, float damage, float speed)
+    {
+        this.direction = direction.normalized;
+        this.damage = damage;
+        this.speed = speed;
+        initialized = true;
+
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+
+        rb.gravityScale = 0f;
+        rb.velocity = this.direction * this.speed;
+        Destroy(gameObject, lifeTime);
+    }
 
     private void Start()
     {
-        Destroy(gameObject, lifeTime);
+        if (!initialized)
+        {
+            rb = GetComponent<Rigidbody2D>();
+            if (rb != null && rb.velocity.sqrMagnitude > 0f)
+            {
+                direction = rb.velocity.normalized;
+                speed = rb.velocity.magnitude;
+            }
+
+            Destroy(gameObject, lifeTime);
+        }
+    }
+
+    private void Update()
+    {
+        if (rb == null && initialized)
+        {
+            transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            Character character = other.GetComponent<Character>();
-            if (character != null)
-            {
-                character.TakeDamage(damage);
-                Destroy(gameObject);
-            }
-        }
-        else if (other.CompareTag("Wall") || other.CompareTag("Obstacle"))
+        if (TryHitPlayer(other) || IsBlockingCollider(other))
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Collider2D other = collision.collider;
+        if (other == null) return;
+
+        if (TryHitPlayer(other) || IsBlockingCollider(other))
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private bool TryHitPlayer(Collider2D other)
+    {
+        if (hasHit)
+            return true;
+
+        Player player = other.GetComponentInParent<Player>();
+        if (player == null && !other.CompareTag("Player"))
+            return false;
+
+        Character character = other.GetComponentInParent<Character>();
+        if (character == null)
+            return false;
+
+        hasHit = true;
+        character.TakeDamage(damage);
+        return true;
+    }
+
+    private static bool IsBlockingCollider(Collider2D other)
+    {
+        int layer = other.gameObject.layer;
+        return (WallLayer >= 0 && layer == WallLayer) || (ObstacleLayer >= 0 && layer == ObstacleLayer);
     }
 }

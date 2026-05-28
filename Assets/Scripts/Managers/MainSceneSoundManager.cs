@@ -235,9 +235,11 @@ public class MainSceneSoundManager : MonoBehaviour
 
     private void PlayOneShot(AudioClip clip, float slotVolume, float pitch)
     {
+        float settingsSfx = SettingsManager.Instance != null ? SettingsManager.Instance.sfxVolume : 1f;
+
         float prevPitch = sfxSource.pitch;
         sfxSource.pitch = pitch;
-        sfxSource.PlayOneShot(clip, slotVolume * masterSfxVolume);
+        sfxSource.PlayOneShot(clip, slotVolume * masterSfxVolume * settingsSfx);
         sfxSource.pitch = prevPitch;
     }
 

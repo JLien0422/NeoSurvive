@@ -19,6 +19,8 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class WeaponManager : MonoBehaviour
   {
+    public static WeaponManager Instance { get; private set; }
+
     [Header("Weapon Data")]
     public List<WeaponBase> allWeaponDatas = new(); // 모든 가능한 무기 데이터 (DB 역할)
 
@@ -30,61 +32,50 @@ namespace NeoSurvive.Weapon
 
     private WeaponBase FindWeaponById(int weaponId)
     {
-      return allWeaponDatas.Find(w => w != null && w.weaponId == weaponId + 1);
+      // F키 등으로 넘어오는 ID가 그대로 데이터의 weaponId(1부터 시작 등)와 일치한다고 가정하고 +1 보정을 제거하거나 유연하게 탐색
+      var found = allWeaponDatas.Find(w => w != null && w.weaponId == weaponId);
+      if (found == null)
+      {
+          // 기존처럼 0-index 기반으로 호출한 경우를 대비
+          found = allWeaponDatas.Find(w => w != null && w.weaponId == weaponId + 1);
+      }
+      return found;
     }
 
-    [Header("Class Weapon Sets (Templates)")]
-    public List<WeaponBase> cyborgAllWeaponDatas = new();
-    public List<WeaponBase> hackerAllWeaponDatas = new();
-
-    [Header("Class Start Weapons (Templates)")]
-    public List<WeaponBase> cyborgStartWeapons = new();
-    public List<WeaponBase> hackerStartWeapons = new();
+    [Header("Start Weapon")]
+    public WeaponBase startWeapon;
 
     private void Awake()
     {
-      ApplyClassLoadout();
-      EquipStartWeapons();
+      Instance = this;
+      EquipStartWeapon();
     }
 
-    private void ApplyClassLoadout()
+    private void OnDestroy()
     {
-      var player = GetComponent<Player>();
-      var classType = (player != null && player.CharacterType == CharacterType.Cyborg)
-        ? PlayerClassType.Cyborg
-        : PlayerClassType.Hacker;
-
-      List<WeaponBase> selectedAll = (classType == PlayerClassType.Cyborg)
-        ? cyborgAllWeaponDatas
-        : hackerAllWeaponDatas;
-
-      List<WeaponBase> selectedStart = (classType == PlayerClassType.Cyborg)
-        ? cyborgStartWeapons
-        : hackerStartWeapons;
-
-      allWeaponDatas.Clear();
-      if (selectedAll != null)
-        allWeaponDatas.AddRange(selectedAll.Where(w => w != null));
-
-      activeWeapons.Clear();
-      if (selectedStart != null)
-        activeWeapons.AddRange(selectedStart.Where(w => w != null));
-    }
-
-    private void EquipStartWeapons()
-    {
-      if (activeWeapons == null || activeWeapons.Count == 0) return;
-
-      var startList = activeWeapons
-        .Where(w => w != null)
-        .Distinct()
-        .ToList();
-
-      activeWeapons.Clear();
-
-      foreach (var w in startList)
+      if (Instance == this)
       {
-        AddWeapon(w);
+        Instance = null;
+      }
+    }
+
+    public static bool IsMarkedDamageBonusSource(WeaponBase weapon)
+    {
+      if (Instance == null || weapon == null || Instance.activeWeapons == null)
+      {
+        return false;
+      }
+
+      int index = Instance.activeWeapons.IndexOf(weapon);
+      return index >= 1 && index <= 5;
+    }
+
+    private void EquipStartWeapon()
+    {
+      activeWeapons.Clear();
+      if (startWeapon != null)
+      {
+        AddWeapon(startWeapon, "start");
       }
     }
 
@@ -92,6 +83,11 @@ namespace NeoSurvive.Weapon
     /// 새로운 무기 추가 또는 레벨업
     /// </summary>
     public void AddWeapon(WeaponBase weaponData)
+    {
+      AddWeapon(weaponData, "choice");
+    }
+
+    private void AddWeapon(WeaponBase weaponData, string source)
     {
       Debug.Log($"[WeaponManager] AddWeapon called. weaponName={weaponData.weaponName}, prefab={(weaponData.weaponPrefab ? weaponData.weaponPrefab.name : "NULL")}");
 
@@ -129,17 +125,8 @@ namespace NeoSurvive.Weapon
         }
 
         OnWeaponChanged?.Invoke(activeWeapons);
+        GameAnalyticsTracker.TrackWeaponSelected(weaponData, source, isLevelUp: true, activeWeapons.IndexOf(weaponData));
         return;
-      }
-
-      // 무기 최대 보유 개수 제한
-      const int MAX_WEAPON_COUNT = 6;
-
-      if (activeWeapons.Count >= MAX_WEAPON_COUNT)
-      {
-          Debug.Log($"[WeaponManager] 무기 최대 보유 개수 도달 | {MAX_WEAPON_COUNT}개");
-          OnWeaponChanged?.Invoke(activeWeapons);
-          return;
       }
 
       // 새로운 무기 추가
@@ -163,9 +150,9 @@ namespace NeoSurvive.Weapon
           newWeaponObj = Instantiate(weaponData.weaponPrefab, transform);
         }
 
-        var source = newWeaponObj.GetComponent<WeaponSource>();
-        if (source == null) source = newWeaponObj.AddComponent<WeaponSource>();
-        source.weaponData = weaponData;
+        var weaponSource = newWeaponObj.GetComponent<WeaponSource>();
+        if (weaponSource == null) weaponSource = newWeaponObj.AddComponent<WeaponSource>();
+        weaponSource.weaponData = weaponData;
 
         spawnedWeapons.Add(weaponData, newWeaponObj);
 
@@ -177,6 +164,7 @@ namespace NeoSurvive.Weapon
       }
 
       OnWeaponChanged?.Invoke(activeWeapons);
+      GameAnalyticsTracker.TrackWeaponSelected(weaponData, source, isLevelUp: false, activeWeapons.IndexOf(weaponData));
       Debug.Log(string.Join(",", activeWeapons));
 
       // sendToServer는 네트워크 제거 이후 호환성 유지를 위해 유지합니다.
@@ -193,7 +181,7 @@ namespace NeoSurvive.Weapon
 
       if (weapon != null)
       {
-        AddWeapon(weapon);
+        AddWeapon(weapon, "debug");
         return;
       }
 
@@ -205,7 +193,7 @@ namespace NeoSurvive.Weapon
       var weapon = FindWeaponById(weaponId);
       if (weapon != null)
       {
-        AddWeapon(weapon);
+        AddWeapon(weapon, "debug");
       }
     }
 
@@ -228,17 +216,19 @@ namespace NeoSurvive.Weapon
 
     void Update()
     {
-      // 테스트용: allWeaponDatas 리스트의 인덱스를 사용하여 테스트
-      if (Input.GetKeyDown(KeyCode.F1)) AddWeapon(0);
-      if (Input.GetKeyDown(KeyCode.F2)) AddWeapon(1);
-      if (Input.GetKeyDown(KeyCode.F3)) AddWeapon(2);
-      if (Input.GetKeyDown(KeyCode.F4)) AddWeapon(3);
-      if (Input.GetKeyDown(KeyCode.F5)) AddWeapon(4);
-      if (Input.GetKeyDown(KeyCode.F6)) AddWeapon(5);
-      if (Input.GetKeyDown(KeyCode.F7)) AddWeapon(6);
-      if (Input.GetKeyDown(KeyCode.F8)) AddWeapon(7);
-      if (Input.GetKeyDown(KeyCode.F9)) AddWeapon(8);
-      if (Input.GetKeyDown(KeyCode.F10)) AddWeapon(9);
+      // 테스트용: 데이터 순서에 의존하지 않고 ID로 직접 무기 찾기 (F1=1, F2=2 ... F10=10)
+      if (Input.GetKeyDown(KeyCode.F1)) AddWeaponById(1);
+      if (Input.GetKeyDown(KeyCode.F2)) AddWeaponById(2);
+      if (Input.GetKeyDown(KeyCode.F3)) AddWeaponById(3);
+      if (Input.GetKeyDown(KeyCode.F4)) AddWeaponById(4);
+      if (Input.GetKeyDown(KeyCode.F5)) AddWeaponById(5);
+      if (Input.GetKeyDown(KeyCode.F6)) AddWeaponById(6);
+      if (Input.GetKeyDown(KeyCode.F7)) AddWeaponById(7);
+      if (Input.GetKeyDown(KeyCode.F8)) AddWeaponById(8);
+      if (Input.GetKeyDown(KeyCode.F9)) AddWeaponById(9);
+      if (Input.GetKeyDown(KeyCode.F10)) AddWeaponById(10);
+      if (Input.GetKeyDown(KeyCode.F11)) AddWeaponById(11);
+      if (Input.GetKeyDown(KeyCode.F12)) AddWeaponById(12);
     }
   }
 }

@@ -44,11 +44,19 @@ namespace NeoSurvive.Weapon
 
     private List<AIDrone> subDrones = new List<AIDrone>();
     private List<DroneLaserNet> laserNets = new List<DroneLaserNet>();
+    private SpriteRenderer spriteRenderer;
+    private int facingSign = 1;
 
     private void Start()
     {
       player = GameObject.FindWithTag("Player");
       anim = GetComponent<Animator>();
+      spriteRenderer = GetComponent<SpriteRenderer>();
+
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayAIDroneSpawn();
+      }
 
       offset = Random.insideUnitCircle.normalized * followDistance;
 
@@ -113,22 +121,7 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      WeaponStatDB.Row levelOneRow = row;
-
-      if (levelDict.TryGetValue(1, out var baseRow))
-      {
-        levelOneRow = baseRow;
-      }
-
-      float perLevel =
-        row.damageperlevel > 0f
-        ? row.damageperlevel
-        : levelOneRow.damageperlevel;
-
-      damage =
-        levelOneRow.damage *
-        (1f + (level - 1) * perLevel);
-
+      damage = row.damage;
       followDistance = row.followdistance;
       followSpeed = row.followspeed;
       detectionRange = row.detectionrange;
@@ -231,36 +224,35 @@ namespace NeoSurvive.Weapon
       if (allDrones.Count < 2)
         return;
 
-      var src = GetComponentInParent<WeaponSource>();
+      List<Transform> droneTransforms = new List<Transform>();
 
       for (int i = 0; i < allDrones.Count; i++)
       {
-        AIDrone current = allDrones[i];
-        AIDrone next = allDrones[(i + 1) % allDrones.Count];
-
-        GameObject laserObj = Instantiate(laserNetPrefab);
-
-        DroneLaserNet laser =
-          laserObj.GetComponent<DroneLaserNet>();
-
-        if (laser == null)
-        {
-          Debug.LogWarning("[AIDrone] DroneLaserNet 컴포넌트 없음");
-          Destroy(laserObj);
-          continue;
-        }
-
-        laser.Initialize(
-          current.transform,
-          next.transform,
-          laserDamagePerTick,
-          laserTickInterval,
-          laserWidth,
-          src != null ? src.weaponData : null
-        );
-
-        laserNets.Add(laser);
+        droneTransforms.Add(allDrones[i].transform);
       }
+
+      var src = GetComponentInParent<WeaponSource>();
+
+      GameObject laserObj = Instantiate(laserNetPrefab);
+
+      DroneLaserNet laser = laserObj.GetComponent<DroneLaserNet>();
+
+      if (laser == null)
+      {
+        Debug.LogWarning("[AIDrone] DroneLaserNet 컴포넌트 없음");
+        Destroy(laserObj);
+        return;
+      }
+
+      laser.Initialize(
+        droneTransforms,
+        laserDamagePerTick,
+        laserTickInterval,
+        laserWidth,
+        src != null ? src.weaponData : null
+      );
+
+      laserNets.Add(laser);
     }
 
     private void ClearLaserNet()
@@ -310,6 +302,7 @@ namespace NeoSurvive.Weapon
 
       player = GameObject.FindWithTag("Player");
       anim = GetComponent<Animator>();
+      spriteRenderer = GetComponent<SpriteRenderer>();
 
       offset = Random.insideUnitCircle.normalized * followDistance;
 
@@ -354,15 +347,24 @@ namespace NeoSurvive.Weapon
       if (projectilePrefab == null) return;
       if (target == null) return;
 
+      if (!isSubDrone && InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayAIDroneFire();
+      }
+
+      FaceTarget(target);
+      Vector3 firePosition = transform.position + GetMirroredFireOffset();
+      Vector3 direction = (target.position - firePosition).normalized;
+
       GameObject obj = Instantiate(
         projectilePrefab,
-        transform.position + (Vector3)fireOffset,
+        firePosition,
         Quaternion.identity
       );
 
       if (obj.TryGetComponent<Projectile>(out var proj))
       {
-        proj.Initialize(transform.right, damage, projectileSpeed);
+        proj.Initialize(direction, damage, projectileSpeed);
 
         proj.SetTarget(target);
 
@@ -378,6 +380,27 @@ namespace NeoSurvive.Weapon
       {
         anim.SetTrigger("doAttack");
       }
+    }
+
+    private void FaceTarget(Transform attackTarget)
+    {
+      if (attackTarget == null) return;
+
+      float deltaX = attackTarget.position.x - transform.position.x;
+      if (!Mathf.Approximately(deltaX, 0f))
+      {
+        facingSign = deltaX < 0f ? -1 : 1;
+      }
+
+      if (spriteRenderer != null)
+      {
+        spriteRenderer.flipX = facingSign < 0;
+      }
+    }
+
+    private Vector3 GetMirroredFireOffset()
+    {
+      return new Vector3(fireOffset.x * facingSign, fireOffset.y, 0f);
     }
 
     private void UpdateAnimationSpeed()
@@ -445,6 +468,11 @@ namespace NeoSurvive.Weapon
 
     private void OnDestroy()
     {
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayAIDroneDestroy();
+      }
+
       if (!isSubDrone)
       {
         ClearLaserNet();

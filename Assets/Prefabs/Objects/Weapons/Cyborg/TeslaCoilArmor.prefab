@@ -51,7 +51,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   enemyTag: Enemy
-  damagePerLevel: 0.18
   radiusPerLevel: 0.12
   enableMaster: 1
   puddlePrefab: {fileID: 3131190775964296594, guid: 2fd39918896301d4ca59cd67df0c89ce, type: 3}

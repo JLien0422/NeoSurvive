@@ -49,7 +49,6 @@ MonoBehaviour:
   radius: 1.6
   rotationSpeed: 180
   fireRate: 0
-  damagePerLevel: 0.2
   radiusPerLevel: 0.05
   baseOrbCount: 1
   maxOrbCount: 5

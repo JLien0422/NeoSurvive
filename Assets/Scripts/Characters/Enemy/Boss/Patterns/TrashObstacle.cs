@@ -30,7 +30,10 @@ public class TrashObstacle : Character
       return;
 
     if (collision.collider.TryGetComponent<Player>(out var player))
+    {
+      GameAnalyticsTracker.TrackBossPatternHit(nameof(TrashObstacle), "thrown_trash_collision", impactDamage, player);
       player.TakeDamage(impactDamage);
+    }
 
     Die();
   }

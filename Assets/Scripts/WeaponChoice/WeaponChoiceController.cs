@@ -10,6 +10,7 @@ public class WeaponChoiceController : MonoBehaviour
 
     private const int MAX_WEAPON_COUNT = 6;
     private const int MAX_WEAPON_LEVEL = 5;
+    private const int MAXED_OUT_CHEST_GOLD_REWARD = 100;
 
     private void Awake()
     {
@@ -30,6 +31,11 @@ public class WeaponChoiceController : MonoBehaviour
         ChestPickup.OnChestOpened -= HandleChestOpened;
     }
 
+    private void OnDestroy()
+    {
+        ChestPickup.OnChestOpened -= HandleChestOpened;
+    }
+
     /// <summary>
     /// 상자 열림 이벤트를 받아 무기 선택 UI를 여는 기능만 담당
     /// </summary>
@@ -45,14 +51,14 @@ public class WeaponChoiceController : MonoBehaviour
         WeaponBase[] choices = PickRandomWeaponsForChest(weaponManager);
         if (choices == null || choices.Length == 0)
         {
-            Debug.LogWarning("[WeaponChoiceController] selectable weapon count is zero.");
+            GrantMaxedOutChestReward();
             return;
         }
 
         weaponChoiceUI.Show(
             choices,
             GetWeaponDisplayName,
-            GetWeaponDescription,
+            weapon => GetWeaponDescription(weaponManager, weapon),
             weapon => GetLevelText(weaponManager, weapon),
             picked =>
             {
@@ -65,6 +71,18 @@ public class WeaponChoiceController : MonoBehaviour
                 weaponManager.AddWeapon(picked);
             }
         );
+    }
+
+    private void GrantMaxedOutChestReward()
+    {
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[WeaponChoiceController] selectable weapon count is zero, but GameManager is null.");
+            return;
+        }
+
+        GameManager.Instance.AddGold(MAXED_OUT_CHEST_GOLD_REWARD);
+        Debug.Log($"[WeaponChoiceController] 모든 무기가 만렙이라 골드 {MAXED_OUT_CHEST_GOLD_REWARD} 지급");
     }
 
     /// <summary>
@@ -258,13 +276,23 @@ public class WeaponChoiceController : MonoBehaviour
     /// <summary>
     /// 무기 설명을 반환하는 기능만 담당
     /// </summary>
-    private string GetWeaponDescription(WeaponBase weapon)
+    private string GetWeaponDescription(WeaponManager weaponManager, WeaponBase weapon)
     {
+        if (weaponManager == null)
+        {
+            Debug.LogError("[WeaponChoiceController] weaponManager is null.");
+            return string.Empty;
+        }
+
         if (weapon == null)
         {
             Debug.LogError("[WeaponChoiceController] weapon is null.");
             return string.Empty;
         }
+
+        int targetLevel = GetTargetLevelAfterPick(weaponManager, weapon);
+        if (HackerWeaponChoiceDescriptionBuilder.TryBuild(weapon, targetLevel, out string dynamicDescription))
+            return dynamicDescription;
 
         if (weapon.description == null)
         {
@@ -273,6 +301,19 @@ public class WeaponChoiceController : MonoBehaviour
         }
 
         return weapon.description;
+    }
+
+    /// <summary>
+    /// 선택했을 때 도달할 레벨을 반환하는 기능만 담당
+    /// </summary>
+    private int GetTargetLevelAfterPick(WeaponManager weaponManager, WeaponBase weapon)
+    {
+        int currentLevel = GetCurrentWeaponLevel(weaponManager, weapon);
+
+        if (currentLevel <= 0)
+            return 1;
+
+        return Mathf.Min(currentLevel + 1, MAX_WEAPON_LEVEL);
     }
 
     /// <summary>

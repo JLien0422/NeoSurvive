@@ -4884,6 +4884,8 @@ MonoBehaviour:
   elapsed: 0
   alpha: 1
   trailRenderer: {fileID: 9003968359049257690}
+  splitCount: 2
+  splitSearchRange: 20
 --- !u!96 &9003968359049257690
 TrailRenderer:
   serializedVersion: 3

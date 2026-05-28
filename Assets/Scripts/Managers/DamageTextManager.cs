@@ -17,6 +17,8 @@ namespace NeoSurvive.Managers
 
     public void ShowDamageText(Vector3 position, float damage)
     {
+      if (SettingsManager.Instance != null && !SettingsManager.Instance.showDamageNumbers) return;
+
       GameObject obj;
       if (damageTextPrefab != null)
       {

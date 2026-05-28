@@ -35,6 +35,8 @@ namespace NeoSurvive.Weapon
     private float arcHeight;
     private LayerMask enemyMask;
     private string enemyTag;
+    private bool applyStun;
+    private WeaponBase sourceWeapon;
 
     private float timer = 0f;
     private bool initialized = false;
@@ -52,7 +54,9 @@ namespace NeoSurvive.Weapon
       float travelTime,
       float arcHeight,
       LayerMask enemyMask,
-      string enemyTag)
+      string enemyTag,
+      bool applyStun,
+      WeaponBase sourceWeapon = null)
     {
       this.owner = owner;
       this.startPos = startPos;
@@ -64,6 +68,8 @@ namespace NeoSurvive.Weapon
       this.arcHeight = arcHeight;
       this.enemyMask = enemyMask;
       this.enemyTag = enemyTag;
+      this.applyStun = applyStun;
+      this.sourceWeapon = sourceWeapon;
 
       // Player player = owner != null ? owner.GetComponent<Player>() : null;
     /*
@@ -205,6 +211,28 @@ namespace NeoSurvive.Weapon
         }
         */
 
+        // ===== Enemy 처리 =====
+        Enemy enemy = hit.GetComponent<Enemy>();
+        if (enemy == null)
+          enemy = hit.GetComponentInParent<Enemy>();
+
+        if (enemy != null)
+        {
+          int id = enemy.gameObject.GetInstanceID();
+          if (processedIds.Contains(id)) continue;
+          processedIds.Add(id);
+
+          if (!string.IsNullOrEmpty(enemyTag) && !enemy.CompareTag(enemyTag))
+            continue;
+
+          enemy.TakeDamage(damage, sourceWeapon);
+          if (applyStun)
+          {
+            ApplyStun(enemy.gameObject, stunDuration);
+          }
+          continue;
+        }
+
         // ===== IDamageable MapObject 처리 =====
         // 자판기 같은 맵오브젝트는 데미지만 받고 스턴은 받지 않음
         IDamageable damageable = hit.GetComponent<IDamageable>();
@@ -224,25 +252,6 @@ namespace NeoSurvive.Weapon
             damageable.TakeDamage(damage);
             continue;
           }
-        }
-
-        // ===== Enemy 처리 =====
-        Enemy enemy = hit.GetComponent<Enemy>();
-        if (enemy == null)
-          enemy = hit.GetComponentInParent<Enemy>();
-
-        if (enemy != null)
-        {
-          int id = enemy.gameObject.GetInstanceID();
-          if (processedIds.Contains(id)) continue;
-          processedIds.Add(id);
-
-          if (!string.IsNullOrEmpty(enemyTag) && !enemy.CompareTag(enemyTag))
-            continue;
-
-          var src = GetComponent<WeaponSource>();
-          enemy.TakeDamage(damage, src != null ? src.weaponData : null);
-          ApplyStun(enemy.gameObject, stunDuration);
         }
       }
 

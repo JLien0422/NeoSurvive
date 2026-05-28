@@ -1,0 +1,7 @@
+segment,starttime,endtime,minspawninterval,maxspawninterval,spawncount,basicweight,shooterweight,rusherweight,bomberweight,tankerweight
+1,0,30,1.3,1.7,1,100,0,0,0,0
+2,30,60,1.15,1.55,1,100,0,0,0,0
+3,60,90,0.9,1.3,1,100,0,0,0,0
+4,90,120,0.75,1.15,1,100,0,0,0,0
+5,120,150,0.6,1.0,1,100,0,0,0,0
+6,150,180,0.4,0.8,1,100,0,0,0,0

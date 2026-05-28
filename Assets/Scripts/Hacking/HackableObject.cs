@@ -80,6 +80,7 @@ public class HackableObject : MonoBehaviour
         }
 
         if (HackingSystem.Instance.IsHacking) return;
+        GameAnalyticsTracker.TrackHackableInteraction(objectType, transform.position);
 
         // 이 오브젝트의 월드 좌표를 전달하여 사이보그 수비 원 위치에 사용
         HackingSystem.Instance.StartHacking(
@@ -93,12 +94,14 @@ public class HackableObject : MonoBehaviour
     private void OnHackingSuccess()
     {
         isHacked = true;
+        GameAnalyticsTracker.TrackHackingResult(objectType, success: true, psychoIncreaseOnFail);
         Debug.Log($"[HackableObject] {objectType} 해킹 성공! 효과 발동!");
         ActivateEffect();
     }
 
     private void OnHackingFailed()
     {
+        GameAnalyticsTracker.TrackHackingResult(objectType, success: false, psychoIncreaseOnFail);
         Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
 
         // 캐시된 플레이어 우선 사용, 없으면 재탐색

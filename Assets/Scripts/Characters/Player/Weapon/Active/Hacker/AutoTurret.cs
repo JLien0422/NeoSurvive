@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using NeoSurvive.Core;
 
@@ -10,6 +11,11 @@ namespace NeoSurvive.Weapon
     public GameObject projectilePrefab;
     public float installCooldown = 5f;
 
+    [Header("Deploy VFX")]
+    public GameObject deployVfxPrefab;      // ★ 추가: 전개 애니메이션 프리팹
+    public float deployDuration = 0.7f;     // ★ 추가: 전개 시간
+    public float deployVfxScale = 1.0f;     // ★ 추가: 전개 VFX 크기
+
     [Header("터렛 설정")]
     public float lifeTime = 10f;
     public float damage = 5f;
@@ -18,34 +24,26 @@ namespace NeoSurvive.Weapon
 
     public float elpased = 0f;
 
-    // ★ 추가
     private readonly string weaponId = "autoturret";
 
-    // ★ 추가: 현재 레벨 저장
     private int currentLevel = 1;
 
-    // ★ 추가: Lv5 이상이면 마스터 포탑으로 설치
     private bool IsMasterLevel => currentLevel >= 5;
 
     private void Start()
     {
-      // ★ 수정: 현재 레벨 저장 후 CSV 적용
       currentLevel = 1;
       ApplyStatsFromCSV(currentLevel);
     }
 
     public void OnLevelUp(int level)
     {
-      // ★ 추가: 현재 레벨 저장
       currentLevel = level;
-
-      // ★ 수정: CSV 적용
       ApplyStatsFromCSV(currentLevel);
 
       Debug.Log($"[AutoTurret] CSV 적용 | Lv={currentLevel}, Damage={damage}, Range={range}, LifeTime={lifeTime}, Master={IsMasterLevel}");
     }
 
-    // ★ 핵심
     private void ApplyStatsFromCSV(int level)
     {
       if (WeaponStatLoader.DB == null)
@@ -66,24 +64,9 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      // Lv1 기준 가져오기
-      var baseRow = row;
-      if (levelDict.TryGetValue(1, out var levelOneRow))
-      {
-        baseRow = levelOneRow;
-      }
-
-      // 증가율 가져오기
-      float dmgPer = row.damageperlevel > 0 ? row.damageperlevel : baseRow.damageperlevel;
-      float rangePer = row.rangeperlevel > 0 ? row.rangeperlevel : baseRow.rangeperlevel;
-      float lifePer = row.lifetimeperlevel > 0 ? row.lifetimeperlevel : baseRow.lifetimeperlevel;
-
-      // 최종 계산
-      damage = baseRow.damage * (1f + (level - 1) * dmgPer);
-      range = baseRow.range * (1f + (level - 1) * rangePer);
-      lifeTime = baseRow.lifetime * (1f + (level - 1) * lifePer);
-
-      // 그대로 쓰는 값들
+      damage = row.damage;
+      range = row.range;
+      lifeTime = row.lifetime;
       installCooldown = row.installcooldown;
       fireRate = row.firerate;
 
@@ -96,15 +79,53 @@ namespace NeoSurvive.Weapon
       if (elpased < installCooldown) return;
 
       Vector2 randomOffset = Random.insideUnitCircle * 0.5f;
+      Vector3 spawnPos = transform.position + (Vector3)randomOffset;
 
-      GameObject drone = Instantiate(dronePrefab, transform.position + (Vector3)randomOffset, Quaternion.identity);
+      // ★ 수정: 전개 VFX가 끝난 뒤 실제 포탑 생성
+      StartCoroutine(DeployTurretRoutine(spawnPos));
+
+      elpased = 0f;
+    }
+
+    // ★ 추가: 전개 연출 후 포탑 생성
+    private IEnumerator DeployTurretRoutine(Vector3 spawnPos)
+    {
+      if (deployVfxPrefab != null)
+      {
+        GameObject vfx = Instantiate(
+          deployVfxPrefab,
+          spawnPos,
+          Quaternion.identity
+        );
+
+        vfx.transform.localScale = Vector3.one * deployVfxScale;
+
+        Destroy(vfx, deployDuration);
+      }
+
+      if (deployDuration > 0f)
+        yield return new WaitForSeconds(deployDuration);
+
+      if (dronePrefab == null)
+        yield break;
+
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayTacticalTurretSpawn();
+      }
+
+      GameObject drone = Instantiate(
+        dronePrefab,
+        spawnPos,
+        Quaternion.identity
+      );
 
       DeployedTurret deployedTurret = drone.GetComponent<DeployedTurret>();
 
       if (deployedTurret == null)
       {
         Debug.LogWarning("[AutoTurret] DeployedTurret 컴포넌트 없음");
-        return;
+        yield break;
       }
 
       var src = GetComponentInParent<WeaponSource>();
@@ -118,8 +139,6 @@ namespace NeoSurvive.Weapon
         src != null ? src.weaponData : null,
         IsMasterLevel
       );
-
-      elpased = 0f;
     }
   }
 }

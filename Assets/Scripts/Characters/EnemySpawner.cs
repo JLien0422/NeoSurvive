@@ -9,6 +9,8 @@ public class EnemySpawner : MonoBehaviour
     [Header("스폰 간격")]
     [SerializeField] private float minSpawnInterval = 1.8f;
     [SerializeField] private float maxSpawnInterval = 2.2f;
+    [SerializeField] private int minSpawnCount = 1;
+    [SerializeField] private int maxSpawnCount = 1;
 
     [Header("스폰 반경 - 카메라 기준 자동 계산")]
     [SerializeField] private float minSpawnRadius = 5f;
@@ -20,6 +22,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float rusherWeight = 0f;
     [SerializeField] private float bomberWeight = 0f;
     [SerializeField] private float tankerWeight = 0f;
+
+    private int currentPhase = 1;
+    private int activePhase1Segment = -1;
 
     private void Awake()
     {
@@ -66,10 +71,18 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
+            UpdatePhase1SegmentIfNeeded();
+
             float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
             yield return new WaitForSeconds(waitTime);
 
-            SpawnEnemy();
+            UpdatePhase1SegmentIfNeeded();
+
+            int spawnCount = Random.Range(minSpawnCount, maxSpawnCount + 1);
+            for (int i = 0; i < spawnCount; i++)
+            {
+                SpawnEnemy();
+            }
         }
     }
 
@@ -115,9 +128,17 @@ public class EnemySpawner : MonoBehaviour
     // ★ 변경: CSV 기반 Phase 설정
     public void SetPhase(int phase)
     {
+        currentPhase = phase;
+        activePhase1Segment = -1;
+
         if (EnemySpawnLoader.DB == null)
         {
             Debug.LogWarning("[EnemySpawner] EnemySpawnLoader.DB가 null입니다.");
+            return;
+        }
+
+        if (phase == 1 && TryApplyPhase1Segment(forceLog: true))
+        {
             return;
         }
 
@@ -127,21 +148,61 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
+        ApplySpawnRow(row);
+
+        Debug.Log(
+            $"[EnemySpawner] Phase {phase} 적용 완료 | " +
+            $"interval={minSpawnInterval}~{maxSpawnInterval} | count={minSpawnCount}~{maxSpawnCount} | " +
+            $"radius={minSpawnRadius}~{maxSpawnRadius} | " +
+            $"weights={basicWeight}/{shooterWeight}/{rusherWeight}/{bomberWeight}/{tankerWeight}"
+        );
+    }
+
+    private void UpdatePhase1SegmentIfNeeded()
+    {
+        if (currentPhase != 1)
+            return;
+
+        TryApplyPhase1Segment(forceLog: false);
+    }
+
+    private bool TryApplyPhase1Segment(bool forceLog)
+    {
+        if (EnemySpawnLoader.DB == null)
+            return false;
+
+        float gameTime = GameManager.Instance != null ? GameManager.Instance.GetGameTime() : 0f;
+
+        if (!EnemySpawnLoader.DB.TryGetPhase1Segment(gameTime, out var segmentRow))
+            return false;
+
+        if (!forceLog && activePhase1Segment == segmentRow.segment)
+            return true;
+
+        activePhase1Segment = segmentRow.segment;
+        ApplySpawnRow(segmentRow);
+
+        Debug.Log(
+            $"[EnemySpawner] Phase1 Segment {segmentRow.segment} 적용 | " +
+            $"time={segmentRow.startTime}~{segmentRow.endTime} | " +
+            $"interval={minSpawnInterval}~{maxSpawnInterval} | count={minSpawnCount}~{maxSpawnCount}"
+        );
+
+        return true;
+    }
+
+    private void ApplySpawnRow(EnemySpawnDB.Row row)
+    {
         minSpawnInterval = row.minSpawnInterval;
-        maxSpawnInterval = row.maxSpawnInterval;
+        maxSpawnInterval = Mathf.Max(row.minSpawnInterval, row.maxSpawnInterval);
+        minSpawnCount = Mathf.Max(1, row.minSpawnCount);
+        maxSpawnCount = Mathf.Max(minSpawnCount, row.maxSpawnCount);
 
         basicWeight = row.basicWeight;
         shooterWeight = row.shooterWeight;
         rusherWeight = row.rusherWeight;
         bomberWeight = row.bomberWeight;
         tankerWeight = row.tankerWeight;
-
-        Debug.Log(
-            $"[EnemySpawner] Phase {phase} 적용 완료 | " +
-            $"interval={minSpawnInterval}~{maxSpawnInterval} | " +
-            $"radius={minSpawnRadius}~{maxSpawnRadius} | " +
-            $"weights={basicWeight}/{shooterWeight}/{rusherWeight}/{bomberWeight}/{tankerWeight}"
-        );
     }
 
     /// <summary>

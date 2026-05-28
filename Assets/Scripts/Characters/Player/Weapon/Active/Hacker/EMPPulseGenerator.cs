@@ -41,6 +41,11 @@ namespace NeoSurvive.Weapon
     {
       if (empFieldPrefab == null) return;
 
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayEMPPulseAttack();
+      }
+
       Vector2 randomPos = Random.insideUnitCircle * spawnRadius;
       Vector3 spawnPosition = transform.position + (Vector3)randomPos;
 
@@ -84,18 +89,8 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      WeaponStatDB.Row baseRow = row;
-      if (levelDict.TryGetValue(1, out var levelOneRow))
-      {
-        baseRow = levelOneRow;
-      }
-
-      float damagePer = row.damageperlevel > 0f ? row.damageperlevel : baseRow.damageperlevel;
-      float areaPer = row.areasizeperlevel > 0f ? row.areasizeperlevel : baseRow.areasizeperlevel;
-
-      damage = baseRow.damage * (1f + (level - 1) * damagePer);
-      areaSize = baseRow.areasize * (1f + (level - 1) * areaPer);
-
+      damage = row.damage;
+      areaSize = row.areasize;
       duration = row.duration;
       fireRate = row.firerate;
       spawnRadius = row.spawnradius;

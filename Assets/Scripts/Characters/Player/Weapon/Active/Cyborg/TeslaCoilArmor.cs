@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 
@@ -5,13 +6,12 @@ namespace NeoSurvive.Weapon
 {
   /// <summary>
   /// 7번 무기: 테슬라 코일 아머
-  /// - 기본: 몸 주변 지속 전류(오라)로 지속 피해
-  /// - Lv.5 마스터: 이동 경로에 전기 장판 + 무작위 적에게 낙뢰
-  /// - Lv.Up: 전류 범위, 대미지 증가
+  /// - 기본: 몸 주변 지속 전류(오라)
+  /// - Lv.5: 이동 경로 전기 장판 + 낙뢰
   /// </summary>
   public class TeslaCoilArmor : MonoBehaviour
   {
-    [Header("Aura Stats")]
+    [Header("Aura")]
     public float auraDamage = 6f;
     public float auraRadius = 2.2f;
     public float auraTick = 0.4f;
@@ -20,27 +20,39 @@ namespace NeoSurvive.Weapon
     public LayerMask enemyMask;
     public string enemyTag = "Enemy";
 
-    [Header("Level Scaling")]
-    public float damagePerLevel = 0.18f;
+    [Header("Scaling")]
     public float radiusPerLevel = 0.12f;
 
     [Header("Master (Lv5) - Electric Puddle")]
     public bool enableMaster = true;
-    public GameObject puddlePrefab;      // ElectricPuddle 프리팹(선택)
-    public float puddleInterval = 0.35f; // 이동 중 생성 간격
+
+    // ★ 수정: 데미지 판정용 프리팹
+    // - ElectricPuddle.cs가 붙어있는 프리팹
+    public GameObject puddleAreaPrefab;
+
+    // ★ 추가: 애니메이션 VFX 프리팹
+    // - SpriteRenderer + Animator만 있는 프리팹
+    public GameObject puddleVfxPrefab;
+
+    public float puddleInterval = 0.35f;
     public float puddleDuration = 1.6f;
     public float puddleRadius = 1.1f;
     public float puddleTick = 0.35f;
-    public float puddleDamageFactor = 0.5f; // 오라 데미지 대비 배수
+    public float puddleDamageFactor = 0.5f;
+
+    [SerializeField] private Vector3 puddleSpawnOffset = new Vector3(0f, -0.6f, 0f);
 
     [Header("Master (Lv5) - Lightning")]
-    public GameObject lightningPrefab;   // LightningStrike 프리팹(선택)
+    public GameObject lightningPrefab;
     public float lightningInterval = 1.2f;
     public float lightningRange = 10f;
     public float lightningDamageFactor = 1.2f;
 
     [Header("Debug")]
+    public bool debugLog = true;
     public bool debugDraw = true;
+
+    private const string weaponId = "teslacoilarmor";
 
     private float auraTimer;
     private float puddleTimer;
@@ -48,7 +60,6 @@ namespace NeoSurvive.Weapon
 
     private Vector3 lastPuddlePos;
 
-    // base
     private float baseAuraDamage;
     private float baseAuraRadius;
 
@@ -56,16 +67,20 @@ namespace NeoSurvive.Weapon
 
     private void Start()
     {
+      ApplyStatsFromCSV(1);
+
       baseAuraDamage = auraDamage;
       baseAuraRadius = auraRadius;
 
       ApplyLevel(1);
       lastPuddlePos = transform.position;
+
+      if (debugLog)
+        Debug.Log($"[TeslaCoilArmor] Start | Lv={currentLevel}");
     }
 
     private void Update()
     {
-      // 1) 오라 틱딜
       auraTimer += Time.deltaTime;
       if (auraTimer >= auraTick)
       {
@@ -73,67 +88,52 @@ namespace NeoSurvive.Weapon
         auraTimer = 0f;
       }
 
-      bool master = enableMaster && currentLevel >= 5;
+      if (!(enableMaster && currentLevel >= 5))
+        return;
 
-      // 2) 마스터: 이동 경로 전기 장판
-      if (master)
+      puddleTimer += Time.deltaTime;
+      if (puddleTimer >= puddleInterval)
       {
-        puddleTimer += Time.deltaTime;
-        if (puddleTimer >= puddleInterval)
-        {
-          DropPuddleIfMoved();
-          puddleTimer = 0f;
-        }
+        DropPuddleIfMoved();
+        puddleTimer = 0f;
+      }
 
-        // 3) 마스터: 랜덤 번개
-        lightningTimer += Time.deltaTime;
-        if (lightningTimer >= lightningInterval)
-        {
-          StrikeRandomEnemy();
-          lightningTimer = 0f;
-        }
+      lightningTimer += Time.deltaTime;
+      if (lightningTimer >= lightningInterval)
+      {
+        StrikeRandomEnemy();
+        lightningTimer = 0f;
       }
     }
 
     public void OnLevelUp(int level)
     {
+      ApplyStatsFromCSV(level);
       ApplyLevel(level);
-      Debug.Log($"[TeslaCoilArmor] Lv.{currentLevel} auraDmg={auraDamage} auraRadius={auraRadius}");
+
+      if (debugLog)
+        Debug.Log($"[TeslaCoilArmor] Lv Up → {currentLevel}");
     }
 
     private void ApplyLevel(int level)
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      auraDamage = baseAuraDamage * (1f + (currentLevel - 1) * damagePerLevel);
       auraRadius = baseAuraRadius * (1f + (currentLevel - 1) * radiusPerLevel);
     }
 
     private void AuraTickDamage()
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, auraRadius, enemyMask);
-      bool didHit = false;
+
       foreach (var col in hits)
       {
-        if (col == null) continue;
+        Enemy enemy = GetValidEnemy(col);
+        if (enemy == null) continue;
 
-        // 태그(자식 콜라이더 구조 고려)
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
-        {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
-            continue;
-        }
-
-        Character character = col.GetComponentInParent<Character>();
-        if (character != null)
-        {
-          var src = GetComponentInParent<WeaponSource>();
-          character.TakeDamage(auraDamage, src != null ? src.weaponData : null);
-          didHit = true;
-        }
+        var src = GetComponentInParent<WeaponSource>();
+        enemy.TakeDamage(auraDamage, src != null ? src.weaponData : null);
       }
-
-      if (didHit && InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayTeslaCoilArmorFire();
 
       if (debugDraw)
         Debug.DrawRay(transform.position, Vector3.right * 0.01f, Color.yellow, 0.1f);
@@ -141,65 +141,159 @@ namespace NeoSurvive.Weapon
 
     private void DropPuddleIfMoved()
     {
-      if (puddlePrefab == null) return;
-
       float moved = Vector3.Distance(transform.position, lastPuddlePos);
-      if (moved < 0.2f) return; // 거의 안 움직였으면 생성 안 함
+      if (moved < 0.2f) return;
 
       lastPuddlePos = transform.position;
 
-      GameObject obj = Instantiate(puddlePrefab, transform.position, Quaternion.identity);
-      var puddle = obj.GetComponent<ElectricPuddle>();
-      if (puddle != null)
+      Vector3 spawnPos = transform.position + puddleSpawnOffset;
+
+      // =========================
+      // ★ 수정: 데미지 판정용 Area 프리팹 생성
+      // =========================
+      if (puddleAreaPrefab != null)
       {
-        float dmg = auraDamage * puddleDamageFactor;
-        puddle.Initialize(dmg, puddleDuration, puddleRadius, puddleTick, enemyMask, enemyTag);
+        GameObject areaObj = Instantiate(puddleAreaPrefab, spawnPos, Quaternion.identity);
+
+        ElectricPuddle puddle = areaObj.GetComponent<ElectricPuddle>();
+        if (puddle != null)
+        {
+          puddle.Initialize(
+            auraDamage,
+            puddleDuration,
+            puddleRadius,
+            puddleTick,
+            puddleDamageFactor,
+            enemyMask,
+            enemyTag
+          );
+
+          var src = GetComponentInParent<WeaponSource>();
+          if (src != null)
+            puddle.SetSourceWeapon(src.weaponData);
+        }
+        else
+        {
+          Debug.LogWarning("[TeslaCoilArmor] puddleAreaPrefab에 ElectricPuddle.cs가 없습니다.");
+        }
       }
-      Destroy(obj, puddleDuration + 0.1f);
+      else if (debugLog)
+      {
+        Debug.LogWarning("[TeslaCoilArmor] puddleAreaPrefab 없음");
+      }
+
+      // =========================
+      // ★ 추가: 애니메이션 VFX 프리팹 생성
+      // =========================
+      if (puddleVfxPrefab != null)
+      {
+        GameObject vfxObj = Instantiate(puddleVfxPrefab, spawnPos, Quaternion.identity);
+        Destroy(vfxObj, puddleDuration);
+      }
+      else if (debugLog)
+      {
+        Debug.LogWarning("[TeslaCoilArmor] puddleVfxPrefab 없음");
+      }
+
+      if (debugLog)
+        Debug.Log($"[TeslaCoilArmor] Puddle Area/VFX 생성 | pos={spawnPos}");
     }
 
     private void StrikeRandomEnemy()
     {
-      // 범위 내 적 찾기
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, lightningRange, enemyMask);
-      if (hits == null || hits.Length == 0) return;
+      List<Enemy> enemies = GetEnemiesInRange(lightningRange);
 
-      // 랜덤 선택 (유효 Enemy만 필터)
-      // 후보가 많지 않으면 단순 루프가 더 안전
-      int attempts = Mathf.Min(10, hits.Length);
-      for (int i = 0; i < attempts; i++)
+      if (enemies.Count == 0)
       {
-        var col = hits[Random.Range(0, hits.Length)];
-        if (col == null) continue;
+        if (debugLog)
+          Debug.Log("[TeslaCoilArmor] 낙뢰 대상 없음");
 
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
-        {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
-            continue;
-        }
-
-        Character character = col.GetComponentInParent<Character>();
-        if (character == null) continue;
-
-        if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayTeslaCoilArmorFire();
-
-        float dmg = auraDamage * lightningDamageFactor;
-        var src2 = GetComponentInParent<WeaponSource>();
-        character.TakeDamage(dmg, src2 != null ? src2.weaponData : null);
-
-        // 이펙트(선택)
-        if (lightningPrefab != null)
-        {
-          Instantiate(lightningPrefab, character.transform.position, Quaternion.identity);
-        }
         return;
       }
+
+      Enemy target = enemies[Random.Range(0, enemies.Count)];
+
+      float dmg = auraDamage * lightningDamageFactor;
+      var src = GetComponentInParent<WeaponSource>();
+
+      target.TakeDamage(dmg, src != null ? src.weaponData : null);
+
+      if (debugLog)
+        Debug.Log($"[TeslaCoilArmor] 낙뢰 적중 → {target.name}");
+
+      if (lightningPrefab != null)
+      {
+        Vector3 fxPos = target.transform.position + new Vector3(0f, 1f, 0f);
+        Instantiate(lightningPrefab, fxPos, Quaternion.identity);
+      }
+    }
+
+    private List<Enemy> GetEnemiesInRange(float range)
+    {
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range, enemyMask);
+      List<Enemy> list = new List<Enemy>();
+
+      foreach (var col in hits)
+      {
+        Enemy e = GetValidEnemy(col);
+
+        if (e != null && !list.Contains(e))
+          list.Add(e);
+      }
+
+      return list;
+    }
+
+    private Enemy GetValidEnemy(Collider2D col)
+    {
+      if (col == null) return null;
+
+      if (!string.IsNullOrEmpty(enemyTag))
+      {
+        bool okTag =
+          col.CompareTag(enemyTag) ||
+          (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
+
+        if (!okTag) return null;
+      }
+
+      return col.GetComponentInParent<Enemy>();
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null) return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levels)) return;
+
+      int lv = Mathf.Clamp(level, 1, 5);
+
+      if (!levels.TryGetValue(lv, out var row)) return;
+
+      if (row.auradamage > 0) auraDamage = row.auradamage;
+      if (row.auraradius > 0) auraRadius = row.auraradius;
+      if (row.auratick > 0) auraTick = row.auratick;
+
+      if (row.radiusperlevel > 0) radiusPerLevel = row.radiusperlevel;
+
+      if (row.puddleinterval > 0) puddleInterval = row.puddleinterval;
+      if (row.puddleduration > 0) puddleDuration = row.puddleduration;
+      if (row.puddleradius > 0) puddleRadius = row.puddleradius;
+      if (row.puddletick > 0) puddleTick = row.puddletick;
+      if (row.puddledamagefactor > 0) puddleDamageFactor = row.puddledamagefactor;
+
+      if (row.lightninginterval > 0) lightningInterval = row.lightninginterval;
+      if (row.lightningrange > 0) lightningRange = row.lightningrange;
+      if (row.lightningdamagefactor > 0) lightningDamageFactor = row.lightningdamagefactor;
     }
 
     private void OnDrawGizmosSelected()
     {
       Gizmos.color = Color.yellow;
       Gizmos.DrawWireSphere(transform.position, auraRadius);
+
+      Gizmos.color = Color.cyan;
+      Gizmos.DrawWireSphere(transform.position, lightningRange);
     }
   }
 }

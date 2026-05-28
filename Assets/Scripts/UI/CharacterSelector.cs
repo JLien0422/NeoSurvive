@@ -56,8 +56,11 @@ namespace NeoSurvive.UI
 
       if (startGameButton != null)
       {
-        Debug.Log("[CharacterSelector] Start Game Button found, adding listener");
-        startGameButton.onClick.AddListener(StartGame);
+        if (startGameButton.onClick.GetPersistentEventCount() == 0)
+        {
+          Debug.Log("[CharacterSelector] Start Game Button found, adding listener");
+          startGameButton.onClick.AddListener(StartGame);
+        }
       }
       // 캐릭터 선택 패널 초기화 (숨김)
       if (selectionPanel != null) selectionPanel.SetActive(false);
@@ -192,6 +195,9 @@ namespace NeoSurvive.UI
     /// </summary>
     private void StartGame()
     {
+      GameAnalyticsTracker.TrackPlayButtonPressed(selectedCharacter);
+      GameAnalyticsTracker.TrackRunStarted(selectedCharacter);
+
       // GameManager에 선택된 캐릭터 전달
       if (GameManager.Instance != null)
       {

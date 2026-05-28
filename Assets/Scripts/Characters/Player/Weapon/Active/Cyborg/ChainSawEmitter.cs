@@ -1,60 +1,62 @@
 using UnityEngine;
+using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// ChainSaw 무기(지속 장착형): 일정 주기마다 ChainSaw(1회용)를 재소환
-  /// WeaponManager.SendMessage("OnLevelUp", level) 호환
-  /// </summary>
   public class ChainSawEmitter : MonoBehaviour
   {
     [Header("Spawn")]
-    public GameObject chainSawPrefab;     // 실제 튕기는 ChainSaw 프리팹
-    public float spawnInterval = 4f;      // 몇 초마다 새로 소환할지
-    public int spawnCount = 1;            // 한 번에 몇 개
-    public float spawnRadius = 0.6f;      // 플레이어 주변 소환 위치
+    public GameObject chainSawPrefab;
+    public float spawnRadius = 0.6f;
 
-    [Header("Pass Level To ChainSaw")]
-    public bool sendLevelToSpawned = true;
+    private Transform owner;
+    private GameObject activeSaw;
 
-    private float timer;
-    private int currentLevel = 1;
-
-    private void Update()
+    private void Start()
     {
-      timer += Time.deltaTime;
-      if (timer < spawnInterval) return;
-      timer = 0f;
+      owner = GetComponentInParent<Player>()?.transform;
+
+      if (owner == null)
+        owner = transform;
 
       Spawn();
     }
 
-    public void OnLevelUp(int level)
+    private void Update()
     {
-      currentLevel = Mathf.Clamp(level, 1, 5);
-
-      // 예시 레벨업 규칙(원하면 네 기획대로 바꿔줄게)
-      // - 레벨업마다 소환 주기 감소
-      // - 레벨업마다 개수 증가(최대 3)
-      spawnInterval = Mathf.Max(1.5f, 4f - (currentLevel - 1) * 0.5f);
-      spawnCount = Mathf.Clamp(1 + (currentLevel - 1) / 2, 1, 3);
-
-      Debug.Log($"[ChainSawEmitter] Lv.{currentLevel} interval={spawnInterval} count={spawnCount}");
+      // ★ ChainSaw가 사라졌을 때만 다시 생성
+      if (activeSaw == null)
+        Spawn();
     }
 
     private void Spawn()
     {
       if (chainSawPrefab == null) return;
+      if (owner == null) return;
 
-      for (int i = 0; i < spawnCount; i++)
+      Vector2 offset =
+        Random.insideUnitCircle * spawnRadius;
+
+      Vector3 pos =
+        owner.position + (Vector3)offset;
+
+      // ★ 부모 없이 월드에 생성
+      // → Player 반전 영향 제거
+      activeSaw =
+        Instantiate(
+          chainSawPrefab,
+          pos,
+          Quaternion.identity
+        );
+
+      ChainSaw saw =
+        activeSaw.GetComponent<ChainSaw>();
+
+      if (saw != null)
       {
-        Vector2 offset = Random.insideUnitCircle * spawnRadius;
-        Vector3 pos = transform.position + (Vector3)offset;
-
-        GameObject obj = Instantiate(chainSawPrefab, pos, Quaternion.identity);
-
-        if (sendLevelToSpawned)
-          obj.SendMessage("OnLevelUp", currentLevel, SendMessageOptions.DontRequireReceiver);
+        // ★ 위치 기준만 전달
+        // ★ 부모로 붙이지 않음
+        saw.SetOwner(owner);
       }
     }
   }

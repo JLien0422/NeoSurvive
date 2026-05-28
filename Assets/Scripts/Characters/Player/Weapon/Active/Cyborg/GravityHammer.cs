@@ -27,7 +27,6 @@ namespace NeoSurvive.Weapon
     public string enemyTag = "Enemy";
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.15f;
     public float rangePerLevel = 0.12f;
     public float knockbackPerLevel = 0.15f;
 
@@ -72,17 +71,16 @@ namespace NeoSurvive.Weapon
 
     private float timer;
 
-    private float baseDamage;
     private float baseRange;
     private float baseKnockback;
     private float baseFireRate;
 
+    private const string weaponId = "gravityhammer";
     private int currentLevel = 1;
     private Coroutine blackholeRoutine;
 
     private void Start()
     {
-      baseDamage = damage;
       baseRange = range;
       baseKnockback = knockbackForce;
       baseFireRate = fireRate;
@@ -105,7 +103,6 @@ namespace NeoSurvive.Weapon
 
     public void OnLevelUp(int level)
     {
-      if (baseDamage <= 0f && damage > 0f) baseDamage = damage;
       if (baseRange <= 0f && range > 0f) baseRange = range;
       if (baseKnockback <= 0f && knockbackForce > 0f) baseKnockback = knockbackForce;
       if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
@@ -125,10 +122,37 @@ namespace NeoSurvive.Weapon
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
+      ApplyStatsFromCSV(currentLevel);
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       knockbackForce = baseKnockback * (1f + (currentLevel - 1) * knockbackPerLevel);
       fireRate = baseFireRate;
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+        return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+        return;
+
+      if (!levelDict.TryGetValue(level, out var row))
+        return;
+
+      if (levelDict.TryGetValue(1, out var baseRow))
+      {
+        if (baseRow.range > 0f) baseRange = baseRow.range;
+        if (baseRow.knockbackforce > 0f) baseKnockback = baseRow.knockbackforce;
+        if (baseRow.firerate > 0f) baseFireRate = baseRow.firerate;
+        if (baseRow.rangeperlevel > 0f) rangePerLevel = baseRow.rangeperlevel;
+        if (baseRow.knockbackperlevel > 0f) knockbackPerLevel = baseRow.knockbackperlevel;
+      }
+
+      if (row.damage > 0f) damage = row.damage;
+      if (row.angle > 0f) angle = row.angle;
+      if (row.blackholeduration > 0f) blackholeDuration = row.blackholeduration;
+      if (row.blackholepullradius > 0f) blackholePullRadius = row.blackholepullradius;
+      if (row.blackholepullforce > 0f) blackholePullForce = row.blackholepullforce;
     }
 
     private void Slam()

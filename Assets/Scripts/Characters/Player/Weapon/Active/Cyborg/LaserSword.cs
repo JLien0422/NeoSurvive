@@ -38,22 +38,20 @@ namespace NeoSurvive.Weapon
     public float riftDamageFactor = 0.35f;
 
     [Header("Level Scaling")]
-    public float damagePerLevel = 0.15f;
     public float rangePerLevel = 0.05f;
     public float fireRateMulPerLevel = 0.94f;
 
     private float fireTimer;
 
     // base stats
-    private float baseDamage;
     private float baseRange;
     private float baseFireRate;
 
+    private const string weaponId = "lasersword";
     private int currentLevel = 1;
 
     private void Start()
     {
-      baseDamage = damage;
       baseRange = range;
       baseFireRate = fireRate;
 
@@ -76,7 +74,6 @@ namespace NeoSurvive.Weapon
     // WeaponManager.SendMessage("OnLevelUp", level) 호환
     public void OnLevelUp(int level)
     {
-      if (baseDamage <= 0f && damage > 0f) baseDamage = damage;
       if (baseRange <= 0f && range > 0f) baseRange = range;
       if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
 
@@ -89,9 +86,36 @@ namespace NeoSurvive.Weapon
     {
       currentLevel = Mathf.Clamp(level, 1, 5);
 
-      damage = baseDamage * (1f + (currentLevel - 1) * damagePerLevel);
+      ApplyStatsFromCSV(currentLevel);
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       fireRate = baseFireRate * Mathf.Pow(fireRateMulPerLevel, (currentLevel - 1));
+    }
+
+    private void ApplyStatsFromCSV(int level)
+    {
+      if (WeaponStatLoader.DB == null)
+        return;
+
+      if (!WeaponStatLoader.DB.rows.TryGetValue(weaponId, out var levelDict))
+        return;
+
+      if (!levelDict.TryGetValue(level, out var row))
+        return;
+
+      if (levelDict.TryGetValue(1, out var baseRow))
+      {
+        if (baseRow.range > 0f) baseRange = baseRow.range;
+        if (baseRow.firerate > 0f) baseFireRate = baseRow.firerate;
+        if (baseRow.rangeperlevel > 0f) rangePerLevel = baseRow.rangeperlevel;
+        if (baseRow.fireratemulperlevel > 0f) fireRateMulPerLevel = baseRow.fireratemulperlevel;
+      }
+
+      if (row.damage > 0f) damage = row.damage;
+      if (row.angle > 0f) angle = row.angle;
+      if (row.riftduration > 0f) riftDuration = row.riftduration;
+      if (row.riftradius > 0f) riftRadius = row.riftradius;
+      if (row.rifttick > 0f) riftTick = row.rifttick;
+      if (row.riftdamagefactor > 0f) riftDamageFactor = row.riftdamagefactor;
     }
 
     private void Attack()

@@ -43,6 +43,7 @@ public class Boss : Character
         // 킬 카운트 증가
         if (GameManager.Instance != null)
             GameManager.Instance.AddKill();
+        GameAnalyticsTracker.TrackBossDefeated(this);
 
         // 게임 클리어 이벤트 발생 → GameClearUI가 구독해서 처리
         OnBossDefeated?.Invoke();

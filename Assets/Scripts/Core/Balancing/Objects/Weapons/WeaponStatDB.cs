@@ -17,7 +17,6 @@ public class WeaponStatDB
         public float rifttick;          // 추가(LaserSword)
         public float riftdamagefactor;  // 추가(LaserSword)
 
-        public float damageperlevel;    // 추가(LaserSword)
         public float rangeperlevel;     // 추가(LaserSword)
         public float fireratemulperlevel; // 추가(LaserSword)
 
@@ -136,20 +135,16 @@ public class WeaponStatDB
         public float installcooldown;   // 추가(AutoTurret) - 설치 쿨다운
 
         public float duration;      // 추가(DataScrambler) - 혼란 효과 지속 시간
-        public float durationperlevel;  // 추가(DataScrambler) - 레벨당 지속 시간 증가량
         public float frenzyduration;    // 추가(DataScrambler) - 광폭화 지속 시간
         public float explosionradius;   // 추가(DataScrambler) - 폭발 반경
 
         public float areasize;      // 추가(EMPPulseGenerator) - 장판 크기
-        public float areasizeperlevel;   // 추가(EMPPulseGenerator) - 레벨당 장판 크기 증가량
 
         public int penetration;     // 추가(PlasmaRifle) - 관통 수
 
         public float hp;    // 추가(HologramDecoy) - 분신 체력
         public float cooldown;  // 추가(HologramDecoy) - 분신 소환 쿨다운
         public float prisonduration;    // 추가(HologramDecoy) - 데이터 감옥 지속 시간
-        public float hpperlevel;    // 추가(HologramDecoy) - 레벨당 분신 체력 증가량
-        public float cooldownreductionperlevel; // 추가(HologramDecoy) - 레벨당 분신 소환 쿨다운 감소량
         public float prisonrange;   // 추가(HologramDecoy) - 데이터 감옥 범위
 
         public float spawndistance;     // 추가(NanoWire) - 나노와이어 생성 거리

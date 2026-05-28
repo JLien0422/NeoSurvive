@@ -49,8 +49,13 @@ MonoBehaviour:
   angle: 60
   fireRate: 2
   duration: 3
-  fireEffectPrefab: {fileID: 7587271420027562806, guid: 97200cccd2b64854b868ab2029f1d1eb, type: 3}
-  fireEffectOffset: {x: 0, y: 0, z: 0}
-  fireEffectLifetime: 1
   enableFrenzyAtLv5: 1
   frenzyDuration: 3
+  explosionRadius: 2.5
+  attackVfxPrefab: {fileID: 6541629313973856808, guid: 197d570a64f9c40469fd1b7514560cf1, type: 3}
+  attackVfxDuration: 0.5
+  attackVfxOffset: 1
+  attackVfxScale: 1
+  explosionVfxPrefab: {fileID: 0}
+  explosionVfxLifetime: 0.7
+  explosionVfxScale: 1

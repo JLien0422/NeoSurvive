@@ -49,3 +49,4 @@ MonoBehaviour:
   range: 10
   fireRate: 0.3
   bulletSpeed: 20
+  masterMarkIcon: {fileID: 21300000, guid: 5053cf3d694cd464fb5a0dfa9e0f8376, type: 3}

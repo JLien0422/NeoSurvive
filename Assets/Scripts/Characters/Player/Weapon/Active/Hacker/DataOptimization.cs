@@ -59,6 +59,11 @@ namespace NeoSurvive.Weapon
 
             Vector3 spawnPos = transform.position;
 
+            if (InGameSoundManager.Instance != null)
+            {
+                InGameSoundManager.Instance.PlayDataOptimizationSpawn();
+            }
+
             GameObject obj = Instantiate(fieldPrefab, spawnPos, Quaternion.identity);
 
             if (obj.TryGetComponent<DataField>(out var field))

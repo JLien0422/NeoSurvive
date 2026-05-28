@@ -88,7 +88,6 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "rifttick", out row.rifttick);
             SimpleCsv.TryGetFloat(r, "riftdamagefactor", out row.riftdamagefactor);
 
-            SimpleCsv.TryGetFloat(r, "damageperlevel", out row.damageperlevel);
             SimpleCsv.TryGetFloat(r, "rangeperlevel", out row.rangeperlevel);
             SimpleCsv.TryGetFloat(r, "fireratemulperlevel", out row.fireratemulperlevel);
 
@@ -251,7 +250,6 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "lifetimeperlevel", out row.lifetimeperlevel);
 
             // DataScrambler 전용 스탯
-            SimpleCsv.TryGetFloat(r, "durationperlevel", out row.durationperlevel);
             SimpleCsv.TryGetFloat(r, "frenzyduration", out row.frenzyduration);
             SimpleCsv.TryGetFloat(r, "explosionradius", out row.explosionradius);
             SimpleCsv.TryGetFloat(r, "duration", out row.duration);
@@ -262,7 +260,6 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "arcHeight", out row.archeight);
             SimpleCsv.TryGetFloat(r, "travelTime", out row.traveltime);
             SimpleCsv.TryGetFloat(r, "areasize", out row.areasize);
-            SimpleCsv.TryGetFloat(r, "areasizeperlevel", out row.areasizeperlevel);
             SimpleCsv.TryGetFloat(r, "spawnradius", out row.spawnradius);
 
             // PlasmaRifle 전용 스탯
@@ -276,8 +273,6 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "hp", out row.hp);
             SimpleCsv.TryGetFloat(r, "cooldown", out row.cooldown);
             SimpleCsv.TryGetFloat(r, "prisonduration", out row.prisonduration);
-            SimpleCsv.TryGetFloat(r, "hpperlevel", out row.hpperlevel);
-            SimpleCsv.TryGetFloat(r, "cooldownreductionperlevel", out row.cooldownreductionperlevel);
             SimpleCsv.TryGetFloat(r, "prisonrange", out row.prisonrange);
 
             // NanoWire 전용 스탯

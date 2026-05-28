@@ -11786,7 +11786,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &910479453
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15380,7 +15380,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1204433552
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17307,6 +17307,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemySpawnCsv: {fileID: 4900000, guid: ebca44fc2425da04c8e62c08f177cff7, type: 3}
+  phase1SegmentsCsv: {fileID: 4900000, guid: cff16032f5a4aee448f49c7820d1de33, type: 3}
+  phase2To5Csv: {fileID: 4900000, guid: d3f4e7fc1e756e24399f247db45b4161, type: 3}
 --- !u!114 &1310064717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20152,7 +20154,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1530475510
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22014,6 +22016,8 @@ MonoBehaviour:
   - {fileID: 7370841270425998504, guid: acaca08da3fa73a4b85d21f18908e61f, type: 3}
   minSpawnInterval: 1.8
   maxSpawnInterval: 2.2
+  minSpawnCount: 1
+  maxSpawnCount: 1
   minSpawnRadius: 5
   maxSpawnRadius: 10
   basicWeight: 0
@@ -23095,23 +23099,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2482857792385282659, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 142.73
       objectReference: {fileID: 0}
     - target: {fileID: 2509332012301376705, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2509332012301376705, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2509332012301376705, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 944.2148
+      value: 960
       objectReference: {fileID: 0}
     - target: {fileID: 2509332012301376705, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -549.02765
+      value: -540
       objectReference: {fileID: 0}
     - target: {fileID: 4009652845193864344, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -23125,6 +23129,14 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4388526263716978091, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.x
+      value: 19.11731
+      objectReference: {fileID: 0}
+    - target: {fileID: 4388526263716978091, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.z
+      value: 9.016968
+      objectReference: {fileID: 0}
     - target: {fileID: 4592037040171021444, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_Name
       value: WeaponChoicePanel
@@ -23135,11 +23147,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4688137402889513671, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 142.73
       objectReference: {fileID: 0}
     - target: {fileID: 5314394073028133702, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 142.73
       objectReference: {fileID: 0}
     - target: {fileID: 5410548454706035766, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_Pivot.x
@@ -23237,6 +23249,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6093200254708915773, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.x
+      value: 11.390991
+      objectReference: {fileID: 0}
+    - target: {fileID: 6093200254708915773, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.z
+      value: 9.492493
+      objectReference: {fileID: 0}
     - target: {fileID: 6701654798381165619, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -23264,6 +23284,14 @@ PrefabInstance:
     - target: {fileID: 6911095912046671329, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7480038607230559627, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.x
+      value: 11.833984
+      objectReference: {fileID: 0}
+    - target: {fileID: 7480038607230559627, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
+      propertyPath: m_margin.z
+      value: 4.746338
       objectReference: {fileID: 0}
     - target: {fileID: 7706184748660894330, guid: ed6e907d833ae4c4bafb05501a44b0d0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -28413,7 +28441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRunGold: 0
-  totalGold: 950
+  totalGold: 1320
   enableDebugGoldCommitKey: 1
   debugGoldCommitKey: 112
   hackerPlayerPrefab: {fileID: 533545058544290356, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}

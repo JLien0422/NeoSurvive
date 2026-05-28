@@ -121,7 +121,6 @@ MonoBehaviour:
   lifetime: 8
   radiusScale: 1
   hitRadius: 0.6
-  damagePerLevel: 0.15
   speedPerLevel: 0.1
   sizePerLevel: 0.12
   cooldownMulPerLevel: 0.92

@@ -11,13 +11,15 @@ namespace NeoSurvive.Weapon
   {
     [Header("표식 유지 시간")]
     [SerializeField] private float markDuration = 5f;
+    [SerializeField] private Sprite markIcon;
 
     /// <summary>
     /// LinkPistol에서 초기화
     /// </summary>
-    public void Init(float duration)
+    public void Init(float duration, Sprite icon)
     {
       markDuration = duration;
+      markIcon = icon;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -35,7 +37,7 @@ namespace NeoSurvive.Weapon
       }
 
       // 이미 있으면 유지시간 갱신
-      mark.Refresh(markDuration);
+      mark.Refresh(markDuration, markIcon);
 
       Debug.Log($"[LinkPistol] 표식 부여: {collision.name}");
     }

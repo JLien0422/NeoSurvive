@@ -1,6 +1,6 @@
-﻿enemyid,maxhp,movespeed,attackdamage,attackrange
-basic,100,2,5,1.5
-shooter,20,1.8,7,4
-rusher,18,3.5,6,1.2
-bomber,15,2.2,12,1.5
-tanker,80,1.2,10,1
+enemyid,maxhp,movespeed,attackdamage
+basic,20,2,2
+shooter,20,1.5,5
+rusher,15,5,2
+bomber,10,3,15
+tanker,100,1.5,5

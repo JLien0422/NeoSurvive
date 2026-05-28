@@ -121,9 +121,11 @@ public class ItemSoundManager : MonoBehaviour
             return;
         }
 
+        float settingsSfx = SettingsManager.Instance != null ? SettingsManager.Instance.sfxVolume : 1f;
+
         float prevPitch = sfxSource.pitch;
         sfxSource.pitch = slot.PickPitch();
-        sfxSource.PlayOneShot(clip, slot.volume * masterSfxVolume);
+        sfxSource.PlayOneShot(clip, slot.volume * masterSfxVolume * settingsSfx);
         sfxSource.pitch = prevPitch;
     }
 

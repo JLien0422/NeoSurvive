@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NeoSurvive.Weapon;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -39,9 +40,12 @@ public class SoundManager : MonoBehaviour
     public const string KeyError = "system.error";
 
     [Header("BGM")]
-    [SerializeField] private AudioClip[] bgmClips;
+    [SerializeField] private AudioClip[] lobbyBgmClips;
+    [SerializeField] private AudioClip[] inGameBgmClips;
     private int currentBgmIndex = 0;
     private AudioSource bgmSource;
+    private string lastSceneType = "";
+    private int currentPhaseBgm = 0;
 
     [Header("SFX")]
     [SerializeField] private AudioSource sfxSource;
@@ -87,6 +91,7 @@ public class SoundManager : MonoBehaviour
         sfxSource.loop = false;
         sfxSource.spatialBlend = 0f;
 
+        PreloadBgmClips();
         RebuildMaps();
     }
 
@@ -105,19 +110,47 @@ public class SoundManager : MonoBehaviour
     {
         UpdateVolume();
 
-        if (bgmClips != null && bgmClips.Length > 0)
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this) Instance = null;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        string sceneType = scene.name.Contains("Lobby") ? "Lobby" : "InGame";
+        if (lastSceneType != sceneType)
         {
-            PlayNextBgm();
-        }
-        else
-        {
-            Debug.LogWarning("SoundManager에 BGM 클립이 할당되지 않았습니다.");
+            lastSceneType = sceneType;
+            currentBgmIndex = 0;
+            currentPhaseBgm = 0;
+
+            if (sceneType == "Lobby")
+            {
+                StopBgm();
+
+                if (lobbyBgmClips != null && lobbyBgmClips.Length > 0)
+                {
+                    PlayNextBgm();
+                }
+            }
+            else
+            {
+                PlayPhaseBgm(1);
+            }
         }
     }
 
     private void Update()
     {
-        if (bgmSource != null && !bgmSource.isPlaying && bgmClips != null && bgmClips.Length > 0)
+        if (lastSceneType != "Lobby") return;
+
+        AudioClip[] activeClips = lastSceneType == "Lobby" ? lobbyBgmClips : inGameBgmClips;
+        if (bgmSource != null && !bgmSource.isPlaying && activeClips != null && activeClips.Length > 0)
         {
             PlayNextBgm();
         }
@@ -130,6 +163,25 @@ public class SoundManager : MonoBehaviour
 
         weaponProfileMap.Clear();
         RegisterWeaponProfiles(weaponSoundProfiles);
+    }
+
+    private void PreloadBgmClips()
+    {
+        PreloadClips(lobbyBgmClips);
+        PreloadClips(inGameBgmClips);
+    }
+
+    private static void PreloadClips(AudioClip[] clips)
+    {
+        if (clips == null) return;
+
+        for (int i = 0; i < clips.Length; i++)
+        {
+            AudioClip clip = clips[i];
+            if (clip == null) continue;
+
+            clip.LoadAudioData();
+        }
     }
 
 #if UNITY_EDITOR
@@ -238,16 +290,62 @@ public class SoundManager : MonoBehaviour
 
     private void PlayNextBgm()
     {
-        if (bgmSource == null || bgmClips == null || bgmClips.Length == 0) return;
+        if (bgmSource == null) return;
+        AudioClip[] activeClips = lastSceneType == "Lobby" ? lobbyBgmClips : inGameBgmClips;
 
-        if (currentBgmIndex >= bgmClips.Length)
+        if (activeClips == null || activeClips.Length == 0) return;
+
+        if (currentBgmIndex >= activeClips.Length)
         {
             currentBgmIndex = 0;
         }
 
-        bgmSource.clip = bgmClips[currentBgmIndex];
+        bgmSource.clip = activeClips[currentBgmIndex];
         bgmSource.Play();
         currentBgmIndex++;
+    }
+
+    public void PlayPhaseBgm(int phase)
+    {
+        if (bgmSource == null) return;
+        if (phase < 1 || phase > 5) return;
+
+        if (currentPhaseBgm == phase)
+            return;
+
+        if (inGameBgmClips == null || inGameBgmClips.Length == 0)
+            return;
+
+        int startIndex = (phase - 1) * 2;
+        if (startIndex >= inGameBgmClips.Length)
+            return;
+
+        int variantCount = Mathf.Min(2, inGameBgmClips.Length - startIndex);
+        int selectedIndex = startIndex + Random.Range(0, variantCount);
+        AudioClip selectedClip = inGameBgmClips[selectedIndex];
+
+        if (selectedClip == null)
+            return;
+
+        if (bgmSource.isPlaying)
+        {
+            bgmSource.Stop();
+        }
+
+        lastSceneType = "InGame";
+        currentPhaseBgm = phase;
+        currentBgmIndex = selectedIndex + 1;
+        bgmSource.clip = selectedClip;
+        UpdateVolume();
+        bgmSource.Play();
+    }
+
+    private void StopBgm()
+    {
+        if (bgmSource == null) return;
+
+        bgmSource.Stop();
+        bgmSource.clip = null;
     }
 
     public void UpdateVolume()

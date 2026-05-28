@@ -17,6 +17,9 @@ namespace NeoSurvive.Weapon
     public float fireRate = 1f;
     public float bulletSpeed = 20f;
 
+    [Header("마스터 표식 표시")]
+    [SerializeField] private Sprite masterMarkIcon;
+
     private float fireTimer;
 
     // ★ CSV 식별용 ID
@@ -66,32 +69,12 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      // Lv1 기준 데미지 가져오기
-      float baseDamage = row.damage;
-
-      if (levelDict.TryGetValue(1, out var levelOneRow))
-      {
-        baseDamage = levelOneRow.damage;
-      }
-
-      // damageperlevel 가져오기
-      float perLevel = row.damageperlevel;
-
-      // 현재 레벨 값이 없으면 Lv1 값 사용
-      if (perLevel <= 0f && levelDict.TryGetValue(1, out var baseRow))
-      {
-        perLevel = baseRow.damageperlevel;
-      }
-
-      // 최종 데미지 계산
-      damage = baseDamage * (1f + (level - 1) * perLevel);
-
-      // 나머지 값은 현재 레벨 CSV 그대로 사용
+      damage = row.damage;
       range = row.range;
       fireRate = row.firerate;
       bulletSpeed = row.bulletspeed;
 
-      Debug.Log($"[LinkPistol] CSV 적용 | Lv={level}, Base={baseDamage}, PerLevel={perLevel}, Final={damage}");
+      Debug.Log($"[LinkPistol] CSV 적용 | Lv={level}, Damage={damage}, Range={range}, FireRate={fireRate}");
     }
 
     private void Update()
@@ -124,6 +107,11 @@ namespace NeoSurvive.Weapon
     {
       if (projectilePrefab == null) return;
 
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayLinkPistolAttack();
+      }
+
       GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
       obj.SetActive(true);
 
@@ -153,7 +141,7 @@ namespace NeoSurvive.Weapon
           markOnHit = obj.AddComponent<LinkPistolMarkOnHit>();
         }
 
-        markOnHit.Init(5f);
+        markOnHit.Init(5f, masterMarkIcon);
       }
     }
 

@@ -40,7 +40,6 @@ public class EnemyStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "maxhp", out row.maxhp);
             SimpleCsv.TryGetFloat(r, "movespeed", out row.movespeed);
             SimpleCsv.TryGetFloat(r, "attackdamage", out row.attackdamage);
-            SimpleCsv.TryGetFloat(r, "attackrange", out row.attackrange);
 
             DB.rows[id] = row;
         }

@@ -46,7 +46,13 @@ public abstract class Character : MonoBehaviour
     if (IsDead) return;
     EnsureHpInitialized(refillToMax: false);
 
-    // 무기별 대미지 통계 기록 (배율 적용 전 원본 수치로 기록)
+    MarkedTarget mark = GetComponent<MarkedTarget>();
+    if (mark != null)
+    {
+      amount = mark.ApplyHackerWeaponDamageBonus(amount, sourceWeapon);
+    }
+
+    // 무기별 대미지 통계 기록
     if (sourceWeapon != null && WeaponDamageStats.Instance != null)
     {
       WeaponDamageStats.Instance.RecordDamage(sourceWeapon, amount);

@@ -13,14 +13,18 @@ namespace NeoSurvive.Weapon
     public float duration;
     public bool destroyProjectile;
 
-    private float tickTimer;
-    private float tickRate = 0.5f; // 0.5초마다 데미지
+    private float tickRate = 0.5f;
+    private float elapsed;
+    private float nextDamageTime;
 
-    private float scaleRatio = 9.5f / 3f;
+    private const float DamageStartOffset = 0.5f;
+    private const float DamageInterval = 1f;
 
     public Animator animator;
 
-    // DPM 기록용 소스 무기
+    [Header("Enemy Projectile Block")]
+    [SerializeField] private string enemyProjectileObjectName = "Shooter_Projectile";
+
     private WeaponBase sourceWeapon;
 
     public void Initialize(float damage, float radius, float duration, bool destroyProjectile, WeaponBase weaponBase = null)
@@ -31,38 +35,51 @@ namespace NeoSurvive.Weapon
       this.destroyProjectile = destroyProjectile;
       this.sourceWeapon = weaponBase;
 
-      // 시각적 크기 조정 (기본 스프라이트 크기가 1x1이라 가정)
-      // 반지름이 radius이므로 지름은 radius * 2
-      transform.localScale = new Vector3(radius * scaleRatio, radius * scaleRatio, 1f);
+      transform.localScale = new Vector3(radius, radius, 1f);
 
-      // 애니메이션 파라미터 설정 (tickSpeedMultiplier)
-      animator.SetFloat("tickSpeedMultiplier", 1 / tickRate);
+      if (animator != null)
+        animator.SetFloat("tickSpeedMultiplier", 1 / tickRate);
 
-      // 초기 생성 시 투사체 파괴 (마스터 효과)
+      elapsed = 0f;
+      nextDamageTime = DamageStartOffset;
+
       if (this.destroyProjectile)
       {
         DestroyEnemyProjectiles();
       }
 
-      // 즉시 1틱 데미지
-      DealAreaDamage();
-
-      // 지속 시간 후 소멸
       Destroy(gameObject, duration);
 
-      // 시각 효과 설정 (없으면 추가 - Cyan 색상)
       var sr = GetComponent<SpriteRenderer>();
       if (sr == null)
       {
         sr = gameObject.AddComponent<SpriteRenderer>();
-        sr.color = new Color(0, 1, 1, 0.4f); // Cyan, 투명도 40%
+        sr.color = new Color(0, 1, 1, 0.4f);
       }
+
       sr.sortingOrder = 0;
+    }
+
+    private void Update()
+    {
+      elapsed += Time.deltaTime;
+
+      if (destroyProjectile)
+      {
+        DestroyEnemyProjectiles();
+      }
+
+      if (elapsed >= nextDamageTime)
+      {
+        DealAreaDamage();
+        nextDamageTime += DamageInterval;
+      }
     }
 
     private void DealAreaDamage()
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+
       foreach (var hit in hits)
       {
         if (hit == null)
@@ -76,11 +93,6 @@ namespace NeoSurvive.Weapon
           continue;
         }
 
-        // =========================
-        // 2. 추가: IDamageable 맵오브젝트 처리
-        // - 자판기 같은 오브젝트가 여기서 데미지를 받음
-        // - Enemy는 위에서 이미 처리했으므로 제외
-        // =========================
         IDamageable damageable = hit.GetComponent<IDamageable>();
 
         if (damageable == null)
@@ -95,14 +107,31 @@ namespace NeoSurvive.Weapon
 
     private void DestroyEnemyProjectiles()
     {
-      // 적 투사체 감지 (Tag: "EnemyProjectile" or "Bullet")
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+
       foreach (var hit in hits)
       {
-        if (hit.CompareTag("EnemyProjectile") || hit.CompareTag("Bullet"))
-        {
-          Destroy(hit.gameObject);
-        }
+        if (hit == null)
+          continue;
+
+        GameObject target =
+          hit.attachedRigidbody != null
+            ? hit.attachedRigidbody.gameObject
+            : hit.gameObject;
+
+        if (target == gameObject)
+          continue;
+
+        string cleanName = target.name.Replace("(Clone)", "").Trim();
+
+        // ★ ShieldOrb와 같은 방식
+        // ★ Shooter_Projectile 이름을 가진 오브젝트만 적 투사체로 판정
+        if (cleanName != enemyProjectileObjectName)
+          continue;
+
+        Debug.Log($"[EMPField] 적 투사체 제거: {target.name}");
+
+        Destroy(target);
       }
     }
 

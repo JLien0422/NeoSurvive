@@ -14,23 +14,25 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
 
-    // DPM 기록용 소스 무기
     private WeaponBase sourceWeapon;
 
-    // ★ 추가: AutoTurret Lv5 마스터 여부
     private bool isMasterTurret;
 
-    // ★ 추가: 마스터 포탑이 따라갈 플레이어
     private Transform player;
 
-    // ★ 추가: 플레이어 주변 호위 위치
     private Vector3 followOffset;
+    private SpriteRenderer[] spriteRenderers;
+    private int facingSign = 1;
 
     [Header("Master Move")]
     [SerializeField] private float followSpeed = 5f;
     [SerializeField] private float followDistance = 1.5f;
 
-    // ★ 수정: isMaster 인자 추가
+    private void Awake()
+    {
+      RefreshVisualRenderers();
+    }
+
     public void Initialize(
       float damage,
       float range,
@@ -46,10 +48,8 @@ namespace NeoSurvive.Weapon
       this.projectilePrefab = projectilePrefab;
       this.sourceWeapon = weaponBase;
 
-      // ★ 추가: 마스터 여부 저장
       this.isMasterTurret = isMaster;
 
-      // ★ 추가: 마스터 포탑이면 플레이어 추적 준비
       if (isMasterTurret)
       {
         GameObject playerObj = GameObject.FindWithTag("Player");
@@ -63,7 +63,6 @@ namespace NeoSurvive.Weapon
 
       Destroy(gameObject, lifeTime);
 
-      // Setup Visuals if missing
       SpriteRenderer sr = GetComponent<SpriteRenderer>();
       if (sr == null)
       {
@@ -71,11 +70,12 @@ namespace NeoSurvive.Weapon
         sr.color = Color.gray;
         sr.sortingOrder = 4;
       }
+
+      RefreshVisualRenderers();
     }
 
     private void Update()
     {
-      // ★ 추가: Lv5 마스터 포탑이면 플레이어를 따라다님
       FollowPlayerIfMaster();
 
       fireTimer += Time.deltaTime;
@@ -86,7 +86,6 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    // ★ 추가: 마스터 포탑 호위 이동
     private void FollowPlayerIfMaster()
     {
       if (!isMasterTurret)
@@ -119,6 +118,12 @@ namespace NeoSurvive.Weapon
       Transform target = FindClosestEnemy();
       if (target == null) return;
 
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayTacticalTurretAttack();
+      }
+
+      FaceTarget(target);
       Vector3 dir = (target.position - transform.position).normalized;
       GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
 
@@ -126,17 +131,44 @@ namespace NeoSurvive.Weapon
       {
         p.Initialize(dir, damage, 20f);
 
-        // 부모 무기에서 전달받은 sourceWeapon으로 DPM 기록
         if (sourceWeapon != null)
           p.SetSourceWeapon(sourceWeapon);
       }
     }
 
+    private void FaceTarget(Transform attackTarget)
+    {
+      if (attackTarget == null) return;
+
+      float deltaX = attackTarget.position.x - transform.position.x;
+      if (!Mathf.Approximately(deltaX, 0f))
+      {
+        facingSign = deltaX < 0f ? -1 : 1;
+      }
+
+      if (spriteRenderers == null || spriteRenderers.Length == 0)
+      {
+        RefreshVisualRenderers();
+      }
+
+      if (spriteRenderers == null) return;
+
+      for (int i = 0; i < spriteRenderers.Length; i++)
+      {
+        if (spriteRenderers[i] != null)
+        {
+          spriteRenderers[i].flipX = facingSign < 0;
+        }
+      }
+    }
+
+    private void RefreshVisualRenderers()
+    {
+      spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+    }
+
     private Transform FindClosestEnemy()
     {
-      // =========================
-      // ★ 추가: LinkPistol 표식 대상 우선 공격
-      // =========================
       Transform markedTarget = MarkedTarget.GetCurrentTarget();
 
       if (markedTarget != null)

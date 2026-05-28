@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 07_DigitalShield
   m_EditorClassIdentifier: 
   weaponId: 7
-  weaponName: 07_DigitalShield
-  weaponIcon: {fileID: 21300000, guid: 452c43ba71ff06f49883dd824ae07f99, type: 3}
+  weaponName: "디지털 실드"
+  weaponIcon: {fileID: 21300000, guid: d2e7aa3b25aba81498902bf0d7543702, type: 3}
   description: "\uB514\uC9C0\uD138 \uC2E4\uB4DC"
   weaponPrefab: {fileID: 2627411191882316743, guid: 245c8fa9f43b56d4d893cbf6ead0b7ec, type: 3}
   level: 1

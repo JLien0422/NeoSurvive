@@ -95,6 +95,7 @@ public class SwingComboPattern : BossPatternBase
       if (hit == null || !hit.CompareTag("Player")) continue;
       if (hit.TryGetComponent<Player>(out var p))
       {
+        GameAnalyticsTracker.TrackBossPatternHit(nameof(SwingComboPattern), "swing_box", damage, p);
         p.TakeDamage(damage);
         return;
       }

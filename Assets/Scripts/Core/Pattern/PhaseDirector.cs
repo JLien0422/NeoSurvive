@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PhaseDirector : MonoBehaviour
@@ -24,15 +25,28 @@ public class PhaseDirector : MonoBehaviour
   // Phase별 특수패턴 "1회만" 실행 플래그
   private bool siege2Done, siege3Done, siege4Done, siege5Done;
 
+  private void Awake()
+  {
+    GameManager.onPlayerSpawned += RefreshPlayerReference;
+  }
+
+  private void OnDestroy()
+  {
+    GameManager.onPlayerSpawned -= RefreshPlayerReference;
+  }
+
   private void Start()
   {
-    player = GameObject.FindWithTag("Player")?.transform;
+    RefreshPlayerReference();
 
     if (siegeEvent == null) siegeEvent = GetComponent<SiegeEvent>();              // ***** 안정화
     enemySpawner = GetComponent<EnemySpawner>();                                  // ***** 안정화
     if (enemySpawner == null) enemySpawner = FindObjectOfType<EnemySpawner>();   // ***** 안정화
 
     enemySpawner?.SetPhase(1); // ★ 변경
+    GameManager.Instance?.SetCurrentPhase(1);
+    GameAnalyticsTracker.TrackPhaseReached(1, GameManager.Instance != null ? GameManager.Instance.GetGameTime() : 0f);
+    SoundManager.Instance?.PlayPhaseBgm(1);
   }
 
   private void Update()
@@ -58,11 +72,14 @@ public class PhaseDirector : MonoBehaviour
   private void TriggerSiegeOnce(int phaseIndex)
   {
       Debug.Log($"[PhaseDirector] Phase{phaseIndex} 특수패턴(포위) 1회 발동");
+      GameManager.Instance?.SetCurrentPhase(phaseIndex);
+      GameAnalyticsTracker.TrackPhaseReached(phaseIndex, GameManager.Instance != null ? GameManager.Instance.GetGameTime() : 0f);
 
       // ★ 변경: 포위 이벤트 시작과 동시에 해당 Phase 스폰률 적용
       if (enemySpawner != null)
       {
           enemySpawner.SetPhase(phaseIndex);
+          SoundManager.Instance?.PlayPhaseBgm(phaseIndex);
           Debug.Log($"[PhaseDirector] Phase{phaseIndex} CSV 스폰 가중치 즉시 적용 완료");
       }
       else
@@ -83,12 +100,27 @@ public class PhaseDirector : MonoBehaviour
           Debug.LogWarning("[PhaseDirector] siegeEvent가 null입니다. 같은 오브젝트에 SiegeEvent를 붙이거나 인스펙터 연결을 하세요.");
       }
 
-      SpawnRandomHackableNearPlayer();
+      StartCoroutine(SpawnRandomHackableAfterFrame());
+  }
+
+  private IEnumerator SpawnRandomHackableAfterFrame()
+  {
+    yield return null;
+    SpawnRandomHackableNearPlayer();
   }
 
   private void SpawnRandomHackableNearPlayer()
   {
-    if (player == null) return;
+    if (player == null)
+    {
+      RefreshPlayerReference();
+    }
+
+    if (player == null)
+    {
+      Debug.LogWarning("[PhaseDirector] Player를 찾지 못해 해킹 오브젝트를 스폰하지 못했습니다.");
+      return;
+    }
 
     if (hackablePrefabs == null || hackablePrefabs.Length == 0)
     {
@@ -103,7 +135,14 @@ public class PhaseDirector : MonoBehaviour
     Vector3 pos = player.position + new Vector3(offset.x, offset.y, 0f);
 
     Instantiate(prefab, pos, Quaternion.identity);
+    GameAnalyticsTracker.TrackHackableSpawned(prefab.name, pos);
     Debug.Log($"[PhaseDirector] Hackable spawned: {prefab.name}");
+  }
+
+  private void RefreshPlayerReference()
+  {
+    GameObject playerObj = GameObject.FindWithTag("Player");
+    player = playerObj != null ? playerObj.transform : null;
   }
 
   // ============================================================
@@ -144,6 +183,10 @@ public class PhaseDirector : MonoBehaviour
 
     // 시작 직후로 살짝 넘겨서 조건 확실히 만족
     GameManager.Instance.DebugSetElapsedTime(targetElapsed + 0.1f);
+    if (phase >= 1 && phase <= 5)
+    {
+      SoundManager.Instance?.PlayPhaseBgm(phase);
+    }
 
     Debug.Log($"[PhaseDirector] JumpToPhase={phase} elapsed={targetElapsed}");
   }

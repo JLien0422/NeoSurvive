@@ -1,73 +1,89 @@
 using UnityEngine;
+using System.Collections;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
   /// <summary>
-  /// 테슬라 아머 마스터: 이동 경로 전기 장판
-  /// - duration 동안 tick마다 범위 내 적에게 피해
+  /// TeslaCoilArmor Lv5 마스터 효과: 전기 장판 데미지 판정 영역
+  /// - VFX와 분리된 Area 프리팹에 붙음
+  /// - Initialize()로 파라미터를 받아 duration 동안 tick 피해
   /// </summary>
   public class ElectricPuddle : MonoBehaviour
   {
-    private float damage;
+    private float weaponDamage;
     private float duration;
     private float radius;
     private float tick;
-    private LayerMask enemyMask;
+    private float damageFactor;
+    private LayerMask hitMask;
     private string enemyTag;
+    private WeaponBase sourceWeapon;
 
-    private float timer;
-    private float life;
+    private bool initialized = false;
 
-    public void Initialize(float damage, float duration, float radius, float tick, LayerMask enemyMask, string enemyTag)
+    public void SetSourceWeapon(WeaponBase weapon)
     {
-      this.damage = damage;
+      sourceWeapon = weapon;
+    }
+
+    public void Initialize(
+      float weaponDamage,
+      float duration,
+      float radius,
+      float tick,
+      float damageFactor,
+      LayerMask hitMask,
+      string enemyTag)
+    {
+      this.weaponDamage = weaponDamage;
       this.duration = duration;
       this.radius = radius;
       this.tick = tick;
-      this.enemyMask = enemyMask;
+      this.damageFactor = damageFactor;
+      this.hitMask = hitMask;
       this.enemyTag = enemyTag;
 
-      life = 0f;
-      timer = 0f;
+      initialized = true;
+
+      StartCoroutine(DamageRoutine());
+      Destroy(gameObject, duration);
     }
 
-    private void Update()
+    private IEnumerator DamageRoutine()
     {
-      life += Time.deltaTime;
-      if (life >= duration)
-      {
-        Destroy(gameObject);
-        return;
-      }
+      if (!initialized) yield break;
 
-      timer += Time.deltaTime;
-      if (timer >= tick)
-      {
-        TickDamage();
-        timer = 0f;
-      }
-    }
+      float elapsed = 0f;
 
-    private void TickDamage()
-    {
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, enemyMask);
-      foreach (var col in hits)
+      while (elapsed < duration)
       {
-        if (col == null) continue;
+        float tickDamage = weaponDamage * damageFactor;
 
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, hitMask);
+
+        foreach (var h in hits)
         {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
-            continue;
+          if (h == null) continue;
+
+          if (!string.IsNullOrEmpty(enemyTag))
+          {
+            bool okTag =
+              h.CompareTag(enemyTag) ||
+              (h.transform.parent != null && h.transform.parent.CompareTag(enemyTag));
+
+            if (!okTag) continue;
+          }
+
+          Enemy enemy = h.GetComponentInParent<Enemy>();
+          if (enemy != null)
+          {
+            enemy.TakeDamage(tickDamage, sourceWeapon);
+          }
         }
 
-        Character character = col.GetComponentInParent<Character>();
-        if (character != null)
-        {
-          var src = GetComponentInParent<WeaponSource>();
-          character.TakeDamage(damage, src != null ? src.weaponData : null);
-        }
+        yield return new WaitForSeconds(tick);
+        elapsed += tick;
       }
     }
 

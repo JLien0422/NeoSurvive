@@ -1,6 +1,6 @@
-﻿weaponid,level,damage,range,angle,firerate,damageperlevel,rangeperlevel,basemaxtargets,maxtargetsatlv5,mastermultiplier
-surgeblade,1,20,3,50,1.2,0.25,0.05,1,3,2
-surgeblade,2,20,3,50,1.2,0.25,0.05,1,3,2
-surgeblade,3,20,3,50,1.2,0.25,0.05,1,3,2
-surgeblade,4,20,3,50,1.2,0.25,0.05,1,3,2
-surgeblade,5,20,3,50,1.2,0.25,0.05,1,3,2
+weaponid,level,damage,range,angle,firerate,rangeperlevel,basemaxtargets,maxtargetsatlv5,mastermultiplier
+surgeblade,1,20,3,50,1.2,0.05,1,3,2
+surgeblade,2,25,3,50,1.2,0.05,1,3,2
+surgeblade,3,30,3,50,1.2,0.05,1,3,2
+surgeblade,4,35,3,50,1.2,0.05,1,3,2
+surgeblade,5,40,3,50,1.2,0.05,1,3,2

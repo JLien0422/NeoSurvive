@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: 08_DataOptimization
   m_EditorClassIdentifier: 
   weaponId: 8
-  weaponName: 08_DataOptimization
-  weaponIcon: {fileID: 21300000, guid: fc470c0b47d3356428086d3f05256aa2, type: 3}
+  weaponName: "데이터 최적화"
+  weaponIcon: {fileID: 21300000, guid: ee367c35e741daf41ace66850fb0fce2, type: 3}
   description: "\uB370\uC774\uD130 \uCD5C\uC801\uD654"
   weaponPrefab: {fileID: 5805923212411512693, guid: 000948aa1dc1d934683df982d7877602, type: 3}
-  level: 1
+  level: 5
   isIndependent: 0

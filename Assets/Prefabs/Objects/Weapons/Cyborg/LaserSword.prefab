@@ -66,6 +66,5 @@ MonoBehaviour:
   riftRadius: 1
   riftTick: 0.25
   riftDamageFactor: 0.35
-  damagePerLevel: 0.15
   rangePerLevel: 0.05
   fireRateMulPerLevel: 0.94

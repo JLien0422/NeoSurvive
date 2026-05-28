@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using NeoSurvive.UI;
-using System.Security.Cryptography.X509Certificates;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,21 +29,103 @@ public class LobbyManager : MonoBehaviour
   public UpgradeManager upgradeManager;
   public CharacterSelector characterSelector;
 
+  [Header("Buttons")]
+  [SerializeField] private Button singlePlayButton;
+  private const string SinglePlayButtonName = "SinglePlayButton";
+  private static readonly string[] TabObjectNames =
+  {
+    "LobbyTab",
+    "SettingsTab",
+    "CharacterSelectionTab",
+    "TraitPanel",
+  };
+
   public List<GameObject> tabList = new List<GameObject>();
   public List<TabType> tabHistory = new List<TabType>();
 
   public TabType activatedTab;
 
+  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+  private static void RegisterSinglePlayButtonSceneBinding()
+  {
+    SceneManager.sceneLoaded -= HandleSceneLoadedForButtonBinding;
+    SceneManager.sceneLoaded += HandleSceneLoadedForButtonBinding;
+    BindSinglePlayButtonInLoadedLobbyScene();
+  }
+
+  private static void HandleSceneLoadedForButtonBinding(Scene scene, LoadSceneMode mode)
+  {
+    if (!scene.name.Contains("Lobby"))
+      return;
+
+    BindSinglePlayButtonInLoadedLobbyScene();
+  }
+
+  private static void BindSinglePlayButtonInLoadedLobbyScene()
+  {
+    LobbyManager manager = FindSceneLobbyManager();
+    if (manager == null && Instance != null)
+    {
+      manager = Instance;
+    }
+
+    if (manager == null)
+    {
+      Debug.LogWarning("[LobbyManager] 로비 씬에서 LobbyManager를 찾지 못했습니다.");
+      return;
+    }
+
+    manager.RefreshSceneReferences();
+  }
+
+  private static LobbyManager FindSceneLobbyManager()
+  {
+    Scene activeScene = SceneManager.GetActiveScene();
+    if (!activeScene.IsValid() || !activeScene.name.Contains("Lobby"))
+      return null;
+
+    GameObject[] roots = activeScene.GetRootGameObjects();
+    foreach (GameObject root in roots)
+    {
+      LobbyManager manager = root.GetComponentInChildren<LobbyManager>(true);
+      if (manager == null) continue;
+      return manager;
+    }
+
+    return null;
+  }
+
   private void Awake()
   {
-    if (Instance == null)
+    if (Instance != null && Instance != this)
     {
-      Instance = this;
+      Destroy(Instance.gameObject);
     }
-    else
+
+    Instance = this;
+    RefreshSceneReferences();
+  }
+
+  private void OnEnable()
+  {
+    RefreshSceneReferences();
+  }
+
+  private void Start()
+  {
+    RefreshSceneReferences();
+  }
+
+  private void OnDestroy()
+  {
+    if (singlePlayButton != null)
     {
-      Destroy(gameObject);
-      return;
+      singlePlayButton.onClick.RemoveListener(OpenCharacterSelectionTab);
+    }
+
+    if (Instance == this)
+    {
+      Instance = null;
     }
   }
 
@@ -55,6 +136,113 @@ public class LobbyManager : MonoBehaviour
     {
       BackTab();
     }
+  }
+
+  private void RefreshSceneReferences()
+  {
+    EnsureTabList();
+    BindSinglePlayButton();
+  }
+
+  private void BindSinglePlayButton()
+  {
+    if (singlePlayButton == null)
+    {
+      singlePlayButton = FindSceneButtonByName(SinglePlayButtonName);
+    }
+
+    if (singlePlayButton == null)
+    {
+      Debug.LogWarning($"[LobbyManager] {SinglePlayButtonName}을 찾지 못했습니다.");
+      return;
+    }
+
+    singlePlayButton.onClick = new Button.ButtonClickedEvent();
+    singlePlayButton.onClick.AddListener(OpenCharacterSelectionTab);
+    Debug.Log("[LobbyManager] SinglePlayButton OnClick을 코드에서 강제 연결했습니다.");
+  }
+
+  private void OpenCharacterSelectionTab()
+  {
+    Debug.Log("[LobbyManager] SinglePlayButton 클릭 감지: CharacterSelection 탭 열기");
+    OpenTab(TabType.CharacterSelection);
+  }
+
+  private Button FindSceneButtonByName(string buttonName)
+  {
+    GameObject buttonObject = FindSceneObjectByName(buttonName);
+    return buttonObject != null ? buttonObject.GetComponent<Button>() : null;
+  }
+
+  private bool EnsureTabList()
+  {
+    int expectedCount = TabObjectNames.Length;
+    bool needsRebuild = tabList == null || tabList.Count < expectedCount;
+
+    if (!needsRebuild)
+    {
+      for (int i = 0; i < expectedCount; i++)
+      {
+        if (tabList[i] == null)
+        {
+          needsRebuild = true;
+          break;
+        }
+      }
+    }
+
+    if (!needsRebuild)
+      return true;
+
+    List<GameObject> rebuiltTabs = new List<GameObject>(expectedCount);
+    for (int i = 0; i < expectedCount; i++)
+    {
+      GameObject tab = FindSceneObjectByName(TabObjectNames[i]);
+      if (tab == null)
+      {
+        Debug.LogWarning($"[LobbyManager] 탭 오브젝트를 찾지 못했습니다: {TabObjectNames[i]}");
+        return false;
+      }
+
+      rebuiltTabs.Add(tab);
+    }
+
+    tabList = rebuiltTabs;
+    Debug.Log("[LobbyManager] tabList를 현재 로비 씬 오브젝트로 복구했습니다.");
+    return true;
+  }
+
+  private GameObject FindSceneObjectByName(string objectName)
+  {
+    Scene activeScene = SceneManager.GetActiveScene();
+    GameObject found = FindObjectInScene(activeScene, objectName);
+    if (found != null)
+      return found;
+
+    Scene ownScene = gameObject.scene;
+    if (ownScene.IsValid() && ownScene != activeScene)
+      return FindObjectInScene(ownScene, objectName);
+
+    return null;
+  }
+
+  private static GameObject FindObjectInScene(Scene scene, string objectName)
+  {
+    if (!scene.IsValid())
+      return null;
+
+    GameObject[] roots = scene.GetRootGameObjects();
+    foreach (GameObject root in roots)
+    {
+      Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+      foreach (Transform child in transforms)
+      {
+        if (child.name == objectName)
+          return child.gameObject;
+      }
+    }
+
+    return null;
   }
 
   public void BackTab()
@@ -88,6 +276,9 @@ public class LobbyManager : MonoBehaviour
 
   public void OpenTab(TabType tabType)
   {
+    if (!EnsureTabList())
+      return;
+
     if (activatedTab != tabType)
       LobbySoundManager.Instance?.PlayTabSwitch();
 
@@ -95,7 +286,14 @@ public class LobbyManager : MonoBehaviour
     {
       tab.SetActive(false);
     }
-    tabList[(int)tabType].SetActive(true);
+    int tabIndex = (int)tabType;
+    if (tabIndex < 0 || tabIndex >= tabList.Count || tabList[tabIndex] == null)
+    {
+      Debug.LogWarning($"[LobbyManager] 열 수 없는 탭입니다: {tabType}");
+      return;
+    }
+
+    tabList[tabIndex].SetActive(true);
     activatedTab = tabType;
 
     if (!tabHistory.Contains(tabType))
@@ -106,7 +304,14 @@ public class LobbyManager : MonoBehaviour
 
   public void CloseTab(TabType tabType)
   {
-    tabList[(int)tabType].SetActive(false);
+    if (!EnsureTabList())
+      return;
+
+    int tabIndex = (int)tabType;
+    if (tabIndex < 0 || tabIndex >= tabList.Count || tabList[tabIndex] == null)
+      return;
+
+    tabList[tabIndex].SetActive(false);
   }
 
   public void CloseCurrentTab()

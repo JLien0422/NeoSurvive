@@ -54,7 +54,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   enemyTag: Enemy
-  damagePerLevel: 0.15
   rangePerLevel: 0.12
   knockbackPerLevel: 0.15
   enableMaster: 1

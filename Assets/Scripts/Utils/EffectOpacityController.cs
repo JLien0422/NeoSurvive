@@ -11,7 +11,7 @@ namespace NeoSurvive.Utils
     [Header("투명도 적용 대상")]
     [SerializeField] private bool applyToSpriteRenderers = true;
     [SerializeField] private bool applyToParticleSystems = true;
-    
+
     [Header("투사체 제외 설정")]
     [SerializeField] private bool isProjectile = false; // 이 오브젝트가 투사체인 경우 체크
 
@@ -64,7 +64,7 @@ namespace NeoSurvive.Utils
     /// <summary>
     /// SettingsManager의 effectOpacity를 모든 이펙트에 적용
     /// </summary>
-    private void ApplyOpacity()
+    public void ApplyOpacity()
     {
       if (SettingsManager.Instance == null) return;
 

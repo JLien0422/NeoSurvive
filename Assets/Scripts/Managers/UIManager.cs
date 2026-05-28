@@ -23,6 +23,11 @@ public class UIManager : MonoBehaviour
   [Header("Exp UI")]
   public Slider expSlider;
   public TextMeshProUGUI levelText;
+  [SerializeField] private float expFillDuration = 0.25f;
+  private float displayedExpValue;
+  private float targetExpValue;
+  private float targetExpMax = 1f;
+  private bool expUiInitialized;
 
   public TextMeshProUGUI gameTimeText;
   public TextMeshProUGUI killCountText;
@@ -107,6 +112,8 @@ public class UIManager : MonoBehaviour
         (idx) => Debug.Log($"선택한 무기 인덱스: {idx}")
       );
     }
+
+    UpdateExpSliderAnimation();
   }
 
   /// <summary>
@@ -151,7 +158,6 @@ public class UIManager : MonoBehaviour
     Player.OnBerserkEnded += OnBerserkEnded;
     Player.OnNeuralLinkGaugeChanged += UpdateNeuralLinkUI;
     Player.OnNeuralLinkActivated += OnNeuralLinkActivated;
-    ChestPickup.OnChestOpened += HandleChestOpened;
     SceneManager.sceneLoaded += OnSceneLoaded;
     eventsRegistered = true;
 
@@ -194,7 +200,6 @@ public class UIManager : MonoBehaviour
     Player.OnBerserkEnded -= OnBerserkEnded;
     Player.OnNeuralLinkGaugeChanged -= UpdateNeuralLinkUI;
     Player.OnNeuralLinkActivated -= OnNeuralLinkActivated;
-    ChestPickup.OnChestOpened -= HandleChestOpened;
     SceneManager.sceneLoaded -= OnSceneLoaded;
     eventsRegistered = false;
   }
@@ -341,11 +346,38 @@ public class UIManager : MonoBehaviour
 
   private void UpdateExpUI(float currentExp, float maxExp)
   {
-    if (expSlider != null)
+    if (expSlider == null)
+      return;
+
+    targetExpMax = Mathf.Max(1f, maxExp);
+    targetExpValue = Mathf.Clamp(currentExp, 0f, targetExpMax);
+    expSlider.maxValue = targetExpMax;
+
+    if (!expUiInitialized)
     {
-      expSlider.maxValue = maxExp;
-      expSlider.value = currentExp;
+      displayedExpValue = targetExpValue;
+      expSlider.value = displayedExpValue;
+      expUiInitialized = true;
+      return;
     }
+
+    if (targetExpValue < displayedExpValue)
+    {
+      displayedExpValue = 0f;
+      expSlider.value = displayedExpValue;
+    }
+  }
+
+  private void UpdateExpSliderAnimation()
+  {
+    if (!expUiInitialized || expSlider == null)
+      return;
+
+    expSlider.maxValue = targetExpMax;
+    float duration = Mathf.Max(0.01f, expFillDuration);
+    float fillSpeed = targetExpMax / duration;
+    displayedExpValue = Mathf.MoveTowards(displayedExpValue, targetExpValue, fillSpeed * Time.unscaledDeltaTime);
+    expSlider.value = displayedExpValue;
   }
 
   private void UpdateLevelUI(int level)

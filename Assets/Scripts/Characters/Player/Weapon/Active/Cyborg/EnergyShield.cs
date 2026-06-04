@@ -69,7 +69,6 @@ namespace NeoSurvive.Weapon
       UpdateOrbPositions();
     }
 
-    // WeaponManager에서 호출
     public void OnLevelUp(int level)
     {
       ApplyLevel(level);
@@ -118,7 +117,6 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      // 기존 오브 제거
       for (int i = orbs.Count - 1; i >= 0; i--)
       {
         if (orbs[i] != null)
@@ -127,7 +125,6 @@ namespace NeoSurvive.Weapon
 
       orbs.Clear();
 
-      // 새 오브 생성
       for (int i = 0; i < currentOrbCount; i++)
       {
         GameObject obj = Instantiate(shieldOrbPrefab);
@@ -144,7 +141,6 @@ namespace NeoSurvive.Weapon
 
         float finalDamage = damage;
 
-        // ★ 마스터 효과
         if (enableMaster && currentLevel >= 5)
           finalDamage *= masterDamageFactor;
 
@@ -184,10 +180,7 @@ namespace NeoSurvive.Weapon
           0f
         );
 
-        // ★ Rigidbody 기반 이동
         orbs[i].SetWorldPosition(center + offset);
-
-        // ★ 오브 자체 회전 고정
         orbs[i].transform.rotation = Quaternion.identity;
       }
     }

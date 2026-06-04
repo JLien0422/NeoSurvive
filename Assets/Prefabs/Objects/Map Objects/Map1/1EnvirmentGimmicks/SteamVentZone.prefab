@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2365863248693854385}
   - component: {fileID: 997705472271232177}
   - component: {fileID: 4615094563950597557}
+  - component: {fileID: 5814416880060563668}
   m_Layer: 0
   m_Name: SteamVentZone
   m_TagString: Untagged
@@ -70,14 +71,14 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.32, y: 0.32}
+    oldSize: {x: 2.1, y: 1.65}
     newSize: {x: 0.32, y: 0.32}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.32, y: 0.32}
+  m_Size: {x: 2.1, y: 1.65}
   m_EdgeRadius: 0
 --- !u!212 &997705472271232177
 SpriteRenderer:
@@ -120,7 +121,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e6ceff12767f19845990055c6dee6e4e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7fb522521b5e15e4fb56a3fa32fdea64, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -143,14 +144,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cae12ab7837ace43a662298fca1852c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapId: Map1
+  gimmickId: steam_vent
   zoneTrigger: {fileID: 2365863248693854385}
   startActive: 1
   pulseInterval: 1
   slowMultiplier: 0.5
   slowDuration: 1.2
-  hackKey: 104
-  requiredHoldTime: 1.5
+  hackKey: 101
   playerTag: Player
+  hackableObject: {fileID: 5814416880060563668}
   stunDuration: 1.25
   enemyTag: Enemy
   targetMask:
@@ -162,3 +165,22 @@ MonoBehaviour:
   autoFitCollider: 1
   colliderPadding: {x: 0, y: 0}
   debugLog: 0
+--- !u!114 &5814416880060563668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3108586645325358097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563b0187f0afc5949a95edd4aa3044d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 4
+  hackRange: 3
+  psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 0}
+  failVfxPrefab: {fileID: 0}
+  failVfxLifetime: 1
+  vfxScale: 1

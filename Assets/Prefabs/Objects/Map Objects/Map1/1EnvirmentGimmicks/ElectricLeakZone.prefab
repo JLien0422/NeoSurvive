@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2861356922340458842}
   - component: {fileID: 4966908168325257834}
   - component: {fileID: 7402568372406122771}
+  - component: {fileID: -5610894377435422096}
+  - component: {fileID: -8865687903356620807}
   m_Layer: 0
   m_Name: ElectricLeakZone
   m_TagString: Untagged
@@ -70,7 +72,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.64, y: 0.64}
+    oldSize: {x: 1.953125, y: 1.953125}
     newSize: {x: 0.64, y: 0.64}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -91,13 +93,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dffd06f51b0b2140bf4ec90417bbc27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapId: Map1
+  gimmickId: electric_leak
   zoneTrigger: {fileID: 2861356922340458842}
   startActive: 1
   pulseInterval: 2
   pulseDamage: 10
   hackKey: 104
-  requiredHoldTime: 1.5
-  playerTag: Player
   hackedEnemyDamage: 10
   stunDuration: 5
   enemyTag: Enemy
@@ -105,9 +107,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   zoneRenderer: {fileID: 7402568372406122771}
-  normalColor: {r: 1, g: 0.2, b: 0.2, a: 0.5}
+  normalColor: {r: 1, g: 1, b: 1, a: 0.5}
   hackedColor: {r: 0.3, g: 0.8, b: 1, a: 0.6}
-  debugLog: 0
+  debugLog: 1
 --- !u!212 &7402568372406122771
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -149,7 +151,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 286393473, guid: 054a7d95e5768324f8b5e87acbb1955e, type: 3}
+  m_Sprite: {fileID: -158386827, guid: 4990852c394412548b7f5bcbcb7605b6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -160,3 +162,43 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &-5610894377435422096
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370820873220978124}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5e75be2954f876c449f3587835dbdb27, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-8865687903356620807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370820873220978124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563b0187f0afc5949a95edd4aa3044d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 0
+  hackRange: 3
+  psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 0}
+  failVfxPrefab: {fileID: 0}
+  failVfxLifetime: 1
+  vfxScale: 1

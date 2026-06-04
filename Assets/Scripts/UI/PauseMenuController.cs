@@ -42,6 +42,8 @@ public class PauseMenuController : MonoBehaviour
     [Tooltip("비어 있으면 씬에서 SettingsUI 찾음")]
     public SettingsUI settingsUI;
 
+    [SerializeField] private WeaponChoiceUI weaponChoiceUI;
+
     [Header("종료 동작")]
     [Tooltip("비어 있으면 Application.Quit(), 있으면 해당 씬으로 이동 (예: 로비)")]
     public string quitSceneName = "";
@@ -59,6 +61,9 @@ public class PauseMenuController : MonoBehaviour
 
         if (settingsUI == null)
             settingsUI = FindObjectOfType<SettingsUI>();
+
+        if (weaponChoiceUI == null)
+            weaponChoiceUI = FindObjectOfType<WeaponChoiceUI>(true);
 
         if (pauseMenuPanel != null)
         {
@@ -139,7 +144,7 @@ public class PauseMenuController : MonoBehaviour
 
         HideWeaponStatsPanel();
         isPauseMenuOpen = false;
-        Time.timeScale = 1f;
+        Time.timeScale = IsWeaponChoiceOpen() ? 0f : 1f;
     }
 
     private void OnResume()
@@ -172,6 +177,14 @@ public class PauseMenuController : MonoBehaviour
     {
         if (weaponStatsPanel == null) return;
         weaponStatsPanel.SetActive(false);
+    }
+
+    private bool IsWeaponChoiceOpen()
+    {
+        if (weaponChoiceUI == null)
+            weaponChoiceUI = FindObjectOfType<WeaponChoiceUI>(true);
+
+        return weaponChoiceUI != null && weaponChoiceUI.IsOpen;
     }
 
     /// <summary>

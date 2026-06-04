@@ -77,8 +77,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f5a9369942dd54abc6e37eab9529be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab: {fileID: 8069210666254170642, guid: 6e88c67baa9de6f4ba9e132262e9a182, type: 3}
-  firePoint: {fileID: 1055732274690073725}
+  beamPrefab: {fileID: -1439210674848907678, guid: dd7b8db874614bf4aa34b5101ff57c48, type: 3}
+  beamVfxPrefab: {fileID: 4893028135031577043, guid: dd7b8db874614bf4aa34b5101ff57c48, type: 3}
+  muzzleVfxPrefab: {fileID: 9128456324047244128, guid: 65e4b9b1dab5adc49984e53c36bf3766, type: 3}
+  beamVfxDuration: 0.45
+  beamVfxScaleX: 0.4
+  beamVfxScaleY: 0.6
+  muzzleVfxDuration: 0.2
+  fireOffset: 0.35
+  beamStartOffset: 0.35
   fireInterval: 0.35
   range: 10
 --- !u!212 &2899125142992121904
@@ -122,7 +129,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -130,6 +137,6 @@ SpriteRenderer:
   m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

@@ -12,6 +12,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int minSpawnCount = 1;
     [SerializeField] private int maxSpawnCount = 1;
 
+    [Header("임시 스폰량 조정")]
+    [SerializeField] private float spawnIntervalMultiplier = 1f;
+
     [Header("스폰 반경 - 카메라 기준 자동 계산")]
     [SerializeField] private float minSpawnRadius = 5f;
     [SerializeField] private float maxSpawnRadius = 10f;
@@ -25,6 +28,7 @@ public class EnemySpawner : MonoBehaviour
 
     private int currentPhase = 1;
     private int activePhase1Segment = -1;
+    private Coroutine spawnIntervalMultiplierRoutine;
 
     private void Awake()
     {
@@ -48,6 +52,8 @@ public class EnemySpawner : MonoBehaviour
         playerTransform = player.transform;
 
         StopAllCoroutines();
+        spawnIntervalMultiplier = 1f;
+        spawnIntervalMultiplierRoutine = null;
         StartCoroutine(SpawnEnemies());
         Debug.Log("[EnemySpawner] 플레이어 스폰 감지 → 스폰 루틴 시작");
     }
@@ -73,7 +79,7 @@ public class EnemySpawner : MonoBehaviour
         {
             UpdatePhase1SegmentIfNeeded();
 
-            float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
+            float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval) * Mathf.Max(0.01f, spawnIntervalMultiplier);
             yield return new WaitForSeconds(waitTime);
 
             UpdatePhase1SegmentIfNeeded();
@@ -211,6 +217,24 @@ public class EnemySpawner : MonoBehaviour
     public void StopSpawning()
     {
         StopAllCoroutines();
+        spawnIntervalMultiplier = 1f;
+        spawnIntervalMultiplierRoutine = null;
         Debug.Log("[EnemySpawner] 스폰 중단 완료");
+    }
+
+    public void ApplyTemporarySpawnIntervalMultiplier(float multiplier, float duration)
+    {
+        if (spawnIntervalMultiplierRoutine != null)
+            StopCoroutine(spawnIntervalMultiplierRoutine);
+
+        spawnIntervalMultiplierRoutine = StartCoroutine(TemporarySpawnIntervalMultiplierRoutine(multiplier, duration));
+    }
+
+    private IEnumerator TemporarySpawnIntervalMultiplierRoutine(float multiplier, float duration)
+    {
+        spawnIntervalMultiplier = Mathf.Max(0.01f, multiplier);
+        yield return new WaitForSeconds(Mathf.Max(0f, duration));
+        spawnIntervalMultiplier = 1f;
+        spawnIntervalMultiplierRoutine = null;
     }
 }

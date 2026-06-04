@@ -1,33 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 using NeoSurvive.UI;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// Cyborg 무기: LaserSword
-  /// - 부채꼴 근접 베기
-  /// - Player 방향 기준 공격
-  /// - Lv5 마스터: RiftArea 생성(잔상딜)
-  /// </summary>
   public class LaserSword : MonoBehaviour
   {
     [Header("Stats")]
     public float damage = 12f;
-    public float range = 2.2f;        // 부채꼴 반경
-    public float angle = 70f;         // 부채꼴 전체 각도
-    public float fireRate = 0.8f;     // 공격 간격(초)
+    public float range = 2.2f;
+    public float angle = 70f;
+    public float fireRate = 0.8f;
 
     [Header("Target / Hit")]
-    public LayerMask hitMask;         // Enemy 레이어
+    public LayerMask hitMask;
     public string enemyTag = "Enemy";
 
     [Header("Sweep VFX (Sprite)")]
-    public GameObject sweepPrefab;                    // 기본 스프라이트 휩쓸기 이펙트 프리팹 (오른쪽이 기준)
-    public GameObject sweepPrefabEnhanced;            // Lv5 시 교체되는 강화 이펙트 프리팹
-    public float sweepDuration = 0.25f;               // 프리팹 유지 시간
-    public float sweepSpawnOffset = 0.6f;             // 생성 위치 오프셋(앞쪽)
-    public float sweepScale = 1.0f;                   // 프리팹 기본 스케일
+    public GameObject sweepPrefab;
+    public GameObject sweepPrefabEnhanced;
+    public float sweepDuration = 0.25f;
+    public float sweepSpawnOffset = 0.6f;
+    public float sweepScale = 1.0f;
 
     [Header("Master (Lv5) - Rift")]
     public bool enableMaster = true;
@@ -43,7 +38,6 @@ namespace NeoSurvive.Weapon
 
     private float fireTimer;
 
-    // base stats
     private float baseRange;
     private float baseFireRate;
 
@@ -55,7 +49,6 @@ namespace NeoSurvive.Weapon
       baseRange = range;
       baseFireRate = fireRate;
 
-      // 위치를 살짝 앞으로 (Player와 겹침 방지)
       transform.localPosition = Vector3.right * 0.5f;
 
       ApplyLevel(1);
@@ -64,6 +57,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       fireTimer += Time.deltaTime;
+
       if (fireTimer >= fireRate)
       {
         Attack();
@@ -71,7 +65,6 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    // WeaponManager.SendMessage("OnLevelUp", level) 호환
     public void OnLevelUp(int level)
     {
       if (baseRange <= 0f && range > 0f) baseRange = range;
@@ -87,6 +80,7 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       ApplyStatsFromCSV(currentLevel);
+
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       fireRate = baseFireRate * Mathf.Pow(fireRateMulPerLevel, (currentLevel - 1));
     }
@@ -121,68 +115,129 @@ namespace NeoSurvive.Weapon
     private void Attack()
     {
       Debug.Log("[LaserSword] Attack!");
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlayLaserSwordFire();
 
-      // Player 방향 기준
-      Transform target = FindClosestEnemy();
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayLaserSwordFire();
+
+      Transform target = FindClosestTarget();
+
       Vector3 forward = transform.parent != null ? transform.parent.right : transform.right;
 
       if (target != null)
-      {
         forward = (target.position - transform.position).normalized;
-      }
 
-      // 디버그: 실제 공격 방향
       Debug.DrawRay(transform.position, forward * range, Color.red, 0.2f);
 
-      // Sprite 기반 훑기 이펙트 생성
       SpawnSweepEffect(forward);
 
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range, hitMask);
+      // ★ 변경:
+      // 기존: OverlapCircleAll(transform.position, range, hitMask)
+      // 변경: 전체 Collider 검사 후 Enemy / IDamageable 여부를 직접 판단
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range);
+
       Debug.Log($"[LaserSword] hits={hits.Length}");
+
+      HashSet<int> processedIds = new HashSet<int>();
 
       foreach (var col in hits)
       {
         if (col == null) continue;
 
-        // Tag는 부모까지 체크
-        if (!string.IsNullOrEmpty(enemyTag))
-        {
-          bool okTag =
-            col.CompareTag(enemyTag) ||
-            (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
+        bool isEnemy = IsEnemyCollider(col);
 
-          if (!okTag) continue;
+        IDamageable damageable = col.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = col.GetComponentInParent<IDamageable>();
+
+        bool isInHitMask = hitMask.value == 0 ||
+          ((1 << col.gameObject.layer) & hitMask.value) != 0;
+
+        // Enemy는 hitMask 기준 유지
+        // 자판기 같은 IDamageable은 hitMask 밖이어도 허용
+        if (!isInHitMask && damageable == null)
+          continue;
+
+        // Enemy도 아니고 IDamageable도 아니면 무시
+        if (!isEnemy && damageable == null)
+          continue;
+
+        Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
+
+        if (Vector3.Angle(forward, dirToTarget) > angle * 0.5f)
+          continue;
+
+        // =========================
+        // 1. 기존 Enemy 처리
+        // =========================
+        if (isEnemy)
+        {
+          Character character = col.GetComponentInParent<Character>();
+
+          if (character != null)
+          {
+            int id = character.gameObject.GetInstanceID();
+            if (processedIds.Contains(id)) continue;
+            processedIds.Add(id);
+
+            var src = GetComponentInParent<WeaponSource>();
+            character.TakeDamage(damage, src != null ? src.weaponData : null);
+
+            continue;
+          }
         }
 
-        // 부채꼴 판정
-        Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
-        if (Vector3.Angle(forward, dirToEnemy) > angle * 0.5f) continue;
-
-        // Character 베이스로 Enemy/Boss 모두 처리
-        Character character = col.GetComponentInParent<Character>();
-        if (character != null)
+        // =========================
+        // 2. 추가: IDamageable MapObject 처리
+        // =========================
+        if (damageable != null)
         {
-          var src = GetComponentInParent<WeaponSource>();
-          character.TakeDamage(damage, src != null ? src.weaponData : null);
+          MonoBehaviour mb = damageable as MonoBehaviour;
+
+          if (mb != null)
+          {
+            int id = mb.gameObject.GetInstanceID();
+            if (processedIds.Contains(id)) continue;
+            processedIds.Add(id);
+          }
+
+          damageable.TakeDamage(damage);
         }
       }
 
-      // Lv5 마스터 효과
       if (enableMaster && currentLevel >= 5)
       {
         SpawnRift(forward);
       }
     }
 
+    private bool IsEnemyCollider(Collider2D col)
+    {
+      if (col == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        col.CompareTag(enemyTag) ||
+        (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
+    }
+
     private void SpawnSweepEffect(Vector3 forward)
     {
-      GameObject prefab = (currentLevel >= 5 && sweepPrefabEnhanced != null) ? sweepPrefabEnhanced : sweepPrefab;
+      GameObject prefab =
+        currentLevel >= 5 && sweepPrefabEnhanced != null
+        ? sweepPrefabEnhanced
+        : sweepPrefab;
+
       if (prefab == null) return;
 
       Vector3 spawnPos = transform.position + forward * sweepSpawnOffset;
       float angleDeg = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-      GameObject go = Instantiate(prefab, spawnPos, Quaternion.Euler(0f, 0f, angleDeg));
+
+      GameObject go = Instantiate(
+        prefab,
+        spawnPos,
+        Quaternion.Euler(0f, 0f, angleDeg)
+      );
+
       go.transform.localScale = Vector3.one * sweepScale;
 
       Destroy(go, sweepDuration);
@@ -196,6 +251,7 @@ namespace NeoSurvive.Weapon
       GameObject obj = Instantiate(riftPrefab, spawnPos, Quaternion.identity);
 
       RiftArea rift = obj.GetComponent<RiftArea>();
+
       if (rift != null)
       {
         rift.Initialize(
@@ -207,30 +263,56 @@ namespace NeoSurvive.Weapon
           hitMask,
           enemyTag
         );
+
         var src = GetComponentInParent<WeaponSource>();
-        if (src != null) rift.SetSourceWeapon(src.weaponData);
+
+        if (src != null)
+          rift.SetSourceWeapon(src.weaponData);
       }
     }
 
-    private Transform FindClosestEnemy()
+    private Transform FindClosestTarget()
     {
-      GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-      GameObject closest = null;
-      float closestDistance = range > 0 ? range * 1.5f : 10f;
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range * 1.5f);
 
-      foreach (GameObject enemy in enemies)
+      Transform closest = null;
+      float closestDistance = range > 0f ? range * 1.5f : 10f;
+
+      foreach (Collider2D hit in hits)
       {
-        if (enemy == null) continue;
+        if (hit == null) continue;
 
-        float distance = Vector3.Distance(transform.position, enemy.transform.position);
+        bool isEnemy = IsEnemyCollider(hit);
+
+        bool isInHitMask = hitMask.value == 0 ||
+          ((1 << hit.gameObject.layer) & hitMask.value) != 0;
+
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if ((!isEnemy || !isInHitMask) && damageable == null)
+          continue;
+
+        Transform targetTransform = hit.transform;
+
+        Enemy enemy = hit.GetComponentInParent<Enemy>();
+
+        if (enemy != null)
+          targetTransform = enemy.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
+
+        float distance = Vector3.Distance(transform.position, targetTransform.position);
+
         if (distance < closestDistance)
         {
           closestDistance = distance;
-          closest = enemy;
+          closest = targetTransform;
         }
       }
 
-      return closest != null ? closest.transform : null;
+      return closest;
     }
 
     private void OnDrawGizmosSelected()

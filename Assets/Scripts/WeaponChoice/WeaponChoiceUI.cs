@@ -12,6 +12,8 @@ public class WeaponChoiceUI : MonoBehaviour
 
     private Action<WeaponBase> onPicked;
 
+    public bool IsOpen => rootPanel != null && rootPanel.activeSelf;
+
     private void Awake()
     {
         ValidateReferences();

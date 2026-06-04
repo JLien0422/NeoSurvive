@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2337266267269029580}
   - component: {fileID: 8144470178347521958}
   - component: {fileID: 396899516786559171}
+  - component: {fileID: 4035485854812218907}
   m_Layer: 0
   m_Name: CargoDropCrane
   m_TagString: Untagged
@@ -123,3 +124,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4035485854812218907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9028971638508563595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563b0187f0afc5949a95edd4aa3044d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 0
+  hackRange: 3
+  psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 0}
+  failVfxPrefab: {fileID: 0}
+  failVfxLifetime: 1
+  vfxScale: 1

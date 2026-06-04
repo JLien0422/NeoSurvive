@@ -120,9 +120,6 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         // 필요시 적 레이어 참고용
         [SerializeField] private LayerMask enemyMask;
 
-        // 디버그/참고용 적 태그
-        [SerializeField] private string enemyTag = "Enemy";
-
         [Header("Prefabs")]
         // 낙하 전 바닥 경고 표시 프리팹
         [SerializeField] private GameObject warningPrefab;

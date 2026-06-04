@@ -1,6 +1,6 @@
 ﻿phase,minspawninterval,maxspawninterval,basicweight,shooterweight,rusherweight,bomberweight,tankerweight,siegeinnerradius,siegeouterradius,siegeoutercount,siegeinnercount,siegeduration,siegefreezeoutershooters
 1,1.5,2,100,0,0,0,0,0,0,0,0,0,FALSE
-2,1,1.5,60,40,0,0,0,9.5,14.5,10,18,10,TRUE
-3,0.8,1.2,50,30,20,0,0,9.5,14.5,10,24,10,TRUE
-4,0.6,1,40,30,15,15,0,9.5,14.5,10,28,10,TRUE
-5,0.4,0.6,35,25,15,15,10,9.5,14.5,10,32,10,TRUE
+2,1,1.5,80,20,0,0,0,9.5,14.5,15,27,10,TRUE
+3,0.8,1.2,60,15,25,0,0,9.5,14.5,15,36,10,TRUE
+4,0.6,1,50,15,20,15,0,9.5,14.5,15,42,10,TRUE
+5,0.4,0.6,40,12,20,18,10,9.5,14.5,15,48,10,TRUE

@@ -1,0 +1,708 @@
+fileFormatVersion: 2
+guid: 99ba998fcdf4f2c458717e1fbe8abf06
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 639
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b34c0575c8a9bb04d91ebbd6d98726f4
+      internalID: 475595359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_1
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 0
+        width: 576
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a98080731a7fbf4bbfd8be13aaee23a
+      internalID: -1662328009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_2
+      rect:
+        serializedVersion: 2
+        x: 1379
+        y: 0
+        width: 545
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1bb18fbac20bb1489e4afe5544bd5cf
+      internalID: -1864784964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_3
+      rect:
+        serializedVersion: 2
+        x: 2036
+        y: 0
+        width: 553
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 174659309c40aee428ea6b16ffa9c9e5
+      internalID: -747505327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_4
+      rect:
+        serializedVersion: 2
+        x: 2694
+        y: 0
+        width: 598
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65d7f4ae50ece9343a2b6f85fbfd89aa
+      internalID: -955410125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_5
+      rect:
+        serializedVersion: 2
+        x: 3396
+        y: 0
+        width: 508
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 768ca6ac5bc09c2498d4fcae24786432
+      internalID: -193400335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_6
+      rect:
+        serializedVersion: 2
+        x: 4024
+        y: 0
+        width: 568
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adc038c4fba0edf40a3b67decfdeb76a
+      internalID: -941290071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_7
+      rect:
+        serializedVersion: 2
+        x: 4696
+        y: 0
+        width: 576
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86ca92d2b26e5614f8029dece121928a
+      internalID: 1785099894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_8
+      rect:
+        serializedVersion: 2
+        x: 5400
+        y: 0
+        width: 519
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 636571a3bbdd06649866b0abf7d92e82
+      internalID: -905114153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_9
+      rect:
+        serializedVersion: 2
+        x: 6026
+        y: 0
+        width: 583
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 245a3e1e316e6774398a54c38d3a92b6
+      internalID: -1647534922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_10
+      rect:
+        serializedVersion: 2
+        x: 6733
+        y: 0
+        width: 536
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2fe2b789d8b28c14c8ac20f8fe830ea3
+      internalID: 1564480324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_11
+      rect:
+        serializedVersion: 2
+        x: 7477
+        y: 0
+        width: 343
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ba2f49126b35f6409e3f31fa459a66d
+      internalID: 1975165293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_12
+      rect:
+        serializedVersion: 2
+        x: 8093
+        y: 0
+        width: 468
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 459991b4a47009044b8242e1c8839154
+      internalID: -96836458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_13
+      rect:
+        serializedVersion: 2
+        x: 8729
+        y: 0
+        width: 493
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5b4c42715d63c549924d64e399fbc13
+      internalID: 792883573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_14
+      rect:
+        serializedVersion: 2
+        x: 9397
+        y: 0
+        width: 480
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b4af221ad7104841a893be5c9ed4e76
+      internalID: 1474704246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_15
+      rect:
+        serializedVersion: 2
+        x: 10060
+        y: 0
+        width: 502
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8e8484200fc04ba4f95fecbd1e7e0861
+      internalID: 1622356474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_16
+      rect:
+        serializedVersion: 2
+        x: 10743
+        y: 0
+        width: 470
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44892f45b7808104cbbd2d84a158950f
+      internalID: 2106364777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_17
+      rect:
+        serializedVersion: 2
+        x: 11442
+        y: 0
+        width: 439
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d0d2b7c69fc37d4784ba9ac8208e4fc
+      internalID: 2101961675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_18
+      rect:
+        serializedVersion: 2
+        x: 12095
+        y: 0
+        width: 437
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3ec520a5f58f5f4b80df78997b33aa0
+      internalID: -2123087115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_19
+      rect:
+        serializedVersion: 2
+        x: 12758
+        y: 0
+        width: 471
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3d8897ae6647bc42b6d77ee68c870ab
+      internalID: 2006675668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_20
+      rect:
+        serializedVersion: 2
+        x: 13402
+        y: 0
+        width: 516
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2276a26b88d7394d99cb8c5cccac197
+      internalID: 1745263140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_21
+      rect:
+        serializedVersion: 2
+        x: 14077
+        y: 0
+        width: 495
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 395dba14caf670847bb1a8c7b165a6db
+      internalID: -1183671917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_22
+      rect:
+        serializedVersion: 2
+        x: 14701
+        y: 0
+        width: 556
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3931757d603b0d45b0989e4f8c60383
+      internalID: -1627449283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_23
+      rect:
+        serializedVersion: 2
+        x: 15473
+        y: 0
+        width: 366
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab37587719374d6488694195f3343159
+      internalID: -1685474052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_24
+      rect:
+        serializedVersion: 2
+        x: 16090
+        y: 0
+        width: 461
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba168accf5372d0478f3d0fc429e2714
+      internalID: 691739503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_25
+      rect:
+        serializedVersion: 2
+        x: 16780
+        y: 0
+        width: 414
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 267f8425756e69249bca573ac055f88e
+      internalID: 1847649596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_26
+      rect:
+        serializedVersion: 2
+        x: 17509
+        y: 0
+        width: 303
+        height: 730
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eda9ff2ef5203d54db1f820856078e1c
+      internalID: -482280067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_0: 475595359
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_1: -1662328009
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_10: 1564480324
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_11: 1975165293
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_12: -96836458
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_13: 792883573
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_14: 1474704246
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_15: 1622356474
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_16: 2106364777
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_17: 2101961675
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_18: -2123087115
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_19: 2006675668
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_2: -1864784964
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_20: 1745263140
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_21: -1183671917
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_22: -1627449283
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_23: -1685474052
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_24: 691739503
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_25: 1847649596
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_26: -482280067
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_3: -747505327
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_4: -955410125
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_5: -193400335
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_6: -941290071
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_7: 1785099894
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_8: -905114153
+      ANIM_SYNAPSE OVERLORD SERVER (14FRAME EFFECT START)27FRAME_9: -1647534922
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

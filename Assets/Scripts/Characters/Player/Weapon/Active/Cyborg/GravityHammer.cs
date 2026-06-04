@@ -1,16 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 5번 무기: GravityHammer
-  /// - 기본: 전방(부채꼴) 강타 + 넉백
-  /// - Lv.Up: 데미지/범위/넉백 증가
-  /// - Lv5 마스터: 블랙홀 생성(흡입)
-  /// - Hammer / Swing / Impact VFX 분리 구조
-  /// </summary>
   public class GravityHammer : MonoBehaviour
   {
     [Header("Stats")]
@@ -38,27 +32,18 @@ namespace NeoSurvive.Weapon
     public float blackholePullForce = 10f;
     public float blackholeScale = 1.0f;
 
-    // =========================
-    // ★ 추가: Hammer 본체 VFX
-    // =========================
     [Header("Hammer VFX")]
     public GameObject hammerEffectPrefab;
     public float hammerEffectDuration = 0.5f;
     public float hammerEffectOffset = 0.6f;
     public float hammerEffectScale = 1.0f;
 
-    // =========================
-    // ★ 추가: Swing VFX
-    // =========================
     [Header("Swing VFX")]
     public GameObject swingEffectPrefab;
     public float swingEffectDuration = 0.5f;
     public float swingEffectOffset = 0.6f;
     public float swingEffectScale = 1.0f;
 
-    // =========================
-    // ★ 추가: Impact VFX
-    // =========================
     [Header("Impact VFX")]
     public GameObject impactEffectPrefab;
     public float impactEffectDuration = 0.6f;
@@ -84,8 +69,6 @@ namespace NeoSurvive.Weapon
       baseRange = range;
       baseKnockback = knockbackForce;
       baseFireRate = fireRate;
-
-      // transform.localPosition = Vector3.right * 0.5f;
 
       ApplyLevel(1);
     }
@@ -123,6 +106,7 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       ApplyStatsFromCSV(currentLevel);
+
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
       knockbackForce = baseKnockback * (1f + (currentLevel - 1) * knockbackPerLevel);
       fireRate = baseFireRate;
@@ -163,7 +147,7 @@ namespace NeoSurvive.Weapon
       if (InGameSoundManager.Instance != null)
         InGameSoundManager.Instance.PlayGravityHammerFire();
 
-      Transform target = FindClosestEnemy();
+      Transform target = FindClosestTarget();
 
       Vector3 forward =
         transform.parent != null
@@ -192,48 +176,77 @@ namespace NeoSurvive.Weapon
         );
       }
 
-      Collider2D[] hits =
-        Physics2D.OverlapCircleAll(
-          transform.position,
-          range,
-          hitMask
-        );
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range);
+
+      HashSet<int> processedIds = new HashSet<int>();
 
       foreach (var col in hits)
       {
         if (col == null) continue;
 
-        if (!string.IsNullOrEmpty(enemyTag))
-        {
-          bool okTag =
-            col.CompareTag(enemyTag) ||
-            (col.transform.parent != null &&
-             col.transform.parent.CompareTag(enemyTag));
+        bool isEnemy = IsEnemyCollider(col);
 
-          if (!okTag)
-            continue;
-        }
+        IDamageable damageable = col.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = col.GetComponentInParent<IDamageable>();
 
-        Vector3 dirToEnemy =
+        bool isInHitMask =
+          hitMask.value == 0 ||
+          ((1 << col.gameObject.layer) & hitMask.value) != 0;
+
+        if (!isInHitMask && damageable == null)
+          continue;
+
+        if (!isEnemy && damageable == null)
+          continue;
+
+        Vector3 dirToTarget =
           (col.transform.position - transform.position).normalized;
 
-        if (Vector3.Angle(forward, dirToEnemy) > angle * 0.5f)
+        if (Vector3.Angle(forward, dirToTarget) > angle * 0.5f)
           continue;
 
-        Character character =
-          col.GetComponentInParent<Character>();
+        if (isEnemy)
+        {
+          Character character = col.GetComponentInParent<Character>();
 
-        if (character == null)
-          continue;
+          if (character != null)
+          {
+            int id = character.gameObject.GetInstanceID();
 
-        var src = GetComponentInParent<WeaponSource>();
+            if (processedIds.Contains(id))
+              continue;
 
-        character.TakeDamage(
-          damage,
-          src != null ? src.weaponData : null
-        );
+            processedIds.Add(id);
 
-        ApplyKnockback(col.transform, forward);
+            var src = GetComponentInParent<WeaponSource>();
+
+            character.TakeDamage(
+              damage,
+              src != null ? src.weaponData : null
+            );
+
+            ApplyKnockback(col.transform, forward);
+            continue;
+          }
+        }
+
+        if (damageable != null)
+        {
+          MonoBehaviour mb = damageable as MonoBehaviour;
+
+          if (mb != null)
+          {
+            int id = mb.gameObject.GetInstanceID();
+
+            if (processedIds.Contains(id))
+              continue;
+
+            processedIds.Add(id);
+          }
+
+          damageable.TakeDamage(damage);
+        }
       }
 
       SpawnHammerEffect(forward);
@@ -248,6 +261,17 @@ namespace NeoSurvive.Weapon
 
         SpawnBlackhole(center);
       }
+    }
+
+    private bool IsEnemyCollider(Collider2D col)
+    {
+      if (col == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        col.CompareTag(enemyTag) ||
+        (col.transform.parent != null &&
+         col.transform.parent.CompareTag(enemyTag));
     }
 
     private void SpawnHammerEffect(Vector3 forward)
@@ -334,7 +358,7 @@ namespace NeoSurvive.Weapon
         hitTransform.GetComponentInParent<Rigidbody2D>();
 
       Vector2 dir =
-        (hitTransform.position - transform.position);
+        hitTransform.position - transform.position;
 
       if (dir.sqrMagnitude < 0.001f)
         dir = forward;
@@ -384,9 +408,6 @@ namespace NeoSurvive.Weapon
         );
     }
 
-    // =========================
-    // ★ 수정: 안정적인 블랙홀 흡입
-    // =========================
     private IEnumerator BlackholePullRoutine(Vector3 center, float duration)
     {
       float t = 0f;
@@ -427,7 +448,6 @@ namespace NeoSurvive.Weapon
 
             float dist = toCenter.magnitude;
 
-            // 중심 근처 도착 시 정지
             if (dist < 0.08f)
             {
               rb.velocity = Vector2.zero;
@@ -436,25 +456,21 @@ namespace NeoSurvive.Weapon
 
             Vector2 pullDir = toCenter.normalized;
 
-            // 가까울수록 약하게
             float distanceRatio =
               Mathf.Clamp01(dist / blackholePullRadius);
 
             float pullSpeed =
               blackholePullForce * distanceRatio;
 
-            // 목표 속도
             Vector2 targetVelocity =
               pullDir * pullSpeed;
 
-            // 기존 속도를 부드럽게 보정
             rb.velocity = Vector2.Lerp(
               rb.velocity,
               targetVelocity,
               Time.deltaTime * 6f
             );
 
-            // 중심 방향으로 이동 보정
             rb.MovePosition(
               Vector2.MoveTowards(
                 rb.position,
@@ -472,30 +488,56 @@ namespace NeoSurvive.Weapon
       blackholeRoutine = null;
     }
 
-    private Transform FindClosestEnemy()
+    private Transform FindClosestTarget()
     {
-      GameObject[] enemies =
-        GameObject.FindGameObjectsWithTag("Enemy");
+      Collider2D[] hits =
+        Physics2D.OverlapCircleAll(
+          transform.position,
+          range * 1.5f
+        );
 
       Transform closest = null;
       float closestDist =
         range > 0 ? range * 1.5f : 10f;
 
-      foreach (var e in enemies)
+      foreach (Collider2D hit in hits)
       {
-        if (e == null)
+        if (hit == null)
           continue;
+
+        bool isEnemy = IsEnemyCollider(hit);
+
+        bool isInHitMask =
+          hitMask.value == 0 ||
+          ((1 << hit.gameObject.layer) & hitMask.value) != 0;
+
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if ((!isEnemy || !isInHitMask) && damageable == null)
+          continue;
+
+        Transform targetTransform = hit.transform;
+
+        Character character = hit.GetComponentInParent<Character>();
+
+        if (character != null)
+          targetTransform = character.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
 
         float d =
           Vector3.Distance(
             transform.position,
-            e.transform.position
+            targetTransform.position
           );
 
         if (d < closestDist)
         {
           closestDist = d;
-          closest = e.transform;
+          closest = targetTransform;
         }
       }
 

@@ -103,7 +103,6 @@ namespace NeoSurvive.Weapon
 
         string cleanName = target.name.Replace("(Clone)", "").Trim();
 
-        // ★ Shooter_Projectile만 적 투사체로 판정
         if (cleanName != enemyProjectileObjectName)
           continue;
 
@@ -116,31 +115,78 @@ namespace NeoSurvive.Weapon
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+      TryDamageTarget(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+      TryDamageTarget(other);
+    }
+
+    private void TryDamageTarget(Collider2D other)
+    {
       if (other == null)
         return;
 
-      if (((1 << other.gameObject.layer) & enemyMask.value) == 0)
+      bool isEnemy = IsEnemyCollider(other);
+
+      Character character = other.GetComponent<Character>();
+      if (character == null)
+        character = other.GetComponentInParent<Character>();
+
+      IDamageable damageable = other.GetComponent<IDamageable>();
+      if (damageable == null)
+        damageable = other.GetComponentInParent<IDamageable>();
+
+      bool isInEnemyMask =
+        enemyMask.value == 0 ||
+        ((1 << other.gameObject.layer) & enemyMask.value) != 0;
+
+      // LaserSword 방식:
+      // enemyMask에 있으면 Character/Enemy 계열 허용
+      // enemyMask 밖이어도 IDamageable이면 허용
+      if (!isInEnemyMask && damageable == null)
         return;
 
-      if (!string.IsNullOrEmpty(enemyTag) &&
-          !other.CompareTag(enemyTag))
-      {
-        if (other.transform.parent == null ||
-            !other.transform.parent.CompareTag(enemyTag))
-          return;
-      }
+      // Character도 아니고, Enemy 태그도 아니고, IDamageable도 아니면 무시
+      if (character == null && !isEnemy && damageable == null)
+        return;
 
-      Enemy enemy = other.GetComponentInParent<Enemy>();
-
-      if (enemy != null)
+      // =========================
+      // 1. Character 처리
+      // Enemy뿐 아니라 TrashObstacle : Character 도 여기서 맞음
+      // =========================
+      if (character != null)
       {
         WeaponSource src = GetComponent<WeaponSource>();
 
-        enemy.TakeDamage(
+        character.TakeDamage(
           damage,
           src != null ? src.weaponData : null
         );
+
+        return;
       }
+
+      // =========================
+      // 2. IDamageable MapObject 처리
+      // 자판기 같은 오브젝트
+      // =========================
+      if (damageable != null)
+      {
+        damageable.TakeDamage(damage);
+      }
+    }
+
+    private bool IsEnemyCollider(Collider2D other)
+    {
+      if (other == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        other.CompareTag(enemyTag) ||
+        (other.transform.parent != null &&
+         other.transform.parent.CompareTag(enemyTag));
     }
 
     private void OnDrawGizmosSelected()

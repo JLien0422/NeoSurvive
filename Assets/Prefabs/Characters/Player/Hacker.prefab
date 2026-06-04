@@ -48,7 +48,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 533545058544290356}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -214,6 +214,7 @@ MonoBehaviour:
     baseValue: 5
     currentValue: 5
   psychoCorruption: 0
+  berserkDuration: 5
   neuralLinkGauge: 0
   characterType: 0
 --- !u!114 &6622069976535106146

@@ -40,6 +40,9 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         [SerializeField] private Color normalColor = new Color(1f, 0.2f, 0.2f, 0.5f);
         [SerializeField] private Color hackedColor = new Color(0.3f, 0.8f, 1f, 0.6f);
 
+        [Header("Debug")]
+        [SerializeField] private bool debugLog = true;
+
         private readonly HashSet<Collider2D> insideTargets = new HashSet<Collider2D>();
 
         private float pulseTimer = 0f;
@@ -57,13 +60,35 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             if (zoneRenderer == null)
                 zoneRenderer = GetComponent<SpriteRenderer>();
 
-            zoneTrigger.isTrigger = true;
+            if (zoneTrigger != null)
+                zoneTrigger.isTrigger = true;
+
+            HackableObject hackable = GetComponent<HackableObject>();
+
+            if (hackable == null)
+            {
+                hackable = gameObject.AddComponent<HackableObject>();
+
+                if (debugLog)
+                    Debug.Log("[ElectricLeakZone] HackableObject 자동 추가");
+            }
+
             ApplyVisualState();
         }
 
         private void Start()
         {
             LoadFromCSV();
+
+            if (debugLog)
+            {
+                Debug.Log(
+                    $"[ElectricLeakZone] Start Check | " +
+                    $"canHack={canHack}, " +
+                    $"zoneTrigger={(zoneTrigger != null ? zoneTrigger.name : "NULL")}, " +
+                    $"HackingSystem={(HackingSystem.Instance != null ? "OK" : "NULL")}"
+                );
+            }
         }
 
         private void Update()
@@ -74,8 +99,19 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         private void LoadFromCSV()
         {
+            if (MapEnvironmentGimmickLoader.DB == null)
+            {
+                Debug.LogWarning("[ElectricLeakZone] MapEnvironmentGimmickLoader.DB == null");
+                return;
+            }
+
             var row = MapEnvironmentGimmickLoader.DB.Get(mapId, gimmickId);
-            if (row == null) return;
+
+            if (row == null)
+            {
+                Debug.LogWarning($"[ElectricLeakZone] CSV row 없음 | mapId={mapId}, gimmickId={gimmickId}");
+                return;
+            }
 
             startActive = row.isActive;
             canHack = row.canHack;
@@ -86,41 +122,86 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             hackedEnemyDamage = row.damage;
             stunDuration = row.hackedEffectDuration;
 
-            Debug.Log("[ElectricLeakZone] CSV 로드 완료");
+            if (debugLog)
+            {
+                Debug.Log(
+                    $"[ElectricLeakZone] CSV 로드 완료 | " +
+                    $"startActive={startActive}, canHack={canHack}, " +
+                    $"pulseInterval={pulseInterval}, pulseDamage={pulseDamage}, " +
+                    $"hackedEnemyDamage={hackedEnemyDamage}, stunDuration={stunDuration}"
+                );
+            }
         }
 
         private void HandleHackStartInput()
         {
-            if (!canHack) return;
-            if (isHacked) return;
-            if (isHackRequestPending) return;
-            if (currentPlayerInZone == null) return;
-            if (!currentPlayerInZone.CharacterType.Equals(CharacterType.Hacker)) return;
-            if (HackingSystem.Instance == null) return;
+            if (!Input.GetKeyDown(hackKey))
+                return;
 
-            if (Input.GetKeyDown(hackKey))
+            Debug.Log("[ElectricLeakZone] E 입력 감지");
+
+            if (!canHack)
             {
-                // 🔥 중복 방지
-                if (HackingSystem.Instance.IsHacking)
-                {
-                    Debug.Log("[ElectricLeakZone] 이미 다른 해킹 진행 중");
-                    return;
-                }
-
-                isHackRequestPending = true;
-
-                // 🔥 랜덤 미니게임
-                HackableObjectType randomType = GetRandomHackableObjectType();
-
-                Debug.Log($"[ElectricLeakZone] 해킹 시작 | 랜덤 미니게임: {randomType}");
-
-                HackingSystem.Instance.StartHacking(
-                    randomType,
-                    OnHackSucceededFromSystem,
-                    OnHackFailedFromSystem,
-                    transform.position
-                );
+                Debug.Log("[ElectricLeakZone] 해킹 불가: canHack=false");
+                return;
             }
+
+            if (isHacked)
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: 이미 해킹 완료");
+                return;
+            }
+
+            if (isHackRequestPending)
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: 이미 해킹 요청 중");
+                return;
+            }
+
+            if (currentPlayerInZone == null)
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: currentPlayerInZone == null");
+                return;
+            }
+
+            Debug.Log(
+                $"[ElectricLeakZone] Player 감지 | " +
+                $"name={currentPlayerInZone.name}, " +
+                $"type={currentPlayerInZone.CharacterType}, " +
+                $"layer={LayerMask.LayerToName(currentPlayerInZone.gameObject.layer)}, " +
+                $"tag={currentPlayerInZone.tag}"
+            );
+
+            if (!currentPlayerInZone.CharacterType.Equals(CharacterType.Hacker))
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: 플레이어가 Hacker 타입이 아님");
+                return;
+            }
+
+            if (HackingSystem.Instance == null)
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: HackingSystem.Instance == null");
+                return;
+            }
+
+            if (HackingSystem.Instance.IsHacking)
+            {
+                Debug.Log("[ElectricLeakZone] 해킹 불가: 이미 다른 해킹 진행 중");
+                return;
+            }
+
+            isHackRequestPending = true;
+
+            HackableObjectType randomType = GetRandomHackableObjectType();
+
+            Debug.Log($"[ElectricLeakZone] 해킹 시작 | 랜덤 미니게임: {randomType}");
+
+            HackingSystem.Instance.StartHacking(
+                randomType,
+                OnHackSucceededFromSystem,
+                OnHackFailedFromSystem,
+                transform.position
+            );
         }
 
         private HackableObjectType GetRandomHackableObjectType()
@@ -143,6 +224,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
             isHacked = true;
             isHackRequestPending = false;
+
             ApplyVisualState();
 
             Debug.Log("[ElectricLeakZone] Hack Success → 누전구역 활성화");
@@ -164,6 +246,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             if (!startActive) return;
 
             pulseTimer += Time.deltaTime;
+
             if (pulseTimer < pulseInterval) return;
 
             pulseTimer = 0f;
@@ -177,36 +260,68 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                 if (col == null) continue;
 
                 Player player = col.GetComponentInParent<Player>();
+
                 if (player != null)
                 {
+                    if (!IsInTargetMask(player.gameObject.layer))
+                        continue;
+
                     if (!isHacked)
                     {
-                        var ch = player.GetComponent<Character>();
+                        Character ch = player.GetComponent<Character>();
+
                         if (ch != null)
                         {
                             float dmg = player.ApplyIncomingDamage(pulseDamage);
                             ch.TakeDamage(dmg);
+
+                            if (debugLog)
+                                Debug.Log($"[ElectricLeakZone] Player Damage | {player.name}, dmg={dmg}");
                         }
                     }
+
                     continue;
                 }
 
                 Transform root = col.transform.root;
-                if (!root.CompareTag(enemyTag)) continue;
 
-                var enemy = root.GetComponent<Character>();
-                if (enemy == null) continue;
+                if (root == null)
+                    continue;
+
+                if (!root.CompareTag(enemyTag))
+                    continue;
+
+                if (!IsInTargetMask(root.gameObject.layer))
+                    continue;
+
+                Character enemy = root.GetComponent<Character>();
+
+                if (enemy == null)
+                    enemy = root.GetComponentInParent<Character>();
+
+                if (enemy == null)
+                    continue;
 
                 if (isHacked)
                 {
                     enemy.TakeDamage(hackedEnemyDamage);
 
-                    var buff = root.GetComponent<BuffHandler>() ?? root.gameObject.AddComponent<BuffHandler>();
+                    BuffHandler buff = root.GetComponent<BuffHandler>();
+
+                    if (buff == null)
+                        buff = root.gameObject.AddComponent<BuffHandler>();
+
                     buff.AddBuff(new StunDebuff(stunDuration));
+
+                    if (debugLog)
+                        Debug.Log($"[ElectricLeakZone] Enemy Damage + Stun | {root.name}");
                 }
                 else
                 {
                     enemy.TakeDamage(pulseDamage);
+
+                    if (debugLog)
+                        Debug.Log($"[ElectricLeakZone] Enemy Damage | {root.name}");
                 }
             }
         }
@@ -222,8 +337,38 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             insideTargets.Add(other);
 
             Player player = other.GetComponentInParent<Player>();
+
             if (player != null)
+            {
                 currentPlayerInZone = player;
+
+                Debug.Log(
+                    $"[ElectricLeakZone] Player Enter | " +
+                    $"name={player.name}, type={player.CharacterType}, " +
+                    $"layer={LayerMask.LayerToName(player.gameObject.layer)}, tag={player.tag}"
+                );
+            }
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            insideTargets.Add(other);
+
+            if (currentPlayerInZone != null)
+                return;
+
+            Player player = other.GetComponentInParent<Player>();
+
+            if (player != null)
+            {
+                currentPlayerInZone = player;
+
+                Debug.Log(
+                    $"[ElectricLeakZone] Player Stay Recover | " +
+                    $"name={player.name}, type={player.CharacterType}, " +
+                    $"layer={LayerMask.LayerToName(player.gameObject.layer)}, tag={player.tag}"
+                );
+            }
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -231,11 +376,22 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             insideTargets.Remove(other);
 
             Player player = other.GetComponentInParent<Player>();
+
             if (player != null && currentPlayerInZone == player)
             {
                 currentPlayerInZone = null;
                 isHackRequestPending = false;
+
+                Debug.Log($"[ElectricLeakZone] Player Exit | {player.name}");
             }
+        }
+
+        private bool IsInTargetMask(int layer)
+        {
+            if (targetMask.value == 0)
+                return true;
+
+            return (targetMask.value & (1 << layer)) != 0;
         }
     }
 }

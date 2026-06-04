@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 3065133449474875235}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 0, z: -0.07620797}
-  m_LocalScale: {x: 10, y: 15, z: 1}
+  m_LocalPosition: {x: 5, y: 0, z: -0.07620797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2042039738, guid: 4b21396c25ea2894c88fecbbcc33d48d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 365ad681f38d95e46a85443d7a61932f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -122,14 +122,14 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.14, y: 0.14}
+    oldSize: {x: 0.92, y: 1.48}
     newSize: {x: 0.14, y: 0.14}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.0001, y: 0.0001}
+  m_Size: {x: 0.92, y: 1.48}
   m_EdgeRadius: 0
 --- !u!114 &7138805442841022830
 MonoBehaviour:
@@ -143,6 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc20a34da1673924b997514ff542185d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapId: Map1
+  objectId: malfunction_vending_machine
   maxHp: 20
   nutritionTubePrefab: {fileID: 2839707077608647735, guid: 6656ceecad484444594de2cc31c5f206, type: 3}
   creditPrefab: {fileID: 3685682062815620704, guid: 2baeafa9ce2c02845bdb279e1b8b119d, type: 3}
@@ -158,4 +160,6 @@ MonoBehaviour:
   sparkIntervalMin: 1.5
   sparkIntervalMax: 4
   sparkPoint: {fileID: 0}
+  autoFitCollider: 1
+  colliderPadding: {x: 0, y: 0}
   debugLog: 1

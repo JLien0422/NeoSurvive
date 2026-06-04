@@ -96,6 +96,11 @@ public class Player : Character
   [Tooltip("현재 사이코 잠식도 (0~100%)")]
   private float psychoCorruption = 0f;
 
+  [SerializeField]
+  [Min(0.1f)]
+  [Tooltip("사이코 잠식도 100% 도달 시 광분 상태가 유지되는 시간 (초)")]
+  private float berserkDuration = 5f;
+
   // 사이코 잠식도 관련 프로퍼티
   public float PsychoCorruption => psychoCorruption;
   public bool IsBerserk { get; private set; } = false;
@@ -546,18 +551,18 @@ public class Player : Character
     originalAttackSpeedPercent += 0.50f;
     originalDamagePercent += 0.50f;
 
-    Debug.Log("⚠️ 폭주 상태 시작! 15초간 통제 불가, 스탯 +50%");
+    Debug.Log($"⚠️ 폭주 상태 시작! {berserkDuration:F1}초간 통제 불가, 스탯 +50%");
 
-    // 15초 후 폭주 상태 종료
+    // 설정된 지속시간 후 폭주 상태 종료
     StartCoroutine(BerserkStateCoroutine());
   }
 
   /// <summary>
-  /// 폭주 상태 코루틴 (15초 후 종료)
+  /// 폭주 상태 코루틴
   /// </summary>
   private IEnumerator BerserkStateCoroutine()
   {
-    yield return new WaitForSeconds(15f);
+    yield return new WaitForSeconds(berserkDuration);
 
     EndBerserkState();
   }

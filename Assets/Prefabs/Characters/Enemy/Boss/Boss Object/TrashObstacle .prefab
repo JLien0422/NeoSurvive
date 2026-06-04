@@ -76,15 +76,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.3254902, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &8955820418315516113
@@ -132,6 +132,20 @@ MonoBehaviour:
   maxHP:
     baseValue: 50
     currentValue: 0
+  impactDamage: 12
+  minImpactSpeed: 1.5
+  trashSprites:
+  - {fileID: 21300000, guid: f4351ead66b9b9140b9dcc8b90bcd252, type: 3}
+  - {fileID: 21300000, guid: 46dcaf9247ca73c409f0e59262b21f40, type: 3}
+  - {fileID: 21300000, guid: 0788784f4ff33e046a05aa28d9b11f1a, type: 3}
+  - {fileID: 21300000, guid: 36dbc621abda4944eb87ebbf8345119f, type: 3}
+  - {fileID: 21300000, guid: 201d3b9c117a3764098b18c0ac8e530e, type: 3}
+  - {fileID: 21300000, guid: f3c2edad8a8163c428c4f882dab64fe0, type: 3}
+  - {fileID: 21300000, guid: 1b0e62863080d7641a4d4959c42676c6, type: 3}
+  - {fileID: 21300000, guid: 0e0272e501a1e4243b54e0dbcbedf622, type: 3}
+  - {fileID: 21300000, guid: 03cd9e280a20bb84484caf05543aa242, type: 3}
+  randomFlipX: 1
+  randomRotation: 1
 --- !u!58 &8688983654122765140
 CircleCollider2D:
   m_ObjectHideFlags: 0

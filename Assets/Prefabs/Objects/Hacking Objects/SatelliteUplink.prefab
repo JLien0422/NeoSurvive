@@ -75,12 +75,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.98490566, g: 0.90046453, b: 0, a: 1}
+  m_Sprite: {fileID: 893478436, guid: d408d6e830fa4c244acbbfec5b9783b7, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5, y: 0.75}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -101,6 +101,10 @@ MonoBehaviour:
   objectType: 2
   hackRange: 3
   psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 1636193004870154035, guid: 22b9a009e02034f41a2002c66aa54483, type: 3}
+  failVfxPrefab: {fileID: 1793095370634822809, guid: 4ed027a78623bc240a6eb9c145b403b2, type: 3}
+  failVfxLifetime: 1
+  vfxScale: 1
 --- !u!114 &-3545826014329309355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,4 +123,5 @@ MonoBehaviour:
   hitInterval: 0.1
   duration: 10
   laserWidth: 0.5
-  laserColor: {r: 0, g: 1, b: 1, a: 1}
+  laserBeamPrefab: {fileID: 521448331602222460, guid: 60040d13d8467214cb3df7ea9faaf747, type: 3}
+  laserBeamScale: 1

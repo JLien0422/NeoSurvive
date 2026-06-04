@@ -39,7 +39,7 @@ namespace NeoSurvive.Balancing.Map
         {
             if (csvFile == null)
             {
-                Debug.LogWarning($"[MapObjectLoader] {mapName} 오브젝트 CSV가 할당되지 않았습니다.");
+                Debug.Log($"[MapObjectLoader] {mapName} 오브젝트 CSV가 할당되지 않았습니다.");
                 return;
             }
 

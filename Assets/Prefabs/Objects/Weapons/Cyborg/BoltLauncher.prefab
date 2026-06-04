@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 2996693542194930770}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.4400089, y: 2.204502, z: -2.08763}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,6 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boltProjectilePrefab: {fileID: 6458317052407179808, guid: 792d9bcb23094a44ca20b990636b90f3, type: 3}
   firePoint: {fileID: 0}
+  muzzleVfxPrefab: {fileID: 2739253357292135861, guid: d59a8b1effadc264da79752b55b18b1c, type: 3}
+  muzzleVfxScale: 1
+  muzzleVfxDuration: 0.25
+  fireOffset: 0.8
+  spawnSideOffset: 0.25
   damage: 10
   range: 12
   speed: 16
@@ -59,7 +64,7 @@ MonoBehaviour:
   spreadAngle: 22
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyTag: Enemy
   enableMaster: 1
   overloadStacksToExplode: 5

@@ -20,6 +20,11 @@ public class EnemyController : MonoBehaviour
   [Tooltip("Basic/Rusher/Tanker가 플레이어와 접촉 중일 때 데미지를 주는 간격")]
   public float contactDamageTickInterval = 0.5f;
 
+  [SerializeField]
+  [Range(0f, 1f)]
+  [Tooltip("플레이어와 접촉 중에도 밀고 들어가는 이동 속도 비율")]
+  private float contactPushSpeedMultiplier = 0.5f;
+
   [Header("메커니즘 설정")]
   [SerializeField]
   [Tooltip("적 메커니즘 타입")]
@@ -361,7 +366,9 @@ public class EnemyController : MonoBehaviour
     Character character = GetValidContactDamageTarget(other);
     if (character == null) return;
 
-    contactDamageTargets.Add(character);
+    bool hadNoTargets = contactDamageTargets.Count == 0;
+    if (contactDamageTargets.Add(character) && hadNoTargets)
+      contactDamageTimer = Mathf.Max(0.01f, contactDamageTickInterval);
   }
 
   private void TryRemoveContactDamageTarget(Collider2D other)
@@ -431,7 +438,19 @@ public class EnemyController : MonoBehaviour
 
     if (UsesContactDamage() && HasContactDamageTarget())
     {
-      rb.velocity = Vector2.zero;
+      Character contactTarget = GetContactDamageTarget();
+      Transform pushTarget = contactTarget != null ? contactTarget.transform : target;
+
+      if (pushTarget != null)
+      {
+        Vector2 direction = (pushTarget.position - transform.position).normalized;
+        rb.velocity = direction * GetMoveSpeed() * contactPushSpeedMultiplier;
+      }
+      else
+      {
+        rb.velocity = Vector2.zero;
+      }
+
       return;
     }
 

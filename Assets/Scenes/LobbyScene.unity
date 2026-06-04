@@ -2813,7 +2813,7 @@ MonoBehaviour:
   - eventType: 0
     clips:
     - {fileID: 8300000, guid: 08848fd838618d041998471ac424b2f4, type: 3}
-    volume: 0
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
@@ -2833,14 +2833,14 @@ MonoBehaviour:
   - eventType: 3
     clips:
     - {fileID: 8300000, guid: 21823dc9e46a4fc42bc511d933a2b465, type: 3}
-    volume: 0
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
   - eventType: 4
     clips:
     - {fileID: 8300000, guid: 335eea91367ee854aaa9420d46f7f705, type: 3}
-    volume: 0
+    volume: 1
     randomPitch: 0
     pitchMin: 0
     pitchMax: 0
@@ -12314,6 +12314,7 @@ MonoBehaviour:
   muteOnFocusLostToggle: {fileID: 7762744203566858675}
   pauseOnFocusLostToggle: {fileID: 7177664374998330712}
   settingsPanel: {fileID: 7168243539983909432}
+  closeButton: {fileID: 0}
   applyToggleSizeOnStart: 1
   commonToggleSize: {x: 40, y: 40}
 --- !u!1 &6386562058211517002

@@ -49,16 +49,16 @@ MonoBehaviour:
   cooldown: 15
   prisonDuration: 3
   prisonRange: 3
-  baseStartVfxPrefab: {fileID: 3426037674829005766, guid: 0e176aea5d6688d4f8b124dca0f73719, type: 3}
-  baseEndVfxPrefab: {fileID: 2558256587982367066, guid: aabcfa100ff889e46886e6c502d93de9, type: 3}
-  fieldStartVfxPrefab: {fileID: 6298780964661687369, guid: 2096cc5747196614e8e68cea96f8032c, type: 3}
-  fieldMiddleVfxPrefab: {fileID: 3071198267606302230, guid: 5d4c16a63de93694bba08f65374a3a82, type: 3}
-  fieldEndVfxPrefab: {fileID: 2748163096030267944, guid: 1bb5526e0a0a84147bf7ac66ce937c2c, type: 3}
-  bodyVfxPrefab: {fileID: 2558256587982367066, guid: aabcfa100ff889e46886e6c502d93de9, type: 3}
+  baseStartVfxPrefab: {fileID: 1563644685543134246, guid: fa11bcaeee2ba4342b7e759160c3f53b, type: 3}
+  baseEndVfxPrefab: {fileID: 8276975572803580018, guid: 42c509da04cbca3478761731bf199889, type: 3}
+  fieldStartVfxPrefab: {fileID: 8206687637810407300, guid: 43b91cdc1154f5d4f80bdf3d8788f3cb, type: 3}
+  fieldMiddleVfxPrefab: {fileID: 6274441845855695224, guid: be47f65e122b795448c0cc5379dc150e, type: 3}
+  fieldEndVfxPrefab: {fileID: 8206687637810407300, guid: 43b91cdc1154f5d4f80bdf3d8788f3cb, type: 3}
+  bodyVfxPrefab: {fileID: 2571058174677957190, guid: 4d28ec5b329eeba4896807b4c3615609, type: 3}
   baseStartDuration: 0.35
   fieldStartDuration: 0.35
   fieldMiddleDuration: 0.7
   fieldEndLifetime: 0.4
   baseEndLifetime: 0.4
-  vfxScale: 1
-  bodyVfxScale: 1
+  vfxScale: 2
+  bodyVfxScale: 2

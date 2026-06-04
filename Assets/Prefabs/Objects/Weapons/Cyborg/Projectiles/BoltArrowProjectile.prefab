@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2095068847336133996}
   - component: {fileID: 8317933583151270732}
   - component: {fileID: 964165485638634963}
+  - component: {fileID: 9008024795792471677}
   m_Layer: 0
   m_Name: BoltArrowProjectile
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 6458317052407179808}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.8965343, y: 1.3150307, z: -2.0853155}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,7 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dec272fa7646814cb656f69c9a04060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useTrigger: 1
+  hitRadius: 0.1
+  spriteAngleOffset: 0
 --- !u!58 &8317933583151270732
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -123,8 +125,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 705654595, guid: 054a7d95e5768324f8b5e87acbb1955e, type: 3}
-  m_Color: {r: 0.07410055, g: 0.03824758, b: 0.9009434, a: 1}
+  m_Sprite: {fileID: 755918490, guid: eb42a9f440d1ff94ba9cfa571406e98d, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -134,3 +136,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &9008024795792471677
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6458317052407179808}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fd32f2874df91c84589e547fff6e2b35, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

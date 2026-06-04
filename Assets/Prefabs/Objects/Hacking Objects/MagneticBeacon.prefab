@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5990718726868602435}
   - component: {fileID: 7819028749397825287}
   - component: {fileID: 3367926092177352855}
+  - component: {fileID: 8810660142448067412}
   m_Layer: 0
   m_Name: MagneticBeacon
   m_TagString: Untagged
@@ -75,8 +76,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.12003076, g: 1, b: 0, a: 1}
+  m_Sprite: {fileID: 893478436, guid: d408d6e830fa4c244acbbfec5b9783b7, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -101,6 +102,10 @@ MonoBehaviour:
   objectType: 4
   hackRange: 3
   psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 1636193004870154035, guid: 22b9a009e02034f41a2002c66aa54483, type: 3}
+  failVfxPrefab: {fileID: 1793095370634822809, guid: 4ed027a78623bc240a6eb9c145b403b2, type: 3}
+  failVfxLifetime: 1
+  vfxScale: 1
 --- !u!114 &3367926092177352855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,6 +118,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68d3fb30d5b14c8469aaa8c74655d962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pullSpeed: 10
+  pullSpeed: 20
   pullDuration: 5
   gatherOffset: 5
+  stopDistance: 0.08
+  refreshInterval: 0.2
+  beaconVfxPrefab: {fileID: 2745064108509882391, guid: 0065e5cb00c246849b3452b57b0a8594, type: 3}
+  vfxScale: 1
+--- !u!95 &8810660142448067412
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6535094812701155988}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 73516470a621bd044b2baeb86fc5aa4c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

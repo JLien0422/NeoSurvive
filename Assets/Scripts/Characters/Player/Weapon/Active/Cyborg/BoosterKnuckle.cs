@@ -104,7 +104,7 @@ namespace NeoSurvive.Weapon
 
       Vector3 baseOrigin = firePoint != null ? firePoint.position : transform.position;
 
-      Transform target = FindClosestEnemy(baseOrigin);
+      Transform target = FindClosestTarget(baseOrigin);
 
       Vector3 forward = target != null
         ? (target.position - baseOrigin).normalized
@@ -161,7 +161,6 @@ namespace NeoSurvive.Weapon
 
       GameObject vfx = Instantiate(muzzleVfxPrefab, position, rotation);
 
-      // ★ 핵심: Muzzle VFX는 시각 효과 전용이므로 물리 완전 비활성화
       DisablePhysicsOnVFX(vfx);
 
       vfx.transform.localScale = Vector3.one * muzzleVfxScale;
@@ -188,9 +187,9 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    private Transform FindClosestEnemy(Vector3 origin)
+    private Transform FindClosestTarget(Vector3 origin)
     {
-      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range, enemyMask);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range);
 
       Transform closest = null;
       float minDist = float.MaxValue;
@@ -199,22 +198,32 @@ namespace NeoSurvive.Weapon
       {
         if (hit == null) continue;
 
-        if (!hit.CompareTag(enemyTag))
+        bool isEnemy =
+          hit.CompareTag(enemyTag) ||
+          (hit.transform.parent != null && hit.transform.parent.CompareTag(enemyTag));
+
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if (!isEnemy && damageable == null)
           continue;
 
-        Character character = hit.GetComponent<Character>();
-        if (character == null)
-          character = hit.GetComponentInParent<Character>();
+        Transform targetTransform = hit.transform;
 
-        if (character == null)
-          continue;
+        Character character = hit.GetComponentInParent<Character>();
 
-        float dist = Vector3.Distance(origin, character.transform.position);
+        if (character != null)
+          targetTransform = character.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
+
+        float dist = Vector3.Distance(origin, targetTransform.position);
 
         if (dist < minDist)
         {
           minDist = dist;
-          closest = character.transform;
+          closest = targetTransform;
         }
       }
 

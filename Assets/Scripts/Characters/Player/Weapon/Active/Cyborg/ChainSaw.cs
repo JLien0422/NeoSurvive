@@ -32,10 +32,10 @@ namespace NeoSurvive.Weapon
     public float spinSpeed = 720f;
 
     [Header("ChainSaw VFX")]
-    public GameObject chainSawVfxPrefab; // ★ 추가: 애니메이션/VFX 프리팹 넣는 칸
-    public Vector3 vfxLocalOffset = Vector3.zero; // ★ 추가
-    public Vector3 vfxLocalScale = Vector3.one; // ★ 추가
-    public bool disableVfxPhysics = true; // ★ 추가: VFX 프리팹 collider/rigidbody 영향 방지
+    public GameObject chainSawVfxPrefab;
+    public Vector3 vfxLocalOffset = Vector3.zero;
+    public Vector3 vfxLocalScale = Vector3.one;
+    public bool disableVfxPhysics = true;
 
     [Header("Debug")]
     public bool debugDraw = false;
@@ -54,7 +54,7 @@ namespace NeoSurvive.Weapon
     private Rigidbody2D rb;
     private Collider2D col;
 
-    private GameObject vfxInstance; // ★ 추가
+    private GameObject vfxInstance;
 
     private void Awake()
     {
@@ -104,7 +104,7 @@ namespace NeoSurvive.Weapon
 
       transform.position = player.position + (Vector3)startLocal;
 
-      SpawnVfx(); // ★ 추가
+      SpawnVfx();
 
       initialized = true;
     }
@@ -145,7 +145,7 @@ namespace NeoSurvive.Weapon
       }
 
       MoveRectBound();
-      DamageEnemies();
+      DamageTargets();
       SpinVisual();
 
       if (debugDraw)
@@ -157,8 +157,6 @@ namespace NeoSurvive.Weapon
       if (chainSawVfxPrefab == null) return;
       if (vfxInstance != null) return;
 
-      // ★ ChainSaw의 자식으로 붙임
-      // Player 자식이 아니므로 Player 좌우 반전 영향은 받지 않음
       vfxInstance = Instantiate(chainSawVfxPrefab, transform);
       vfxInstance.transform.localPosition = vfxLocalOffset;
       vfxInstance.transform.localRotation = Quaternion.identity;
@@ -167,10 +165,12 @@ namespace NeoSurvive.Weapon
       if (disableVfxPhysics)
       {
         Collider2D[] cols = vfxInstance.GetComponentsInChildren<Collider2D>(true);
+
         foreach (Collider2D c in cols)
           c.enabled = false;
 
         Rigidbody2D[] bodies = vfxInstance.GetComponentsInChildren<Rigidbody2D>(true);
+
         foreach (Rigidbody2D body in bodies)
           body.simulated = false;
       }
@@ -222,49 +222,127 @@ namespace NeoSurvive.Weapon
       transform.Rotate(0f, 0f, -spinSpeed * Time.deltaTime);
     }
 
-    private void DamageEnemies()
+    private void DamageTargets()
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(
         transform.position,
-        hitRadius * radiusScale,
-        enemyMask
+        hitRadius * radiusScale
       );
 
       float now = Time.time;
 
       foreach (var hit in hits)
       {
-        if (hit == null) continue;
+        if (hit == null)
+          continue;
 
-        if (!string.IsNullOrEmpty(enemyTag))
-        {
-          bool okTag =
-            hit.CompareTag(enemyTag) ||
-            (hit.transform.parent != null &&
-             hit.transform.parent.CompareTag(enemyTag));
+        TryDamageTarget(hit, now);
+      }
+    }
 
-          if (!okTag) continue;
-        }
+    private bool TryDamageTarget(Collider2D hit, float now)
+    {
+      if (hit == null)
+        return false;
 
-        Enemy enemy = hit.GetComponentInParent<Enemy>();
+      bool isEnemy = IsEnemyCollider(hit);
 
-        if (enemy == null) continue;
+      Character character = hit.GetComponent<Character>();
 
-        int id = enemy.gameObject.GetInstanceID();
+      if (character == null)
+        character = hit.GetComponentInParent<Character>();
+
+      IDamageable damageable = hit.GetComponent<IDamageable>();
+
+      if (damageable == null)
+        damageable = hit.GetComponentInParent<IDamageable>();
+
+      bool isInEnemyMask =
+        enemyMask.value == 0 ||
+        ((1 << hit.gameObject.layer) & enemyMask.value) != 0;
+
+      // LaserSword 방식:
+      // enemyMask 안의 Character 허용
+      // enemyMask 밖이어도 IDamageable이면 허용
+      if (!isInEnemyMask && damageable == null)
+        return false;
+
+      // Character도 아니고 Enemy도 아니고 IDamageable도 아니면 무시
+      if (character == null && !isEnemy && damageable == null)
+        return false;
+
+      // =========================
+      // 1. Character 처리
+      // Enemy + TrashObstacle 둘 다 여기서 처리
+      // =========================
+      if (character != null)
+      {
+        int id = character.gameObject.GetInstanceID();
 
         if (lastHitTime.TryGetValue(id, out float last) &&
             now - last < hitCooldown)
-          continue;
+          return false;
 
         lastHitTime[id] = now;
 
-        float finalDamage = CalculateDamage(enemy);
+        float finalDamage = damage;
 
-        enemy.TakeDamage(finalDamage);
+        Enemy enemy = character.GetComponent<Enemy>();
+
+        if (enemy == null)
+          enemy = character.GetComponentInParent<Enemy>();
+
+        // 일반 적만 체력 비례 데미지 적용
+        if (enemy != null)
+          finalDamage = CalculateDamage(enemy);
+
+        character.TakeDamage(finalDamage);
 
         if (debugLog)
-          Debug.Log($"[ChainSaw] Hit {enemy.name} dmg={finalDamage}");
+          Debug.Log($"[ChainSaw] Hit Character {character.name} dmg={finalDamage}");
+
+        return true;
       }
+
+      // =========================
+      // 2. IDamageable 처리
+      // 자판기 같은 맵 오브젝트
+      // =========================
+      if (damageable != null)
+      {
+        MonoBehaviour mb = damageable as MonoBehaviour;
+
+        if (mb == null)
+          return false;
+
+        int id = mb.gameObject.GetInstanceID();
+
+        if (lastHitTime.TryGetValue(id, out float last) &&
+            now - last < hitCooldown)
+          return false;
+
+        lastHitTime[id] = now;
+
+        damageable.TakeDamage(damage);
+
+        if (debugLog)
+          Debug.Log($"[ChainSaw] Hit Damageable {mb.name} dmg={damage}");
+
+        return true;
+      }
+
+      return false;
+    }
+
+    private bool IsEnemyCollider(Collider2D hit)
+    {
+      if (hit == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        hit.CompareTag(enemyTag) ||
+        (hit.transform.parent != null &&
+         hit.transform.parent.CompareTag(enemyTag));
     }
 
     private float CalculateDamage(Enemy enemy)
@@ -423,9 +501,9 @@ namespace NeoSurvive.Weapon
       Vector3 c = player.position;
 
       Vector3 a = c + new Vector3(-halfWidth, -halfHeight, 0);
-      Vector3 b = c + new Vector3( halfWidth, -halfHeight, 0);
-      Vector3 d = c + new Vector3(-halfWidth,  halfHeight, 0);
-      Vector3 e = c + new Vector3( halfWidth,  halfHeight, 0);
+      Vector3 b = c + new Vector3(halfWidth, -halfHeight, 0);
+      Vector3 d = c + new Vector3(-halfWidth, halfHeight, 0);
+      Vector3 e = c + new Vector3(halfWidth, halfHeight, 0);
 
       Debug.DrawLine(a, b, Color.yellow);
       Debug.DrawLine(b, e, Color.yellow);

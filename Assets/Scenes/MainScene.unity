@@ -6164,6 +6164,7 @@ MonoBehaviour:
   weaponIconPrefab: {fileID: 6931289576150443170, guid: f90abdd30d215f44caa32264cef75a37, type: 3}
   expSlider: {fileID: 433421087}
   levelText: {fileID: 1558483951}
+  expFillDuration: 0.25
   gameTimeText: {fileID: 1450491671}
   killCountText: {fileID: 2096946303}
   playerHealthSlider: {fileID: 1205811752}
@@ -6699,6 +6700,7 @@ MonoBehaviour:
   muteOnFocusLostToggle: {fileID: 631069661}
   pauseOnFocusLostToggle: {fileID: 1898416107}
   settingsPanel: {fileID: 1343913623}
+  closeButton: {fileID: 0}
   applyToggleSizeOnStart: 1
   commonToggleSize: {x: 40, y: 40}
 --- !u!114 &561034630 stripped
@@ -27786,50 +27788,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &2034839438
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2034839440}
-  - component: {fileID: 2034839439}
-  m_Layer: 0
-  m_Name: HackableObjectSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2034839439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2034839438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13447a3005a84b148a3551be8d2ece6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &2034839440
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2034839438}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2038494998
 GameObject:
   m_ObjectHideFlags: 0
@@ -28441,7 +28399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRunGold: 0
-  totalGold: 1320
+  totalGold: 1710
   enableDebugGoldCommitKey: 1
   debugGoldCommitKey: 112
   hackerPlayerPrefab: {fileID: 533545058544290356, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
@@ -28466,6 +28424,7 @@ MonoBehaviour:
   - {fileID: 7370841270425998504, guid: acaca08da3fa73a4b85d21f18908e61f, type: 3}
   innerRadius: 9.5
   outerRadius: 14.5
+  enemiesPerFrame: 1
   outerCount: 10
   innerCountP2: 18
   innerCountP3: 24
@@ -29898,7 +29857,6 @@ SceneRoots:
   - {fileID: 1582928303}
   - {fileID: 1965596372}
   - {fileID: 849519856}
-  - {fileID: 2034839440}
   - {fileID: 575507295}
   - {fileID: 1635127890}
   - {fileID: 1269261767}

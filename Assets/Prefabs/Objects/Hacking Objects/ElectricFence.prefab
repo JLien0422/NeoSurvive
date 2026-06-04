@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1036543103066905220}
   - component: {fileID: 5495711543161232812}
   - component: {fileID: 3019452522130807443}
+  - component: {fileID: 2888401607920987285}
   m_Layer: 0
   m_Name: ElectricFence
   m_TagString: Untagged
@@ -75,8 +76,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 893478436, guid: d408d6e830fa4c244acbbfec5b9783b7, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -101,6 +102,10 @@ MonoBehaviour:
   objectType: 1
   hackRange: 3
   psychoIncreaseOnFail: 50
+  idleVfxPrefab: {fileID: 1636193004870154035, guid: 22b9a009e02034f41a2002c66aa54483, type: 3}
+  failVfxPrefab: {fileID: 1793095370634822809, guid: 4ed027a78623bc240a6eb9c145b403b2, type: 3}
+  failVfxLifetime: 1
+  vfxScale: 1
 --- !u!114 &3019452522130807443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,9 +118,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8488efb1f3a39b49bac46e9cba39b9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fenceSize: 6
+  fenceSize: 4.2
   fenceHeight: 0.3
   duration: 8
   damagePerSecond: 15
   damageInterval: 0.5
-  fenceColor: {r: 0.2, g: 0.8, b: 1, a: 0.8}
+  fenceVfxPrefab: {fileID: 7350384014105699780, guid: d25c23d02978b8b4091cb03deb19ab96, type: 3}
+  fenceVfxBaseLength: 5
+  horizontalLengthPadding: 2.4
+  verticalLengthPadding: 2.4
+  fenceVfxThicknessScale: 1.6
+  topVfxOffset: {x: -0.5, y: -2.5}
+  bottomVfxOffset: {x: 0.5, y: 2.5}
+  leftVfxOffset: {x: 2.5, y: -0.5}
+  rightVfxOffset: {x: -2.5, y: 0.5}
+--- !u!95 &2888401607920987285
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733874190501676579}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 73516470a621bd044b2baeb86fc5aa4c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

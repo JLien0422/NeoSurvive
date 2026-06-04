@@ -1,6 +1,6 @@
 weaponid,level,damage,range,firerate,bulletspeed,duration,penetration
-plasmarifle,1,10,10,1,2000,0.2,0
-plasmarifle,2,12,10,0.95,2000,0.2,1
-plasmarifle,3,15,10,0.9,2000,0.2,2
-plasmarifle,4,17,10,0.85,2000,0.2,3
-plasmarifle,5,20,10,0.8,2000,0.2,4
+plasmarifle,1,10,10,0.8,2000,0.2,0
+plasmarifle,2,12,10,0.76,2000,0.2,1
+plasmarifle,3,15,10,0.72,2000,0.2,2
+plasmarifle,4,17,10,0.68,2000,0.2,3
+plasmarifle,5,20,10,0.64,2000,0.2,4

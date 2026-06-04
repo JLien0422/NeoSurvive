@@ -28,6 +28,10 @@ public class ShooterMechanism : EnemyMechanismBase
     [Tooltip("투사체 대미지")]
     private float projectileDamage = 5f;
 
+    [Min(0.1f)]
+    [Tooltip("투사체가 자동으로 사라지는 시간 (초)")]
+    public float projectileLifeTime = 3.5f;
+
     [SerializeField]
     [Tooltip("발사 위치 오프셋 (적 루트 로컬 공간; localScale.x 반전 시 TransformPoint로 같이 미러링됨)")]
     private Vector2 shootOffset = Vector2.zero;
@@ -219,7 +223,7 @@ public class ShooterMechanism : EnemyMechanismBase
             enemyProj = projectile.AddComponent<EnemyProjectile>();
         }
 
-        enemyProj.Initialize(direction, damage, projectileSpeed);
+        enemyProj.Initialize(direction, damage, projectileSpeed, projectileLifeTime);
     }
 
     private void ResolveGunAnimatorIfNeeded()
@@ -325,7 +329,7 @@ public class ShooterMechanism : EnemyMechanismBase
 public class EnemyProjectile : MonoBehaviour
 {
     public float damage = 5f;
-    [SerializeField] private float lifeTime = 5f;
+    [SerializeField] private float lifeTime = 3.5f;
     private static readonly int WallLayer = LayerMask.NameToLayer("Wall");
     private static readonly int ObstacleLayer = LayerMask.NameToLayer("Obstacle");
     private Vector2 direction;
@@ -334,11 +338,12 @@ public class EnemyProjectile : MonoBehaviour
     private bool hasHit;
     private Rigidbody2D rb;
 
-    public void Initialize(Vector2 direction, float damage, float speed)
+    public void Initialize(Vector2 direction, float damage, float speed, float lifeTime)
     {
         this.direction = direction.normalized;
         this.damage = damage;
         this.speed = speed;
+        this.lifeTime = Mathf.Max(0.1f, lifeTime);
         initialized = true;
 
         rb = GetComponent<Rigidbody2D>();
@@ -349,7 +354,7 @@ public class EnemyProjectile : MonoBehaviour
 
         rb.gravityScale = 0f;
         rb.velocity = this.direction * this.speed;
-        Destroy(gameObject, lifeTime);
+        Destroy(gameObject, this.lifeTime);
     }
 
     private void Start()

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
@@ -103,8 +104,7 @@ namespace NeoSurvive.Weapon
 
       Vector3 baseOrigin = firePoint != null ? firePoint.position : transform.position;
 
-      // ★ 수정: 전 방향 대응. 가장 가까운 적 방향으로 발사 기준 잡기
-      Transform target = FindClosestEnemy(baseOrigin);
+      Transform target = FindClosestTarget(baseOrigin);
 
       Vector3 forward = target != null
         ? (target.position - baseOrigin).normalized
@@ -115,7 +115,6 @@ namespace NeoSurvive.Weapon
       float muzzleAngleZ = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
       Quaternion muzzleRot = Quaternion.Euler(0f, 0f, muzzleAngleZ);
 
-      // ★ Trigger/VFX도 적 방향으로 회전해서 생성
       SpawnMuzzleVFX(origin, muzzleRot);
 
       float half = spreadAngle * 0.5f;
@@ -194,10 +193,9 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    // ★ 추가: 가장 가까운 적 찾기
-    private Transform FindClosestEnemy(Vector3 origin)
+    private Transform FindClosestTarget(Vector3 origin)
     {
-      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range, enemyMask);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range);
 
       Transform closest = null;
       float minDist = float.MaxValue;
@@ -206,27 +204,54 @@ namespace NeoSurvive.Weapon
       {
         if (hit == null) continue;
 
-        if (!string.IsNullOrEmpty(enemyTag) && !hit.CompareTag(enemyTag))
+        bool isEnemy = IsEnemyCollider(hit);
+
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        bool isInEnemyMask =
+          enemyMask.value == 0 ||
+          ((1 << hit.gameObject.layer) & enemyMask.value) != 0;
+
+        if (!isInEnemyMask && damageable == null)
           continue;
 
-        Character character = hit.GetComponent<Character>();
+        if (!isEnemy && damageable == null)
+          continue;
 
+        Transform targetTransform = hit.transform;
+
+        Character character = hit.GetComponent<Character>();
         if (character == null)
           character = hit.GetComponentInParent<Character>();
 
-        if (character == null)
-          continue;
+        if (character != null)
+          targetTransform = character.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
 
-        float dist = Vector3.Distance(origin, character.transform.position);
+        float dist = Vector3.Distance(origin, targetTransform.position);
 
         if (dist < minDist)
         {
           minDist = dist;
-          closest = character.transform;
+          closest = targetTransform;
         }
       }
 
       return closest;
+    }
+
+    private bool IsEnemyCollider(Collider2D other)
+    {
+      if (other == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        other.CompareTag(enemyTag) ||
+        (other.transform.parent != null &&
+         other.transform.parent.CompareTag(enemyTag));
     }
   }
 }

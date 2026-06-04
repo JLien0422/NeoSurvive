@@ -24,7 +24,7 @@ namespace NeoSurvive.Weapon
     public float homingSearchRange = 10f;
 
     [Header("Hit Detection")]
-    public float hitRadius = 0.1f; // ★ 수정: 플레이어 주변 오검출 방지용으로 축소
+    public float hitRadius = 0.1f;
 
     [Header("Rotation")]
     public float spriteAngleOffset = 0f;
@@ -41,13 +41,13 @@ namespace NeoSurvive.Weapon
     private bool bounced = false;
     private bool destroyed = false;
 
-    private Transform lastHitEnemy;
+    private Transform lastHitTarget;
     private WeaponBase sourceWeapon;
+
+    private readonly HashSet<int> hitIds = new HashSet<int>();
 
     private void Awake()
     {
-      // ★ 물리 충돌은 사용하지 않음
-      // 데미지 판정은 Physics2D.OverlapCircleAll로 직접 처리
       Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
       foreach (Collider2D col in colliders)
       {
@@ -121,7 +121,7 @@ namespace NeoSurvive.Weapon
 
       if (masterHoming && bounced)
       {
-        Transform target = FindRandomEnemy(homingSearchRange, lastHitEnemy);
+        Transform target = FindRandomTarget(homingSearchRange, lastHitTarget);
 
         if (target != null)
         {
@@ -145,13 +145,9 @@ namespace NeoSurvive.Weapon
 
     private void CheckHitByOverlap()
     {
-      // ★ 핵심 수정:
-      // 전체 Collider를 검사하지 않고 enemyMask에 포함된 Collider만 검사
-      // 그래서 Player, Weapon, VFX, 기타 오브젝트를 건드리지 않음
       Collider2D[] hits = Physics2D.OverlapCircleAll(
         transform.position,
-        hitRadius,
-        enemyMask
+        hitRadius
       );
 
       foreach (Collider2D hit in hits)
@@ -171,22 +167,10 @@ namespace NeoSurvive.Weapon
         if (ownerRoot != null && hit.transform.root == ownerRoot)
           continue;
 
-        if (!IsEnemy(hit))
-          continue;
-
-        Character character = hit.GetComponent<Character>();
-
-        if (character == null)
-          character = hit.GetComponentInParent<Character>();
-
-        if (character == null)
-          continue;
-
-        HandleEnemyHit(character);
-        return;
+        if (TryHitTarget(hit))
+          return;
       }
 
-      // ★ 벽은 별도 Mask가 있을 때만 검사
       if (wallMask.value != 0)
       {
         Collider2D[] wallHits = Physics2D.OverlapCircleAll(
@@ -206,13 +190,87 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    private void HandleEnemyHit(Character character)
+    private bool TryHitTarget(Collider2D hit)
+    {
+      if (hit == null)
+        return false;
+
+      bool isEnemy = IsEnemy(hit);
+
+      IDamageable damageable = hit.GetComponent<IDamageable>();
+      if (damageable == null)
+        damageable = hit.GetComponentInParent<IDamageable>();
+
+      bool isInEnemyMask =
+        enemyMask.value == 0 ||
+        ((1 << hit.gameObject.layer) & enemyMask.value) != 0;
+
+      if (!isInEnemyMask && damageable == null)
+        return false;
+
+      if (!isEnemy && damageable == null)
+        return false;
+
+      Character character = hit.GetComponent<Character>();
+      if (character == null)
+        character = hit.GetComponentInParent<Character>();
+
+      if (character != null && isEnemy)
+      {
+        int id = character.gameObject.GetInstanceID();
+
+        if (hitIds.Contains(id))
+          return false;
+
+        hitIds.Add(id);
+
+        HandleCharacterHit(character);
+        return true;
+      }
+
+      if (damageable != null)
+      {
+        MonoBehaviour mb = damageable as MonoBehaviour;
+
+        if (mb == null)
+          return false;
+
+        int id = mb.gameObject.GetInstanceID();
+
+        if (hitIds.Contains(id))
+          return false;
+
+        hitIds.Add(id);
+
+        HandleDamageableHit(damageable, mb.transform);
+        return true;
+      }
+
+      return false;
+    }
+
+    private void HandleCharacterHit(Character character)
     {
       if (character == null)
         return;
 
       character.TakeDamage(Mathf.Max(1f, damage), sourceWeapon);
 
+      HandleAfterHit(character.transform);
+    }
+
+    private void HandleDamageableHit(IDamageable damageable, Transform targetTransform)
+    {
+      if (damageable == null)
+        return;
+
+      damageable.TakeDamage(Mathf.Max(1f, damage));
+
+      HandleAfterHit(targetTransform);
+    }
+
+    private void HandleAfterHit(Transform hitTarget)
+    {
       if (!masterHoming)
       {
         DestroyProjectile();
@@ -222,11 +280,11 @@ namespace NeoSurvive.Weapon
       if (!bounced)
       {
         bounced = true;
-        lastHitEnemy = character.transform;
+        lastHitTarget = hitTarget;
 
         dir = -dir;
 
-        Transform target = FindRandomEnemy(homingSearchRange, lastHitEnemy);
+        Transform target = FindRandomTarget(homingSearchRange, lastHitTarget);
 
         if (target != null)
         {
@@ -253,7 +311,7 @@ namespace NeoSurvive.Weapon
         bounced = true;
         dir = -dir;
 
-        Transform target = FindRandomEnemy(homingSearchRange, null);
+        Transform target = FindRandomTarget(homingSearchRange, null);
 
         if (target != null)
         {
@@ -304,12 +362,11 @@ namespace NeoSurvive.Weapon
       return true;
     }
 
-    private Transform FindRandomEnemy(float searchRange, Transform excludeTarget)
+    private Transform FindRandomTarget(float searchRange, Transform excludeTarget)
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(
         transform.position,
-        searchRange,
-        enemyMask
+        searchRange
       );
 
       List<Transform> candidates = new List<Transform>();
@@ -319,18 +376,44 @@ namespace NeoSurvive.Weapon
         if (hit == null)
           continue;
 
-        if (!IsEnemy(hit))
+        if (owner != null)
+        {
+          if (hit.gameObject == owner)
+            continue;
+
+          if (hit.transform.root == owner.transform.root)
+            continue;
+        }
+
+        if (ownerRoot != null && hit.transform.root == ownerRoot)
           continue;
 
-        Character character = hit.GetComponent<Character>();
+        bool isEnemy = IsEnemy(hit);
 
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        bool isInEnemyMask =
+          enemyMask.value == 0 ||
+          ((1 << hit.gameObject.layer) & enemyMask.value) != 0;
+
+        if (!isInEnemyMask && damageable == null)
+          continue;
+
+        if (!isEnemy && damageable == null)
+          continue;
+
+        Transform target = hit.transform;
+
+        Character character = hit.GetComponent<Character>();
         if (character == null)
           character = hit.GetComponentInParent<Character>();
 
-        if (character == null)
-          continue;
-
-        Transform target = character.transform;
+        if (character != null)
+          target = character.transform;
+        else if (damageable is Component damageableComponent)
+          target = damageableComponent.transform;
 
         if (excludeTarget != null && target == excludeTarget)
           continue;

@@ -1,6 +1,6 @@
 weaponid,level,damage,range,firerate,bulletspeed
-linkpistol,1,10,5,0.8,20
-linkpistol,2,11,5,0.76,20
-linkpistol,3,12,5,0.72,20
-linkpistol,4,13,5,0.68,20
-linkpistol,5,14,8,0.63,22
+linkpistol,1,10,5,0.64,20
+linkpistol,2,11,5,0.608,20
+linkpistol,3,12,5,0.576,20
+linkpistol,4,13,5,0.544,20
+linkpistol,5,14,8,0.504,22

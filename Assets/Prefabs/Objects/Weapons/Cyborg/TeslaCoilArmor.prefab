@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 691817947624430636}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.57343876, y: 1.4521939, z: -2.0764437}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -49,18 +49,23 @@ MonoBehaviour:
   auraTick: 0.4
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyTag: Enemy
   radiusPerLevel: 0.12
   enableMaster: 1
-  puddlePrefab: {fileID: 3131190775964296594, guid: 2fd39918896301d4ca59cd67df0c89ce, type: 3}
+  puddleAreaPrefab: {fileID: 3131190775964296594, guid: 2fd39918896301d4ca59cd67df0c89ce, type: 3}
+  puddleVfxPrefab: {fileID: 4550269116410569526, guid: ea2638357d1e7e14a819741f2b7a97bc, type: 3}
   puddleInterval: 0.35
   puddleDuration: 1.6
   puddleRadius: 1.1
   puddleTick: 0.35
   puddleDamageFactor: 0.5
+  puddleSpawnOffset: {x: 0, y: -0.6, z: 0}
   lightningPrefab: {fileID: 1917796836720186483, guid: 87b3fd43ae21040458fbbc7c495772ac, type: 3}
+  lightningVfxPrefab: {fileID: 5853812615049139594, guid: 01670dcc4dbbaf54ca307db40dca4048, type: 3}
   lightningInterval: 1.2
   lightningRange: 10
   lightningDamageFactor: 1.2
+  lightningVfxLifetime: 2
+  debugLog: 1
   debugDraw: 1

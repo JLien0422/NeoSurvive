@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 4678613158969812910}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.48841578, y: 1.2607397, z: -2.1110816}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,6 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fistProjectilePrefab: {fileID: 8751476221276986614, guid: c213f861866c40b4fb32e290a9502a01, type: 3}
   firePoint: {fileID: 0}
+  muzzleVfxPrefab: {fileID: 4934841867261951544, guid: cbc09fc62fd37cf449d5bb63c4caf30e, type: 3}
+  muzzleVfxScale: 1
+  muzzleVfxDuration: 0.25
+  fireOffset: 0.8
   damage: 14
   range: 12
   fireRate: 1.2
@@ -55,6 +59,6 @@ MonoBehaviour:
   maxCount: 4
   enemyMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyTag: Enemy
-  enableMaster: 1
+  enableMaster: 0

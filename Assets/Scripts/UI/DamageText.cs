@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace NeoSurvive.UI
 {
@@ -11,8 +12,11 @@ namespace NeoSurvive.UI
     public float moveSpeed = 100f; // UI 공간이므로 속도를 높임
     public float alphaSpeed = 2f;
     public float destroyTime = 1.0f;
+    [SerializeField] private Color outlineColor = Color.black;
+    [SerializeField] private float outlineDistance = 2f;
 
     private TextMeshProUGUI textMesh;
+    private Outline outline;
     private Color color;
     private RectTransform rectTransform;
     private Vector3 worldPosition;
@@ -31,6 +35,14 @@ namespace NeoSurvive.UI
         var font = Resources.Load<TMP_FontAsset>("Fonts/Maplestory Light SDF");
         if (font != null) textMesh.font = font;
       }
+
+      outline = GetComponent<Outline>();
+      if (outline == null)
+        outline = gameObject.AddComponent<Outline>();
+
+      outline.effectColor = outlineColor;
+      outline.effectDistance = Vector2.one * outlineDistance;
+      outline.useGraphicAlpha = true;
 
       color = textMesh.color;
     }

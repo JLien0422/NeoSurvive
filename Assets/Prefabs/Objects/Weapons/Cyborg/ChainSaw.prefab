@@ -110,6 +110,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 6
+  hpRatioDamage: 0.05
+  useHpRatioDamage: 1
+  useCurrentHpRatio: 0
   hitCooldown: 0.2
   enemyMask:
     serializedVersion: 2
@@ -118,15 +121,15 @@ MonoBehaviour:
   speed: 8
   halfWidth: 7
   halfHeight: 4
+  infiniteLifetime: 1
   lifetime: 8
   radiusScale: 1
   hitRadius: 0.6
-  speedPerLevel: 0.1
-  sizePerLevel: 0.12
-  cooldownMulPerLevel: 0.92
-  lifetimePerLevel: 0.15
-  enableMaster: 1
-  masterSizeFactor: 1.25
+  spinSpeed: 720
+  chainSawVfxPrefab: {fileID: 1684874735877199194, guid: 5815b582307e4ad48a86bec0c2fad87f, type: 3}
+  vfxLocalOffset: {x: 0, y: 0, z: 0}
+  vfxLocalScale: {x: 1, y: 1, z: 1}
+  disableVfxPhysics: 1
   debugDraw: 0
   debugLog: 0
 --- !u!212 &189806787830236226
@@ -136,7 +139,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1068046529786470421}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1

@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -101,10 +101,10 @@ TextureImporter:
         \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_0"
       rect:
         serializedVersion: 2
-        x: 21
-        y: 18
-        width: 20
-        height: 16
+        x: 0
+        y: 0
+        width: 63.75
+        height: 65
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e93e9c966d9e7fc4fa528f48ba2bb3e4
-      internalID: -381719272
+      spriteID: 13e2ab284dbf82d4385e862d22d22405
+      internalID: 1980951356
       vertices: []
       indices: 
       edges: []
@@ -123,10 +123,10 @@ TextureImporter:
         \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_1"
       rect:
         serializedVersion: 2
-        x: 85
-        y: 18
-        width: 20
-        height: 16
+        x: 63
+        y: 0
+        width: 63.75
+        height: 65
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,8 +134,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 77dc3d9efa0a60d4b9cfddf67ce76ee0
-      internalID: -1719784380
+      spriteID: 4e9b55626f1a18f4a8619e87a0a85f04
+      internalID: -1135203398
       vertices: []
       indices: 
       edges: []
@@ -145,10 +145,10 @@ TextureImporter:
         \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_2"
       rect:
         serializedVersion: 2
-        x: 149
-        y: 18
-        width: 20
-        height: 16
+        x: 126
+        y: 0
+        width: 63.75
+        height: 65
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,8 +156,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 09142731d5c76954f8c5e4475197b3f8
-      internalID: 1382932603
+      spriteID: 6b2c35b379ea19344a26c4f5eadcf57d
+      internalID: -1403123245
       vertices: []
       indices: 
       edges: []
@@ -167,10 +167,10 @@ TextureImporter:
         \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_3"
       rect:
         serializedVersion: 2
-        x: 213
-        y: 18
-        width: 20
-        height: 16
+        x: 189
+        y: 0
+        width: 63.75
+        height: 65
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,8 +178,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 123aded46b443e74f95b440ea2991450
-      internalID: 517335530
+      spriteID: 574767919485b084ca830b4f072458ae
+      internalID: -2087432044
       vertices: []
       indices: 
       edges: []
@@ -195,10 +195,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_0": -381719272
-      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_1": -1719784380
-      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_2": 1382932603
-      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_3": 517335530
+      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_0": 1980951356
+      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_1": -1135203398
+      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_2": -1403123245
+      "\uD640\uB85C\uADF8\uB7A8 \uBD84\uC2E0 \uAE30\uACC4 \uC560\uB2C8\uBA54\uC774\uC158 \uB9C8\uBB34\uB9AC 4\uD504\uB808\uC784-Sheet-Sheet_3": -2087432044
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

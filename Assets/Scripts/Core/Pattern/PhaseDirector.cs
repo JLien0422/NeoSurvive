@@ -11,6 +11,8 @@ public class PhaseDirector : MonoBehaviour
 
   [Header("포위 이벤트")]
   [SerializeField] private SiegeEvent siegeEvent;
+  [SerializeField] private float postSiegeSpawnSlowDuration = 10f;
+  [SerializeField] private float postSiegeSpawnIntervalMultiplier = 5f;
 
   [Header("해킹 오브젝트 프리팹(5종)")]
   [SerializeField] private GameObject[] hackablePrefabs;
@@ -79,6 +81,7 @@ public class PhaseDirector : MonoBehaviour
       if (enemySpawner != null)
       {
           enemySpawner.SetPhase(phaseIndex);
+          enemySpawner.ApplyTemporarySpawnIntervalMultiplier(postSiegeSpawnIntervalMultiplier, postSiegeSpawnSlowDuration);
           SoundManager.Instance?.PlayPhaseBgm(phaseIndex);
           Debug.Log($"[PhaseDirector] Phase{phaseIndex} CSV 스폰 가중치 즉시 적용 완료");
       }

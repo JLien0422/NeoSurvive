@@ -1,46 +1,40 @@
+using System.Collections.Generic;
 using UnityEngine;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
 {
-  /// <summary>
-  /// 2번 무기: 서지 블레이드
-  /// - 기본: 강한 한방, 기본 1명 타격
-  /// - Lv.Up: 타격 가능 인원 + 데미지 증가
-  /// - Lv.5 마스터: 2회 공격마다 공격력/사거리/범위(각도) 2배(강화 공격)
-  /// </summary>
   public class SurgeBlade : MonoBehaviour
   {
     [Header("Stats")]
     public float damage = 20f;
-    public float range = 3.0f;     // 타격 반경(근접 판정)
-    public float angle = 50f;      // 부채꼴 각도
-    public float fireRate = 1.2f;  // 공격 간격
+    public float range = 3.0f;
+    public float angle = 50f;
+    public float fireRate = 1.2f;
 
     [Header("Target Filter")]
     public LayerMask hitMask;
     public string enemyTag = "Enemy";
 
     [Header("Level Scaling")]
-    public float rangePerLevel = 0.05f;  // 레벨당 사거리 +5%
-    public int baseMaxTargets = 1;       // 기본 타격 인원
-    public int maxTargetsAtLv5 = 3;      // Lv5에서 최대 타격 인원(원하면 조절)
+    public float rangePerLevel = 0.05f;
+    public int baseMaxTargets = 1;
+    public int maxTargetsAtLv5 = 3;
 
     [Header("VFX")]
-    public GameObject surgePrefab;               // 기본 시전/휩쓸기 프리팹
-    public GameObject surgePrefabEnhanced;       // Lv5 강화 시 사용할 프리팹
+    public GameObject surgePrefab;
+    public GameObject surgePrefabEnhanced;
     public float surgeDuration = 0.35f;
     public float surgeSpawnOffset = 0.6f;
     public float surgeScale = 1.0f;
 
     [Header("Master (Lv5)")]
     public bool enableMaster = true;
-    public float masterMultiplier = 2.0f;   // 강화 공격 시 damage/range/angle 배수
+    public float masterMultiplier = 2.0f;
     public bool debugDraw = true;
 
     private float fireTimer;
 
-    // base stats
     private float baseRange;
     private float baseAngle;
     private float baseFireRate;
@@ -49,7 +43,7 @@ namespace NeoSurvive.Weapon
     private int currentLevel = 1;
     private int currentMaxTargets = 1;
 
-    private int attackCount = 0; // 마스터용: 몇 번 공격했는지
+    private int attackCount = 0;
 
     private void Start()
     {
@@ -63,6 +57,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       fireTimer += Time.deltaTime;
+
       if (fireTimer >= fireRate)
       {
         Attack();
@@ -70,15 +65,14 @@ namespace NeoSurvive.Weapon
       }
     }
 
-    // WeaponManager가 SendMessage로 호출
     public void OnLevelUp(int level)
     {
-      // 안전장치(혹시 base가 0으로 깨진 경우)
       if (baseRange <= 0f && range > 0f) baseRange = range;
       if (baseAngle <= 0f && angle > 0f) baseAngle = angle;
       if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
 
       ApplyLevel(level);
+
       Debug.Log($"[SurgeBlade] Lv.{currentLevel} -> Dmg:{damage}, Range:{range}, MaxTargets:{currentMaxTargets}");
     }
 
@@ -87,13 +81,16 @@ namespace NeoSurvive.Weapon
       currentLevel = Mathf.Clamp(level, 1, 5);
 
       ApplyStatsFromCSV(currentLevel);
-      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
-      angle = baseAngle; // 기본은 고정(강화 공격에서만 배수 적용)
 
-      // 타격 인원 증가 (Lv1=1, Lv3=2, Lv5=3 느낌)
-      if (currentLevel <= 1) currentMaxTargets = baseMaxTargets;
-      else if (currentLevel <= 3) currentMaxTargets = Mathf.Min(2, maxTargetsAtLv5);
-      else currentMaxTargets = maxTargetsAtLv5;
+      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
+      angle = baseAngle;
+
+      if (currentLevel <= 1)
+        currentMaxTargets = baseMaxTargets;
+      else if (currentLevel <= 3)
+        currentMaxTargets = Mathf.Min(2, maxTargetsAtLv5);
+      else
+        currentMaxTargets = maxTargetsAtLv5;
     }
 
     private void ApplyStatsFromCSV(int level)
@@ -125,28 +122,28 @@ namespace NeoSurvive.Weapon
     private void Attack()
     {
       attackCount++;
-      if (InGameSoundManager.Instance != null) InGameSoundManager.Instance.PlaySurgeBladeFire();
 
-      // 기본 공격 파라미터
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlaySurgeBladeFire();
+
       float useRange = range;
       float useAngle = angle;
-      float useDamage = damage; // ✅ 추가: 이번 공격에 사용할 데미지
+      float useDamage = damage;
 
-      // Lv5 마스터: 2회 공격마다 강화(2,4,6...)
       bool empowered = false;
-      if (enableMaster && currentLevel >= 5 && (attackCount % 2 == 0))
+
+      if (enableMaster && currentLevel >= 5 && attackCount % 2 == 0)
       {
         empowered = true;
         useRange *= masterMultiplier;
         useAngle *= masterMultiplier;
-        useDamage *= masterMultiplier; // ✅ 핵심: 공격력도 2배
+        useDamage *= masterMultiplier;
       }
 
-      // 가장 가까운 적 방향(없으면 오른쪽)
-      Transform target = FindClosestEnemy(useRange * 1.5f);
+      Transform target = FindClosestTarget(useRange * 1.5f);
 
-      // Player 자식이면 Player 방향 기준이 더 안전
       Vector3 forward = transform.parent != null ? transform.parent.right : transform.right;
+
       if (target != null)
         forward = (target.position - transform.position).normalized;
 
@@ -157,72 +154,166 @@ namespace NeoSurvive.Weapon
         Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, -useAngle * 0.5f) * forward * useRange, Color.magenta, 0.2f);
       }
 
-      // 근접 판정: OverlapCircle + 부채꼴 필터
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, useRange, hitMask);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, useRange);
 
       int damaged = 0;
+      HashSet<int> processedIds = new HashSet<int>();
+
       foreach (var col in hits)
       {
         if (col == null) continue;
 
-        // 태그는 자식 콜라이더일 수 있어서 parent도 허용
-        if (!string.IsNullOrEmpty(enemyTag) && !col.CompareTag(enemyTag))
+        bool isEnemy = IsEnemyCollider(col);
+
+        IDamageable damageable = col.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = col.GetComponentInParent<IDamageable>();
+
+        bool isInHitMask =
+          hitMask.value == 0 ||
+          ((1 << col.gameObject.layer) & hitMask.value) != 0;
+
+        // Enemy는 hitMask 기준 유지
+        // 자판기 같은 IDamageable은 hitMask 밖이어도 허용
+        if (!isInHitMask && damageable == null)
+          continue;
+
+        // Enemy도 아니고 IDamageable도 아니면 무시
+        if (!isEnemy && damageable == null)
+          continue;
+
+        Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
+
+        if (Vector3.Angle(forward, dirToTarget) > useAngle * 0.5f)
+          continue;
+
+        if (isEnemy)
         {
-          if (col.transform.parent == null || !col.transform.parent.CompareTag(enemyTag))
+          Character character = col.GetComponentInParent<Character>();
+
+          if (character != null)
+          {
+            int id = character.gameObject.GetInstanceID();
+
+            if (processedIds.Contains(id))
+              continue;
+
+            processedIds.Add(id);
+
+            var src = GetComponentInParent<WeaponSource>();
+            character.TakeDamage(useDamage, src != null ? src.weaponData : null);
+
+            damaged++;
+
+            if (damaged >= currentMaxTargets)
+              break;
+
             continue;
+          }
         }
 
-        Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
-        if (Vector3.Angle(forward, dirToEnemy) > useAngle * 0.5f) continue;
+        if (damageable != null)
+        {
+          MonoBehaviour mb = damageable as MonoBehaviour;
 
-        // Character 베이스로 Enemy/Boss 모두 처리
-        Character character = col.GetComponentInParent<Character>();
-        if (character == null) continue;
+          if (mb != null)
+          {
+            int id = mb.gameObject.GetInstanceID();
 
-        var src = GetComponentInParent<WeaponSource>();
-        character.TakeDamage(useDamage, src != null ? src.weaponData : null); // ✅ 변경: 이번 공격 데미지 반영
-        damaged++;
+            if (processedIds.Contains(id))
+              continue;
 
-        if (damaged >= currentMaxTargets) break;
+            processedIds.Add(id);
+          }
+
+          damageable.TakeDamage(useDamage);
+
+          damaged++;
+
+          if (damaged >= currentMaxTargets)
+            break;
+        }
       }
 
-      // ✅ 디버그(원하면 주석 처리)
-      // Debug.Log($"[SurgeBlade] Attack#{attackCount} empowered={empowered} damaged={damaged} useDmg={useDamage} useRange={useRange}");
-
-      // VFX 생성
       SpawnSurgeEffect(forward, empowered);
+    }
+
+    private bool IsEnemyCollider(Collider2D col)
+    {
+      if (col == null) return false;
+      if (string.IsNullOrEmpty(enemyTag)) return false;
+
+      return
+        col.CompareTag(enemyTag) ||
+        (col.transform.parent != null && col.transform.parent.CompareTag(enemyTag));
     }
 
     private void SpawnSurgeEffect(Vector3 forward, bool empowered)
     {
-      GameObject prefab = (empowered && surgePrefabEnhanced != null) ? surgePrefabEnhanced : surgePrefab;
+      GameObject prefab =
+        empowered && surgePrefabEnhanced != null
+        ? surgePrefabEnhanced
+        : surgePrefab;
+
       if (prefab == null) return;
 
       Vector3 spawnPos = transform.position + forward * surgeSpawnOffset;
       float angleDeg = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-      GameObject go = Instantiate(prefab, spawnPos, Quaternion.Euler(0f, 0f, angleDeg));
+
+      GameObject go = Instantiate(
+        prefab,
+        spawnPos,
+        Quaternion.Euler(0f, 0f, angleDeg)
+      );
+
       go.transform.localScale = Vector3.one * surgeScale;
 
       Destroy(go, surgeDuration);
     }
 
-    private Transform FindClosestEnemy(float searchRange)
+    private Transform FindClosestTarget(float searchRange)
     {
-      GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-      GameObject closest = null;
-      float minDist = searchRange > 0 ? searchRange : 10f;
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, searchRange);
 
-      foreach (GameObject e in enemies)
+      Transform closest = null;
+      float minDist = searchRange > 0f ? searchRange : 10f;
+
+      foreach (Collider2D hit in hits)
       {
-        if (e == null) continue;
-        float d = Vector3.Distance(transform.position, e.transform.position);
-        if (d < minDist)
+        if (hit == null) continue;
+
+        bool isEnemy = IsEnemyCollider(hit);
+
+        bool isInHitMask =
+          hitMask.value == 0 ||
+          ((1 << hit.gameObject.layer) & hitMask.value) != 0;
+
+        IDamageable damageable = hit.GetComponent<IDamageable>();
+        if (damageable == null)
+          damageable = hit.GetComponentInParent<IDamageable>();
+
+        if ((!isEnemy || !isInHitMask) && damageable == null)
+          continue;
+
+        Transform targetTransform = hit.transform;
+
+        Enemy enemy = hit.GetComponentInParent<Enemy>();
+
+        if (enemy != null)
+          targetTransform = enemy.transform;
+        else if (damageable is Component damageableComponent)
+          targetTransform = damageableComponent.transform;
+
+        float distance = Vector3.Distance(transform.position, targetTransform.position);
+
+        if (distance < minDist)
         {
-          minDist = d;
-          closest = e;
+          minDist = distance;
+          closest = targetTransform;
         }
       }
-      return closest ? closest.transform : null;
+
+      return closest;
     }
 
     private void OnDrawGizmosSelected()

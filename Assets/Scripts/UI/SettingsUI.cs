@@ -50,6 +50,7 @@ public class SettingsUI : MonoBehaviour
 
     [Header("Settings Panel")]
     public GameObject settingsPanel; // 메인 설정 패널 (자동 생성됨)
+    public Button closeButton; // 닫기 버튼은 인스펙터에서 OnClick에 CloseSettings 연결
 
     [Header("공통 토글 크기 설정")]
     [Tooltip("Start 시점에 SettingsPanel 하위 모든 Toggle의 크기를 이 값으로 맞춥니다.")]
@@ -159,6 +160,7 @@ public class SettingsUI : MonoBehaviour
         Debug.Log($"[SettingsUI] ToggleSettings 호출됨. 현재 isSettingsOpen: {isSettingsOpen}, settingsPanel: {(settingsPanel != null ? settingsPanel.name : "NULL")}");
 
         isSettingsOpen = !isSettingsOpen;
+        bool keepPausedAfterClose = false;
 
         if (isSettingsOpen)
             LobbySoundManager.Instance?.PlaySettingsOpen();
@@ -189,8 +191,13 @@ public class SettingsUI : MonoBehaviour
         {
             // 설정을 버튼 등으로 닫을 때 일시정지 메뉴로 복귀 (ESC로 닫을 때는 PauseMenuController가 직접 ShowPauseMenu 호출)
             var pauseMenu = FindObjectOfType<PauseMenuController>();
+            keepPausedAfterClose = IsWeaponChoiceOpen() || (pauseMenu != null && pauseMenu.IsPauseMenuOpen);
+
             if (pauseMenu != null && !pauseMenu.IsPauseMenuOpen)
+            {
                 pauseMenu.ShowPauseMenu();
+                keepPausedAfterClose = true;
+            }
 
             // 로비 등 외부에서 등록한 닫기 콜백 호출
             onSettingsClosed?.Invoke();
@@ -203,7 +210,7 @@ public class SettingsUI : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 1f;
+            Time.timeScale = keepPausedAfterClose ? 0f : 1f;
             // 설정 저장
             if (settingsManager != null)
             {
@@ -232,6 +239,12 @@ public class SettingsUI : MonoBehaviour
         {
             ToggleSettings();
         }
+    }
+
+    private bool IsWeaponChoiceOpen()
+    {
+        var weaponChoiceUI = FindObjectOfType<WeaponChoiceUI>(true);
+        return weaponChoiceUI != null && weaponChoiceUI.IsOpen;
     }
 
     /// <summary>

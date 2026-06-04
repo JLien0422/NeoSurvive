@@ -40,7 +40,7 @@ namespace NeoSurvive.Balancing.Map
         {
             if (csvFile == null)
             {
-                Debug.LogWarning($"[MapLoader] {mapName} 환경 기믹 CSV가 할당되지 않았습니다.");
+                Debug.Log($"[MapLoader] {mapName} 환경 기믹 CSV가 할당되지 않았습니다.");
                 return;
             }
 

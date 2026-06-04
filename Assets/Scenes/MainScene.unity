@@ -21299,6 +21299,7 @@ MonoBehaviour:
   quitButton: {fileID: 2009246831}
   weaponStatsPanel: {fileID: 1375788615}
   settingsUI: {fileID: 553265340}
+  weaponChoiceUI: {fileID: 0}
   quitSceneName: LobbyScene
 --- !u!1 &1582765261
 GameObject:
@@ -22020,6 +22021,7 @@ MonoBehaviour:
   maxSpawnInterval: 2.2
   minSpawnCount: 1
   maxSpawnCount: 1
+  spawnIntervalMultiplier: 1
   minSpawnRadius: 5
   maxSpawnRadius: 10
   basicWeight: 0
@@ -28448,6 +28450,8 @@ MonoBehaviour:
   phase4Time: 540
   phase5Time: 720
   siegeEvent: {fileID: 0}
+  postSiegeSpawnSlowDuration: 10
+  postSiegeSpawnIntervalMultiplier: 5
   hackablePrefabs:
   - {fileID: 733874190501676579, guid: e34d5199262cb1a4ab57c961ebcd5fa3, type: 3}
   - {fileID: 6535094812701155988, guid: 2aacc1100fe79814eb758ad2c8210a94, type: 3}

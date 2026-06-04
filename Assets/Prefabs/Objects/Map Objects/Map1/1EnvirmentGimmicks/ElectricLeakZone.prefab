@@ -99,7 +99,7 @@ MonoBehaviour:
   startActive: 1
   pulseInterval: 2
   pulseDamage: 10
-  hackKey: 104
+  hackKey: 101
   hackedEnemyDamage: 10
   stunDuration: 5
   enemyTag: Enemy
@@ -202,3 +202,5 @@ MonoBehaviour:
   failVfxPrefab: {fileID: 0}
   failVfxLifetime: 1
   vfxScale: 1
+  hideBaseSpriteOnFail: 1
+  failVfxOrderOffset: 10

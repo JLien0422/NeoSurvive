@@ -144,6 +144,7 @@ namespace NeoSurvive.Weapon
       Quaternion rot = Quaternion.Euler(0f, 0f, angleZ);
 
       bool cold = enableMaster && currentLevel >= 5 && masterColdMode;
+      var src = GetComponentInParent<WeaponSource>();
 
       GameObject obj = Instantiate(breathAreaPrefab, center, rot);
 
@@ -159,7 +160,8 @@ namespace NeoSurvive.Weapon
           width,
           cold,
           enemyMask,
-          enemyTag
+          enemyTag,
+          src != null ? src.weaponData : null
         );
       }
 

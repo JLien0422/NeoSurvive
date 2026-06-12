@@ -125,6 +125,9 @@ namespace NeoSurvive.Weapon
 
       orbs.Clear();
 
+      var src = GetComponentInParent<WeaponSource>();
+      WeaponBase sourceWeapon = src != null ? src.weaponData : null;
+
       for (int i = 0; i < currentOrbCount; i++)
       {
         GameObject obj = Instantiate(shieldOrbPrefab);
@@ -149,7 +152,8 @@ namespace NeoSurvive.Weapon
           enemyMask,
           enemyTag,
           blockProjectiles,
-          projectileTag
+          projectileTag,
+          sourceWeapon
         );
 
         orbs.Add(orb);

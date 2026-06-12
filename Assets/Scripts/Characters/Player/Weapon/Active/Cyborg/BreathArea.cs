@@ -17,6 +17,7 @@ namespace NeoSurvive.Weapon
     private float range;
     private float width;
     private bool coldMode;
+    private WeaponBase sourceWeapon;
 
     private float life;
     private float timer;
@@ -39,7 +40,8 @@ namespace NeoSurvive.Weapon
       float width,
       bool coldMode,
       LayerMask enemyMask,
-      string enemyTag)
+      string enemyTag,
+      WeaponBase sourceWeapon)
     {
       this.damagePerTick = damagePerTick;
       this.tickInterval = tickInterval;
@@ -49,6 +51,7 @@ namespace NeoSurvive.Weapon
       this.coldMode = coldMode;
       this.enemyMask = enemyMask;
       this.enemyTag = enemyTag;
+      this.sourceWeapon = sourceWeapon;
 
       life = 0f;
       timer = 0f;
@@ -138,7 +141,7 @@ namespace NeoSurvive.Weapon
 
           damagedIds.Add(id);
 
-          character.TakeDamage(damagePerTick, null);
+          character.TakeDamage(damagePerTick, sourceWeapon);
 
           ApplyColdEffects(character.gameObject);
 

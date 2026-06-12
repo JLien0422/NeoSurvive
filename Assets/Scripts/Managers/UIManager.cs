@@ -470,6 +470,7 @@ public class UIManager : MonoBehaviour
 
     // Canvas 부모 하위에 생성 (weaponUIPanel의 부모인 Canvas를 쓰거나, 별도 레이어 사용 가능)
     GameObject obj = Instantiate(damageTextPrefab, screenPosition, Quaternion.identity, canvas);
+    obj.transform.SetAsFirstSibling();
 
     if (obj.TryGetComponent<RectTransform>(out var rect))
     {

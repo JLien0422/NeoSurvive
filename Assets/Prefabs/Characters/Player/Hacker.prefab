@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 2543455237898608764}
   - component: {fileID: 5480581071709093891}
   - component: {fileID: 1325396303002162321}
+  - component: {fileID: -8010481249530274341}
   m_Layer: 6
   m_Name: Hacker
   m_TagString: Player
@@ -281,3 +282,22 @@ MonoBehaviour:
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.08
   spriteRenderers: []
+--- !u!114 &-8010481249530274341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533545058544290356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6853c81d666827489c5698578a7d42b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowPrefab: {fileID: 1410214595427278205, guid: c05228c71f121f545af0d8684a70d79f, type: 3}
+  localOffset: {x: 0, y: -0.5, z: 0}
+  sortingOrderOffset: -1
+  autoScaleToEntity: 1
+  sizeMultiplier: {x: 0.9, y: 0.25}
+  minScale: {x: 0.2, y: 0.08}
+  maxScale: {x: 5, y: 2}

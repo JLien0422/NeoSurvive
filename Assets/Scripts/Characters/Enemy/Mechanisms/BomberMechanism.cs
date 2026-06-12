@@ -64,7 +64,7 @@ public class BomberMechanism : EnemyMechanismBase
 
         fuseProximityTimer = 0f;
 
-        if (!IsTaggedPlayerOverlappingCircle(fuseTriggerRadius, fuseOverlapMask))
+        if (!IsTaggedDamageTargetOverlappingCircle(fuseTriggerRadius, fuseOverlapMask))
             return;
 
         enemy.RequestDeathViaMechanism();
@@ -165,7 +165,7 @@ public class BomberMechanism : EnemyMechanismBase
         zone.transform.localScale = new Vector3(uniform, uniform, 1f);
     }
 
-    private bool IsTaggedPlayerOverlappingCircle(float radius, LayerMask mask)
+    private bool IsTaggedDamageTargetOverlappingCircle(float radius, LayerMask mask)
     {
         int count = Physics2D.OverlapCircleNonAlloc(transform.position, radius, fuseScratch, mask);
         if (count >= FuseOverlapCapacity)
@@ -176,18 +176,18 @@ public class BomberMechanism : EnemyMechanismBase
 
         for (int i = 0; i < count; i++)
         {
-            if (TransformHasPlayerTag(fuseScratch[i].transform))
+            if (TransformHasDamageTargetTag(fuseScratch[i].transform))
                 return true;
         }
 
         return false;
     }
 
-    private static bool TransformHasPlayerTag(Transform t)
+    private static bool TransformHasDamageTargetTag(Transform t)
     {
         while (t != null)
         {
-            if (t.CompareTag("Player")) return true;
+            if (t.CompareTag("Player") || t.CompareTag("Decoy")) return true;
             t = t.parent;
         }
 

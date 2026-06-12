@@ -36,6 +36,8 @@ namespace NeoSurvive.UI
         if (font != null) textMesh.font = font;
       }
 
+      textMesh.raycastTarget = false;
+
       outline = GetComponent<Outline>();
       if (outline == null)
         outline = gameObject.AddComponent<Outline>();

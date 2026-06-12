@@ -73,6 +73,8 @@ namespace NeoSurvive.Weapon
     private void EquipStartWeapon()
     {
       activeWeapons.Clear();
+      WeaponDamageStats.Instance.ResetStats();
+
       if (startWeapon != null)
       {
         AddWeapon(startWeapon, "start");
@@ -131,6 +133,8 @@ namespace NeoSurvive.Weapon
 
       // 새로운 무기 추가
       activeWeapons.Add(weaponData);
+      WeaponDamageStats.Instance.RegisterWeapon(weaponData);
+
       // 초기 레벨 설정 (혹시 모르니)
       weaponData.level = 1;
 

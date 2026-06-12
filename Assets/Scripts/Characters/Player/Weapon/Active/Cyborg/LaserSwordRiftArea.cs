@@ -21,11 +21,6 @@ namespace NeoSurvive.Weapon
 
     private bool initialized = false;
 
-    public void SetSourceWeapon(WeaponBase weapon)
-    {
-      sourceWeapon = weapon;
-    }
-
     public void Initialize(
       float weaponDamage,
       float duration,
@@ -33,7 +28,8 @@ namespace NeoSurvive.Weapon
       float tick,
       float damageFactor,
       LayerMask hitMask,
-      string enemyTag)
+      string enemyTag,
+      WeaponBase sourceWeapon)
     {
       this.weaponDamage = weaponDamage;
       this.duration = duration;
@@ -42,6 +38,7 @@ namespace NeoSurvive.Weapon
       this.damageFactor = damageFactor;
       this.hitMask = hitMask;
       this.enemyTag = enemyTag;
+      this.sourceWeapon = sourceWeapon;
 
       initialized = true;
 

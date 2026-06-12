@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 06_BoosterKnuckle
   m_EditorClassIdentifier: 
   weaponId: 6
-  weaponName: 
+  weaponName: "\uBD80\uC2A4\uD130\uB108\uD074"
   weaponIcon: {fileID: 21300000, guid: 4b336d782935f214e8cfd627f316808d, type: 3}
   description: 
   weaponPrefab: {fileID: 4678613158969812910, guid: 3064ab6010bf6b2479e28e49cdc03f02, type: 3}

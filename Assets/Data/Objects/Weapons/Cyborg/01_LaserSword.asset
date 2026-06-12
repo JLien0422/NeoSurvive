@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 01_LaserSword
   m_EditorClassIdentifier: 
   weaponId: 1
-  weaponName: LaserSword
+  weaponName: "\uB808\uC774\uC800\uC18C\uB4DC"
   weaponIcon: {fileID: 21300000, guid: a17d55bec6135ee4fbd681f265359d8b, type: 3}
   description: "\uB808\uC774\uC800\uC18C\uB4DC"
   weaponPrefab: {fileID: 2544833515744044033, guid: e1ad768643ff8ed48aeb1b130d79ae8b, type: 3}

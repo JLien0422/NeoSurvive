@@ -24,6 +24,11 @@ public class SiegeEvent : MonoBehaviour
 
   [SerializeField] private float siegeDuration = 10f;
 
+  [Header("포위 보상 상자")]
+  [SerializeField] private bool enableRewardChest = true;
+  [SerializeField] private float rewardChestDelaySeconds = 15f;
+  [SerializeField] private float rewardChestSpawnRadius = 2.5f;
+
   private Transform player;
   private bool running;
   private Action onEnd;
@@ -83,6 +88,11 @@ public class SiegeEvent : MonoBehaviour
 
     StartCoroutine(SpawnSiegeRoutine(row));
     StartCoroutine(EndRoutine(row.siegeDuration));
+
+    if (enableRewardChest)
+    {
+      StartCoroutine(DropRewardChestRoutine(rewardChestDelaySeconds));
+    }
   }
 
   private void RefreshPlayerReference()
@@ -327,6 +337,36 @@ public class SiegeEvent : MonoBehaviour
     Debug.Log("[SiegeEvent] Siege End");
     onEnd?.Invoke();
     onEnd = null;
+  }
+
+  private IEnumerator DropRewardChestRoutine(float delaySeconds)
+  {
+    yield return new WaitForSeconds(Mathf.Max(0f, delaySeconds));
+
+    ChestDropper chestDropper = GetPlayerChestDropper();
+    if (chestDropper == null)
+    {
+      Debug.LogWarning("[SiegeEvent] Player에 ChestDropper가 없어 포위 보상 상자를 드랍하지 못했습니다.");
+      yield break;
+    }
+
+    chestDropper.DropChest(rewardChestSpawnRadius);
+    Debug.Log($"[SiegeEvent] Reward chest requested after {delaySeconds:0.##}s");
+  }
+
+  private ChestDropper GetPlayerChestDropper()
+  {
+    if (player == null)
+    {
+      RefreshPlayerReference();
+    }
+
+    if (player == null)
+    {
+      return null;
+    }
+
+    return player.GetComponent<ChestDropper>();
   }
 
   private Vector3 AngleToVector(float angleDeg)

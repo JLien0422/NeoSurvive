@@ -9,12 +9,19 @@ public class ChestDropper : MonoBehaviour
 
     [Header("Spawn Timing")]
     public float dropDelay = 0.8f;           // ★ 변경: 0.8초
+    [SerializeField] private bool dropOnLevelUp = false;
 
     [Header("Spawn Range")]
     public float spawnRadius = 2.5f;
 
     private void OnEnable()
     {
+        if (!dropOnLevelUp)
+        {
+            Debug.Log("[ChestDropper] Level-up chest drop disabled");
+            return;
+        }
+
         Debug.Log("[ChestDropper] OnEnable - subscribed");
         Player.OnLevelUp += HandleLevelUp;
     }
@@ -33,10 +40,21 @@ public class ChestDropper : MonoBehaviour
     private void HandleLevelUp(int newLevel)
     {
         Debug.Log($"[ChestDropper] HandleLevelUp called! newLevel={newLevel}");
-        StartCoroutine(DropAfterDelay());
+        DropChest();
     }
 
-    private IEnumerator DropAfterDelay()
+    public void DropChest()
+    {
+        DropChest(spawnRadius);
+    }
+
+    public void DropChest(float overrideSpawnRadius)
+    {
+        float targetSpawnRadius = overrideSpawnRadius > 0f ? overrideSpawnRadius : spawnRadius;
+        StartCoroutine(DropAfterDelay(targetSpawnRadius));
+    }
+
+    private IEnumerator DropAfterDelay(float targetSpawnRadius)
     {
         if (chestPrefab == null)
         {
@@ -45,7 +63,11 @@ public class ChestDropper : MonoBehaviour
         }
 
         // 1️⃣ 스폰 위치를 미리 결정 (0.8초 동안 고정)
-        Vector2 offset = Random.insideUnitCircle.normalized * Random.Range(1.0f, spawnRadius);
+        float radius = Mathf.Max(0f, targetSpawnRadius);
+        float minDistance = Mathf.Min(1.0f, radius);
+        Vector2 offset = radius > 0f
+            ? Random.insideUnitCircle.normalized * Random.Range(minDistance, radius)
+            : Vector2.zero;
         Vector3 spawnPos = transform.position + (Vector3)offset;
         spawnPos.z = 0f;
 

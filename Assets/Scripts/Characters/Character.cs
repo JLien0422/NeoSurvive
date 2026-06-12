@@ -60,7 +60,7 @@ public abstract class Character : MonoBehaviour
     else if (sourceWeapon == null && _nullWeaponWarnCount < NULL_WEAPON_WARN_LIMIT)
     {
       _nullWeaponWarnCount++;
-      Debug.LogWarning($"[DPM 누락 {_nullWeaponWarnCount}/{NULL_WEAPON_WARN_LIMIT}] {gameObject.name}이(가) sourceWeapon=null로 피해를 받음. 대미지={amount:F1}. 투사체나 무기 스크립트의 SetSourceWeapon/GetComponentInParent<WeaponSource>() 를 확인하세요.");
+      Debug.LogWarning($"[무기 통계 누락 {_nullWeaponWarnCount}/{NULL_WEAPON_WARN_LIMIT}] {gameObject.name}이(가) sourceWeapon=null로 피해를 받음. 대미지={amount:F1}. 투사체나 무기 스크립트의 SetSourceWeapon/GetComponentInParent<WeaponSource>() 를 확인하세요.");
     }
 
     // (추가) 받는 피해 배율(데미지 2배 디버프 등) 적용

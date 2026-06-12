@@ -3365,7 +3365,7 @@ GameObject:
   - component: {fileID: 355362196}
   - component: {fileID: 355362195}
   m_Layer: 5
-  m_Name: DPM_Label
+  m_Name: DPS_Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3410,7 +3410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: DPM
+  m_text: DPS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}
   m_sharedMaterial: {fileID: 6181904266208840343, guid: a60fb9aeaa841214582a2eb33c2b35a0, type: 2}

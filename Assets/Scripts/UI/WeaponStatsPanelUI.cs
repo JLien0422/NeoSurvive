@@ -5,7 +5,7 @@ using System.Collections;
 using NeoSurvive.Weapon;
 
 /// <summary>
-/// 설정(ESC) 패널의 무기별 대미지 통계를 한 줄씩(아이콘 + 이름 + 총대미지 + DPM) 표시합니다.
+/// 설정(ESC) 패널의 무기별 대미지 통계를 한 줄씩(아이콘 + 이름 + 총대미지 + DPS) 표시합니다.
 /// WeaponStatRows 아래에 "한 줄 템플릿"을 두고, 무기 개수만큼 복제해서 채웁니다.
 /// </summary>
 public class WeaponStatsPanelUI : MonoBehaviour
@@ -14,7 +14,7 @@ public class WeaponStatsPanelUI : MonoBehaviour
     [Tooltip("무기 한 줄씩 쌓을 부모 (Vertical Layout 권장)")]
     public Transform weaponStatRowsRoot;
 
-    [Tooltip("한 줄 템플릿: Horizontal Layout + [Image(아이콘), Text(이름), Text(총대미지), Text(DPM)]. 비어 있으면 weaponStatRowsRoot의 첫 번째 자식을 템플릿으로 씀")]
+    [Tooltip("한 줄 템플릿: Horizontal Layout + [Image(아이콘), Text(이름), Text(총대미지), Text(DPS)]. 비어 있으면 weaponStatRowsRoot의 첫 번째 자식을 템플릿으로 씀")]
     public GameObject rowTemplate;
 
     [Header("선택")]
@@ -74,9 +74,9 @@ public class WeaponStatsPanelUI : MonoBehaviour
             if (weapon == null) continue;
 
             float total = stats.GetTotalDamage(weapon);
-            float dpm = stats.GetDPM(weapon);
+            float dps = stats.GetDPS(weapon);
 
-            Debug.Log($"[WeaponStatsPanelUI] 무기: {weapon.weaponName}, 총대미지: {total:F1}, DPM: {dpm:F1}");
+            Debug.Log($"[WeaponStatsPanelUI] 무기: {weapon.weaponName}, 총대미지: {total:F1}, DPS: {dps:F1}");
 
             var row = Instantiate(template, weaponStatRowsRoot);
             row.SetActive(true);
@@ -101,7 +101,7 @@ public class WeaponStatsPanelUI : MonoBehaviour
             {
                 texts[0].text = weapon.weaponName ?? "(무기)";
                 texts[1].text = total.ToString("F0");
-                texts[2].text = dpm.ToString("F0");
+                texts[2].text = dps.ToString("F1");
             }
         }
 

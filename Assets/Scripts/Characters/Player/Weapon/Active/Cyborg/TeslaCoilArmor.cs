@@ -159,6 +159,8 @@ namespace NeoSurvive.Weapon
 
         if (puddle != null)
         {
+          var src = GetComponentInParent<WeaponSource>();
+
           puddle.Initialize(
             auraDamage,
             puddleDuration,
@@ -166,13 +168,9 @@ namespace NeoSurvive.Weapon
             puddleTick,
             puddleDamageFactor,
             enemyMask,
-            enemyTag
+            enemyTag,
+            src != null ? src.weaponData : null
           );
-
-          var src = GetComponentInParent<WeaponSource>();
-
-          if (src != null)
-            puddle.SetSourceWeapon(src.weaponData);
         }
       }
 

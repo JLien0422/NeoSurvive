@@ -346,8 +346,8 @@ public static class GameAnalyticsTracker
                 continue;
 
             float totalDamage = damageStats != null ? damageStats.GetTotalDamage(weapon) : 0f;
-            float dps = totalDamage / safeElapsedSeconds;
-            float dpm = damageStats != null ? damageStats.GetDPM(weapon) : 0f;
+            float activeSeconds = damageStats != null ? damageStats.GetActiveSeconds(weapon) : safeElapsedSeconds;
+            float dps = damageStats != null ? damageStats.GetDPS(weapon) : totalDamage / safeElapsedSeconds;
 
             Dictionary<string, object> fields = new Dictionary<string, object>(runFields)
             {
@@ -357,8 +357,8 @@ public static class GameAnalyticsTracker
                 { "weapon_level", weapon.level },
                 { "slot_index", i },
                 { "total_damage", Mathf.RoundToInt(totalDamage) },
-                { "dps", dps },
-                { "dpm", dpm }
+                { "weapon_active_seconds", activeSeconds },
+                { "dps", dps }
             };
 
             SendDesignEvent("weapon:summary", totalDamage, fields);

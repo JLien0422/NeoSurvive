@@ -6,7 +6,7 @@ using DG.Tweening;
 
 /// <summary>
 /// 보스 처치 후 게임 클리어 UI를 표시합니다.
-/// - WeaponStatsPanelUI로 무기별 DPM 표 표시
+/// - WeaponStatsPanelUI로 무기별 DPS 표 표시
 /// - 왼쪽 하단 "로비로 돌아가기" 버튼
 /// Boss.OnBossDefeated 이벤트를 구독합니다.
 /// </summary>
@@ -16,7 +16,7 @@ public class GameClearUI : MonoBehaviour
     [Tooltip("게임 클리어 전체 패널 (루트 오브젝트)")]
     [SerializeField] private GameObject clearPanel;
 
-    [Header("DPM 표")]
+    [Header("DPS 표")]
     [Tooltip("기존 WeaponStatsPanelUI를 그대로 참조 - None이면 씬에서 자동 탐색")]
     [SerializeField] private WeaponStatsPanelUI weaponStatsPanel;
 
@@ -83,7 +83,7 @@ public class GameClearUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 클리어 UI를 표시하고 WeaponStatsPanelUI로 DPM 표를 갱신합니다.
+    /// 클리어 UI를 표시하고 WeaponStatsPanelUI로 DPS 표를 갱신합니다.
     /// </summary>
     private void ShowClearUI()
     {

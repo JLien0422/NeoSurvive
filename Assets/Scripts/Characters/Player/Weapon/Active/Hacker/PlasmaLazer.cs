@@ -24,7 +24,7 @@ public class PlasmaLazer : MonoBehaviour
   private readonly HashSet<int> damagedEnemyIds = new HashSet<int>();
   private readonly HashSet<int> damagedObjectIds = new HashSet<int>();
 
-  // DPM 기록용 소스 무기
+  // DPS 기록용 소스 무기
   private WeaponBase sourceWeapon;
 
   // ★ PlasmaRifle Lv5 마스터 효과 여부

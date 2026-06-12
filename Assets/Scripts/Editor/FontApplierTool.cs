@@ -34,6 +34,21 @@ public static class FontApplierTool
     [MenuItem(MenuRoot + "quaver SDF", priority = 13)]
     private static void ApplyQuaver() => Apply("Fonts/quaver SDF");
 
+    [MenuItem(MenuRoot + "GalmuriMono7 SDF", priority = 14)]
+    private static void ApplyGalmuriMono7() => Apply("Fonts/Galmuri-v2.40.3/GalmuriMono7 SDF");
+
+    [MenuItem(MenuRoot + "Mulmaru", priority = 15)]
+    private static void ApplyMulmaru() => Apply("Fonts/Mulmaru/Mulmaru SDF");
+
+    [MenuItem(MenuRoot + "Stardust", priority = 16)]
+    private static void ApplyStardust() => Apply("Fonts/Stardust/PF스타더스트 3.0 SDF");
+
+    [MenuItem(MenuRoot + "Stardust Bold", priority = 17)]
+    private static void ApplyStardustBold() => Apply("Fonts/Stardust/PF스타더스트 3.0 Bold SDF");
+
+    [MenuItem(MenuRoot + "Stardust ExtraBold", priority = 18)]
+    private static void ApplyStardustExtraBold() => Apply("Fonts/Stardust/PF스타더스트 3.0 ExtraBold SDF");
+
     // ─── 공통 적용 로직 ───────────────────────────────────────────────────
 
     private static void Apply(string resourcePath)

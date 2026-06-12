@@ -12,6 +12,26 @@ public class WeaponChoiceController : MonoBehaviour
     private const int MAX_WEAPON_LEVEL = 5;
     private const int MAXED_OUT_CHEST_GOLD_REWARD = 100;
 
+    private readonly Queue<WeaponChoiceRequest> pendingWeaponChoices = new Queue<WeaponChoiceRequest>();
+
+    private enum RewardType
+    {
+        LevelUp,
+        Chest
+    }
+
+    private struct WeaponChoiceRequest
+    {
+        public RewardType RewardType;
+        public string Source;
+
+        public WeaponChoiceRequest(RewardType rewardType, string source)
+        {
+            RewardType = rewardType;
+            Source = source;
+        }
+    }
+
     private void Awake()
     {
         if (weaponChoiceUI == null)
@@ -24,16 +44,19 @@ public class WeaponChoiceController : MonoBehaviour
     private void OnEnable()
     {
         ChestPickup.OnChestOpened += HandleChestOpened;
+        Player.OnLevelUp += HandleLevelUp;
     }
 
     private void OnDisable()
     {
         ChestPickup.OnChestOpened -= HandleChestOpened;
+        Player.OnLevelUp -= HandleLevelUp;
     }
 
     private void OnDestroy()
     {
         ChestPickup.OnChestOpened -= HandleChestOpened;
+        Player.OnLevelUp -= HandleLevelUp;
     }
 
     /// <summary>
@@ -41,6 +64,27 @@ public class WeaponChoiceController : MonoBehaviour
     /// </summary>
     private void HandleChestOpened()
     {
+        RequestWeaponChoice(RewardType.Chest, "chest");
+    }
+
+    /// <summary>
+    /// 레벨업 이벤트를 받아 상자 없이 즉시 무기 선택 UI를 엽니다.
+    /// </summary>
+    private void HandleLevelUp(int newLevel)
+    {
+        Debug.Log($"[WeaponChoiceController] Level up reward requested. newLevel={newLevel}");
+        RequestWeaponChoice(RewardType.LevelUp, "level_up");
+    }
+
+    private void RequestWeaponChoice(RewardType rewardType, string source)
+    {
+        if (weaponChoiceUI != null && weaponChoiceUI.IsOpen)
+        {
+            pendingWeaponChoices.Enqueue(new WeaponChoiceRequest(rewardType, source));
+            Debug.Log($"[WeaponChoiceController] Weapon choice queued. source={source}, pending={pendingWeaponChoices.Count}");
+            return;
+        }
+
         WeaponManager weaponManager = GetPlayerWeaponManager();
         if (weaponManager == null)
         {
@@ -48,13 +92,28 @@ public class WeaponChoiceController : MonoBehaviour
             return;
         }
 
-        WeaponBase[] choices = PickRandomWeaponsForChest(weaponManager);
+        WeaponBase[] choices = rewardType == RewardType.Chest
+            ? PickRandomWeaponsForChestReward(weaponManager)
+            : PickRandomWeaponsForSingleChoice(weaponManager);
+
         if (choices == null || choices.Length == 0)
         {
             GrantMaxedOutChestReward();
+            ShowNextQueuedWeaponChoiceIfNeeded();
             return;
         }
 
+        if (rewardType == RewardType.Chest)
+        {
+            ShowChestRewardChoice(weaponManager, choices);
+            return;
+        }
+
+        ShowSingleWeaponChoice(weaponManager, choices);
+    }
+
+    private void ShowSingleWeaponChoice(WeaponManager weaponManager, WeaponBase[] choices)
+    {
         weaponChoiceUI.Show(
             choices,
             GetWeaponDisplayName,
@@ -69,8 +128,39 @@ public class WeaponChoiceController : MonoBehaviour
                 }
 
                 weaponManager.AddWeapon(picked);
+                ShowNextQueuedWeaponChoiceIfNeeded();
             }
         );
+    }
+
+    private void ShowChestRewardChoice(WeaponManager weaponManager, WeaponBase[] choices)
+    {
+        weaponChoiceUI.ShowPickAll(
+            choices,
+            GetWeaponDisplayName,
+            weapon => GetWeaponDescription(weaponManager, weapon),
+            weapon => GetLevelText(weaponManager, weapon),
+            picked =>
+            {
+                if (picked == null)
+                {
+                    Debug.LogError("[WeaponChoiceController] picked weapon is null.");
+                    return;
+                }
+
+                weaponManager.AddWeapon(picked);
+            },
+            ShowNextQueuedWeaponChoiceIfNeeded
+        );
+    }
+
+    private void ShowNextQueuedWeaponChoiceIfNeeded()
+    {
+        if (pendingWeaponChoices.Count <= 0)
+            return;
+
+        WeaponChoiceRequest request = pendingWeaponChoices.Dequeue();
+        RequestWeaponChoice(request.RewardType, request.Source);
     }
 
     private void GrantMaxedOutChestReward()
@@ -108,9 +198,9 @@ public class WeaponChoiceController : MonoBehaviour
     }
 
     /// <summary>
-    /// 상자에서 보여줄 무기 후보를 만든 뒤 최대 3개를 랜덤으로 반환한다.
+    /// 레벨업 선택에서 보여줄 무기 후보를 만든 뒤 최대 3개를 랜덤으로 반환한다.
     /// </summary>
-    private WeaponBase[] PickRandomWeaponsForChest(WeaponManager weaponManager)
+    private WeaponBase[] PickRandomWeaponsForSingleChoice(WeaponManager weaponManager)
     {
         if (weaponManager == null)
         {
@@ -123,17 +213,73 @@ public class WeaponChoiceController : MonoBehaviour
         if (selectableWeapons.Count == 0)
             return new WeaponBase[0];
 
-        for (int i = 0; i < selectableWeapons.Count; i++)
-        {
-            int j = Random.Range(i, selectableWeapons.Count);
-
-            WeaponBase temp = selectableWeapons[i];
-            selectableWeapons[i] = selectableWeapons[j];
-            selectableWeapons[j] = temp;
-        }
+        ShuffleWeapons(selectableWeapons);
 
         int count = Mathf.Min(3, selectableWeapons.Count);
         return selectableWeapons.Take(count).ToArray();
+    }
+
+    /// <summary>
+    /// 상자 보상은 1~3개 후보를 띄우고, 표시된 후보를 전부 획득한다.
+    /// </summary>
+    private WeaponBase[] PickRandomWeaponsForChestReward(WeaponManager weaponManager)
+    {
+        if (weaponManager == null)
+        {
+            Debug.LogError("[WeaponChoiceController] weaponManager is null.");
+            return null;
+        }
+
+        List<WeaponBase> selectableWeapons = BuildSelectableWeapons(weaponManager);
+
+        if (selectableWeapons.Count == 0)
+            return new WeaponBase[0];
+
+        ShuffleWeapons(selectableWeapons);
+
+        int maxChoiceCount = Mathf.Min(3, selectableWeapons.Count);
+        int targetCount = Random.Range(1, maxChoiceCount + 1);
+
+        List<WeaponBase> rewardChoices = TakeChestRewardChoices(weaponManager, selectableWeapons, targetCount);
+        return rewardChoices.ToArray();
+    }
+
+    private List<WeaponBase> TakeChestRewardChoices(
+        WeaponManager weaponManager,
+        List<WeaponBase> selectableWeapons,
+        int targetCount)
+    {
+        List<WeaponBase> rewardChoices = new List<WeaponBase>();
+        int newWeaponSlotsRemaining = Mathf.Max(0, MAX_WEAPON_COUNT - weaponManager.activeWeapons.Count);
+
+        foreach (WeaponBase weapon in selectableWeapons)
+        {
+            if (rewardChoices.Count >= targetCount)
+                break;
+
+            bool isNewWeapon = IsNewWeapon(weaponManager, weapon);
+            if (isNewWeapon && newWeaponSlotsRemaining <= 0)
+                continue;
+
+            rewardChoices.Add(weapon);
+
+            if (isNewWeapon)
+                newWeaponSlotsRemaining--;
+        }
+
+        return rewardChoices;
+    }
+
+    private void ShuffleWeapons(List<WeaponBase> weapons)
+    {
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            int j = Random.Range(i, weapons.Count);
+
+            WeaponBase temp = weapons[i];
+            weapons[i] = weapons[j];
+            weapons[j] = temp;
+        }
     }
 
     /// <summary>

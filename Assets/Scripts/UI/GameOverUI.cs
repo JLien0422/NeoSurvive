@@ -14,7 +14,7 @@ public class GameOverUI : MonoBehaviour
     [Tooltip("게임 오버 전체 패널 (루트 오브젝트)")]
     [SerializeField] private GameObject overPanel;
 
-    [Header("DPM 표")]
+    [Header("DPS 표")]
     [Tooltip("기존 WeaponStatsPanelUI를 그대로 참조 - None이면 씬에서 자동 탐색")]
     [SerializeField] private WeaponStatsPanelUI weaponStatsPanel;
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 04_PlasmaPhoton
   m_EditorClassIdentifier: 
   weaponId: 4
-  weaponName: 
+  weaponName: "\uD50C\uB77C\uC988\uB9C8\uD3EC\uD1A4"
   weaponIcon: {fileID: 21300000, guid: addbde2b6545eb448923161a11759645, type: 3}
   description: 
   weaponPrefab: {fileID: 7521909767303125472, guid: a0e4dbed9daf5884faabfaab66bef55f, type: 3}

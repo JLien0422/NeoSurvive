@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -330202846834953429}
   - component: {fileID: 5989513886038450708}
   - component: {fileID: 3115488246623445132}
+  - component: {fileID: 4048541197767140366}
   m_Layer: 7
   m_Name: Map1Boss
   m_TagString: Enemy
@@ -302,3 +303,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4048541197767140366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863590038507068367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6853c81d666827489c5698578a7d42b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowPrefab: {fileID: 1410214595427278205, guid: c05228c71f121f545af0d8684a70d79f, type: 3}
+  localOffset: {x: 0, y: 0, z: 0}
+  sortingOrderOffset: -1

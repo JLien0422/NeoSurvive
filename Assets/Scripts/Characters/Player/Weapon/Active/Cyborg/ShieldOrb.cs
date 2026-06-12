@@ -15,6 +15,7 @@ namespace NeoSurvive.Weapon
     private string enemyTag;
     private bool blockProjectiles;
     private string projectileTag;
+    private WeaponBase sourceWeapon;
 
     private Rigidbody2D rb;
 
@@ -51,13 +52,15 @@ namespace NeoSurvive.Weapon
       LayerMask enemyMask,
       string enemyTag,
       bool blockProjectiles,
-      string projectileTag)
+      string projectileTag,
+      WeaponBase sourceWeapon)
     {
       this.damage = damage;
       this.enemyMask = enemyMask;
       this.enemyTag = enemyTag;
       this.blockProjectiles = blockProjectiles;
       this.projectileTag = projectileTag;
+      this.sourceWeapon = sourceWeapon;
     }
 
     public void SetWorldPosition(Vector2 pos)
@@ -158,12 +161,7 @@ namespace NeoSurvive.Weapon
       // =========================
       if (character != null)
       {
-        WeaponSource src = GetComponent<WeaponSource>();
-
-        character.TakeDamage(
-          damage,
-          src != null ? src.weaponData : null
-        );
+        character.TakeDamage(damage, sourceWeapon);
 
         return;
       }

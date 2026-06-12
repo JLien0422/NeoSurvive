@@ -254,6 +254,8 @@ namespace NeoSurvive.Weapon
 
       if (rift != null)
       {
+        var src = GetComponentInParent<WeaponSource>();
+
         rift.Initialize(
           damage,
           riftDuration,
@@ -261,13 +263,9 @@ namespace NeoSurvive.Weapon
           riftTick,
           riftDamageFactor,
           hitMask,
-          enemyTag
+          enemyTag,
+          src != null ? src.weaponData : null
         );
-
-        var src = GetComponentInParent<WeaponSource>();
-
-        if (src != null)
-          rift.SetSourceWeapon(src.weaponData);
       }
     }
 

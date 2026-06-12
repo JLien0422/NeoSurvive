@@ -17,6 +17,7 @@ namespace NeoSurvive.Weapon
         private Vector3 fixedPosition;
 
         private GameObject bodyVfxInstance;
+        private SpriteHitFlash bodyHitFlash;
 
         private GameObject fieldEndVfxPrefab;
         private GameObject baseEndVfxPrefab;
@@ -72,6 +73,14 @@ namespace NeoSurvive.Weapon
         private void LateUpdate()
         {
             transform.position = fixedPosition;
+        }
+
+        public override void TakeDamage(float amount, WeaponBase sourceWeapon)
+        {
+            if (!IsDead)
+                bodyHitFlash?.PlayFlash();
+
+            base.TakeDamage(amount, sourceWeapon);
         }
 
         private void SetupDecoyHitBody()
@@ -158,6 +167,12 @@ namespace NeoSurvive.Weapon
                 bodyVfxInstance.AddComponent<HologramVfxFollower>();
 
             follower.Initialize(transform);
+
+            bodyHitFlash =
+                bodyVfxInstance.GetComponent<SpriteHitFlash>();
+
+            if (bodyHitFlash == null)
+                bodyHitFlash = bodyVfxInstance.AddComponent<SpriteHitFlash>();
         }
 
         private void OnDestroy()

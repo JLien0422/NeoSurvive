@@ -11,6 +11,8 @@ public class WeaponChoiceUI : MonoBehaviour
     [SerializeField] private WeaponChoiceCard[] cards = new WeaponChoiceCard[3]; // 카드 3장 관리만 담당
 
     private Action<WeaponBase> onPicked;
+    private Action onPickAllCompleted;
+    private int remainingPickAllCount;
 
     public bool IsOpen => rootPanel != null && rootPanel.activeSelf;
 
@@ -68,6 +70,8 @@ public class WeaponChoiceUI : MonoBehaviour
         }
 
         onPicked = pickedCallback;
+        onPickAllCompleted = null;
+        remainingPickAllCount = 0;
 
         for (int i = 0; i < cards.Length; i++)
         {
@@ -106,6 +110,97 @@ public class WeaponChoiceUI : MonoBehaviour
     }
 
     /// <summary>
+    /// 상자 보상처럼 표시된 무기를 전부 획득해야 하는 패널을 엽니다.
+    /// </summary>
+    public void ShowPickAll(
+        WeaponBase[] choices,
+        Func<WeaponBase, string> nameProvider,
+        Func<WeaponBase, string> descProvider,
+        Func<WeaponBase, string> levelProvider,
+        Action<WeaponBase> pickedCallback,
+        Action completedCallback)
+    {
+        ValidateReferences();
+
+        if (choices == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] choices is null.");
+            return;
+        }
+
+        if (choices.Length == 0)
+        {
+            Debug.LogError("[WeaponChoiceUI] choices is empty.");
+            return;
+        }
+
+        if (nameProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] nameProvider is null.");
+            return;
+        }
+
+        if (descProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] descProvider is null.");
+            return;
+        }
+
+        if (levelProvider == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] levelProvider is null.");
+            return;
+        }
+
+        if (pickedCallback == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] pickedCallback is null.");
+            return;
+        }
+
+        if (completedCallback == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] completedCallback is null.");
+            return;
+        }
+
+        onPicked = pickedCallback;
+        onPickAllCompleted = completedCallback;
+        remainingPickAllCount = choices.Length;
+
+        for (int i = 0; i < cards.Length; i++)
+        {
+            if (cards[i] == null)
+            {
+                Debug.LogError($"[WeaponChoiceUI] cards[{i}] is null.");
+                return;
+            }
+
+            if (i >= choices.Length)
+            {
+                cards[i].gameObject.SetActive(false);
+                continue;
+            }
+
+            cards[i].gameObject.SetActive(true);
+
+            int cardIndex = i;
+            WeaponBase weapon = choices[i];
+
+            cards[i].Setup(
+                weapon,
+                nameProvider(weapon),
+                descProvider(weapon),
+                levelProvider(weapon),
+                selected => HandlePickAllPicked(cardIndex, selected)
+            );
+        }
+
+        rootPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    /// <summary>
     /// 무기 선택 패널을 닫는 기능만 담당
     /// </summary>
     public void Hide()
@@ -115,6 +210,8 @@ public class WeaponChoiceUI : MonoBehaviour
         rootPanel.SetActive(false);
         Time.timeScale = 1f;
         onPicked = null;
+        onPickAllCompleted = null;
+        remainingPickAllCount = 0;
     }
 
     /// <summary>
@@ -139,6 +236,32 @@ public class WeaponChoiceUI : MonoBehaviour
         // ✅ [수정]
         // Hide() 이후에도 저장해둔 콜백으로 무기 추가를 실행한다.
         pickedCallback?.Invoke(weapon);
+    }
+
+    private void HandlePickAllPicked(int cardIndex, WeaponBase weapon)
+    {
+        if (weapon == null)
+        {
+            Debug.LogError("[WeaponChoiceUI] picked weapon is null.");
+            return;
+        }
+
+        if (cardIndex < 0 || cardIndex >= cards.Length || cards[cardIndex] == null)
+        {
+            Debug.LogError($"[WeaponChoiceUI] invalid cardIndex={cardIndex}");
+            return;
+        }
+
+        cards[cardIndex].gameObject.SetActive(false);
+        onPicked?.Invoke(weapon);
+
+        remainingPickAllCount = Mathf.Max(0, remainingPickAllCount - 1);
+        if (remainingPickAllCount > 0)
+            return;
+
+        Action completedCallback = onPickAllCompleted;
+        Hide();
+        completedCallback?.Invoke();
     }
 
     private void ValidateReferences()

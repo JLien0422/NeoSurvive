@@ -7,6 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public class MapManager : MonoBehaviour
 {
+  private const int TileSortingOrder = -10;
+
   [Header("맵 프리팹 설정")]
   public GameObject baseTilePrefab;     // 기본 바닥 타일 (거의 모든 곳)
   public List<GameObject> flowerPrefabs;    // 꽃 장식 타일들
@@ -189,7 +191,12 @@ public class MapManager : MonoBehaviour
 
     // 타일이 실제 칸(actualTileSize)을 꽉 채우도록 스케일 조정
     // 1.01배로 약간 크게 만들어서 타일 사이 간격이 보이지 않도록 함
-    var sr = tile.GetComponentInChildren<SpriteRenderer>();
+    var sr = tile.GetComponentInChildren<SpriteRenderer>(true);
+    if (sr != null)
+    {
+      sr.sortingOrder = TileSortingOrder;
+    }
+
     if (sr != null && sr.sprite != null)
     {
       float spriteWorldWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;

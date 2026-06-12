@@ -100,7 +100,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.03125, y: 0.5625}
+  m_Size: {x: 0.515625, y: 0.28125}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -153,12 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectilePrefab: {fileID: 3262128633114905044, guid: 800706b81e6c7f142b21f93bfba7c6f7, type: 3}
-  upperBodyAnimator: {fileID: 5077575655243389083}
-  lowerBodyAnimator: {fileID: 4341505940889470122}
-  upperBodyRoot: {fileID: 7584989283199849268}
-  fireOffset: {x: 0.4, y: 0.125}
-  spawnTriggerName: doSpawn
-  fireTriggerName: doFire
+  followSpeed: 5
+  followDistance: 1.5
 --- !u!1 &6487186458110612117
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,7 +255,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.46875, y: 0.4375}
+  m_Size: {x: 0.734375, y: 0.21875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

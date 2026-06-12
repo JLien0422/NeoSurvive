@@ -55,6 +55,7 @@ namespace NeoSurvive.Weapon
     private Collider2D col;
 
     private GameObject vfxInstance;
+    private WeaponBase sourceWeapon;
 
     private void Awake()
     {
@@ -86,6 +87,7 @@ namespace NeoSurvive.Weapon
         return;
       }
 
+      CacheSourceWeapon();
       transform.SetParent(null, true);
 
       ApplyStatsFromCSV(1);
@@ -111,8 +113,21 @@ namespace NeoSurvive.Weapon
 
     public void SetOwner(Transform owner)
     {
+      CacheSourceWeapon();
       player = owner;
       transform.SetParent(null, true);
+    }
+
+    private void CacheSourceWeapon()
+    {
+      if (sourceWeapon != null) return;
+
+      var src = GetComponent<WeaponSource>();
+      if (src == null)
+        src = GetComponentInParent<WeaponSource>();
+
+      if (src != null)
+        sourceWeapon = src.weaponData;
     }
 
     private void Update()
@@ -296,7 +311,10 @@ namespace NeoSurvive.Weapon
         if (enemy != null)
           finalDamage = CalculateDamage(enemy);
 
-        character.TakeDamage(finalDamage);
+        if (sourceWeapon == null)
+          CacheSourceWeapon();
+
+        character.TakeDamage(finalDamage, sourceWeapon);
 
         if (debugLog)
           Debug.Log($"[ChainSaw] Hit Character {character.name} dmg={finalDamage}");

@@ -382,7 +382,7 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (TryHitPlayer(other) || IsBlockingCollider(other))
+        if (TryHitDamageTarget(other) || IsBlockingCollider(other))
         {
             Destroy(gameObject);
         }
@@ -393,23 +393,22 @@ public class EnemyProjectile : MonoBehaviour
         Collider2D other = collision.collider;
         if (other == null) return;
 
-        if (TryHitPlayer(other) || IsBlockingCollider(other))
+        if (TryHitDamageTarget(other) || IsBlockingCollider(other))
         {
             Destroy(gameObject);
         }
     }
 
-    private bool TryHitPlayer(Collider2D other)
+    private bool TryHitDamageTarget(Collider2D other)
     {
         if (hasHit)
             return true;
 
-        Player player = other.GetComponentInParent<Player>();
-        if (player == null && !other.CompareTag("Player"))
-            return false;
-
         Character character = other.GetComponentInParent<Character>();
         if (character == null)
+            return false;
+
+        if (!character.CompareTag("Player") && !character.CompareTag("Decoy"))
             return false;
 
         hasHit = true;

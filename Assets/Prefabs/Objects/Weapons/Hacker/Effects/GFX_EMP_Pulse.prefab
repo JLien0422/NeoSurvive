@@ -124,3 +124,4 @@ MonoBehaviour:
   duration: 1
   destroyProjectile: 0
   animator: {fileID: 5786020975898320340}
+  enemyProjectileObjectName: Shooter_Projectile

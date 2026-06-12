@@ -12596,7 +12596,7 @@ GameObject:
   - component: {fileID: 6077561878945636025}
   - component: {fileID: 2690837943628397640}
   m_Layer: 5
-  m_Name: WeaponDPM
+  m_Name: WeaponDPS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

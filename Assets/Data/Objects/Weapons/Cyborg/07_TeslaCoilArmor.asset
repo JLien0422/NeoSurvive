@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 07_TeslaCoilArmor
   m_EditorClassIdentifier: 
   weaponId: 7
-  weaponName: 
+  weaponName: "\uD14C\uC2AC\uB77C\uCF54\uC77C\uC544\uBA38"
   weaponIcon: {fileID: 21300000, guid: c44534fc5594e3048a96495356378f03, type: 3}
   description: 
   weaponPrefab: {fileID: 691817947624430636, guid: 5c439be5199a2ed4d9ec85c11defbae4, type: 3}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 10_BlastBreath
   m_EditorClassIdentifier: 
   weaponId: 10
-  weaponName: "\uBE14\uB798\uC2A4\uD2B8 \uBE14\uB9AC\uC2A4"
+  weaponName: "\uBE14\uB798\uC2A4\uD2B8\uBE0C\uB808\uC2A4"
   weaponIcon: {fileID: 21300000, guid: 5f910c830a9b7ba4aa9316bca6b01ad1, type: 3}
   description: 
   weaponPrefab: {fileID: 3246525789668707929, guid: ced2c2a8485911349ac38e6c0e1f47af, type: 3}

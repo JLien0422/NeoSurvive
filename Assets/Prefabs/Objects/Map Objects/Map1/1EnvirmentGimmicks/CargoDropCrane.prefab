@@ -67,7 +67,6 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 128
-  enemyTag: Enemy
   warningPrefab: {fileID: 3043635611486806166, guid: e84ce51eff309ec40ba6ccda27dd2e80, type: 3}
   impactPrefab: {fileID: 8982129329864076309, guid: 3ffa2b6f776574546bc2435d153ae1eb, type: 3}
   debugLog: 0
@@ -113,12 +112,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0d64ddafac304d345835f0bd23fbf52e, type: 3}
-  m_Color: {r: 0.254717, g: 0.073291205, b: 0.073291205, a: 1}
+  m_Sprite: {fileID: -682655225, guid: 8171cbab978a8e945bb43a3d0bec56d8, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.16, y: 0.16}
+  m_Size: {x: 3.14, y: 1.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -143,3 +142,9 @@ MonoBehaviour:
   failVfxPrefab: {fileID: 0}
   failVfxLifetime: 1
   vfxScale: 1
+  hideBaseSpriteOnFail: 1
+  failVfxOrderOffset: 10
+  canCapture: 1
+  captureTime: 5
+  resetCaptureWhenOutOfRange: 1
+  captureUI: {fileID: 0}

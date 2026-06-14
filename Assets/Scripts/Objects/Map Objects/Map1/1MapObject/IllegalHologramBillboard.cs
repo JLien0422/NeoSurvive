@@ -9,8 +9,7 @@ namespace NeoSurvive.Map.Map1.MapObjects
     ///
     /// [역할]
     /// - Sprite 크기에 맞춰 Trigger 범위를 자동 설정
-    /// - 플레이어가 영역 안에 들어오면 카메라 orthographicSize를 줄여 시야를 좁힘
-    /// - 광고판 Sprite를 낮은 sorting order로 배치하여 바닥/하부 연출처럼 보이게 함
+    /// - 광고판 Sprite의 렌더 순서를 제어하여 시야 방해 오브젝트로 배치
     ///
     /// [연결 구조]
     /// 1. MapObjectLoader.DB
@@ -18,9 +17,7 @@ namespace NeoSurvive.Map.Map1.MapObjects
     /// 2. SpriteRenderer
     ///    -> Trigger 영역 계산 기준, 렌더 순서 제어
     /// 3. BoxCollider2D
-    ///    -> 플레이어 진입/이탈 감지
-    /// 4. Camera
-    ///    -> 플레이어 진입 시 시야 축소 연출
+    ///    -> Sprite 크기 기반 감지 영역/디버그 영역 유지
     ///
     /// [병합 시 중요]
     /// - 이 스크립트는 MapObjectLoader.DB 초기화 순서에 의존함
@@ -42,18 +39,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
         // Trigger 영역 여유값
         [SerializeField] private Vector2 triggerPadding = Vector2.zero;
 
-        [Header("Detection")]
-        // 플레이어 인식 태그
-        [SerializeField] private string playerTag = "Player";
-
-        [Header("Camera")]
-        // 연출 대상 카메라
-        [SerializeField] private Camera targetCamera;
-        // 플레이어가 영역 안에 있을 때 줄어든 카메라 크기
-        [SerializeField] private float reducedOrthographicSize = 5.5f;
-        // 카메라 줌 변화 속도
-        [SerializeField] private float zoomLerpSpeed = 4f;
-
         [Header("Render Order")]
         // 광고판 렌더링 우선순위
         [SerializeField] private string sortingLayerName = "Default";
@@ -66,26 +51,11 @@ namespace NeoSurvive.Map.Map1.MapObjects
         private SpriteRenderer sr;
         private BoxCollider2D boxCol;
 
-        // 현재 플레이어가 영역 안에 있는지
-        private bool playerInside = false;
-
-        // 카메라 원래 크기 저장용
-        private float normalOrthographicSize = 8f;
-
         private void Awake()
         {
             // 컴포넌트 참조 캐싱
             sr = GetComponent<SpriteRenderer>();
             boxCol = GetComponent<BoxCollider2D>();
-
-            // 카메라가 수동 지정되지 않았으면 Main Camera 사용
-            if (targetCamera == null)
-                targetCamera = Camera.main;
-
-            // 원래 카메라 크기를 저장해두고
-            // 나중에 플레이어가 광고판 영역에서 나가면 복구한다.
-            if (targetCamera != null)
-                normalOrthographicSize = targetCamera.orthographicSize;
         }
 
         private void Start()
@@ -99,21 +69,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
 
             // 3) 렌더 순서 적용
             ApplyRenderOrder();
-        }
-
-        private void Update()
-        {
-            if (targetCamera == null) return;
-
-            // 플레이어가 영역 안에 있으면 축소값, 아니면 원래 크기
-            float targetSize = playerInside ? reducedOrthographicSize : normalOrthographicSize;
-
-            // 부드럽게 카메라 줌 변화
-            targetCamera.orthographicSize = Mathf.Lerp(
-                targetCamera.orthographicSize,
-                targetSize,
-                Time.deltaTime * zoomLerpSpeed
-            );
         }
 
         /// <summary>
@@ -140,8 +95,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
 
             autoFitOnAwake = row.autoFit;
             triggerPadding = new Vector2(row.triggerPaddingX, row.triggerPaddingY);
-            reducedOrthographicSize = row.reducedOrthographicSize;
-            zoomLerpSpeed = row.zoomLerpSpeed;
 
             if (!string.IsNullOrWhiteSpace(row.sortingLayerName) && row.sortingLayerName != "None")
                 sortingLayerName = row.sortingLayerName;
@@ -153,7 +106,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
                 Debug.Log(
                     $"[Map1][IllegalHologramBillboard] CSV 적용 | " +
                     $"autoFit={autoFitOnAwake}, triggerPadding={triggerPadding}, " +
-                    $"reducedOrthographicSize={reducedOrthographicSize}, zoomLerpSpeed={zoomLerpSpeed}, " +
                     $"sortingLayerName={sortingLayerName}, sortingOrder={sortingOrder}"
                 );
             }
@@ -161,10 +113,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
 
         /// <summary>
         /// Sprite 크기에 맞춰 BoxCollider2D를 Trigger 영역으로 설정.
-        ///
-        /// [다른 시스템과의 연결]
-        /// - Player가 이 영역에 들어오면 OnTriggerEnter2D 호출
-        /// - 그 결과 playerInside가 true가 되고, Update에서 카메라 줌 연출 시작
         /// </summary>
         public void FitTriggerToSprite()
         {
@@ -192,7 +140,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
 
         /// <summary>
         /// SpriteRenderer의 sorting layer / order를 적용.
-        /// 광고판 이미지를 플레이어보다 아래로 깔리게 만들 때 사용.
         /// </summary>
         public void ApplyRenderOrder()
         {
@@ -205,27 +152,6 @@ namespace NeoSurvive.Map.Map1.MapObjects
             {
                 Debug.Log($"[Map1][IllegalHologramBillboard] Render Order 적용 | layer={sortingLayerName}, order={sortingOrder}");
             }
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            // Player만 반응
-            if (!other.CompareTag(playerTag)) return;
-
-            playerInside = true;
-
-            if (debugLog)
-                Debug.Log($"[Map1][IllegalHologramBillboard] Player Enter | {gameObject.name}");
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (!other.CompareTag(playerTag)) return;
-
-            playerInside = false;
-
-            if (debugLog)
-                Debug.Log($"[Map1][IllegalHologramBillboard] Player Exit | {gameObject.name}");
         }
 
 #if UNITY_EDITOR

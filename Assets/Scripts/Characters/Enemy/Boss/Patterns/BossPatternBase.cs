@@ -20,6 +20,7 @@ public abstract class BossPatternBase : MonoBehaviour
   protected Transform PlayerTarget { get; private set; }
   protected Rigidbody2D BossRb { get; private set; }
   private BossAttackWarningDisplay _warningFallback;
+  private Animator bossAnimator;
 
   public virtual void Initialize(Boss boss, Transform player, Rigidbody2D bossRb)
   {
@@ -27,7 +28,10 @@ public abstract class BossPatternBase : MonoBehaviour
     PlayerTarget = player;
     BossRb = bossRb;
     if (boss != null)
+    {
       _warningFallback = boss.GetComponentInChildren<BossAttackWarningDisplay>(true);
+      bossAnimator = boss.GetComponentInChildren<Animator>(true);
+    }
   }
 
   public virtual void RefreshPlayerTarget(Transform player)
@@ -39,6 +43,32 @@ public abstract class BossPatternBase : MonoBehaviour
   public abstract IEnumerator RunPatternCoroutine();
 
   protected bool BossAlive => BossRef != null && !BossRef.IsDead;
+
+  protected void PlayBossAnimTrigger(string triggerName)
+  {
+    if (bossAnimator == null || string.IsNullOrEmpty(triggerName))
+      return;
+
+    if (!HasTriggerParameter(triggerName))
+      return;
+
+    bossAnimator.ResetTrigger(triggerName);
+    bossAnimator.SetTrigger(triggerName);
+  }
+
+  private bool HasTriggerParameter(string triggerName)
+  {
+    foreach (AnimatorControllerParameter parameter in bossAnimator.parameters)
+    {
+      if (parameter.type == AnimatorControllerParameterType.Trigger &&
+          parameter.name == triggerName)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   protected void IgnoreCollisionWithBoss(GameObject spawnedObject)
   {

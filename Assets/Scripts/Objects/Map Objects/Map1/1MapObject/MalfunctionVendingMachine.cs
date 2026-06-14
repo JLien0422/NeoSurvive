@@ -13,6 +13,7 @@ namespace NeoSurvive.Map.Map1.MapObjects
     /// - 체력이 0 이하가 되면 파괴되고 드롭 아이템 생성
     /// - 일정 거리 이상 플레이어와 멀어지면 일정 시간 후 자동 삭제
     /// - 랜덤 스파크 연출 가능
+    /// - 여러 자판기 Sprite 중 하나를 랜덤 적용 가능
     /// - Sprite 크기에 맞춰 Collider 자동 조정 가능
     ///
     /// [연결 구조]
@@ -73,8 +74,14 @@ namespace NeoSurvive.Map.Map1.MapObjects
         [SerializeField] private bool autoFitCollider = true;
         [SerializeField] private Vector2 colliderPadding = Vector2.zero;
 
+        [Header("Random Sprite")]
+        [SerializeField] private Sprite[] vendingSprites;
+        [SerializeField] private bool randomFlipX = false;
+
         [Header("Debug")]
         [SerializeField] private bool debugLog = false;
+
+        private SpriteRenderer spriteRenderer;
 
         // 현재 체력
         private float currentHp;
@@ -95,8 +102,8 @@ namespace NeoSurvive.Map.Map1.MapObjects
 
         private void Awake()
         {
-            // 현재는 비워져 있음
-            // 필요 시 초기 참조 캐싱이나 사전 검증을 여기 넣을 수 있음
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            ApplyRandomSprite();
         }
 
         private void Start()
@@ -277,6 +284,29 @@ namespace NeoSurvive.Map.Map1.MapObjects
             nextSparkDelay = Random.Range(sparkIntervalMin, sparkIntervalMax);
         }
 
+        private void ApplyRandomSprite()
+        {
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+
+            if (spriteRenderer == null || vendingSprites == null || vendingSprites.Length == 0)
+                return;
+
+            int index = Random.Range(0, vendingSprites.Length);
+            spriteRenderer.sprite = vendingSprites[index];
+
+            if (randomFlipX)
+                spriteRenderer.flipX = Random.value > 0.5f;
+
+            if (debugLog && spriteRenderer.sprite != null)
+            {
+                Debug.Log(
+                    $"[MalfunctionVendingMachine] Random Sprite Applied | " +
+                    $"index={index} | sprite={spriteRenderer.sprite.name}"
+                );
+            }
+        }
+
         /// <summary>
         /// 체력이 0 이하가 되었을 때 호출되는 파괴 처리.
         ///
@@ -353,7 +383,10 @@ namespace NeoSurvive.Map.Map1.MapObjects
         /// </summary>
         private void FitColliderToSprite()
         {
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+
+            SpriteRenderer sr = spriteRenderer;
             Collider2D col = GetComponent<Collider2D>();
 
             if (sr == null || sr.sprite == null || col == null)
@@ -382,6 +415,8 @@ namespace NeoSurvive.Map.Map1.MapObjects
         private void OnValidate()
         {
             // 프리팹 수정 중에도 Collider 자동 반영
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
             if (autoFitCollider)
                 FitColliderToSprite();
         }

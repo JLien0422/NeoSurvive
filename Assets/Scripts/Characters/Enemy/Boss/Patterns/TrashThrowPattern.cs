@@ -38,6 +38,8 @@ public class TrashThrowPattern : BossPatternBase
     {
       if (PlayerTarget == null) yield break;
 
+      PlayBossAnimTrigger("Map1Boss Pattern1");
+
       // 플레이어 "현재 위치 스냅샷"에 경고
       Vector3 impactCenter = PlayerTarget.position;
       impactCenter.z = 0f;

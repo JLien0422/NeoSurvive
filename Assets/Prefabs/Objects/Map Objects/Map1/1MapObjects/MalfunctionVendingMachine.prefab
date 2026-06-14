@@ -162,4 +162,10 @@ MonoBehaviour:
   sparkPoint: {fileID: 0}
   autoFitCollider: 1
   colliderPadding: {x: 0, y: 0}
+  vendingSprites:
+  - {fileID: 21300000, guid: 365ad681f38d95e46a85443d7a61932f, type: 3}
+  - {fileID: 21300000, guid: 8fbb9368661f8c8468de86077112e396, type: 3}
+  - {fileID: 21300000, guid: b1853679490ce91449c28533c1bf16db, type: 3}
+  - {fileID: 21300000, guid: 1b94df78b4a6599429624463807c7629, type: 3}
+  randomFlipX: 0
   debugLog: 1

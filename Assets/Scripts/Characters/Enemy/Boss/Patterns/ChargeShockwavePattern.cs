@@ -40,12 +40,16 @@ public class ChargeShockwavePattern : BossPatternBase
     if (BossRb != null)
       BossRb.velocity = Vector2.zero;
 
+    PlayBossAnimTrigger("Map1Boss Pattern2 Charging");
+
     // 차징 동안 충격파 위험 반경 예고
     yield return PlayTelegraphCircle(transform.position, shockwaveRadius, chargeDuration);
     if (!BossAlive || PlayerTarget == null) yield break;
 
     Vector2 dir = ((Vector2)(PlayerTarget.position - transform.position)).normalized;
     if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+
+    PlayBossAnimTrigger("Map1Boss Pattern2 Sprint");
 
     // 플레이어 충돌 또는 벽 충돌 시 돌진 종료 (플레이어 접촉 시 1회 피해)
     float elapsed = 0f;
@@ -96,11 +100,17 @@ public class ChargeShockwavePattern : BossPatternBase
     if (BossRb != null)
       BossRb.velocity = Vector2.zero;
 
+    PlayBossAnimTrigger("Map1Boss Pattern2 Brake");
+
     // 크게 점프하는 타이밍 연출(탑다운에서는 딜레이 처리)
     if (jumpDelay > 0f)
       yield return new WaitForSeconds(jumpDelay);
 
+    PlayBossAnimTrigger("Map1Boss Pattern2 Stamp");
+
     ApplyShockwaveDamage();
+
+    PlayBossAnimTrigger("Map1Boss Pattern2 Howling");
 
     // 주변 원형 Trash 생성 후 플레이어 방향 투척
     List<GameObject> ringTrash = SpawnRingTrash();

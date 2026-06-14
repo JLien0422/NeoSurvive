@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -9,8 +10,14 @@ public class Boss : Character
     [Tooltip("HP바/클리어 화면에 표시될 보스 이름 (비워두면 프리팹 오브젝트 이름 사용)")]
     [SerializeField] private string bossNameForUI = "";
 
+    [Header("사망 애니메이션")]
+    [SerializeField] private string deathAnimationTrigger = "Map1Boss Die";
+    [SerializeField] private float defeatEventDelay = 1f;
+
     // 보스 처치 시 발생하는 이벤트 (GameClearUI 등에서 구독)
     public static event System.Action OnBossDefeated;
+
+    private Animator bossAnimator;
 
     /// <summary>
     /// UI에 표시할 보스 이름을 반환합니다.
@@ -26,6 +33,7 @@ public class Boss : Character
     protected override void Awake()
     {
         base.Awake();
+        bossAnimator = GetComponentInChildren<Animator>(true);
     }
 
     /// <summary>
@@ -45,10 +53,42 @@ public class Boss : Character
             GameManager.Instance.AddKill();
         GameAnalyticsTracker.TrackBossDefeated(this);
 
-        // 게임 클리어 이벤트 발생 → GameClearUI가 구독해서 처리
-        OnBossDefeated?.Invoke();
+        PlayDeathAnimation();
+        StartCoroutine(CompleteDefeatAfterAnimation());
+    }
 
-        // 보스 오브젝트 제거
+    private IEnumerator CompleteDefeatAfterAnimation()
+    {
+        if (defeatEventDelay > 0f)
+            yield return new WaitForSeconds(defeatEventDelay);
+
+        OnBossDefeated?.Invoke();
         Destroy(gameObject);
+    }
+
+    private void PlayDeathAnimation()
+    {
+        if (bossAnimator == null || string.IsNullOrEmpty(deathAnimationTrigger))
+            return;
+
+        if (!HasTriggerParameter(deathAnimationTrigger))
+            return;
+
+        bossAnimator.ResetTrigger(deathAnimationTrigger);
+        bossAnimator.SetTrigger(deathAnimationTrigger);
+    }
+
+    private bool HasTriggerParameter(string triggerName)
+    {
+        foreach (AnimatorControllerParameter parameter in bossAnimator.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Trigger &&
+                parameter.name == triggerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

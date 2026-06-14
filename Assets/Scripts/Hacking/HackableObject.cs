@@ -1,4 +1,5 @@
 using UnityEngine;
+using NeoSurvive.Characters;
 
 public class HackableObject : MonoBehaviour
 {
@@ -19,10 +20,19 @@ public class HackableObject : MonoBehaviour
     [SerializeField] private bool hideBaseSpriteOnFail = true;
     [SerializeField] private int failVfxOrderOffset = 10;
 
+    [Header("Cyborg Capture")]
+    [SerializeField] private bool canCapture = true;
+    [SerializeField] private float captureTime = 5f;
+    [SerializeField] private bool resetCaptureWhenOutOfRange = true;
+    [SerializeField] private CaptureProgressUI captureUI;
+
     private GameObject currentIdleVfx;
 
     private bool canHack = false;
     private bool isHacked = false;
+    private bool isCaptured = false;
+
+    private float captureProgress = 0f;
 
     private Player cachedPlayer;
     private float playerSearchTimer = 0f;
@@ -31,28 +41,100 @@ public class HackableObject : MonoBehaviour
     private float checkTimer = 0f;
     private const float CheckInterval = 0.1f;
 
+    private bool IsActivated => isHacked || isCaptured;
+
     private void Start()
     {
         SpawnIdleVFX();
+
+        if (captureUI == null)
+            captureUI = GetComponentInChildren<CaptureProgressUI>(true);
+
+        if (captureUI != null)
+            captureUI.ResetProgress();
     }
 
     private void Update()
     {
-        if (isHacked) return;
-
-        if (canHack && Input.GetKeyDown(KeyCode.E))
-        {
-            StartHacking();
-            return;
-        }
+        if (IsActivated) return;
 
         checkTimer += Time.deltaTime;
 
-        if (checkTimer < CheckInterval) return;
+        if (checkTimer >= CheckInterval)
+        {
+            checkTimer = 0f;
+            CheckForPlayer();
+        }
 
-        checkTimer = 0f;
+        HandleHackerInput();
+        HandleCyborgCapture();
+    }
 
-        CheckForPlayer();
+    private void HandleHackerInput()
+    {
+        if (!canHack || cachedPlayer == null)
+            return;
+
+        if (cachedPlayer.CharacterType != CharacterType.Hacker)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.E))
+            StartHacking();
+    }
+
+    private void HandleCyborgCapture()
+    {
+        if (!canCapture || !canHack || cachedPlayer == null)
+        {
+            StopCapture();
+            return;
+        }
+
+        if (cachedPlayer.CharacterType != CharacterType.Cyborg)
+        {
+            StopCapture();
+            return;
+        }
+
+        captureProgress += Time.deltaTime / Mathf.Max(0.01f, captureTime);
+        captureProgress = Mathf.Clamp01(captureProgress);
+
+        if (captureUI != null)
+        {
+            captureUI.Show();
+            captureUI.SetProgress(captureProgress);
+        }
+
+        if (captureProgress >= 1f)
+            CompleteCapture();
+    }
+
+    private void StopCapture()
+    {
+        if (captureProgress <= 0f)
+            return;
+
+        if (resetCaptureWhenOutOfRange)
+            captureProgress = 0f;
+
+        if (captureUI != null)
+            captureUI.ResetProgress();
+    }
+
+    private void CompleteCapture()
+    {
+        if (isCaptured)
+            return;
+
+        isCaptured = true;
+
+        Debug.Log($"[HackableObject] {objectType} 사이보그 점령 성공! 효과 발동!");
+
+        if (captureUI != null)
+            captureUI.ShowCompleted();
+
+        DestroyIdleVFX();
+        ActivateEffect();
     }
 
     private void CheckForPlayer()
@@ -83,6 +165,9 @@ public class HackableObject : MonoBehaviour
 
     private void StartHacking()
     {
+        if (cachedPlayer == null || cachedPlayer.CharacterType != CharacterType.Hacker)
+            return;
+
         if (HackingSystem.Instance == null)
         {
             Debug.LogWarning("[HackableObject] HackingSystem 인스턴스가 없습니다!");
@@ -111,6 +196,9 @@ public class HackableObject : MonoBehaviour
         GameAnalyticsTracker.TrackHackingResult(objectType, success: true, psychoIncreaseOnFail);
         Debug.Log($"[HackableObject] {objectType} 해킹 성공! 효과 발동!");
 
+        if (captureUI != null)
+            captureUI.ResetProgress();
+
         DestroyIdleVFX();
         ActivateEffect();
     }
@@ -119,6 +207,9 @@ public class HackableObject : MonoBehaviour
     {
         GameAnalyticsTracker.TrackHackingResult(objectType, success: false, psychoIncreaseOnFail);
         Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
+
+        if (captureUI != null)
+            captureUI.ResetProgress();
 
         DestroyIdleVFX();
         SpawnFailVFX();

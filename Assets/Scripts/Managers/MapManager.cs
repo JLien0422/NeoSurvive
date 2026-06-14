@@ -215,6 +215,15 @@ public class MapManager : MonoBehaviour
 
     tile.SetActive(true);
     activeTiles.Add(coord, tile);
+
+    if (MapObjectTileSpawner.Instance != null)
+    {
+      MapObjectTileSpawner.Instance.OnTileSpawned(
+        coord,
+        tile.transform.position,
+        actualTileSize
+      );
+    }
   }
 
   private GameObject GetFromPool(Dictionary<int, Queue<GameObject>> poolDict, int index, GameObject prefab)
@@ -232,6 +241,11 @@ public class MapManager : MonoBehaviour
   {
     if (activeTiles.TryGetValue(coord, out GameObject tile))
     {
+      if (MapObjectTileSpawner.Instance != null)
+      {
+        MapObjectTileSpawner.Instance.OnTileDespawned(coord);
+      }
+
       tile.SetActive(false);
       string[] info = tile.name.Split('_');
       if (info.Length >= 3)

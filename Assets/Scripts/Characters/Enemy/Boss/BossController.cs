@@ -14,6 +14,10 @@ public class BossController : MonoBehaviour
   [Tooltip("패턴이 끝난 뒤 플레이어 추적 속도")]
   [SerializeField] private float moveSpeed = 2f;
 
+  [Header("방향 반전")]
+  [SerializeField] private bool defaultSpriteFacesLeft = true;
+  [SerializeField] private float flipThreshold = 0.05f;
+
   [Header("패턴")]
   [Tooltip("사용 가능한 패턴 풀 (순서는 랜덤 모드에서는 무시됩니다)")]
   [SerializeField] private BossPatternBase[] patternsInOrder;
@@ -41,6 +45,7 @@ public class BossController : MonoBehaviour
 
   /// <summary>직전에 실행한 <see cref="patternsInOrder"/> 인덱스. 랜덤 시 같은 패턴 연속 방지용.</summary>
   private int lastPatternIndex = -1;
+  private Vector3 originalScale;
 
   private void Awake()
   {
@@ -49,6 +54,7 @@ public class BossController : MonoBehaviour
     bossColliders = GetComponentsInChildren<Collider2D>(true);
     rb.gravityScale = 0f;
     rb.freezeRotation = true;
+    originalScale = transform.localScale;
 
     FindPlayer();
   }
@@ -174,6 +180,8 @@ public class BossController : MonoBehaviour
       SyncBossTrashObstacleCollisionIgnore();
       collisionSyncTimer = 0f;
     }
+
+    FacePlayer();
   }
 
   private void FixedUpdate()
@@ -204,6 +212,21 @@ public class BossController : MonoBehaviour
 
     Vector2 direction = (playerTarget.position - transform.position).normalized;
     rb.velocity = direction * moveSpeed;
+  }
+
+  private void FacePlayer()
+  {
+    if (playerTarget == null) return;
+
+    float deltaX = playerTarget.position.x - transform.position.x;
+    if (Mathf.Abs(deltaX) < flipThreshold) return;
+
+    Vector3 scale = transform.localScale;
+    float baseX = Mathf.Abs(originalScale.x);
+    bool playerOnRight = deltaX > 0f;
+
+    scale.x = defaultSpriteFacesLeft == playerOnRight ? -baseX : baseX;
+    transform.localScale = scale;
   }
 
   /// <summary>

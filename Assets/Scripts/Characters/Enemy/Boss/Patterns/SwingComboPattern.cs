@@ -49,6 +49,8 @@ public class SwingComboPattern : BossPatternBase
       center = (Vector2)transform.position + dir * normalHitDistance;
       angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
+      PlayBossAnimTrigger(s == 0 ? "Map1Boss Pattern3 First" : "Map1Boss Pattern3 Second");
+
       DamagePlayerInBox(center, normalHitBoxSize, angle, comboDamage);
 
       if (gapBetweenNormalSwings > 0f)
@@ -65,6 +67,8 @@ public class SwingComboPattern : BossPatternBase
     Vector2 finalCenter = (Vector2)transform.position + finalDir * finalHitDistance;
     float finalAngle = Mathf.Atan2(finalDir.y, finalDir.x) * Mathf.Rad2Deg;
     yield return PlayTelegraphRect(finalCenter, finalHitBoxSize, finalAngle, telegraphDuration);
+
+    PlayBossAnimTrigger("Map1Boss Pattern3 Third");
 
     // 돌진
     float elapsed = 0f;

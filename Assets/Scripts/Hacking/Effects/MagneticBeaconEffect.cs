@@ -4,86 +4,253 @@ using UnityEngine;
 using NeoSurvive.Buff;
 
 /// <summary>
-/// 마그네틱 비컨 해킹 성공 효과
+/// 마그네틱 비컨 해킹/점령 성공 효과
 /// 화면 내 모든 적을 우측(3시 방향) 끝으로 강제 견인하여 한곳에 몰아버립니다.
-/// StatusFlags.isPulled 플래그를 사용해 EnemyController의 AI 이동을 우선 차단합니다.
 /// </summary>
 public class MagneticBeaconEffect : MonoBehaviour
 {
     [Header("견인 설정")]
-    [SerializeField] private float pullSpeed     = 20f;  // 적 견인 속도
-    [SerializeField] private float pullDuration  = 3f;   // 견인 지속 시간 (초)
-    [SerializeField] private float gatherOffset  = 3f;   // 플레이어 기준 집결 지점 우측 거리
+    [SerializeField] private float pullSpeed = 20f;
+    [SerializeField] private float pullDuration = 3f;
+    [SerializeField] private float gatherOffset = 3f;
+    [SerializeField] private float stopDistance = 0.08f;
 
-    /// <summary>
-    /// 외부(HackableObject)에서 호출하여 효과를 시작합니다.
-    /// </summary>
+    [Header("새 적 감지")]
+    [SerializeField] private float refreshInterval = 0.2f;
+
+    [Header("Beacon VFX")]
+    [SerializeField] private GameObject beaconVfxPrefab;
+    [SerializeField] private float vfxScale = 1f;
+
+    private HackableObject hackableObject;
+    private bool isActivated = false;
+
+    private GameObject beaconVfxInstance;
+
+    private class PulledEnemy
+    {
+        public GameObject enemyObject;
+        public StatusFlags flags;
+        public Rigidbody2D rb;
+    }
+
+    private void Awake()
+    {
+        hackableObject = GetComponent<HackableObject>();
+
+        if (hackableObject != null)
+            hackableObject.OnActivated += Activate;
+    }
+
+    private void OnDestroy()
+    {
+        if (hackableObject != null)
+            hackableObject.OnActivated -= Activate;
+    }
+
     public void Activate()
     {
+        if (isActivated) return;
+        isActivated = true;
+
         StartCoroutine(PullAllEnemiesToRight());
     }
 
-    /// <summary>
-    /// 화면 내 모든 적을 우측 끝으로 강제 이동시키는 코루틴
-    /// StatusFlags.isPulled = true로 설정하여 EnemyController.FixedUpdate()가
-    /// AI 이동 대신 pullVelocity를 적용하도록 합니다.
-    /// </summary>
     private IEnumerator PullAllEnemiesToRight()
     {
-        // 플레이어 찾기
         Player player = FindObjectOfType<Player>();
 
-        // 견인 시작 시점 스냅샷 + StatusFlags 수집
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        List<StatusFlags> pulledFlags = new List<StatusFlags>();
+        Vector2 gatherPoint = GetGatherPoint(player);
 
-        foreach (GameObject enemy in enemies)
-        {
-            if (enemy == null) continue;
-            StatusFlags flags = enemy.GetComponent<StatusFlags>();
-            if (flags == null) flags = enemy.AddComponent<StatusFlags>();
+        SpawnBeaconVFX(gatherPoint);
 
-            // 견인 플래그 ON → FixedUpdate가 pullVelocity를 사용하도록 신호 전송
-            flags.isPulled = true;
-            pulledFlags.Add(flags);
-        }
+        List<PulledEnemy> pulledEnemies =
+            new List<PulledEnemy>();
+
+        RefreshPulledEnemies(pulledEnemies);
 
         float elapsed = 0f;
+        float refreshTimer = 0f;
+
         while (elapsed < pullDuration)
         {
             elapsed += Time.deltaTime;
+            refreshTimer += Time.deltaTime;
 
-            // 집결 지점: 플레이어 오른쪽 gatherOffset 거리의 한 점
-            // 플레이어가 없으면 이 오브젝트 위치 기준
-            Vector2 gatherPoint = player != null
-                ? (Vector2)player.transform.position + Vector2.right * gatherOffset
-                : (Vector2)transform.position + Vector2.right * gatherOffset;
+            gatherPoint = GetGatherPoint(player);
 
-            // 매 프레임 각 적의 pullVelocity를 갱신
-            // 모든 적이 동일한 한 점을 향해 이동 → 한곳에 뭉침
-            for (int i = 0; i < enemies.Length; i++)
+            if (beaconVfxInstance != null)
+                beaconVfxInstance.transform.position =
+                    gatherPoint;
+
+            if (refreshTimer >= refreshInterval)
             {
-                GameObject enemy = enemies[i];
-                if (enemy == null) continue;
+                RefreshPulledEnemies(pulledEnemies);
+                refreshTimer = 0f;
+            }
 
-                Vector2 direction = (gatherPoint - (Vector2)enemy.transform.position).normalized;
-                pulledFlags[i].pullVelocity = direction * pullSpeed;
+            foreach (PulledEnemy pulled in pulledEnemies)
+            {
+                if (pulled == null) continue;
+                if (pulled.enemyObject == null) continue;
+                if (pulled.flags == null) continue;
+
+                Vector2 enemyPos =
+                    pulled.rb != null
+                        ? pulled.rb.position
+                        : (Vector2)pulled.enemyObject.transform.position;
+
+                Vector2 toCenter =
+                    gatherPoint - enemyPos;
+
+                float dist =
+                    toCenter.magnitude;
+
+                if (dist < stopDistance)
+                {
+                    if (pulled.rb != null)
+                        pulled.rb.velocity = Vector2.zero;
+
+                    pulled.flags.pullVelocity = Vector2.zero;
+                    continue;
+                }
+
+                Vector2 pullDir =
+                    toCenter.normalized;
+
+                Vector2 targetVelocity =
+                    pullDir * pullSpeed;
+
+                pulled.flags.isPulled = true;
+                pulled.flags.pullVelocity = targetVelocity;
+
+                if (pulled.rb != null &&
+                    pulled.rb.bodyType == RigidbodyType2D.Dynamic)
+                {
+                    pulled.rb.velocity = Vector2.Lerp(
+                        pulled.rb.velocity,
+                        targetVelocity,
+                        Time.deltaTime * 6f
+                    );
+
+                    pulled.rb.MovePosition(
+                        Vector2.MoveTowards(
+                            pulled.rb.position,
+                            gatherPoint,
+                            pullSpeed * Time.deltaTime
+                        )
+                    );
+                }
+                else
+                {
+                    pulled.enemyObject.transform.position =
+                        Vector3.MoveTowards(
+                            pulled.enemyObject.transform.position,
+                            gatherPoint,
+                            pullSpeed * Time.deltaTime
+                        );
+                }
             }
 
             yield return null;
         }
 
-        // 견인 종료: 플래그 해제 및 속도 초기화
-        foreach (StatusFlags flags in pulledFlags)
+        foreach (PulledEnemy pulled in pulledEnemies)
         {
-            if (flags == null) continue;
-            flags.isPulled      = false;
-            flags.pullVelocity  = Vector2.zero;
+            if (pulled == null) continue;
+            if (pulled.flags == null) continue;
 
-            Rigidbody2D rb = flags.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.velocity = Vector2.zero;
+            pulled.flags.isPulled = false;
+            pulled.flags.pullVelocity = Vector2.zero;
+
+            if (pulled.rb != null)
+                pulled.rb.velocity = Vector2.zero;
         }
 
+        if (beaconVfxInstance != null)
+            Destroy(beaconVfxInstance);
+
         Destroy(this);
+    }
+
+    private void RefreshPulledEnemies(
+        List<PulledEnemy> pulledEnemies)
+    {
+        GameObject[] enemies =
+            GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null)
+                continue;
+
+            bool alreadyExists = false;
+
+            foreach (PulledEnemy pulled in pulledEnemies)
+            {
+                if (pulled == null)
+                    continue;
+
+                if (pulled.enemyObject == enemy)
+                {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            if (alreadyExists)
+                continue;
+
+            StatusFlags flags =
+                enemy.GetComponent<StatusFlags>();
+
+            if (flags == null)
+                flags = enemy.AddComponent<StatusFlags>();
+
+            Rigidbody2D rb =
+                enemy.GetComponent<Rigidbody2D>();
+
+            flags.isPulled = true;
+            flags.pullVelocity = Vector2.zero;
+
+            pulledEnemies.Add(
+                new PulledEnemy
+                {
+                    enemyObject = enemy,
+                    flags = flags,
+                    rb = rb
+                }
+            );
+        }
+    }
+
+    private Vector2 GetGatherPoint(Player player)
+    {
+        if (player != null)
+        {
+            return
+                (Vector2)player.transform.position +
+                Vector2.right * gatherOffset;
+        }
+
+        return
+            (Vector2)transform.position +
+            Vector2.right * gatherOffset;
+    }
+
+    private void SpawnBeaconVFX(Vector2 position)
+    {
+        if (beaconVfxPrefab == null)
+            return;
+
+        beaconVfxInstance =
+            Instantiate(
+                beaconVfxPrefab,
+                position,
+                Quaternion.identity
+            );
+
+        beaconVfxInstance.transform.localScale =
+            Vector3.one * vfxScale;
     }
 }

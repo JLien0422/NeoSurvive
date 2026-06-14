@@ -126,6 +126,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frenzyDuration: 15
+  synapseVfxPrefab: {fileID: 6492510408012252817, guid: 3bf57f762450ba341bdd173781fa95fd, type: 3}
+  defaultVfxLocalOffset: {x: 0, y: 0.45, z: 0}
+  shooterVfxLocalOffset: {x: 0, y: 0.15, z: 0}
+  vfxScale: 1
 --- !u!95 &2115860915698162081
 Animator:
   serializedVersion: 5

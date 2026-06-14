@@ -34,6 +34,7 @@ public class MapObjectTileSpawner : MonoBehaviour
         public GameObject obj;
         public SpawnType spawnType;
         public Vector2Int originTileCoord;
+        public float invisibleTimer;
     }
 
     [Header("Map Objects")]
@@ -42,18 +43,37 @@ public class MapObjectTileSpawner : MonoBehaviour
     [Header("Environment Gimmicks")]
     [SerializeField] private SpawnEntry[] gimmickEntries;
 
+    [Header("Spawn Limit / Difficulty")]
+    [SerializeField] private int baseMaxAliveMapObjects = 3;
+    [SerializeField] private int baseMaxAliveGimmicks = 2;
+
+    [SerializeField] private int maxAliveMapObjectCap = 8;
+    [SerializeField] private int maxAliveGimmickCap = 6;
+
+    [Tooltip("몇 초마다 최대 활성 개수를 +1 할지. 3분 = 180초")]
+    [SerializeField] private float difficultyIncreaseInterval = 180f;
+
     [Header("거리 제한")]
     [SerializeField] private float playerSafeRadius = 8f;
     [SerializeField] private float minDistanceBetweenMapObjects = 3f;
     [SerializeField] private float minDistanceBetweenGimmicks = 12f;
 
-    [Header("유지 / 제거 범위")]
-    [SerializeField] private float unloadMargin = 18f;
+    [Header("카메라 밖 생성 범위")]
+    [Tooltip("카메라 화면 바깥쪽으로 이 거리만큼 확장한 링 영역에서만 생성")]
+    [SerializeField] private float preloadMargin = 8f;
+
+    [Header("카메라 밖 제거")]
+    [Tooltip("카메라 밖으로 나간 뒤 이 시간 이상 보이지 않으면 제거")]
+    [SerializeField] private float despawnAfterInvisibleSeconds = 10f;
+
     [SerializeField] private float checkInterval = 0.35f;
 
     [Header("Boss Phase Cleanup")]
     [SerializeField] private bool clearObjectsOnBossTime = true;
+
+    [Tooltip("보스전 시작 시간. 15분 = 900초")]
     [SerializeField] private float bossStartTime = 900f;
+
     [SerializeField] private bool stopSpawningAfterBossTime = true;
 
     [Header("랜덤 Seed")]
@@ -100,6 +120,7 @@ public class MapObjectTileSpawner : MonoBehaviour
         if (player == null)
         {
             GameObject playerObj = GameObject.FindWithTag("Player");
+
             if (playerObj != null)
                 player = playerObj.transform;
         }
@@ -123,7 +144,8 @@ public class MapObjectTileSpawner : MonoBehaviour
             return;
 
         checkTimer = 0f;
-        CleanupFarMapObjects();
+
+        UpdateInvisibleTimersAndDespawn();
     }
 
     private void CreateRuntimeSpawnRoot()
@@ -131,6 +153,7 @@ public class MapObjectTileSpawner : MonoBehaviour
         GameObject rootObj = new GameObject("[Runtime_MapObjects_And_Gimmicks]");
         rootObj.transform.SetParent(transform);
         rootObj.transform.localPosition = Vector3.zero;
+
         runtimeSpawnRoot = rootObj.transform;
     }
 
@@ -174,8 +197,14 @@ public class MapObjectTileSpawner : MonoBehaviour
         if (entries == null)
             return;
 
+        if (!CanSpawnMore(spawnType))
+            return;
+
         foreach (SpawnEntry entry in entries)
         {
+            if (!CanSpawnMore(spawnType))
+                return;
+
             if (entry == null || entry.prefab == null)
                 continue;
 
@@ -193,6 +222,9 @@ public class MapObjectTileSpawner : MonoBehaviour
                 entry.randomOffsetMax
             );
 
+            if (!IsInsideCameraOuterRing(spawnPosition))
+                continue;
+
             if (!IsValidSpawnPosition(spawnPosition, spawnType))
                 continue;
 
@@ -206,8 +238,6 @@ public class MapObjectTileSpawner : MonoBehaviour
 
             GameObject spawned = Instantiate(entry.prefab, spawnPosition, rotation);
 
-            // 핵심:
-            // 이 스포너가 만든 모든 오브젝트를 전용 부모 밑으로 넣음.
             if (runtimeSpawnRoot != null)
                 spawned.transform.SetParent(runtimeSpawnRoot, true);
 
@@ -221,10 +251,63 @@ public class MapObjectTileSpawner : MonoBehaviour
             if (debugLog)
             {
                 Debug.Log(
-                    $"[MapObjectTileSpawner] Spawn | type={spawnType}, prefab={entry.prefab.name}, tile={coord}, pos={spawnPosition}"
+                    $"[MapObjectTileSpawner] Spawn Outside Camera | " +
+                    $"type={spawnType}, prefab={entry.prefab.name}, tile={coord}, pos={spawnPosition} | " +
+                    $"limit={GetCurrentMaxAlive(spawnType)}"
                 );
             }
         }
+    }
+
+    private bool CanSpawnMore(SpawnType spawnType)
+    {
+        int aliveCount = GetAliveCount(spawnType);
+        int maxAlive = GetCurrentMaxAlive(spawnType);
+
+        return aliveCount < maxAlive;
+    }
+
+    private int GetAliveCount(SpawnType spawnType)
+    {
+        int count = 0;
+
+        foreach (var pair in objectsByTile)
+        {
+            List<SpawnedObjectInfo> list = pair.Value;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                SpawnedObjectInfo info = list[i];
+
+                if (info == null || info.obj == null)
+                    continue;
+
+                if (info.spawnType == spawnType)
+                    count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int GetCurrentMaxAlive(SpawnType spawnType)
+    {
+        float t = GetCurrentGameTime();
+
+        int bonus = Mathf.FloorToInt(t / difficultyIncreaseInterval);
+
+        if (spawnType == SpawnType.MapObject)
+        {
+            return Mathf.Min(
+                baseMaxAliveMapObjects + bonus,
+                maxAliveMapObjectCap
+            );
+        }
+
+        return Mathf.Min(
+            baseMaxAliveGimmicks + bonus,
+            maxAliveGimmickCap
+        );
     }
 
     private Vector3 GetRandomPositionInTile(
@@ -247,6 +330,31 @@ public class MapObjectTileSpawner : MonoBehaviour
             tileWorldPosition.y + y + offsetY,
             0f
         );
+    }
+
+    private bool IsInsideCameraOuterRing(Vector3 position)
+    {
+        if (targetCamera == null)
+            targetCamera = Camera.main;
+
+        if (targetCamera == null)
+            return false;
+
+        Rect cameraRect = GetCameraWorldRect(0f);
+        Rect preloadRect = GetCameraWorldRect(preloadMargin);
+
+        Vector2 pos = position;
+
+        bool insideCamera = cameraRect.Contains(pos);
+        bool insidePreload = preloadRect.Contains(pos);
+
+        return !insideCamera && insidePreload;
+    }
+
+    private bool IsVisibleByCamera(Vector3 position)
+    {
+        Rect cameraRect = GetCameraWorldRect(0f);
+        return cameraRect.Contains((Vector2)position);
     }
 
     private bool IsValidSpawnPosition(Vector3 position, SpawnType spawnType)
@@ -291,20 +399,13 @@ public class MapObjectTileSpawner : MonoBehaviour
         {
             obj = obj,
             spawnType = spawnType,
-            originTileCoord = coord
+            originTileCoord = coord,
+            invisibleTimer = 0f
         });
     }
 
-    private void CleanupFarMapObjects()
+    private void UpdateInvisibleTimersAndDespawn()
     {
-        if (targetCamera == null)
-            targetCamera = Camera.main;
-
-        if (targetCamera == null)
-            return;
-
-        Rect unloadRect = GetCameraWorldRect(unloadMargin);
-
         List<Vector2Int> emptyTileKeys = new();
 
         foreach (var pair in objectsByTile)
@@ -321,13 +422,26 @@ public class MapObjectTileSpawner : MonoBehaviour
                     continue;
                 }
 
-                if (info.spawnType == SpawnType.EnvironmentGimmick)
+                bool visible = IsVisibleByCamera(info.obj.transform.position);
+
+                if (visible)
+                {
+                    info.invisibleTimer = 0f;
+                    continue;
+                }
+
+                info.invisibleTimer += checkInterval;
+
+                if (info.invisibleTimer < despawnAfterInvisibleSeconds)
                     continue;
 
-                Vector2 pos = info.obj.transform.position;
-
-                if (unloadRect.Contains(pos))
-                    continue;
+                if (debugLog)
+                {
+                    Debug.Log(
+                        $"[MapObjectTileSpawner] Despawn After Invisible | " +
+                        $"{info.obj.name}, invisible={info.invisibleTimer:F1}s"
+                    );
+                }
 
                 Destroy(info.obj);
                 list.RemoveAt(i);
@@ -338,7 +452,9 @@ public class MapObjectTileSpawner : MonoBehaviour
         }
 
         foreach (Vector2Int key in emptyTileKeys)
+        {
             objectsByTile.Remove(key);
+        }
     }
 
     public void ClearAllSpawnedObjectsForBossPhase()
@@ -422,4 +538,28 @@ public class MapObjectTileSpawner : MonoBehaviour
             return new System.Random(hash);
         }
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Camera cam = targetCamera != null ? targetCamera : Camera.main;
+
+        if (cam == null)
+            return;
+
+        Gizmos.color = Color.green;
+        Rect cameraRect = GetCameraWorldRect(0f);
+        Gizmos.DrawWireCube(
+            cameraRect.center,
+            new Vector3(cameraRect.width, cameraRect.height, 0f)
+        );
+
+        Gizmos.color = Color.yellow;
+        Rect preloadRect = GetCameraWorldRect(preloadMargin);
+        Gizmos.DrawWireCube(
+            preloadRect.center,
+            new Vector3(preloadRect.width, preloadRect.height, 0f)
+        );
+    }
+#endif
 }

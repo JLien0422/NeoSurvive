@@ -1,5 +1,6 @@
 using UnityEngine;
 using NeoSurvive.Characters;
+using System;
 
 public class HackableObject : MonoBehaviour
 {
@@ -25,6 +26,11 @@ public class HackableObject : MonoBehaviour
     [SerializeField] private float captureTime = 5f;
     [SerializeField] private bool resetCaptureWhenOutOfRange = true;
     [SerializeField] private CaptureProgressUI captureUI;
+
+    // =========================
+    // ★ 추가: Effect 이벤트
+    // =========================
+    public event Action OnActivated;
 
     private GameObject currentIdleVfx;
 
@@ -96,7 +102,9 @@ public class HackableObject : MonoBehaviour
             return;
         }
 
-        captureProgress += Time.deltaTime / Mathf.Max(0.01f, captureTime);
+        captureProgress +=
+            Time.deltaTime / Mathf.Max(0.01f, captureTime);
+
         captureProgress = Mathf.Clamp01(captureProgress);
 
         if (captureUI != null)
@@ -128,7 +136,9 @@ public class HackableObject : MonoBehaviour
 
         isCaptured = true;
 
-        Debug.Log($"[HackableObject] {objectType} 사이보그 점령 성공! 효과 발동!");
+        Debug.Log(
+            $"[HackableObject] {objectType} 사이보그 점령 성공! 효과 발동!"
+        );
 
         if (captureUI != null)
             captureUI.ShowCompleted();
@@ -141,7 +151,8 @@ public class HackableObject : MonoBehaviour
     {
         playerSearchTimer += CheckInterval;
 
-        if (cachedPlayer == null || playerSearchTimer >= PlayerSearchInterval)
+        if (cachedPlayer == null ||
+            playerSearchTimer >= PlayerSearchInterval)
         {
             playerSearchTimer = 0f;
             cachedPlayer = FindPlayers();
@@ -153,33 +164,50 @@ public class HackableObject : MonoBehaviour
             return;
         }
 
-        float sqrDist = (transform.position - cachedPlayer.transform.position).sqrMagnitude;
-        canHack = sqrDist <= hackRange * hackRange;
+        float sqrDist =
+            (transform.position -
+             cachedPlayer.transform.position).sqrMagnitude;
+
+        canHack =
+            sqrDist <= hackRange * hackRange;
     }
 
     private Player FindPlayers()
     {
-        Player[] players = FindObjectsOfType<Player>();
-        return players.Length > 0 ? players[0] : null;
+        Player[] players =
+            FindObjectsOfType<Player>();
+
+        return players.Length > 0
+            ? players[0]
+            : null;
     }
 
     private void StartHacking()
     {
-        if (cachedPlayer == null || cachedPlayer.CharacterType != CharacterType.Hacker)
+        if (cachedPlayer == null ||
+            cachedPlayer.CharacterType != CharacterType.Hacker)
             return;
 
         if (HackingSystem.Instance == null)
         {
-            Debug.LogWarning("[HackableObject] HackingSystem 인스턴스가 없습니다!");
+            Debug.LogWarning(
+                "[HackableObject] HackingSystem 인스턴스가 없습니다!"
+            );
+
             return;
         }
 
         if (HackingSystem.Instance.IsHacking)
             return;
 
-        GameAnalyticsTracker.TrackHackableInteraction(objectType, transform.position);
+        GameAnalyticsTracker.TrackHackableInteraction(
+            objectType,
+            transform.position
+        );
 
-        Debug.Log($"[HackableObject] {objectType} 해킹 시작");
+        Debug.Log(
+            $"[HackableObject] {objectType} 해킹 시작"
+        );
 
         HackingSystem.Instance.StartHacking(
             objectType,
@@ -193,8 +221,15 @@ public class HackableObject : MonoBehaviour
     {
         isHacked = true;
 
-        GameAnalyticsTracker.TrackHackingResult(objectType, success: true, psychoIncreaseOnFail);
-        Debug.Log($"[HackableObject] {objectType} 해킹 성공! 효과 발동!");
+        GameAnalyticsTracker.TrackHackingResult(
+            objectType,
+            success: true,
+            psychoIncreaseOnFail
+        );
+
+        Debug.Log(
+            $"[HackableObject] {objectType} 해킹 성공! 효과 발동!"
+        );
 
         if (captureUI != null)
             captureUI.ResetProgress();
@@ -205,8 +240,15 @@ public class HackableObject : MonoBehaviour
 
     private void OnHackingFailed()
     {
-        GameAnalyticsTracker.TrackHackingResult(objectType, success: false, psychoIncreaseOnFail);
-        Debug.Log($"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%");
+        GameAnalyticsTracker.TrackHackingResult(
+            objectType,
+            success: false,
+            psychoIncreaseOnFail
+        );
+
+        Debug.Log(
+            $"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%"
+        );
 
         if (captureUI != null)
             captureUI.ResetProgress();
@@ -214,7 +256,10 @@ public class HackableObject : MonoBehaviour
         DestroyIdleVFX();
         SpawnFailVFX();
 
-        Player player = cachedPlayer != null ? cachedPlayer : FindPlayers();
+        Player player =
+            cachedPlayer != null
+                ? cachedPlayer
+                : FindPlayers();
 
         if (player != null)
             player.AddPsychoCorruption(psychoIncreaseOnFail);
@@ -228,16 +273,22 @@ public class HackableObject : MonoBehaviour
         if (currentIdleVfx != null)
             return;
 
-        currentIdleVfx = Instantiate(
-            idleVfxPrefab,
-            transform.position,
-            Quaternion.identity,
-            transform
-        );
+        currentIdleVfx =
+            Instantiate(
+                idleVfxPrefab,
+                transform.position,
+                Quaternion.identity,
+                transform
+            );
 
-        currentIdleVfx.transform.localPosition = Vector3.zero;
-        currentIdleVfx.transform.localRotation = Quaternion.identity;
-        currentIdleVfx.transform.localScale = Vector3.one * vfxScale;
+        currentIdleVfx.transform.localPosition =
+            Vector3.zero;
+
+        currentIdleVfx.transform.localRotation =
+            Quaternion.identity;
+
+        currentIdleVfx.transform.localScale =
+            Vector3.one * vfxScale;
     }
 
     private void DestroyIdleVFX()
@@ -253,30 +304,38 @@ public class HackableObject : MonoBehaviour
     {
         if (failVfxPrefab == null)
         {
-            Debug.LogWarning($"[HackableObject] {objectType} failVfxPrefab이 비어 있음");
+            Debug.LogWarning(
+                $"[HackableObject] {objectType} failVfxPrefab이 비어 있음"
+            );
+
             return;
         }
 
         if (hideBaseSpriteOnFail)
         {
-            SpriteRenderer baseSr = GetComponent<SpriteRenderer>();
+            SpriteRenderer baseSr =
+                GetComponent<SpriteRenderer>();
 
             if (baseSr != null)
                 baseSr.enabled = false;
         }
 
-        GameObject vfx = Instantiate(
-            failVfxPrefab,
-            transform.position,
-            Quaternion.identity
-        );
+        GameObject vfx =
+            Instantiate(
+                failVfxPrefab,
+                transform.position,
+                Quaternion.identity
+            );
 
-        vfx.transform.localScale = Vector3.one * vfxScale;
+        vfx.transform.localScale =
+            Vector3.one * vfxScale;
 
         ApplyFailVFXSorting(vfx);
         DisablePhysicsOnVFX(vfx);
 
-        Debug.Log($"[HackableObject] {objectType} Fail VFX 생성: {vfx.name}");
+        Debug.Log(
+            $"[HackableObject] {objectType} Fail VFX 생성: {vfx.name}"
+        );
 
         Destroy(vfx, failVfxLifetime);
     }
@@ -286,8 +345,11 @@ public class HackableObject : MonoBehaviour
         if (vfx == null)
             return;
 
-        SpriteRenderer baseSr = GetComponent<SpriteRenderer>();
-        SpriteRenderer[] renderers = vfx.GetComponentsInChildren<SpriteRenderer>(true);
+        SpriteRenderer baseSr =
+            GetComponent<SpriteRenderer>();
+
+        SpriteRenderer[] renderers =
+            vfx.GetComponentsInChildren<SpriteRenderer>(true);
 
         foreach (SpriteRenderer sr in renderers)
         {
@@ -296,8 +358,12 @@ public class HackableObject : MonoBehaviour
 
             if (baseSr != null)
             {
-                sr.sortingLayerID = baseSr.sortingLayerID;
-                sr.sortingOrder = baseSr.sortingOrder + failVfxOrderOffset;
+                sr.sortingLayerID =
+                    baseSr.sortingLayerID;
+
+                sr.sortingOrder =
+                    baseSr.sortingOrder +
+                    failVfxOrderOffset;
             }
             else
             {
@@ -311,7 +377,8 @@ public class HackableObject : MonoBehaviour
         if (vfx == null)
             return;
 
-        Collider2D[] colliders = vfx.GetComponentsInChildren<Collider2D>(true);
+        Collider2D[] colliders =
+            vfx.GetComponentsInChildren<Collider2D>(true);
 
         foreach (Collider2D col in colliders)
         {
@@ -319,7 +386,8 @@ public class HackableObject : MonoBehaviour
                 col.enabled = false;
         }
 
-        Rigidbody2D[] rigidbodies = vfx.GetComponentsInChildren<Rigidbody2D>(true);
+        Rigidbody2D[] rigidbodies =
+            vfx.GetComponentsInChildren<Rigidbody2D>(true);
 
         foreach (Rigidbody2D rb in rigidbodies)
         {
@@ -330,13 +398,21 @@ public class HackableObject : MonoBehaviour
 
     private void ActivateEffect()
     {
+        // =========================
+        // ★ 이벤트 호출
+        // =========================
+        OnActivated?.Invoke();
+
         switch (objectType)
         {
             case HackableObjectType.SecurityTurret:
             {
                 Debug.Log("[Effect] 보안 터렛 활성화!");
-                var turret = GetComponent<SecurityTurretEffect>()
-                             ?? gameObject.AddComponent<SecurityTurretEffect>();
+
+                var turret =
+                    GetComponent<SecurityTurretEffect>()
+                    ?? gameObject.AddComponent<SecurityTurretEffect>();
+
                 turret.Activate();
                 break;
             }
@@ -344,8 +420,11 @@ public class HackableObject : MonoBehaviour
             case HackableObjectType.ElectricFence:
             {
                 Debug.Log("[Effect] 전기 울타리 생성!");
-                var fence = GetComponent<ElectricFenceEffect>()
-                            ?? gameObject.AddComponent<ElectricFenceEffect>();
+
+                var fence =
+                    GetComponent<ElectricFenceEffect>()
+                    ?? gameObject.AddComponent<ElectricFenceEffect>();
+
                 fence.Activate();
                 break;
             }
@@ -353,32 +432,22 @@ public class HackableObject : MonoBehaviour
             case HackableObjectType.SatelliteUplink:
             {
                 Debug.Log("[Effect] 새틀라이트 레이저 발동!");
-                var satellite = GetComponent<SatelliteUplinkEffect>()
-                                ?? gameObject.AddComponent<SatelliteUplinkEffect>();
+
+                var satellite =
+                    GetComponent<SatelliteUplinkEffect>()
+                    ?? gameObject.AddComponent<SatelliteUplinkEffect>();
+
                 satellite.Activate();
                 break;
             }
 
-            case HackableObjectType.SynapseServer:
-            {
-                Debug.Log("[Effect] 적 절반 아군화!");
-                var synapse = GetComponent<SynapseServerEffect>()
-                              ?? gameObject.AddComponent<SynapseServerEffect>();
-                synapse.Activate();
-                break;
-            }
-
-            case HackableObjectType.MagneticBeacon:
-            {
-                Debug.Log("[Effect] 마그네틱 비컨 발동 - 적 견인!");
-                var beacon = GetComponent<MagneticBeaconEffect>()
-                             ?? gameObject.AddComponent<MagneticBeaconEffect>();
-                beacon.Activate();
-                break;
-            }
+            // =========================
+            // ★ Synapse / Beacon 직접 호출 제거
+            // 이벤트 기반으로 동작
+            // =========================
 
             default:
-                return;
+                break;
         }
 
         HideVisuals();
@@ -386,7 +455,8 @@ public class HackableObject : MonoBehaviour
 
     private void HideVisuals()
     {
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        SpriteRenderer sr =
+            GetComponent<SpriteRenderer>();
 
         if (sr != null)
             sr.enabled = false;
@@ -400,6 +470,10 @@ public class HackableObject : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, hackRange);
+
+        Gizmos.DrawWireSphere(
+            transform.position,
+            hackRange
+        );
     }
 }

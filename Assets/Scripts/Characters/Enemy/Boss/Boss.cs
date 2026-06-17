@@ -6,6 +6,10 @@ using UnityEngine;
 /// </summary>
 public class Boss : Character
 {
+    [Header("밸런싱 CSV")]
+    [Tooltip("enemy_stats.csv의 enemyid (예: map1boss)")]
+    [SerializeField] private string enemyStatId = "map1boss";
+
     [Header("보스 이름 설정")]
     [Tooltip("HP바/클리어 화면에 표시될 보스 이름 (비워두면 프리팹 오브젝트 이름 사용)")]
     [SerializeField] private string bossNameForUI = "";
@@ -34,6 +38,35 @@ public class Boss : Character
     {
         base.Awake();
         bossAnimator = GetComponentInChildren<Animator>(true);
+        ApplyStatsFromCsv();
+    }
+
+    private void ApplyStatsFromCsv()
+    {
+        if (EnemyStatLoader.DB == null)
+        {
+            Debug.LogWarning("[Boss] EnemyStatLoader.DB가 null입니다. 프리팹 HP를 사용합니다.");
+            return;
+        }
+
+        string key = string.IsNullOrWhiteSpace(enemyStatId)
+            ? gameObject.name.Trim().ToLowerInvariant()
+            : enemyStatId.Trim().ToLowerInvariant();
+
+        if (!EnemyStatLoader.DB.rows.TryGetValue(key, out var row))
+        {
+            Debug.LogWarning($"[Boss] enemy_stats.csv에 '{key}'가 없습니다. 프리팹 HP를 사용합니다.");
+            return;
+        }
+
+        if (row.maxhp <= 0f)
+            return;
+
+        maxHP.BaseValue = row.maxhp;
+        currentHP.BaseValue = row.maxhp;
+        currentHP.CurrentValue = row.maxhp;
+
+        Debug.Log($"[Boss] CSV 체력 적용 | id={key}, maxHp={row.maxhp}");
     }
 
     /// <summary>

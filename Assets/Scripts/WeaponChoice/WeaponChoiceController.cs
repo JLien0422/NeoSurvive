@@ -440,6 +440,9 @@ public class WeaponChoiceController : MonoBehaviour
         if (HackerWeaponChoiceDescriptionBuilder.TryBuild(weapon, targetLevel, out string dynamicDescription))
             return dynamicDescription;
 
+        if (CyborgWeaponChoiceDescriptionBuilder.TryBuild(weapon, targetLevel, out dynamicDescription))
+            return dynamicDescription;
+
         if (weapon.description == null)
         {
             Debug.LogError($"[WeaponChoiceController] description is null. asset={weapon.name}");

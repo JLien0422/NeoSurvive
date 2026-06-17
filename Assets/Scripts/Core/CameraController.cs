@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -16,7 +14,16 @@ public class CameraController : MonoBehaviour
   [SerializeField] private float shakeDuration = 0.3f;
   [SerializeField] private float shakeMagnitude = 0.2f;
 
-  private Vector3 originalPosition;
+  private Camera controlledCamera;
+  private float defaultOrthographicSize;
+  private bool hasDefaultOrthographicSize;
+
+  private Object areaLockOwner;
+  private bool hasAreaLock;
+  private Vector3 areaLockCenter;
+  private Vector2 areaLockSize;
+  private float areaLockPadding;
+
   private float shakeTimer = 0f;
   private bool isShaking = false;
 
@@ -29,12 +36,45 @@ public class CameraController : MonoBehaviour
     else
     {
       Destroy(gameObject);
+      return;
     }
+
+    CacheCamera();
   }
 
   public void SetTarget(Transform target)
   {
     player = target;
+  }
+
+  public void LockToArea(Object owner, Vector3 center, Vector2 size, float padding)
+  {
+    if (owner == null)
+      return;
+
+    if (hasAreaLock && areaLockOwner != owner)
+      return;
+
+    areaLockOwner = owner;
+    hasAreaLock = true;
+    areaLockCenter = center;
+    areaLockSize = size;
+    areaLockPadding = Mathf.Max(0f, padding);
+  }
+
+  public void ReleaseAreaLock(Object owner)
+  {
+    if (!hasAreaLock)
+      return;
+
+    if (areaLockOwner != null && areaLockOwner != owner)
+      return;
+
+    hasAreaLock = false;
+    areaLockOwner = null;
+
+    if (controlledCamera != null && hasDefaultOrthographicSize)
+      controlledCamera.orthographicSize = defaultOrthographicSize;
   }
 
   /// <summary>
@@ -58,7 +98,7 @@ public class CameraController : MonoBehaviour
 
   void LateUpdate()
   {
-    if (player == null)
+    if (!hasAreaLock && player == null)
     {
       // "Player" 태그로 타겟을 찾습니다.
       {
@@ -71,10 +111,13 @@ public class CameraController : MonoBehaviour
       }
     }
 
-    if (player == null) return;
+    if (!hasAreaLock && player == null) return;
 
-    // 기본 카메라 위치 (플레이어 추적)
-    Vector3 targetPosition = new Vector3(player.position.x, player.position.y, -10);
+    Vector3 targetPosition = hasAreaLock
+      ? new Vector3(areaLockCenter.x, areaLockCenter.y, -10)
+      : new Vector3(player.position.x, player.position.y, -10);
+
+    UpdateOrthographicSize();
 
     // 화면 흔들림 효과 적용
     if (isShaking)
@@ -98,5 +141,40 @@ public class CameraController : MonoBehaviour
     {
       transform.position = targetPosition;
     }
+  }
+
+  private void CacheCamera()
+  {
+    controlledCamera = GetComponent<Camera>();
+    if (controlledCamera == null)
+      controlledCamera = Camera.main;
+
+    if (controlledCamera == null)
+      return;
+
+    defaultOrthographicSize = controlledCamera.orthographicSize;
+    hasDefaultOrthographicSize = true;
+  }
+
+  private void UpdateOrthographicSize()
+  {
+    if (controlledCamera == null)
+      CacheCamera();
+
+    if (controlledCamera == null)
+      return;
+
+    if (!hasAreaLock)
+    {
+      if (hasDefaultOrthographicSize)
+        controlledCamera.orthographicSize = defaultOrthographicSize;
+
+      return;
+    }
+
+    float aspect = Mathf.Max(0.01f, controlledCamera.aspect);
+    float sizeByHeight = areaLockSize.y * 0.5f;
+    float sizeByWidth = areaLockSize.x / (2f * aspect);
+    controlledCamera.orthographicSize = Mathf.Max(sizeByHeight, sizeByWidth) + areaLockPadding;
   }
 }

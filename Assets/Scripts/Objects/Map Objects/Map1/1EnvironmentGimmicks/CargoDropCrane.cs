@@ -18,7 +18,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
     /// [해킹 역할]
     /// - 해커 플레이어가 크레인 본체 근처에서 H 키를 누르면 해킹 모드 진입
     /// - 일정 시간 동안 플레이어 주변의 적을 탐색하여 적 위치를 추적 낙하
-    /// - 적이 없으면 플레이어 위치를 대체 타겟으로 사용
+    /// - 플레이어가 맞는 낙하 위치는 제외하고, 유효한 적이 없으면 해당 회차 낙하를 스킵
     ///
     /// [연결 구조]
     /// - CSV: MapEnvironmentGimmickLoader.DB에서 설정값 로드
@@ -52,7 +52,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
     /// 2. 경고 -> 실제 충돌 순서가 정확한가
     /// 3. 기본 모드에서 플레이어 위치 추적이 정확한가
     /// 4. 해킹 모드에서 적 위치 추적이 정확한가
-    /// 5. 적이 없을 때 플레이어 위치로 fallback 되는가
+    /// 5. 해킹 모드에서 플레이어가 맞는 낙하 위치를 제외하는가
     /// 6. 해킹 종료 후 기본 모드로 정상 복귀하는가
     /// 7. CSV 값(데미지/타이밍/범위)이 정상 반영되는가
     /// </summary>
@@ -63,6 +63,8 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         [Header("CSV")]
         [SerializeField] private string mapId = "Map1";
         [SerializeField] private string gimmickId = "cargo_drop_crane";
+        [Tooltip("끄면 인스펙터 값만 사용합니다. (임시 튜닝용)")]
+        [SerializeField] private bool loadValuesFromCsv = false;
 
         [Header("Spawn Area / Activation")]
         // 플레이어가 이 범위 안에 들어오면 기본 낙하 루틴 시작
@@ -127,6 +129,14 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         // 실제 충돌/피해 판정 프리팹
         [SerializeField] private GameObject impactPrefab;
 
+        [Header("Camera Control")]
+        [SerializeField] private bool lockCameraInActiveArea = true;
+        [SerializeField] private float cameraAreaPadding = 1.5f;
+
+        [Header("Tile Preload")]
+        [SerializeField] private bool preloadTilesInActiveArea = true;
+        [SerializeField] private float tilePreloadPadding = 2f;
+
         [Header("Debug")]
         [SerializeField] private bool debugLog = false;
 
@@ -138,6 +148,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         // 현재 플레이어 참조
         private Player currentPlayer;
+        private MapManager mapManager;
 
         // 기본 모드 낙하 코루틴
         private Coroutine dropRoutine;
@@ -157,6 +168,9 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         // [추가]
         // Warning이 이미 생성되어 Impact까지 보장해야 하는 상태인지
         private bool attackCycleInProgress = false;
+
+        private bool cameraLockRequested = false;
+        private bool tilePreloadRequested = false;
 
         // 해킹 남은 시간(디버그용)
         private float hackedRemainTime = 0f;
@@ -184,11 +198,12 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         private void Start()
         {
-            // CSV 값 로드
-            LoadFromCSV();
+            if (loadValuesFromCsv)
+                LoadFromCSV();
 
             // 씬 내 플레이어 참조 찾기
             FindPlayerReference();
+            FindMapManagerReference();
         }
 
         private void Update()
@@ -199,6 +214,9 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
             // 활성 구역 내 플레이어 존재 여부 갱신
             UpdatePlayerInsideState();
+
+            UpdateCameraLockState();
+            UpdateTilePreloadState();
 
             // 기본 낙하 루틴 시작/중지 상태 관리
             HandleDropRoutineState();
@@ -216,6 +234,18 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                     Debug.Log($"[CargoDropCrane] 해킹 중... 남은 시간: {hackedRemainTime:F1}초");
                 }
             }
+        }
+
+        private void OnDisable()
+        {
+            ReleaseCameraLock();
+            ReleaseTilePreload();
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseCameraLock();
+            ReleaseTilePreload();
         }
 
         /// <summary>
@@ -280,6 +310,14 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                 Debug.Log($"[CargoDropCrane] Player 찾음 | {currentPlayer.name}");
         }
 
+        private void FindMapManagerReference()
+        {
+            if (mapManager != null)
+                return;
+
+            mapManager = FindObjectOfType<MapManager>();
+        }
+
         /// <summary>
         /// 플레이어가 activeArea 안에 있는지 매 프레임 계산
         /// </summary>
@@ -340,6 +378,72 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                         Debug.Log("[CargoDropCrane] 플레이어가 구역 밖으로 나가서 기본 낙하 중지");
                 }
             }
+        }
+
+        private void UpdateCameraLockState()
+        {
+            if (!lockCameraInActiveArea || !playerInsideActiveArea)
+            {
+                ReleaseCameraLock();
+                return;
+            }
+
+            if (CameraController.Instance == null)
+                return;
+
+            CameraController.Instance.LockToArea(
+                this,
+                transform.position,
+                activeAreaSize,
+                cameraAreaPadding
+            );
+            cameraLockRequested = true;
+        }
+
+        private void ReleaseCameraLock()
+        {
+            if (!cameraLockRequested)
+                return;
+
+            if (CameraController.Instance != null)
+                CameraController.Instance.ReleaseAreaLock(this);
+
+            cameraLockRequested = false;
+        }
+
+        private void UpdateTilePreloadState()
+        {
+            if (!preloadTilesInActiveArea || !playerInsideActiveArea)
+            {
+                ReleaseTilePreload();
+                return;
+            }
+
+            if (tilePreloadRequested)
+                return;
+
+            FindMapManagerReference();
+            if (mapManager == null)
+                return;
+
+            mapManager.ReserveTileArea(
+                this,
+                transform.position,
+                activeAreaSize,
+                tilePreloadPadding
+            );
+            tilePreloadRequested = true;
+        }
+
+        private void ReleaseTilePreload()
+        {
+            if (!tilePreloadRequested)
+                return;
+
+            if (mapManager != null)
+                mapManager.ReleaseTileArea(this);
+
+            tilePreloadRequested = false;
         }
 
         /// <summary>
@@ -463,21 +567,26 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             while (elapsed < duration)
             {
                 // 플레이어 근처 적을 찾아 낙하 지점 계산
-                Vector3 targetPos = GetTrackedEnemyDropPosition();
+                if (TryGetTrackedEnemyDropPosition(out Vector3 targetPos))
+                {
+                    SpawnWarning(targetPos);
 
-                SpawnWarning(targetPos);
+                    if (debugLog)
+                        Debug.Log($"[CargoDropCrane] 해킹모드 Warning Spawn | pos={targetPos}");
 
-                if (debugLog)
-                    Debug.Log($"[CargoDropCrane] 해킹모드 Warning Spawn | pos={targetPos}");
+                    yield return new WaitForSeconds(warningDuration);
+                    elapsed += warningDuration;
+                    hackedRemainTime = Mathf.Max(0f, duration - elapsed);
 
-                yield return new WaitForSeconds(warningDuration);
-                elapsed += warningDuration;
-                hackedRemainTime = Mathf.Max(0f, duration - elapsed);
+                    SpawnImpact(targetPos);
 
-                SpawnImpact(targetPos);
-
-                if (debugLog)
-                    Debug.Log($"[CargoDropCrane] 해킹모드 Impact Spawn | pos={targetPos}");
+                    if (debugLog)
+                        Debug.Log($"[CargoDropCrane] 해킹모드 Impact Spawn | pos={targetPos}");
+                }
+                else if (hackDebugLog)
+                {
+                    Debug.Log("[CargoDropCrane] 해킹 타겟 없음 또는 플레이어 피격 위험 → 이번 낙하 스킵");
+                }
 
                 float nextDelay = Random.Range(intervalMin, intervalMax);
                 yield return new WaitForSeconds(nextDelay);
@@ -605,13 +714,15 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         /// <summary>
         /// 해킹 모드에서 플레이어 근처 적을 탐색하여 낙하 좌표 계산
-        /// - 가장 가까운 살아있는 Enemy를 찾음
-        /// - 찾지 못하면 플레이어 위치로 대체
+        /// - 플레이어가 실제 impact 범위에 들어오는 후보는 제외
+        /// - 유효한 적 후보가 없으면 이번 낙하를 스킵
         /// </summary>
-        private Vector3 GetTrackedEnemyDropPosition()
+        private bool TryGetTrackedEnemyDropPosition(out Vector3 targetPos)
         {
+            targetPos = default;
+
             if (currentPlayer == null)
-                return transform.position;
+                return false;
 
             Vector3 playerPos = currentPlayer.transform.position;
 
@@ -630,6 +741,10 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                 if (enemy == null) continue;
                 if (enemy.IsDead) continue;
 
+                Vector3 enemyDropPos = GetEnemyDropPosition(enemy);
+                if (WouldImpactHitPlayer(enemyDropPos, playerPos))
+                    continue;
+
                 if (!enemies.Contains(enemy))
                     enemies.Add(enemy);
             }
@@ -637,9 +752,9 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             if (enemies.Count == 0)
             {
                 if (hackDebugLog)
-                    Debug.Log("[CargoDropCrane] 적 탐색 실패 → 플레이어 위치 대체");
+                    Debug.Log("[CargoDropCrane] 유효한 해킹 타겟 없음");
 
-                return GetPlayerTrackedDropPosition();
+                return false;
             }
 
             Enemy bestCenterEnemy = null;
@@ -650,13 +765,13 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             // impactSize 범위 안에 몇 마리의 적이 들어오는지 계산
             foreach (Enemy centerEnemy in enemies)
             {
-                Vector3 centerPos = centerEnemy.transform.position;
+                Vector3 centerPos = GetEnemyDropPosition(centerEnemy);
 
                 int clusterCount = 0;
 
                 foreach (Enemy otherEnemy in enemies)
                 {
-                    Vector3 otherPos = otherEnemy.transform.position;
+                    Vector3 otherPos = GetEnemyDropPosition(otherEnemy);
 
                     bool insideX = Mathf.Abs(otherPos.x - centerPos.x) <= impactSize.x * 0.5f;
                     bool insideY = Mathf.Abs(otherPos.y - centerPos.y) <= impactSize.y * 0.5f;
@@ -681,9 +796,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
             if (bestCenterEnemy != null)
             {
-                Vector3 pos = bestCenterEnemy.transform.position;
-                pos.z = 0f;
-                pos.y += trackOffsetY;
+                targetPos = GetEnemyDropPosition(bestCenterEnemy);
 
                 if (hackDebugLog)
                 {
@@ -693,10 +806,25 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                     );
                 }
 
-                return pos;
+                return true;
             }
 
-            return GetPlayerTrackedDropPosition();
+            return false;
+        }
+
+        private Vector3 GetEnemyDropPosition(Enemy enemy)
+        {
+            Vector3 pos = enemy.transform.position;
+            pos.z = 0f;
+            pos.y += trackOffsetY;
+            return pos;
+        }
+
+        private bool WouldImpactHitPlayer(Vector3 impactCenter, Vector3 playerPos)
+        {
+            bool insideX = Mathf.Abs(playerPos.x - impactCenter.x) <= impactSize.x * 0.5f;
+            bool insideY = Mathf.Abs(playerPos.y - impactCenter.y) <= impactSize.y * 0.5f;
+            return insideX && insideY;
         }
 
 #if UNITY_EDITOR

@@ -47,6 +47,7 @@ public class MapManager : MonoBehaviour
   // 타일 크기 계산용
   private float actualTileSize;
   private Dictionary<Vector2Int, GameObject> activeTiles = new();
+  private Dictionary<Object, Rect> reservedTileAreas = new();
   private Vector2Int lastCoord = new Vector2Int(int.MinValue, int.MinValue);
 
   // 카테고리별 풀 관리를 위한 딕셔너리
@@ -108,6 +109,41 @@ public class MapManager : MonoBehaviour
     }
   }
 
+  public void ReserveTileArea(Object owner, Vector3 center, Vector2 size, float padding)
+  {
+    if (owner == null)
+      return;
+
+    if (actualTileSize <= 0f)
+      UpdateActualTileSize();
+
+    Vector2 paddedSize = size + Vector2.one * Mathf.Max(0f, padding) * 2f;
+    Rect area = new Rect(
+      center.x - paddedSize.x * 0.5f,
+      center.y - paddedSize.y * 0.5f,
+      paddedSize.x,
+      paddedSize.y
+    );
+
+    reservedTileAreas[owner] = area;
+    SpawnReservedAreaTiles(area);
+  }
+
+  public void ReleaseTileArea(Object owner)
+  {
+    if (owner == null)
+      return;
+
+    reservedTileAreas.Remove(owner);
+
+    if (playerTransform == null)
+      return;
+
+    int currentX = Mathf.FloorToInt(playerTransform.position.x / actualTileSize);
+    int currentY = Mathf.FloorToInt(playerTransform.position.y / actualTileSize);
+    UpdateTiles(currentX, currentY);
+  }
+
   void UpdateScreenSize(Vector2 size)
   {
     Camera cam = Camera.main;
@@ -133,7 +169,8 @@ public class MapManager : MonoBehaviour
     List<Vector2Int> toRemove = new();
     foreach (var key in activeTiles.Keys)
     {
-      if (Mathf.Abs(key.x - currentX) > despawnDistX || Mathf.Abs(key.y - currentY) > despawnDistY)
+      bool outsidePlayerArea = Mathf.Abs(key.x - currentX) > despawnDistX || Mathf.Abs(key.y - currentY) > despawnDistY;
+      if (outsidePlayerArea && !IsReservedTileCoord(key))
       {
         toRemove.Add(key);
       }
@@ -155,6 +192,53 @@ public class MapManager : MonoBehaviour
         }
       }
     }
+
+    foreach (Rect area in reservedTileAreas.Values)
+    {
+      SpawnReservedAreaTiles(area);
+    }
+  }
+
+  private void SpawnReservedAreaTiles(Rect area)
+  {
+    GetTileCoordRange(area, out Vector2Int min, out Vector2Int max);
+
+    for (int x = min.x; x <= max.x; x++)
+    {
+      for (int y = min.y; y <= max.y; y++)
+      {
+        Vector2Int coord = new(x, y);
+        if (!activeTiles.ContainsKey(coord))
+        {
+          SpawnTile(coord);
+        }
+      }
+    }
+  }
+
+  private bool IsReservedTileCoord(Vector2Int coord)
+  {
+    Vector2 worldPos = new Vector2(coord.x * actualTileSize, coord.y * actualTileSize);
+    foreach (Rect area in reservedTileAreas.Values)
+    {
+      if (area.Contains(worldPos))
+        return true;
+    }
+
+    return false;
+  }
+
+  private void GetTileCoordRange(Rect area, out Vector2Int min, out Vector2Int max)
+  {
+    min = new Vector2Int(
+      Mathf.FloorToInt(area.xMin / actualTileSize),
+      Mathf.FloorToInt(area.yMin / actualTileSize)
+    );
+
+    max = new Vector2Int(
+      Mathf.CeilToInt(area.xMax / actualTileSize),
+      Mathf.CeilToInt(area.yMax / actualTileSize)
+    );
   }
 
   private void SpawnTile(Vector2Int coord)

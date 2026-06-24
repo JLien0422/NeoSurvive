@@ -47,9 +47,6 @@ public class UIManager : MonoBehaviour
   [Header("사이코 잠식도 UI")]
   [SerializeField] private PsychoMeterUI psychoMeterUI;
 
-  [Header("화면 노이즈 효과")]
-  public GameObject screenNoiseOverlay; // 화면 모서리 노이즈 오버레이 (60% 이상일 때 표시)
-
   [Header("신경링크 UI")]
   public Slider neuralLinkSlider;
   public TextMeshProUGUI neuralLinkText;
@@ -117,28 +114,6 @@ public class UIManager : MonoBehaviour
     UpdateExpSliderAnimation();
   }
 
-  /// <summary>
-  /// 화면 노이즈 오버레이 생성
-  /// </summary>
-  private void CreateScreenNoiseOverlay(Transform parent)
-  {
-    GameObject overlayObj = new GameObject("ScreenNoiseOverlay");
-    overlayObj.transform.SetParent(parent, false);
-
-    RectTransform overlayRect = overlayObj.AddComponent<RectTransform>();
-    overlayRect.anchorMin = Vector2.zero;
-    overlayRect.anchorMax = Vector2.one;
-    overlayRect.sizeDelta = Vector2.zero;
-    overlayRect.anchoredPosition = Vector2.zero;
-
-    Image overlayImg = overlayObj.AddComponent<Image>();
-    overlayImg.color = new Color(1f, 0f, 0f, 0.1f); // 빨간색 반투명
-    overlayImg.raycastTarget = false; // 클릭 통과 (버튼/UI 가리지 않음)
-
-    screenNoiseOverlay = overlayObj;
-    screenNoiseOverlay.SetActive(false); // 초기에는 비활성화
-  }
-
   private void OnDestroy()
   {
     UnregisterEvents();
@@ -189,8 +164,6 @@ public class UIManager : MonoBehaviour
       psychoMeterUI.SetCharacter(p.CharacterType);
       psychoMeterUI.SetCorruption(p.PsychoCorruption);
     }
-
-    CreateScreenNoiseOverlay(canvas); // 화면 노이즈 오버레이 생성
   }
 
   private void UnregisterEvents()
@@ -592,19 +565,6 @@ public class UIManager : MonoBehaviour
   {
     if (psychoMeterUI != null)
       psychoMeterUI.SetCorruption(current);
-  }
-
-  /// <summary>
-  /// 화면 노이즈 효과 표시/숨김 (60% 이상일 때)
-  /// </summary>
-  public void SetScreenNoise(bool active)
-  {
-    if (screenNoiseOverlay != null)
-    {
-      screenNoiseOverlay.SetActive(active);
-      if (active && screenNoiseOverlay.TryGetComponent<Image>(out var img))
-        img.raycastTarget = false; // 클릭 통과
-    }
   }
 
   /// <summary>

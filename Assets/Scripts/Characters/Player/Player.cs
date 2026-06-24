@@ -698,7 +698,7 @@ public class Player : Character
   }
 
   /// <summary>
-  /// 60% 효과: 대미지 +25%, 화면 노이즈
+  /// 60% 효과: 대미지 +25%
   /// </summary>
   private void Apply60PercentEffect()
   {
@@ -706,25 +706,13 @@ public class Player : Character
     originalDamagePercent += 0.25f;
 
     float newDamage = attackDamage.GetValue();
-    Debug.Log($"사이코 잠식도 60% 달성: 대미지 +25%, 화면 노이즈 시작 | 공격력: {newDamage:F2}");
-
-    // 화면 노이즈 효과 시작 (UIManager를 통해)
-    if (UIManager.Instance != null)
-    {
-      UIManager.Instance.SetScreenNoise(true);
-    }
+    Debug.Log($"사이코 잠식도 60% 달성: 대미지 +25% | 공격력: {newDamage:F2}");
   }
 
   private void Remove60PercentEffect()
   {
     attackDamage.AddPercentModifier(-0.25f);
     originalDamagePercent -= 0.25f;
-
-    // 화면 노이즈 효과 종료
-    if (UIManager.Instance != null)
-    {
-      UIManager.Instance.SetScreenNoise(false);
-    }
   }
 
   /// <summary>
@@ -812,12 +800,6 @@ public class Player : Character
     {
       attackDamage.AddPercentModifier(-originalDamagePercent);
       originalDamagePercent = 0f;
-    }
-
-    // 화면 노이즈 종료
-    if (UIManager.Instance != null)
-    {
-      UIManager.Instance.SetScreenNoise(false);
     }
   }
 

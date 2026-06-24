@@ -13,6 +13,9 @@ public class EntityShadow : MonoBehaviour
   [SerializeField] private Vector2 sizeMultiplier = new Vector2(0.9f, 0.25f);
   [SerializeField] private Vector2 minScale = new Vector2(0.2f, 0.08f);
   [SerializeField] private Vector2 maxScale = new Vector2(5f, 2f);
+  [SerializeField] [Range(0f, 1f)] private float shadowAlpha = 0.45f;
+  [SerializeField] private bool useFixedWorldSize = false;
+  [SerializeField] private Vector2 fixedWorldSize = new Vector2(1.8f, 0.5f);
 
   private GameObject shadowInstance;
   private SpriteRenderer entityRenderer;
@@ -53,6 +56,7 @@ public class EntityShadow : MonoBehaviour
     shadowBaseLocalScale = shadowInstance.transform.localScale;
 
     RefreshRenderers();
+    ApplyShadowAlpha();
     ApplySortingBelowEntity();
 
     if (autoScaleToEntity)
@@ -67,6 +71,22 @@ public class EntityShadow : MonoBehaviour
     entityRenderer = GetComponent<SpriteRenderer>();
     shadowRenderers = shadowInstance.GetComponentsInChildren<SpriteRenderer>(true);
     shadowBaseWorldSize = CalculateShadowWorldSize();
+  }
+
+  private void ApplyShadowAlpha()
+  {
+    if (shadowRenderers == null || shadowRenderers.Length == 0)
+      return;
+
+    foreach (SpriteRenderer renderer in shadowRenderers)
+    {
+      if (renderer == null)
+        continue;
+
+      Color color = renderer.color;
+      color.a = shadowAlpha;
+      renderer.color = color;
+    }
   }
 
   private void ApplySortingBelowEntity()
@@ -101,17 +121,28 @@ public class EntityShadow : MonoBehaviour
     if (entityRenderer == null)
       RefreshRenderers();
 
-    if (!TryGetEntityBounds(out Bounds entityBounds))
-      return;
-
     if (shadowBaseWorldSize.x <= 0f || shadowBaseWorldSize.y <= 0f)
       shadowBaseWorldSize = CalculateShadowWorldSize();
 
     if (shadowBaseWorldSize.x <= 0f || shadowBaseWorldSize.y <= 0f)
       return;
 
-    float targetWorldWidth = Mathf.Max(0.001f, entityBounds.size.x * sizeMultiplier.x);
-    float targetWorldHeight = Mathf.Max(0.001f, entityBounds.size.y * sizeMultiplier.y);
+    float targetWorldWidth;
+    float targetWorldHeight;
+
+    if (useFixedWorldSize && fixedWorldSize.x > 0f && fixedWorldSize.y > 0f)
+    {
+      targetWorldWidth = fixedWorldSize.x;
+      targetWorldHeight = fixedWorldSize.y;
+    }
+    else
+    {
+      if (!TryGetEntityBounds(out Bounds entityBounds))
+        return;
+
+      targetWorldWidth = Mathf.Max(0.001f, entityBounds.size.x * sizeMultiplier.x);
+      targetWorldHeight = Mathf.Max(0.001f, entityBounds.size.y * sizeMultiplier.y);
+    }
 
     float scaleX = Mathf.Clamp(targetWorldWidth / shadowBaseWorldSize.x, minScale.x, maxScale.x);
     float scaleY = Mathf.Clamp(targetWorldHeight / shadowBaseWorldSize.y, minScale.y, maxScale.y);

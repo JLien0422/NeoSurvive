@@ -301,3 +301,6 @@ MonoBehaviour:
   sizeMultiplier: {x: 0.9, y: 0.25}
   minScale: {x: 0.2, y: 0.08}
   maxScale: {x: 5, y: 2}
+  shadowAlpha: 0.45
+  useFixedWorldSize: 1
+  fixedWorldSize: {x: 0.9, y: 0.25}

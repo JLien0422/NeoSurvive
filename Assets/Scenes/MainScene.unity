@@ -2466,14 +2466,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapObjectEntries:
-  - prefab: {fileID: 8128147340646450223, guid: 0928cc497dcf367428ec4b870eddad93, type: 3}
-    spawnChance: 0.01
-    spawnType: 0
-    randomOffsetMin: {x: 0, y: 0}
-    randomOffsetMax: {x: 0, y: 0}
-    randomRotation: 0
   - prefab: {fileID: 3065133449474875235, guid: 3dca973ea79675e4d85e569e7293673c, type: 3}
-    spawnChance: 0.02
+    spawnChance: 0.03
     spawnType: 0
     randomOffsetMin: {x: 0, y: 0}
     randomOffsetMax: {x: 0, y: 0}
@@ -2486,13 +2480,13 @@ MonoBehaviour:
     randomRotation: 0
   gimmickEntries:
   - prefab: {fileID: 3108586645325358097, guid: b7dd8e70717362940b4db2ca2547b761, type: 3}
-    spawnChance: 0
+    spawnChance: 0.01
     spawnType: 1
     randomOffsetMin: {x: 0, y: 0}
     randomOffsetMax: {x: 0, y: 0}
     randomRotation: 0
   - prefab: {fileID: 6370820873220978124, guid: 49d8a28529c7d2045a6cc590c45fd198, type: 3}
-    spawnChance: 0
+    spawnChance: 0.01
     spawnType: 1
     randomOffsetMin: {x: 0, y: 0}
     randomOffsetMax: {x: 0, y: 0}
@@ -6119,7 +6113,6 @@ MonoBehaviour:
   goldText: {fileID: 1278532230}
   characterChoicePanel: {fileID: 2078993006}
   psychoMeterUI: {fileID: 503865204}
-  screenNoiseOverlay: {fileID: 0}
   neuralLinkSlider: {fileID: 1427274718}
   neuralLinkText: {fileID: 0}
   healthBarOffset: {x: 0, y: 1, z: 0}
@@ -29314,7 +29307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRunGold: 0
-  totalGold: 228890
+  totalGold: 228980
   enableDebugGoldCommitKey: 1
   debugGoldCommitKey: 112
   hackerPlayerPrefab: {fileID: 533545058544290356, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}

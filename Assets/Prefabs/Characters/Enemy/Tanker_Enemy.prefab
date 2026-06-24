@@ -262,9 +262,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shadowPrefab: {fileID: 1410214595427278205, guid: c05228c71f121f545af0d8684a70d79f, type: 3}
-  localOffset: {x: 0, y: -0.5, z: 0}
+  localOffset: {x: 0, y: -1, z: 0}
   sortingOrderOffset: -1
   autoScaleToEntity: 1
-  sizeMultiplier: {x: 0.9, y: 0.25}
+  sizeMultiplier: {x: 0.6, y: 0.167}
   minScale: {x: 0.2, y: 0.08}
   maxScale: {x: 5, y: 2}
+  shadowAlpha: 0.45

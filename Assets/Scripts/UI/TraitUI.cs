@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using TMPro;
 
 /// <summary>
 /// LobbyManager의 제어(Show/Hide) 아래 동작하는 트레잇 전용 UI 스크립트입니다.
@@ -26,6 +27,16 @@ public class TraitUI : MonoBehaviour
   [Tooltip("공통 특성들이 들어갈 하위 UI 패널")]
   public GameObject commonSubPanel;
 
+  [Header("탭 배경화면 (Background Sprites)")]
+  [Tooltip("배경화면을 렌더링할 대상 Image 컴포넌트")]
+  public Image targetBackgroundImage;
+  [Tooltip("해커 탭 배경 스프라이트")]
+  public Sprite hackerBackgroundSprite;
+  [Tooltip("사이보그 탭 배경 스프라이트")]
+  public Sprite cyborgBackgroundSprite;
+  [Tooltip("공통 탭 배경 스프라이트")]
+  public Sprite commonBackgroundSprite;
+
   [Header("버튼 참조 (옵션)")]
   [Tooltip("각 탭을 활성화 시키는 버튼 애니메이션 처리 등을 위해 참조")]
   public Button hackerTabBtn;
@@ -40,7 +51,7 @@ public class TraitUI : MonoBehaviour
   [Tooltip("사이코 잠식도 표시용 슬라이더 (Inspector에 연결하세요)")]
   public Slider psychoSlider;
   [Tooltip("사이코 수치 텍스트(선택)")]
-  public Text psychoValueText;
+  public TMP_Text psychoValueText;
 
   [Header("특성 버튼 상태 표시")]
   [Tooltip("비워두면 하위 Button 이름을 traitId 규칙으로 변환해 자동 수집합니다. 예외가 있으면 여기에 직접 연결하세요.")]
@@ -199,6 +210,17 @@ public class TraitUI : MonoBehaviour
     if (cyborgSubPanel != null) cyborgSubPanel.SetActive(currentCategory == TraitCategory.Cyborg);
     if (commonSubPanel != null) commonSubPanel.SetActive(currentCategory == TraitCategory.Common);
 
+    // 배경 스프라이트 교체
+    if (targetBackgroundImage != null)
+    {
+      if (currentCategory == TraitCategory.Hacker && hackerBackgroundSprite != null)
+        targetBackgroundImage.sprite = hackerBackgroundSprite;
+      else if (currentCategory == TraitCategory.Cyborg && cyborgBackgroundSprite != null)
+        targetBackgroundImage.sprite = cyborgBackgroundSprite;
+      else if (currentCategory == TraitCategory.Common && commonBackgroundSprite != null)
+        targetBackgroundImage.sprite = commonBackgroundSprite;
+    }
+
     // 버튼들 시각적 상태 업데이트 (Interactable, Color 등)는 여기서 구현 가능합니다.
   }
 
@@ -206,10 +228,6 @@ public class TraitUI : MonoBehaviour
   // 특성 업그레이드 액션 연동
   // ============================================
 
-  /// <summary>
-  /// 직접 인스펙터 버튼 OnClick에서 이 함수를 호출하고, 
-  /// String 매개변수에 TraitManager에 정의한 traitId (예: "plasma_rifling") 를 넘겨주세요.
-  /// </summary>
   public void OnClickUpgradeTrait(string traitId)
   {
     if (TraitManager.Instance == null)
@@ -222,7 +240,7 @@ public class TraitUI : MonoBehaviour
 
     if (success)
     {
-      if (LobbySoundManager.Instance != null) LobbySoundManager.Instance.PlayConfirm();
+      if (LobbySoundManager.Instance != null) LobbySoundManager.Instance.PlayUpgradeBuy();
       // 전체 UI 최신화 (레벨 텍스트, 자물쇠 상태 등 업뎃용)
       RefreshUI();
     }
@@ -246,7 +264,7 @@ public class TraitUI : MonoBehaviour
 
     if (success)
     {
-      if (LobbySoundManager.Instance != null) LobbySoundManager.Instance.PlayConfirm();
+      if (LobbySoundManager.Instance != null) LobbySoundManager.Instance.PlayTraitDownGrade();
       RefreshUI();
     }
     else

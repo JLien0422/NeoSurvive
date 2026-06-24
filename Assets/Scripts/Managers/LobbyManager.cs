@@ -37,7 +37,7 @@ public class LobbyManager : MonoBehaviour
     "LobbyTab",
     "SettingsTab",
     "CharacterSelectionTab",
-    "TraitPanel",
+    "TraitTab",
   };
 
   public List<GameObject> tabList = new List<GameObject>();
@@ -64,11 +64,6 @@ public class LobbyManager : MonoBehaviour
   private static void BindSinglePlayButtonInLoadedLobbyScene()
   {
     LobbyManager manager = FindSceneLobbyManager();
-    if (manager == null && Instance != null)
-    {
-      manager = Instance;
-    }
-
     if (manager == null)
     {
       Debug.LogWarning("[LobbyManager] 로비 씬에서 LobbyManager를 찾지 못했습니다.");
@@ -97,12 +92,14 @@ public class LobbyManager : MonoBehaviour
 
   private void Awake()
   {
-    if (Instance != null && Instance != this)
+    if (Instance != null && Instance != this && Instance.gameObject.scene != gameObject.scene)
     {
       Destroy(Instance.gameObject);
     }
 
     Instance = this;
+    tabHistory.Clear();
+    tabList.Clear();
     RefreshSceneReferences();
   }
 
@@ -113,7 +110,9 @@ public class LobbyManager : MonoBehaviour
 
   private void Start()
   {
+    tabHistory.Clear();
     RefreshSceneReferences();
+    OpenTab(TabType.Lobby);
   }
 
   private void OnDestroy()
@@ -140,16 +139,13 @@ public class LobbyManager : MonoBehaviour
 
   private void RefreshSceneReferences()
   {
-    EnsureTabList();
+    EnsureTabList(forceRebuild: true);
     BindSinglePlayButton();
   }
 
   private void BindSinglePlayButton()
   {
-    if (singlePlayButton == null)
-    {
-      singlePlayButton = FindSceneButtonByName(SinglePlayButtonName);
-    }
+    singlePlayButton = FindSceneButtonByName(SinglePlayButtonName);
 
     if (singlePlayButton == null)
     {
@@ -174,10 +170,10 @@ public class LobbyManager : MonoBehaviour
     return buttonObject != null ? buttonObject.GetComponent<Button>() : null;
   }
 
-  private bool EnsureTabList()
+  private bool EnsureTabList(bool forceRebuild = false)
   {
     int expectedCount = TabObjectNames.Length;
-    bool needsRebuild = tabList == null || tabList.Count < expectedCount;
+    bool needsRebuild = forceRebuild || tabList == null || tabList.Count < expectedCount;
 
     if (!needsRebuild)
     {
@@ -279,6 +275,9 @@ public class LobbyManager : MonoBehaviour
     if (!EnsureTabList())
       return;
 
+    if (activatedTab == TabType.Settings && tabType != TabType.Settings)
+      CloseLobbySettingsIfNeeded();
+
     if (activatedTab != tabType)
       LobbySoundManager.Instance?.PlayTabSwitch();
 
@@ -296,10 +295,31 @@ public class LobbyManager : MonoBehaviour
     tabList[tabIndex].SetActive(true);
     activatedTab = tabType;
 
+    if (tabType == TabType.Settings)
+      OpenLobbySettingsIfNeeded();
+
     if (!tabHistory.Contains(tabType))
     {
       tabHistory.Add(tabType);
     }
+  }
+
+  private void OpenLobbySettingsIfNeeded()
+  {
+    int settingsIndex = (int)TabType.Settings;
+    if (settingsIndex < 0 || settingsIndex >= tabList.Count || tabList[settingsIndex] == null)
+      return;
+
+    tabList[settingsIndex].GetComponent<SettingsUI>()?.OpenForLobby();
+  }
+
+  private void CloseLobbySettingsIfNeeded()
+  {
+    int settingsIndex = (int)TabType.Settings;
+    if (settingsIndex < 0 || settingsIndex >= tabList.Count || tabList[settingsIndex] == null)
+      return;
+
+    tabList[settingsIndex].GetComponent<SettingsUI>()?.CloseForLobby();
   }
 
   public void CloseTab(TabType tabType)

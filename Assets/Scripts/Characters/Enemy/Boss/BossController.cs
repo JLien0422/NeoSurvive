@@ -264,6 +264,35 @@ public class BossController : MonoBehaviour
     }
   }
 
+  [Header("애니메이션 이벤트 사운드")]
+  [Tooltip("PlayFootstep 애니메이션 이벤트 시 동시에 재생될 오디오 클립들")]
+  [SerializeField] private List<AudioClip> animFootstepClips = new List<AudioClip>();
+  [Tooltip("이벤트 사운드를 재생할 오디오 소스 (없으면 1회성 생성 재생)")]
+  [SerializeField] private AudioSource bossAudioSource;
+
+  /// <summary>
+  /// 애니메이션 이벤트에서 호출할 발소리 재생 함수.
+  /// 리스트에 있는 모든 클립을 동시에 재생합니다.
+  /// </summary>
+  public void PlayFootstep()
+  {
+    if (animFootstepClips == null || animFootstepClips.Count == 0) return;
+
+    foreach (var clip in animFootstepClips)
+    {
+      if (clip == null) continue;
+
+      if (bossAudioSource != null)
+      {
+        bossAudioSource.PlayOneShot(clip);
+      }
+      else
+      {
+        AudioSource.PlayClipAtPoint(clip, transform.position);
+      }
+    }
+  }
+
 #if UNITY_EDITOR
   private void OnDrawGizmos()
   {

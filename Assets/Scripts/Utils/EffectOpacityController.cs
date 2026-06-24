@@ -1,24 +1,29 @@
 using UnityEngine;
+using TMPro;
 
 namespace NeoSurvive.Utils
 {
   /// <summary>
   /// 이펙트 투명도 제어 유틸리티
-  /// 투사체를 제외한 모든 이펙트(SpriteRenderer, ParticleSystem 등)에 투명도를 적용합니다.
+  /// 투사체를 제외한 모든 이펙트(SpriteRenderer, ParticleSystem, TMP Text 등)에 투명도를 적용합니다.
   /// </summary>
   public class EffectOpacityController : MonoBehaviour
   {
     [Header("투명도 적용 대상")]
     [SerializeField] private bool applyToSpriteRenderers = true;
     [SerializeField] private bool applyToParticleSystems = true;
+    [SerializeField] private bool applyToTMPTexts = true;
 
     [Header("투사체 제외 설정")]
     [SerializeField] private bool isProjectile = false; // 이 오브젝트가 투사체인 경우 체크
 
     private SpriteRenderer[] spriteRenderers;
     private ParticleSystem[] particleSystems;
+    private TMP_Text[] tmpTexts;
+    
     private Color[] originalSpriteColors;
     private Color[] originalParticleColors;
+    private Color[] originalTMPColors;
 
     private void Start()
     {
@@ -45,6 +50,17 @@ namespace NeoSurvive.Utils
         {
           var main = particleSystems[i].main;
           originalParticleColors[i] = main.startColor.color;
+        }
+      }
+
+      // TMP Text 수집
+      if (applyToTMPTexts)
+      {
+        tmpTexts = GetComponentsInChildren<TMP_Text>();
+        originalTMPColors = new Color[tmpTexts.Length];
+        for (int i = 0; i < tmpTexts.Length; i++)
+        {
+          originalTMPColors[i] = tmpTexts[i].color;
         }
       }
 
@@ -95,6 +111,20 @@ namespace NeoSurvive.Utils
             Color newColor = originalParticleColors[i];
             newColor.a = originalParticleColors[i].a * opacity;
             main.startColor = newColor;
+          }
+        }
+      }
+
+      // TMP Text 투명도 적용
+      if (applyToTMPTexts && tmpTexts != null)
+      {
+        for (int i = 0; i < tmpTexts.Length; i++)
+        {
+          if (tmpTexts[i] != null)
+          {
+            Color newColor = originalTMPColors[i];
+            newColor.a = originalTMPColors[i].a * opacity;
+            tmpTexts[i].color = newColor;
           }
         }
       }

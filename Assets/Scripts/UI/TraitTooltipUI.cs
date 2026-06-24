@@ -187,27 +187,37 @@ public class TraitTooltipUI : MonoBehaviour
   private string BuildEffectText(TraitData td, int currentLevel)
   {
     StringBuilder sb = new StringBuilder();
-    sb.AppendLine(string.IsNullOrEmpty(td.effectDescription) ? "효과 없음" : td.effectDescription);
 
     if (TraitManager.Instance == null)
       return sb.ToString().TrimEnd();
 
     float current = TraitManager.Instance.GetCurrentPsychoCorruption();
-    float increase = TraitManager.Instance.CanUpgrade(td.traitId) ? TraitManager.Instance.GetPsychoCorruptionIncrease(td.traitId) : 0f;
-    float next = Mathf.Clamp(current + increase, 0f, TraitManager.MaxPsychoCorruption);
-    float appliedIncrease = next - current;
-
-    sb.AppendLine();
-    sb.AppendLine($"사이코 잠식도: {FormatPsychoValue(current)}/100 -> <color=#55FF73>{FormatPsychoValue(next)}</color>/100");
-    sb.AppendLine($"증가량: +<color=#FF4D4D>{FormatPsychoValue(appliedIncrease)}</color>/100");
 
     if (currentLevel < td.maxLevel)
     {
-      int cost = TraitManager.Instance.GetUpgradeCost();
-      bool hasGold = GameManager.Instance != null && GameManager.Instance.TotalGold >= cost;
-      string costColor = hasGold ? "#FFD700" : "#FF4D4D";
+      float psychoCost = TraitManager.Instance.GetPsychoCorruptionIncrease(td.traitId);
+      int goldCost = TraitManager.Instance.GetUpgradeCost();
+      bool hasGold = GameManager.Instance != null && GameManager.Instance.TotalGold >= goldCost;
+      string goldColor = hasGold ? "#FFD700" : "#FF4D4D";
+
+      float next = Mathf.Clamp(current + psychoCost, 0f, TraitManager.MaxPsychoCorruption);
+
       sb.AppendLine();
-      sb.AppendLine($"다음 업그레이드 비용: <color={costColor}>{cost} 골드</color>");
+      sb.AppendLine($"사이코 잠식도: {FormatPsychoValue(current)} -> <color=#55FF73>{FormatPsychoValue(next)}</color>");
+      sb.AppendLine($"사이코 잠식도 비용: <color=#FF4D4D>{FormatPsychoValue(psychoCost)}</color>");
+      sb.AppendLine($"골드 비용: <color={goldColor}>{goldCost}</color> 골드");
+    }
+    else
+    {
+      sb.AppendLine();
+      sb.AppendLine($"사이코 잠식도: {FormatPsychoValue(current)}/100 (최대 레벨)");
+    }
+
+    if (currentLevel > 0)
+    {
+      int currentTotal = TraitManager.Instance.GetTotalTraitLevels();
+      int refundAmount = TraitManager.Instance.baseTraitCost + ((currentTotal - 1) * TraitManager.Instance.traitCostIncrement);
+      sb.AppendLine($"다운그레이드 시 환급: <color=#55FF73>{refundAmount}</color> 골드");
     }
 
     return sb.ToString().TrimEnd();

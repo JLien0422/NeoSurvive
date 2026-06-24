@@ -103,20 +103,58 @@ public class TraitManager : MonoBehaviour
   public event Action OnTraitsLoaded;
   public event Action<float, float> OnPsychoCorruptionChanged;
 
+  private static bool _spawningPersistent;
+
   private void Awake()
   {
-    if (Instance == null)
+    if (Instance != null && Instance != this)
     {
-      Instance = this;
-      DontDestroyOnLoad(gameObject);
-      EnsureDefaultCyborgTraits();
-      // ApplyTraitPsychoCorruptionCosts(); // 주석 처리: 인스펙터에서 설정한 값이 유지되도록 함
-      LoadTraits();
+      Destroy(this);
+      return;
     }
-    else
+
+    if (GetComponent<LobbyManager>() != null)
     {
-      Destroy(gameObject);
+      SpawnPersistentFromSceneConfig();
+      return;
     }
+
+    Instance = this;
+    DontDestroyOnLoad(gameObject);
+
+    if (_spawningPersistent)
+      return;
+
+    EnsureDefaultCyborgTraits();
+    LoadTraits();
+  }
+
+  private void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
+  }
+
+  private void SpawnPersistentFromSceneConfig()
+  {
+    GameObject host = new GameObject("TraitManager");
+    DontDestroyOnLoad(host);
+
+    _spawningPersistent = true;
+    TraitManager persistent = host.AddComponent<TraitManager>();
+    _spawningPersistent = false;
+
+    persistent.baseTraitCost = baseTraitCost;
+    persistent.traitCostIncrement = traitCostIncrement;
+    persistent.availableTraits = availableTraits != null
+      ? new List<TraitData>(availableTraits)
+      : new List<TraitData>();
+
+    Instance = persistent;
+    persistent.EnsureDefaultCyborgTraits();
+    persistent.LoadTraits();
+
+    Destroy(this);
   }
 
   // 코드 레벨에서 기본 사이보그 특성들을 등록합니다. 인스펙터에 이미 수동 등록된 항목은 덮어쓰지 않습니다.

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
 
@@ -85,6 +86,13 @@ public class SettingsUI : MonoBehaviour
     public System.Action onSettingsClosed;
 
     private TMP_FontAsset _maplestoryLight;
+
+    private Sprite _menuSliderBorderSprite;
+    private Sprite _menuSliderBgSprite;
+    private Sprite _menuSliderHandleSprite;
+    private Sprite _menuToggleOnSprite;
+    private Sprite _menuToggleOffSprite;
+    private bool _menuUiSpritesLoaded;
 
     private void Awake()
     {
@@ -209,20 +217,55 @@ public class SettingsUI : MonoBehaviour
             onSettingsClosed?.Invoke();
         }
 
-        // 설정이 열려있을 때 게임 일시정지
+        if (!IsLobbyScene())
+        {
+            if (isSettingsOpen)
+                Time.timeScale = 0f;
+            else
+                Time.timeScale = keepPausedAfterClose ? 0f : 1f;
+        }
+
+        if (!isSettingsOpen && settingsManager != null)
+            settingsManager.SaveSettings();
+    }
+
+    private static bool IsLobbyScene()
+    {
+        return SceneManager.GetActiveScene().name.Contains("Lobby");
+    }
+
+    /// <summary>
+    /// 로비 SettingsTab에서 설정 패널을 연다. timeScale은 변경하지 않는다.
+    /// </summary>
+    public void OpenForLobby()
+    {
+        if (settingsPanel == null)
+        {
+            Debug.LogError("[SettingsUI] settingsPanel이 null입니다. 씬에서 SettingPanel을 SettingsUI에 연결해 주세요.");
+            return;
+        }
+
         if (isSettingsOpen)
-        {
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            Time.timeScale = keepPausedAfterClose ? 0f : 1f;
-            // 설정 저장
-            if (settingsManager != null)
-            {
-                settingsManager.SaveSettings();
-            }
-        }
+            return;
+
+        isSettingsOpen = true;
+        settingsPanel.SetActive(true);
+        ShowTab(0);
+        LobbySoundManager.Instance?.PlaySettingsOpen();
+    }
+
+    /// <summary>
+    /// 로비 SettingsTab을 닫을 때 설정 패널을 숨긴다. timeScale은 변경하지 않는다.
+    /// </summary>
+    public void CloseForLobby()
+    {
+        if (!isSettingsOpen)
+            return;
+
+        isSettingsOpen = false;
+        settingsPanel.SetActive(false);
+        LobbySoundManager.Instance?.PlaySettingsClose();
+        settingsManager?.SaveSettings();
     }
 
     /// <summary>
@@ -431,6 +474,8 @@ public class SettingsUI : MonoBehaviour
     private void InitializeAudioSettings()
     {
         if (settingsManager == null) return;
+
+        ApplyAudioTabMenuStyle();
 
         // 마스터 볼륨
         if (masterVolumeSlider != null)
@@ -709,6 +754,80 @@ public class SettingsUI : MonoBehaviour
         {
             animator.SetTrigger(highlightedTrigger);
         }
+    }
+
+    private void EnsureMenuUiSpritesLoaded()
+    {
+        if (_menuUiSpritesLoaded)
+            return;
+
+        _menuUiSpritesLoaded = true;
+
+        foreach (var sprite in Resources.LoadAll<Sprite>("Sprites/UI/SPR_MENU UI"))
+        {
+            switch (sprite.name)
+            {
+                case "SPR_MENU_SLIDER_BORDER":
+                    _menuSliderBorderSprite = sprite;
+                    break;
+                case "SPR_MENU_SLIDER_BG":
+                    _menuSliderBgSprite = sprite;
+                    break;
+                case "SPR_MENU_SLIDER_HANDLE":
+                    _menuSliderHandleSprite = sprite;
+                    break;
+                case "SPR_MENU_SWITCH_5":
+                    _menuToggleOnSprite = sprite;
+                    break;
+                case "SPR_MENU_SWITCH_1":
+                    _menuToggleOffSprite = sprite;
+                    break;
+            }
+        }
+    }
+
+    private void ApplyVolumeSliderMenuStyle(Slider slider)
+    {
+        if (slider == null || _menuSliderBorderSprite == null)
+            return;
+
+        foreach (var image in slider.GetComponentsInChildren<Image>(true))
+        {
+            switch (image.gameObject.name)
+            {
+                case "Background":
+                    image.sprite = _menuSliderBorderSprite;
+                    image.type = Image.Type.Sliced;
+                    break;
+                case "Fill":
+                    image.sprite = _menuSliderBgSprite;
+                    image.type = Image.Type.Filled;
+                    break;
+                case "Handle":
+                    image.sprite = _menuSliderHandleSprite;
+                    image.type = Image.Type.Simple;
+                    image.preserveAspect = true;
+                    break;
+            }
+        }
+    }
+
+    private void ApplyAudioTabMenuStyle()
+    {
+        EnsureMenuUiSpritesLoaded();
+
+        ApplyVolumeSliderMenuStyle(masterVolumeSlider);
+        ApplyVolumeSliderMenuStyle(bgmVolumeSlider);
+        ApplyVolumeSliderMenuStyle(sfxVolumeSlider);
+
+        if (muteOnFocusLostOnSprite == null)
+            muteOnFocusLostOnSprite = _menuToggleOnSprite;
+        if (muteOnFocusLostOffSprite == null)
+            muteOnFocusLostOffSprite = _menuToggleOffSprite;
+        if (pauseOnFocusLostOnSprite == null)
+            pauseOnFocusLostOnSprite = _menuToggleOnSprite;
+        if (pauseOnFocusLostOffSprite == null)
+            pauseOnFocusLostOffSprite = _menuToggleOffSprite;
     }
 
     private void ConfigureToggleWithSprites(Toggle toggle, bool initialValue, Sprite onSprite, Sprite offSprite, System.Action<bool> onValueChanged)

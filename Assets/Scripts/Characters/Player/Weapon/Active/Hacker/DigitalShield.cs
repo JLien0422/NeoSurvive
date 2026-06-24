@@ -45,6 +45,14 @@ namespace NeoSurvive.Weapon
             if (owner == null)
                 owner = GetComponent<Player>();
 
+            // [수정] 무기 프리팹에 잘못 부착되어 웨이브가 무한 증식/중첩 발사되는 문제(소리 증폭 등) 방지
+            if (owner == null)
+            {
+                if (debugLog) Debug.LogWarning("[DigitalShield] owner가 없습니다. 잘못된 부착이므로 스크립트를 비활성화합니다.");
+                enabled = false;
+                return;
+            }
+
             ApplyStatsFromCSV(level);
         }
 
@@ -190,6 +198,12 @@ namespace NeoSurvive.Weapon
             if (row.hitradius > 0f) hitRadius = row.hitradius;
             if (row.knockbackforce > 0f) knockbackForce = row.knockbackforce;
             if (row.knockbackduration > 0f) knockbackDuration = row.knockbackduration;
+
+            if (Player.Instance != null)
+            {
+                fireRate *= Player.Instance.GetComputeOptimizationCooldownMultiplier();
+                knockbackDuration *= Player.Instance.GetSuperconductiveCircuitsDurationMultiplier();
+            }
 
             if (targetLevel >= 5)
             {

@@ -116,6 +116,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7584989283199849268}
   - component: {fileID: -4276880272665728143}
+  - component: {fileID: -732318482717501030}
   m_Layer: 0
   m_Name: Deployed Turret
   m_TagString: Untagged

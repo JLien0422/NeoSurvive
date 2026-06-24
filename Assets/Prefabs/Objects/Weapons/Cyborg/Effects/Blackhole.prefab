@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4645003805702997080}
   - component: {fileID: 4579637624255844719}
   - component: {fileID: -5638753394414773928}
+  - component: {fileID: -3686585176361441809}
   m_Layer: 0
   m_Name: Blackhole
   m_TagString: Untagged
@@ -101,3 +102,18 @@ MonoBehaviour:
   rotateSpeed: 360
   pulseScale: 0.12
   pulseSpeed: 6
+--- !u!114 &-3686585176361441809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017606884553233075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

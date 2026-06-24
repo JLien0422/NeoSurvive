@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6812265035506201799}
   - component: {fileID: 3053531294154349333}
+  - component: {fileID: 7925726750975082792}
   m_Layer: 0
   m_Name: PlasmaRifle
   m_TagString: Untagged
@@ -49,3 +50,18 @@ MonoBehaviour:
   fireRate: 1
   bulletSpeed: 200
   lazerPrefab: {fileID: 7537406376116908388, guid: ba789425f74007744a8045094ae89e3f, type: 3}
+--- !u!114 &7925726750975082792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7631013138892754734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

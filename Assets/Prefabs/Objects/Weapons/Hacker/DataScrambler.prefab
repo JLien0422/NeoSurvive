@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3358107807983987545}
   - component: {fileID: 7038467266003380318}
+  - component: {fileID: 7159122911668030378}
   m_Layer: 0
   m_Name: DataScrambler
   m_TagString: Untagged

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7964608701303590884}
   - component: {fileID: 2834867424136611229}
+  - component: {fileID: -4757705834975426361}
   m_Layer: 0
   m_Name: TeslaCoilArmor
   m_TagString: Untagged
@@ -69,3 +70,18 @@ MonoBehaviour:
   lightningVfxLifetime: 2
   debugLog: 1
   debugDraw: 1
+--- !u!114 &-4757705834975426361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691817947624430636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

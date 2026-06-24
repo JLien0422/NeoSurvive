@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 773364937470172814}
   - component: {fileID: 979029126457090813}
+  - component: {fileID: -8183370720668935088}
   m_Layer: 0
   m_Name: HologramDecoyGenerator
   m_TagString: Untagged

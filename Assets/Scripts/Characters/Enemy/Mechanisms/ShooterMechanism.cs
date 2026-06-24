@@ -28,10 +28,6 @@ public class ShooterMechanism : EnemyMechanismBase
     [Tooltip("투사체 대미지")]
     private float projectileDamage = 5f;
 
-    [Min(0.1f)]
-    [Tooltip("투사체가 자동으로 사라지는 시간 (초)")]
-    public float projectileLifeTime = 3.5f;
-
     [SerializeField]
     [Tooltip("발사 위치 오프셋 (적 루트 로컬 공간; localScale.x 반전 시 TransformPoint로 같이 미러링됨)")]
     private Vector2 shootOffset = Vector2.zero;
@@ -223,7 +219,7 @@ public class ShooterMechanism : EnemyMechanismBase
             enemyProj = projectile.AddComponent<EnemyProjectile>();
         }
 
-        enemyProj.Initialize(direction, damage, projectileSpeed, projectileLifeTime);
+        enemyProj.Initialize(direction, damage, projectileSpeed);
     }
 
     private void ResolveGunAnimatorIfNeeded()
@@ -329,21 +325,17 @@ public class ShooterMechanism : EnemyMechanismBase
 public class EnemyProjectile : MonoBehaviour
 {
     public float damage = 5f;
-    [SerializeField] private float lifeTime = 3.5f;
-    private static readonly int WallLayer = LayerMask.NameToLayer("Wall");
-    private static readonly int ObstacleLayer = LayerMask.NameToLayer("Obstacle");
     private Vector2 direction;
     private float speed;
     private bool initialized;
     private bool hasHit;
     private Rigidbody2D rb;
 
-    public void Initialize(Vector2 direction, float damage, float speed, float lifeTime)
+    public void Initialize(Vector2 direction, float damage, float speed)
     {
         this.direction = direction.normalized;
         this.damage = damage;
         this.speed = speed;
-        this.lifeTime = Mathf.Max(0.1f, lifeTime);
         initialized = true;
 
         rb = GetComponent<Rigidbody2D>();
@@ -354,21 +346,18 @@ public class EnemyProjectile : MonoBehaviour
 
         rb.gravityScale = 0f;
         rb.velocity = this.direction * this.speed;
-        Destroy(gameObject, this.lifeTime);
     }
 
     private void Start()
     {
-        if (!initialized)
-        {
-            rb = GetComponent<Rigidbody2D>();
-            if (rb != null && rb.velocity.sqrMagnitude > 0f)
-            {
-                direction = rb.velocity.normalized;
-                speed = rb.velocity.magnitude;
-            }
+        if (initialized)
+            return;
 
-            Destroy(gameObject, lifeTime);
+        rb = GetComponent<Rigidbody2D>();
+        if (rb != null && rb.velocity.sqrMagnitude > 0f)
+        {
+            direction = rb.velocity.normalized;
+            speed = rb.velocity.magnitude;
         }
     }
 
@@ -378,11 +367,16 @@ public class EnemyProjectile : MonoBehaviour
         {
             transform.position += (Vector3)(direction * speed * Time.deltaTime);
         }
+
+        if (IsOutsideCameraView())
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (TryHitDamageTarget(other) || IsBlockingCollider(other))
+        if (TryHitDamageTarget(other))
         {
             Destroy(gameObject);
         }
@@ -393,7 +387,7 @@ public class EnemyProjectile : MonoBehaviour
         Collider2D other = collision.collider;
         if (other == null) return;
 
-        if (TryHitDamageTarget(other) || IsBlockingCollider(other))
+        if (TryHitDamageTarget(other))
         {
             Destroy(gameObject);
         }
@@ -416,9 +410,13 @@ public class EnemyProjectile : MonoBehaviour
         return true;
     }
 
-    private static bool IsBlockingCollider(Collider2D other)
+    private bool IsOutsideCameraView()
     {
-        int layer = other.gameObject.layer;
-        return (WallLayer >= 0 && layer == WallLayer) || (ObstacleLayer >= 0 && layer == ObstacleLayer);
+        Camera cam = Camera.main;
+        if (cam == null)
+            return false;
+
+        Vector3 viewport = cam.WorldToViewportPoint(transform.position);
+        return viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f;
     }
 }

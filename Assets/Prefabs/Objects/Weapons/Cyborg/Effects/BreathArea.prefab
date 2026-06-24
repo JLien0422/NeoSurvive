@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5719037657131952622}
   - component: {fileID: 5467992296785758030}
   - component: {fileID: -8457013940859991320}
+  - component: {fileID: 7731170382589058677}
   m_Layer: 0
   m_Name: BreathArea
   m_TagString: Untagged
@@ -122,3 +123,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7731170382589058677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7298700397245030376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

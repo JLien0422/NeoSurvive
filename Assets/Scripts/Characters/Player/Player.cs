@@ -16,6 +16,8 @@ public enum PlayerClassType
 // Character 클래스를 상속받아 캐릭터의 기본 기능을 모두 가집니다.
 public class Player : Character
 {
+  public static Player Instance { get; private set; }
+
   /// <summary>플레이어 사망 시 발생 (GameOverUI 등에서 구독). Destroy 직전에 호출됩니다.</summary>
   public static event System.Action OnPlayerDied;
 
@@ -36,18 +38,18 @@ public class Player : Character
 
   public int RequiredExpForNextLevel
   {
-      get
-      {
-          return PlayerExpLoader.GetRequiredExp(level, fallbackRequiredExpForNextLevel);
-      }
+    get
+    {
+      return PlayerExpLoader.GetRequiredExp(level, fallbackRequiredExpForNextLevel);
+    }
   }
 
   public int MaxLevel
   {
-      get
-      {
-          return PlayerExpLoader.GetMaxLevel(fallbackMaxLevel);
-      }
+    get
+    {
+      return PlayerExpLoader.GetMaxLevel(fallbackMaxLevel);
+    }
   }
 
   public bool IsMaxLevel => level >= MaxLevel;
@@ -115,6 +117,12 @@ public class Player : Character
   private float originalAttackSpeedPercent = 0f;
   private float originalDamagePercent = 0f;
 
+  // 시작 시 특성 보너스 저장 (재초기화 시 중복 적용 방지용)
+  private float appliedTraitMoveSpeedPercent = 0f;
+  private float appliedTraitAttackSpeedPercent = 0f;
+  private float appliedTraitDamagePercent = 0f;
+  private float appliedTraitAttackRangePercent = 0f;
+
   [Header("신경 링크 (Neural Link) 시스템")]
   [SerializeField]
   [Range(0f, 100f)]
@@ -160,6 +168,21 @@ public class Player : Character
   #endregion
 
   #endregion
+
+  protected override void Awake()
+  {
+    if (Instance == null)
+    {
+      Instance = this;
+    }
+    else if (Instance != this)
+    {
+      Destroy(gameObject);
+      return;
+    }
+
+    base.Awake();
+  }
 
   // (추가) StatusFlags의 배율을 Stat 퍼센트 모디파이어로 적용/해제(델타 방식)
   private void SyncBuffMultipliersToStats() // (추가)
@@ -276,11 +299,19 @@ public class Player : Character
     GameManager.Instance.NotifyPlayerSpawned(); // GameManager에 플레이어 생성 알림
   }
 
+  private void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
+  }
+
   /// <summary>
   /// 캐릭터 타입에 따라 스탯을 초기화합니다.
   /// </summary>
   public void InitCharacter(CharacterType type)
   {
+    RemoveAppliedTraitCombatBonuses();
+
     // CSV 값이 있으면 덮어쓰기
     if (CharacterBalanceLoader.DB != null)
     {
@@ -308,9 +339,138 @@ public class Player : Character
     // HP는 maxHP 기준으로 즉시 동기화 (스폰 직후 currentHP=0 문제 방지)
     EnsureHpInitialized(refillToMax: true);
 
-    // TODO -> 특성 등 추가 시 여기에 초기화 코드 작성
+    // 특성 보너스는 시작 시점에 한 번 전투 스탯에 반영합니다.
+    ApplyTraitCombatBonuses();
+
+    ApplyLobbyTraitPsychoCorruption(type);
 
     Debug.Log($"[Player] {type} 캐릭터 초기화 완료: HP={currentHP.BaseValue}, ATK={attackDamage.BaseValue}");
+  }
+
+  public override void TakeDamage(float amount, WeaponBase sourceWeapon)
+  {
+    if (HasTrait("nano_armor"))
+    {
+      amount *= GetNanoArmorDamageMultiplier();
+    }
+
+    base.TakeDamage(amount, sourceWeapon);
+
+    if (amount > 0f && HasTrait("reactive_exoskeleton"))
+    {
+      TriggerReactiveExoskeleton(amount);
+    }
+  }
+
+  public int GetTraitLevel(string traitId)
+  {
+    return TraitManager.Instance != null ? TraitManager.Instance.GetTraitLevel(traitId) : 0;
+  }
+
+  public bool HasTrait(string traitId)
+  {
+    return GetTraitLevel(traitId) > 0;
+  }
+
+  public float GetCriticalBreakthroughMultiplier()
+  {
+    if (!HasTrait("critical_breakthrough"))
+      return 1f;
+
+    float maxValue = Mathf.Max(1f, maxHP.GetValue());
+    float missingRatio = 1f - Mathf.Clamp01(currentHP.CurrentValue / maxValue);
+    return 1f + missingRatio;
+  }
+
+  public float GetVirusDevelopmentMultiplier()
+  {
+    int level = GetTraitLevel("virus_development");
+    return level <= 0 ? 1f : 1f + 0.35f * level;
+  }
+
+  public float GetNanoArmorDamageMultiplier()
+  {
+    int level = GetTraitLevel("nano_armor");
+    return level <= 0 ? 1f : Mathf.Clamp01(1f - 0.05f * level);
+  }
+
+  public float GetKnockbackResistanceMultiplier()
+  {
+    int level = GetTraitLevel("inertia_frame");
+    return level <= 0 ? 1f : Mathf.Clamp01(1f - 0.10f * level);
+  }
+
+  public float GetComputeOptimizationCooldownMultiplier()
+  {
+    int level = GetTraitLevel("compute_optimization");
+    return level <= 0 ? 1f : Mathf.Max(0.1f, 1f - 0.05f * level);
+  }
+
+  public float GetFacilityAugmentationDurationMultiplier()
+  {
+    int level = GetTraitLevel("facility_augmentation");
+    return level <= 0 ? 1f : 1f + 0.10f * level;
+  }
+
+  public float GetOverchargedBatteryTickMultiplier()
+  {
+    int level = GetTraitLevel("overcharged_battery");
+    return level <= 0 ? 1f : Mathf.Max(0.1f, 1f - 0.10f * level);
+  }
+
+  public float GetCompileNodeExpansionMultiplier()
+  {
+    int level = GetTraitLevel("compile_node_expansion");
+    return level <= 0 ? 1f : 1f + 0.10f * level;
+  }
+
+  public float GetInertiaChargeMultiplier()
+  {
+    int level = GetTraitLevel("inertia_charge");
+    if (level <= 0)
+      return 1f;
+
+    float baseValue = Mathf.Max(0.0001f, moveSpeed.BaseValue);
+    return Mathf.Max(1f, moveSpeed.GetValue() / baseValue);
+  }
+
+  public float GetSuperconductiveCircuitsDurationMultiplier()
+  {
+    int level = GetTraitLevel("superconductive_circuits");
+    return level <= 0 ? 1f : 1f + 0.10f * level;
+  }
+
+  public int GetBandwidthExpansionBonusCount()
+  {
+    return HasTrait("bandwidth_expansion") ? 2 : 0;
+  }
+
+  public float GetBandwidthExpansionCloneMultiplier()
+  {
+    return HasTrait("bandwidth_expansion") ? 0.7f : 1f;
+  }
+
+  private void TriggerReactiveExoskeleton(float incomingDamage)
+  {
+    int level = GetTraitLevel("reactive_exoskeleton");
+    if (level <= 0)
+      return;
+
+    float radius = 1.5f + 0.25f * level;
+    float damage = Mathf.Max(1f, incomingDamage * 0.10f * level);
+
+    Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+    foreach (Collider2D hit in hits)
+    {
+      if (hit == null || !hit.CompareTag("Enemy"))
+        continue;
+
+      Character enemy = hit.GetComponentInParent<Character>();
+      if (enemy == null || enemy == this || enemy.IsDead)
+        continue;
+
+      enemy.TakeDamage(damage, null);
+    }
   }
 
   // 부모 클래스(Character)의 Die 메서드를 오버라이드(재정의)하여
@@ -322,6 +482,12 @@ public class Player : Character
 
     Debug.Log($"{gameObject.name} (플레이어)가 죽었습니다!");
     GameAnalyticsTracker.TrackPlayerDeath(this);
+
+    if (SoundManager.Instance != null)
+    {
+      SoundManager.Instance.PlayPlayerDeath();
+      SoundManager.Instance.PlayGameOver();
+    }
 
     // GameManager에 플레이어의 죽음을 알리고 골드를 저장합니다.
     if (GameManager.Instance != null)
@@ -340,9 +506,9 @@ public class Player : Character
   {
     if (IsMaxLevel)
     {
-        experience = 0;
-        OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
-        return;
+      experience = 0;
+      OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
+      return;
     }
 
     experience += amount;
@@ -370,13 +536,13 @@ public class Player : Character
   {
     while (!IsMaxLevel && experience >= RequiredExpForNextLevel)
     {
-        experience -= RequiredExpForNextLevel;
-        LevelUpInternal();
+      experience -= RequiredExpForNextLevel;
+      LevelUpInternal();
     }
 
     if (IsMaxLevel)
     {
-        experience = 0;
+      experience = 0;
     }
 
     OnExpChanged?.Invoke(experience, RequiredExpForNextLevel);
@@ -394,6 +560,38 @@ public class Player : Character
   }
 
   #region Cyber Psycho
+  /// <summary>
+  /// 로비 특성창에서 누적된 사이코 잠식도를 인게임 시작 시 적용합니다.
+  /// </summary>
+  private void ApplyLobbyTraitPsychoCorruption(CharacterType type)
+  {
+    if (TraitManager.Instance == null)
+    {
+      Debug.LogWarning("[Player] TraitManager를 찾지 못해 로비 사이코 잠식도를 적용하지 못했습니다.");
+      return;
+    }
+
+    RemoveAllPsychoCorruptionEffects();
+    has30PercentEffect = false;
+    has60PercentEffect = false;
+    has100PercentEffect = false;
+    IsBerserk = false;
+
+    TraitCategory category = type == CharacterType.Cyborg
+      ? TraitCategory.Cyborg
+      : TraitCategory.Hacker;
+
+    psychoCorruption = Mathf.Clamp(
+      TraitManager.Instance.GetCurrentPsychoCorruption(category),
+      0f,
+      100f);
+
+    OnPsychoCorruptionChanged?.Invoke(psychoCorruption, 100f);
+    UpdatePsychoCorruptionEffects();
+
+    Debug.Log($"[Player] 로비 특성 사이코 잠식도 적용: {type} | {psychoCorruption:F1}%");
+  }
+
   /// <summary>
   /// 사이버사이코 잠식도를 감소시킵니다.
   /// 잠식도 감소 아이템이 이 함수를 호출합니다.
@@ -621,6 +819,88 @@ public class Player : Character
     {
       UIManager.Instance.SetScreenNoise(false);
     }
+  }
+
+  private void ApplyTraitCombatBonuses()
+  {
+    if (TraitManager.Instance == null)
+    {
+      Debug.LogWarning("[Player] TraitManager를 찾지 못해 시작 특성 보너스를 적용하지 못했습니다.");
+      return;
+    }
+
+    ApplyTraitPercentBonus("hydraulic_motor_amp", StatType.AttackDamage, 5f, ref appliedTraitDamagePercent);
+    ApplyTraitPercentBonus("energy_overload", StatType.AttackDamage, 5f, ref appliedTraitDamagePercent);
+
+    ApplyTraitPercentBonus("plasma_strand", StatType.AttackSpeed, 5f, ref appliedTraitAttackSpeedPercent);
+
+    ApplyTraitPercentBonus("radar", StatType.AttackRange, 10f, ref appliedTraitAttackRangePercent);
+    ApplyTraitPercentBonus("output_optimization", StatType.AttackRange, 5f, ref appliedTraitAttackRangePercent);
+
+    ApplyTraitPercentBonus("exoskeleton", StatType.MoveSpeed, 10f, ref appliedTraitMoveSpeedPercent);
+
+    Debug.Log($"[Player] 시작 특성 보너스 적용 완료: DMG +{appliedTraitDamagePercent * 100f:F0}%, ASPD +{appliedTraitAttackSpeedPercent * 100f:F0}%, RANGE +{appliedTraitAttackRangePercent * 100f:F0}%, MOVE +{appliedTraitMoveSpeedPercent * 100f:F0}%");
+  }
+
+  private void RemoveAppliedTraitCombatBonuses()
+  {
+    if (appliedTraitMoveSpeedPercent > 0f)
+    {
+      moveSpeed.AddPercentModifier(-appliedTraitMoveSpeedPercent);
+      appliedTraitMoveSpeedPercent = 0f;
+    }
+
+    if (appliedTraitAttackSpeedPercent > 0f)
+    {
+      attackSpeed.AddPercentModifier(-appliedTraitAttackSpeedPercent);
+      appliedTraitAttackSpeedPercent = 0f;
+    }
+
+    if (appliedTraitDamagePercent > 0f)
+    {
+      attackDamage.AddPercentModifier(-appliedTraitDamagePercent);
+      appliedTraitDamagePercent = 0f;
+    }
+
+    if (appliedTraitAttackRangePercent > 0f)
+    {
+      attackRange.AddPercentModifier(-appliedTraitAttackRangePercent);
+      appliedTraitAttackRangePercent = 0f;
+    }
+  }
+
+  private void ApplyTraitPercentBonus(string traitId, StatType statType, float percentPerLevel, ref float appliedPercentCache)
+  {
+    if (TraitManager.Instance == null)
+      return;
+
+    int level = TraitManager.Instance.GetTraitLevel(traitId);
+    if (level <= 0)
+      return;
+
+    float bonusPercent = percentPerLevel * level / 100f;
+    if (bonusPercent <= 0f)
+      return;
+
+    switch (statType)
+    {
+      case StatType.AttackDamage:
+        attackDamage.AddPercentModifier(bonusPercent);
+        break;
+      case StatType.AttackRange:
+        attackRange.AddPercentModifier(bonusPercent);
+        break;
+      case StatType.AttackSpeed:
+        attackSpeed.AddPercentModifier(bonusPercent);
+        break;
+      case StatType.MoveSpeed:
+        moveSpeed.AddPercentModifier(bonusPercent);
+        break;
+      default:
+        return;
+    }
+
+    appliedPercentCache += bonusPercent;
   }
 
   #endregion

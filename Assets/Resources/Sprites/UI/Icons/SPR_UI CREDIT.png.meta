@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 344eeb3f879e40d409ef4d1a269b1f1a
+guid: 4ba0eb9aadb4cd547abb7b324d9eb8f2
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -111,8 +111,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1dc3e743b26ea0c498782905b9963c17
-      internalID: 1207900880
+      spriteID: 0bb9b423e6e42084ab10970341b25b1a
+      internalID: -1376304744
       vertices: []
       indices: 
       edges: []
@@ -128,7 +128,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SPR_UI CREDIT_0: 1207900880
+      SPR_UI CREDIT_0: -1376304744
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

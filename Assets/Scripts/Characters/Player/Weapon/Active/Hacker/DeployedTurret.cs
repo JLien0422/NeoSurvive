@@ -11,6 +11,8 @@ namespace NeoSurvive.Weapon
 
     [SerializeField]
     private GameObject projectilePrefab;
+    [SerializeField]
+    private Vector3 fireOffset = Vector3.zero;
 
     private float fireTimer;
 
@@ -124,9 +126,16 @@ namespace NeoSurvive.Weapon
       }
 
       FaceTarget(target);
-      Vector3 dir = (target.position - transform.position).normalized;
-      GameObject obj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
 
+      Vector3 spawnPos = transform.position;
+      if (fireOffset != Vector3.zero)
+      {
+        // 타겟 방향/회전된 터렛에 따라 위치 반전 적용
+        spawnPos = transform.TransformPoint(fireOffset);
+      }
+
+      Vector3 dir = (target.position - spawnPos).normalized;
+      GameObject obj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
       if (obj.TryGetComponent<Projectile>(out var p))
       {
         p.Initialize(dir, damage, 20f);

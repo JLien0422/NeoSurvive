@@ -95,6 +95,12 @@ namespace NeoSurvive.Weapon
       fireRate = row.firerate;
       spawnRadius = row.spawnradius;
 
+      if (Player.Instance != null)
+      {
+        duration *= Player.Instance.GetFacilityAugmentationDurationMultiplier();
+        fireRate *= Player.Instance.GetComputeOptimizationCooldownMultiplier();
+      }
+
       Debug.Log($"[EMP Pulse] CSV 적용 | Lv={level}, Damage={damage}, Area={areaSize}, Duration={duration}, FireRate={fireRate}, SpawnRadius={spawnRadius}");
     }
   }

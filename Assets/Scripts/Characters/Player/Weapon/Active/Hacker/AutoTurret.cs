@@ -70,6 +70,12 @@ namespace NeoSurvive.Weapon
       installCooldown = row.installcooldown;
       fireRate = row.firerate;
 
+      if (Player.Instance != null)
+      {
+        installCooldown *= Player.Instance.GetComputeOptimizationCooldownMultiplier();
+        lifeTime *= Player.Instance.GetFacilityAugmentationDurationMultiplier();
+      }
+
       Debug.Log($"[AutoTurret] CSV 적용 | Lv={level}, Damage={damage}, Range={range}, Life={lifeTime}, Cool={installCooldown}");
     }
 
@@ -137,6 +143,35 @@ namespace NeoSurvive.Weapon
         lifeTime,
         projectilePrefab,
         src != null ? src.weaponData : null,
+        IsMasterLevel
+      );
+
+      if (Player.Instance != null && Player.Instance.HasTrait("bandwidth_expansion"))
+      {
+        SpawnExtraTurret(spawnPos + Vector3.right * 0.6f, src != null ? src.weaponData : null);
+      }
+    }
+
+    private void SpawnExtraTurret(Vector3 spawnPos, WeaponBase sourceWeapon)
+    {
+      if (dronePrefab == null)
+        return;
+
+      GameObject extraDrone = Instantiate(dronePrefab, spawnPos, Quaternion.identity);
+      DeployedTurret extraTurret = extraDrone.GetComponent<DeployedTurret>();
+
+      if (extraTurret == null)
+        return;
+
+      float cloneMul = Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f;
+
+      extraTurret.Initialize(
+        damage * cloneMul,
+        range * cloneMul,
+        fireRate,
+        lifeTime * cloneMul,
+        projectilePrefab,
+        sourceWeapon,
         IsMasterLevel
       );
     }

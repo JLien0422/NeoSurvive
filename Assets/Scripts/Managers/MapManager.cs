@@ -8,11 +8,23 @@ using System.Collections.Generic;
 public class MapManager : MonoBehaviour
 {
   private const int TileSortingOrder = -10;
+  private const int DecoTileSortingOrder = TileSortingOrder + 1;
+
+  [System.Serializable]
+  public class WeightedTilePrefab
+  {
+    public GameObject prefab;
+    [Min(0f)] public float weight = 1f;
+  }
 
   [Header("맵 프리팹 설정")]
-  public GameObject baseTilePrefab;     // 기본 바닥 타일 (거의 모든 곳)
-  public List<GameObject> flowerPrefabs;    // 꽃 장식 타일들
-  public List<GameObject> grassPrefabs;     // 풀 장식 타일들
+  [Tooltip("기본 바닥 타일 후보와 가중치. 예: tile 50, 1-1 20, 3 20, 3-1 10")]
+  public List<WeightedTilePrefab> baseTilePrefabs = new();
+
+  [Tooltip("낮은 확률로 기본 타일 위에 추가 생성되는 데코 타일 프리팹")]
+  public List<GameObject> decoTilePrefabs = new();
+
+  [HideInInspector] public GameObject baseTilePrefab; // 기존 씬 참조 유지용 fallback
 
   [Header("맵 설정 (Pixel 방식)")]
   public bool autoSizeFromPrefab = true; // 프리팹 스프라이트 크기에 맞춰 자동 조절
@@ -28,8 +40,12 @@ public class MapManager : MonoBehaviour
   [Tooltip("타일이 삭제되기 전 추가로 유지되는 거리 (히스테리시스)")]
   public int despawnMargin = 2;
   public int seed = 42;
-  [Range(0f, 1f)] public float flowerChance = 0.1f; // 꽃이 나올 확률
-  [Range(0f, 1f)] public float grassChance = 0.2f;  // 풀이 나올 확률
+
+  [Header("데코 타일 생성 설정")]
+  [Range(0f, 1f)] public float decoTileChance = 0.01f;
+  [Tooltip("기존 데코 타일 기준 가로/세로 몇 칸 안에 새 데코를 금지할지")]
+  [Min(0)] public int decoTileMinSpacing = 3;
+
   public Transform playerTransform;
 
   public void SetTarget(Transform target)
@@ -47,14 +63,13 @@ public class MapManager : MonoBehaviour
   // 타일 크기 계산용
   private float actualTileSize;
   private Dictionary<Vector2Int, GameObject> activeTiles = new();
+  private Dictionary<Vector2Int, GameObject> activeDecoTiles = new();
   private Dictionary<Object, Rect> reservedTileAreas = new();
   private Vector2Int lastCoord = new Vector2Int(int.MinValue, int.MinValue);
 
-  // 카테고리별 풀 관리를 위한 딕셔너리
-  // 0: Base, 1: Flower, 2: Grass
+  // 프리팹 인덱스별 풀 관리
   private Dictionary<int, Queue<GameObject>> basePool = new();
-  private Dictionary<int, Queue<GameObject>> flowerPool = new();
-  private Dictionary<int, Queue<GameObject>> grassPool = new();
+  private Dictionary<int, Queue<GameObject>> decoPool = new();
 
   private void Start()
   {
@@ -245,60 +260,25 @@ public class MapManager : MonoBehaviour
   {
     // 결정론적인 난수 생성기
     System.Random prng = GetPRNG(coord);
-    double roll = prng.NextDouble();
 
-    GameObject tile = null;
-    int typeIndex = 0; // 0: Base, 1: Flower, 2: Grass
-    int subIndex = 0;
-
-    if (roll < flowerChance && flowerPrefabs.Count > 0)
+    if (!TrySelectBaseTile(prng, out int baseIndex, out GameObject basePrefab))
     {
-      typeIndex = 1;
-      subIndex = prng.Next(0, flowerPrefabs.Count);
-      tile = GetFromPool(flowerPool, subIndex, flowerPrefabs[subIndex]);
-    }
-    else if (roll < (flowerChance + grassChance) && grassPrefabs.Count > 0)
-    {
-      typeIndex = 2;
-      subIndex = prng.Next(0, grassPrefabs.Count);
-      tile = GetFromPool(grassPool, subIndex, grassPrefabs[subIndex]);
-    }
-    else
-    {
-      typeIndex = 0;
-      subIndex = 0;
-      tile = GetFromPool(basePool, subIndex, baseTilePrefab);
+      Debug.LogError("[MapManager] 생성 가능한 baseTilePrefabs가 없습니다. 인스펙터에 tile, 1-1, 3, 3-1 프리팹을 등록하세요.");
+      return;
     }
 
-    tile.name = $"Type_{typeIndex}_{subIndex}"; // 풀링 식별용 이름
+    GameObject tile = GetFromPool(basePool, baseIndex, basePrefab);
+    tile.name = $"BaseTile_{baseIndex}"; // 풀링 식별용 이름
     tile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, tileZValue);
 
-    // 타일이 실제 칸(actualTileSize)을 꽉 채우도록 스케일 조정
-    // 1.01배로 약간 크게 만들어서 타일 사이 간격이 보이지 않도록 함
-    var sr = tile.GetComponentInChildren<SpriteRenderer>(true);
-    if (sr != null)
-    {
-      sr.sortingOrder = TileSortingOrder;
-    }
-
-    if (sr != null && sr.sprite != null)
-    {
-      float spriteWorldWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
-      if (spriteWorldWidth > 0)
-      {
-        float scale = ((actualTileSize - gap) / spriteWorldWidth) * 1.01f;
-        tile.transform.localScale = new Vector3(scale, scale, 1f);
-      }
-    }
-    else
-    {
-      tile.transform.localScale = Vector3.one;
-    }
+    ApplyTileVisualSettings(tile, TileSortingOrder);
 
     tile.transform.rotation = Quaternion.identity;
 
     tile.SetActive(true);
     activeTiles.Add(coord, tile);
+
+    TrySpawnDecoTile(coord, prng);
 
     if (MapObjectTileSpawner.Instance != null)
     {
@@ -308,6 +288,141 @@ public class MapManager : MonoBehaviour
         actualTileSize
       );
     }
+  }
+
+  private bool TrySelectBaseTile(System.Random prng, out int selectedIndex, out GameObject selectedPrefab)
+  {
+    selectedIndex = -1;
+    selectedPrefab = null;
+
+    float totalWeight = 0f;
+    for (int i = 0; i < baseTilePrefabs.Count; i++)
+    {
+      WeightedTilePrefab entry = baseTilePrefabs[i];
+      if (entry == null || entry.prefab == null || entry.weight <= 0f)
+        continue;
+
+      totalWeight += entry.weight;
+    }
+
+    if (totalWeight <= 0f)
+    {
+      if (baseTilePrefab == null)
+        return false;
+
+      selectedIndex = 0;
+      selectedPrefab = baseTilePrefab;
+      return true;
+    }
+
+    float roll = (float)(prng.NextDouble() * totalWeight);
+    float cumulative = 0f;
+
+    for (int i = 0; i < baseTilePrefabs.Count; i++)
+    {
+      WeightedTilePrefab entry = baseTilePrefabs[i];
+      if (entry == null || entry.prefab == null || entry.weight <= 0f)
+        continue;
+
+      cumulative += entry.weight;
+      if (roll <= cumulative)
+      {
+        selectedIndex = i;
+        selectedPrefab = entry.prefab;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private void TrySpawnDecoTile(Vector2Int coord, System.Random prng)
+  {
+    if (decoTilePrefabs == null || decoTilePrefabs.Count == 0)
+      return;
+
+    if (prng.NextDouble() > decoTileChance)
+      return;
+
+    if (IsDecoTileBlocked(coord))
+      return;
+
+    int decoIndex = PickValidDecoIndex(prng);
+    if (decoIndex < 0)
+      return;
+
+    GameObject decoTile = GetFromPool(decoPool, decoIndex, decoTilePrefabs[decoIndex]);
+    decoTile.name = $"DecoTile_{decoIndex}";
+    decoTile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, tileZValue);
+    decoTile.transform.rotation = Quaternion.identity;
+    ApplyTileVisualSettings(decoTile, DecoTileSortingOrder);
+    decoTile.SetActive(true);
+    activeDecoTiles.Add(coord, decoTile);
+  }
+
+  private int PickValidDecoIndex(System.Random prng)
+  {
+    int validCount = 0;
+    for (int i = 0; i < decoTilePrefabs.Count; i++)
+    {
+      if (decoTilePrefabs[i] != null)
+        validCount++;
+    }
+
+    if (validCount == 0)
+      return -1;
+
+    int selectedValidIndex = prng.Next(0, validCount);
+    for (int i = 0; i < decoTilePrefabs.Count; i++)
+    {
+      if (decoTilePrefabs[i] == null)
+        continue;
+
+      if (selectedValidIndex == 0)
+        return i;
+
+      selectedValidIndex--;
+    }
+
+    return -1;
+  }
+
+  private bool IsDecoTileBlocked(Vector2Int coord)
+  {
+    foreach (Vector2Int decoCoord in activeDecoTiles.Keys)
+    {
+      if (Mathf.Abs(decoCoord.x - coord.x) <= decoTileMinSpacing &&
+          Mathf.Abs(decoCoord.y - coord.y) <= decoTileMinSpacing)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private void ApplyTileVisualSettings(GameObject tile, int sortingOrder)
+  {
+    // 타일이 실제 칸(actualTileSize)을 꽉 채우도록 스케일 조정
+    // 1.01배로 약간 크게 만들어서 타일 사이 간격이 보이지 않도록 함
+    var sr = tile.GetComponentInChildren<SpriteRenderer>(true);
+    if (sr != null)
+    {
+      sr.sortingOrder = sortingOrder;
+    }
+
+    if (sr != null && sr.sprite != null)
+    {
+      float spriteWorldWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
+      if (spriteWorldWidth > 0)
+      {
+        float scale = ((actualTileSize - gap) / spriteWorldWidth) * 1.01f;
+        tile.transform.localScale = new Vector3(scale, scale, 1f);
+        return;
+      }
+    }
+
+    tile.transform.localScale = Vector3.one;
   }
 
   private GameObject GetFromPool(Dictionary<int, Queue<GameObject>> poolDict, int index, GameObject prefab)
@@ -332,17 +447,31 @@ public class MapManager : MonoBehaviour
 
       tile.SetActive(false);
       string[] info = tile.name.Split('_');
-      if (info.Length >= 3)
+      if (info.Length >= 2 && int.TryParse(info[1], out int baseIndex))
       {
-        int type = int.Parse(info[1]);
-        int subIndex = int.Parse(info[2]);
-
-        var targetPool = type == 0 ? basePool : (type == 1 ? flowerPool : grassPool);
-        if (!targetPool.ContainsKey(subIndex)) targetPool[subIndex] = new Queue<GameObject>();
-        targetPool[subIndex].Enqueue(tile);
+        if (!basePool.ContainsKey(baseIndex)) basePool[baseIndex] = new Queue<GameObject>();
+        basePool[baseIndex].Enqueue(tile);
       }
       activeTiles.Remove(coord);
     }
+
+    ReturnDecoTileToPool(coord);
+  }
+
+  private void ReturnDecoTileToPool(Vector2Int coord)
+  {
+    if (!activeDecoTiles.TryGetValue(coord, out GameObject decoTile))
+      return;
+
+    decoTile.SetActive(false);
+    string[] info = decoTile.name.Split('_');
+    if (info.Length >= 2 && int.TryParse(info[1], out int decoIndex))
+    {
+      if (!decoPool.ContainsKey(decoIndex)) decoPool[decoIndex] = new Queue<GameObject>();
+      decoPool[decoIndex].Enqueue(decoTile);
+    }
+
+    activeDecoTiles.Remove(coord);
   }
 
   private System.Random GetPRNG(Vector2Int coord)

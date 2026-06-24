@@ -102,6 +102,9 @@ namespace NeoSurvive.Weapon
     {
       if (fistProjectilePrefab == null) return;
 
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayBoosterKnuckleFire();
+
       Vector3 baseOrigin = firePoint != null ? firePoint.position : transform.position;
 
       Transform target = FindClosestTarget(baseOrigin);

@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 8789270601557241111}
   - component: {fileID: 1801468994984455064}
   - component: {fileID: 2899125142992121904}
+  - component: {fileID: 1653300603950744477}
   m_Layer: 0
   m_Name: PlasmaPhoton
   m_TagString: Untagged
@@ -140,3 +141,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1653300603950744477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7521909767303125472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

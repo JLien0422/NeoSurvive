@@ -41,7 +41,7 @@ namespace NeoSurvive.Exp
         {
             if (player == null) return;
             player.GainExperience(amount);
-            SoundManager.Instance?.PlayExpPickup();
+            ItemSoundManager.Instance?.PlayExpPickup();
             Destroy(gameObject);
         }
     }

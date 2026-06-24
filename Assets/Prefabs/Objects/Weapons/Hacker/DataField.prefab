@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9139459883266778686}
   - component: {fileID: 6596267717946754707}
   - component: {fileID: 6867895765825384952}
+  - component: {fileID: 590082012138161286}
   m_Layer: 0
   m_Name: DataField
   m_TagString: Untagged

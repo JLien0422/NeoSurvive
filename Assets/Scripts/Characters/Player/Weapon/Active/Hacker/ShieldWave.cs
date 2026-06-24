@@ -48,13 +48,14 @@ namespace NeoSurvive.Weapon
         {
             this.owner = owner;
             this.damage = damage;
-            this.hitRadius = hitRadius;
+            float expansionMul = Player.Instance != null ? Player.Instance.GetCompileNodeExpansionMultiplier() : 1f;
+            this.hitRadius = hitRadius * expansionMul;
             this.knockbackForce = knockbackForce;
             this.knockbackDuration = knockbackDuration;
             this.isMaster = isMaster;
             this.collisionDamage = collisionDamage;
-            this.collisionDetectRadius = collisionDetectRadius;
-            this.collisionImpactRadius = collisionImpactRadius;
+            this.collisionDetectRadius = collisionDetectRadius * expansionMul;
+            this.collisionImpactRadius = collisionImpactRadius * expansionMul;
             this.collisionCarrierDuration = collisionCarrierDuration;
             this.enemyTag = enemyTag;
             this.debugLog = debugLog;
@@ -83,6 +84,12 @@ namespace NeoSurvive.Weapon
 
                 if (enemy != null && enemy.CompareTag(enemyTag))
                 {
+                    if (!playedSound && InGameSoundManager.Instance != null)
+                    {
+                        InGameSoundManager.Instance.PlayDigitalShieldAttack();
+                        playedSound = true;
+                    }
+
                     if (processed.Contains(enemy)) continue;
 
                     if (!playedSound && InGameSoundManager.Instance != null)
@@ -161,4 +168,4 @@ namespace NeoSurvive.Weapon
         }
 #endif
     }
-}   
+}

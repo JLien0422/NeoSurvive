@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7902857027439044319}
   - component: {fileID: 5534801555840221038}
+  - component: {fileID: 519547233612036436}
   m_Layer: 0
   m_Name: PistolPrefab
   m_TagString: Untagged

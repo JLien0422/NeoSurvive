@@ -142,7 +142,8 @@ public class PlasmaLazer : MonoBehaviour
   {
     this.direction = direction.normalized;
     this.damage = damage;
-    this.range = Mathf.Max(0f, range);
+    float expansionMul = Player.Instance != null ? Player.Instance.GetCompileNodeExpansionMultiplier() : 1f;
+    this.range = Mathf.Max(0f, range * expansionMul);
     this.bulletSpeed = Mathf.Max(0f, bulletSpeed);
     this.duration = Mathf.Max(0.01f, duration);
     this.maxDamageTargets = Mathf.Max(1, penetration + 1);

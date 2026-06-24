@@ -18,6 +18,7 @@ namespace NeoSurvive.Weapon
     private Transform target;
     private Vector3 destination;
     private WeaponBase sourceWeapon;
+    private bool ricochetUsed;
 
     public event System.Action OnHitEvent;
 
@@ -83,10 +84,61 @@ namespace NeoSurvive.Weapon
 
     protected virtual void OnHit()
     {
+      if (TryRicochet())
+        return;
+
       // 명중 이펙트
       VisualEffectHelper.CreateCircleEffect(transform.position, 0.3f, Color.white, 0.1f);
       // 기본적으로 명중 시 소멸
       Destroy(gameObject);
+    }
+
+    private bool TryRicochet()
+    {
+      if (ricochetUsed)
+        return false;
+
+      if (Player.Instance == null || !Player.Instance.HasTrait("ricochet"))
+        return false;
+
+      int level = Player.Instance.GetTraitLevel("ricochet");
+      if (level <= 0)
+        return false;
+
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 4f + level);
+      Character nearest = null;
+      float nearestDistance = float.MaxValue;
+
+      foreach (Collider2D hit in hits)
+      {
+        if (hit == null || hit.gameObject == gameObject)
+          continue;
+
+        if (!hit.CompareTag("Enemy"))
+          continue;
+
+        Character targetCharacter = hit.GetComponentInParent<Character>();
+        if (targetCharacter == null || targetCharacter.IsDead)
+          continue;
+
+        float distance = Vector2.Distance(transform.position, targetCharacter.transform.position);
+        if (distance < nearestDistance)
+        {
+          nearestDistance = distance;
+          nearest = targetCharacter;
+        }
+      }
+
+      if (nearest == null)
+        return false;
+
+      ricochetUsed = true;
+      target = nearest.transform;
+      destination = Vector3.zero;
+      direction = (nearest.transform.position - transform.position).normalized;
+      transform.position += direction * 0.15f;
+
+      return true;
     }
 
     public void SetTarget(Transform t)

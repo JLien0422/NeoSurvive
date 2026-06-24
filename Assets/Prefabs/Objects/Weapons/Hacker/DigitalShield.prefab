@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8109854268819214248}
   - component: {fileID: 5639199434422580686}
+  - component: {fileID: -8687140343763276658}
   m_Layer: 0
   m_Name: DigitalShield
   m_TagString: Untagged
@@ -58,3 +59,18 @@ MonoBehaviour:
   collisionImpactRadius: 1.2
   collisionCarrierDuration: 0.8
   debugLog: 0
+--- !u!114 &-8687140343763276658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627411191882316743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

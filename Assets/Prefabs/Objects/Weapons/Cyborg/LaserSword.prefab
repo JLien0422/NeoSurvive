@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6644727431122397021}
   - component: {fileID: 1884259701448498654}
+  - component: {fileID: -2945784015391498648}
   m_Layer: 0
   m_Name: LaserSword
   m_TagString: Untagged
@@ -52,9 +53,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   enemyTag: Enemy
-  enableAttackVfx: 1
-  attackVfxColor: {r: 1, g: 1, b: 1, a: 0.9}
-  attackVfxDuration: 0.15
   sweepPrefab: {fileID: 1939645155375754756, guid: 820bb3b5956ef804e9fab9e13314021a, type: 3}
   sweepPrefabEnhanced: {fileID: 1939645155375754756, guid: 820bb3b5956ef804e9fab9e13314021a, type: 3}
   sweepDuration: 0.25
@@ -68,3 +66,18 @@ MonoBehaviour:
   riftDamageFactor: 0.35
   rangePerLevel: 0.05
   fireRateMulPerLevel: 0.94
+--- !u!114 &-2945784015391498648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2544833515744044033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

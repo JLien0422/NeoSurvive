@@ -21,24 +21,12 @@ public class HackableObject : MonoBehaviour
     [SerializeField] private bool hideBaseSpriteOnFail = true;
     [SerializeField] private int failVfxOrderOffset = 10;
 
-    [Header("Cyborg Capture")]
-    [SerializeField] private bool canCapture = true;
-    [SerializeField] private float captureTime = 5f;
-    [SerializeField] private bool resetCaptureWhenOutOfRange = true;
-    [SerializeField] private CaptureProgressUI captureUI;
-
-    // =========================
-    // ★ 추가: Effect 이벤트
-    // =========================
     public event Action OnActivated;
 
     private GameObject currentIdleVfx;
 
     private bool canHack = false;
     private bool isHacked = false;
-    private bool isCaptured = false;
-
-    private float captureProgress = 0f;
 
     private Player cachedPlayer;
     private float playerSearchTimer = 0f;
@@ -47,22 +35,14 @@ public class HackableObject : MonoBehaviour
     private float checkTimer = 0f;
     private const float CheckInterval = 0.1f;
 
-    private bool IsActivated => isHacked || isCaptured;
-
     private void Start()
     {
         SpawnIdleVFX();
-
-        if (captureUI == null)
-            captureUI = GetComponentInChildren<CaptureProgressUI>(true);
-
-        if (captureUI != null)
-            captureUI.ResetProgress();
     }
 
     private void Update()
     {
-        if (IsActivated) return;
+        if (isHacked) return;
 
         checkTimer += Time.deltaTime;
 
@@ -72,79 +52,21 @@ public class HackableObject : MonoBehaviour
             CheckForPlayer();
         }
 
-        HandleHackerInput();
-        HandleCyborgCapture();
+        HandleHackInput();
     }
 
-    private void HandleHackerInput()
+    private void HandleHackInput()
     {
         if (!canHack || cachedPlayer == null)
             return;
 
-        if (cachedPlayer.CharacterType != CharacterType.Hacker)
+        if (!Input.GetKeyDown(KeyCode.E))
             return;
 
-        if (Input.GetKeyDown(KeyCode.E))
-            StartHacking();
-    }
-
-    private void HandleCyborgCapture()
-    {
-        if (!canCapture || !canHack || cachedPlayer == null)
-        {
-            StopCapture();
-            return;
-        }
-
-        if (cachedPlayer.CharacterType != CharacterType.Cyborg)
-        {
-            StopCapture();
-            return;
-        }
-
-        captureProgress +=
-            Time.deltaTime / Mathf.Max(0.01f, captureTime);
-
-        captureProgress = Mathf.Clamp01(captureProgress);
-
-        if (captureUI != null)
-        {
-            captureUI.Show();
-            captureUI.SetProgress(captureProgress);
-        }
-
-        if (captureProgress >= 1f)
-            CompleteCapture();
-    }
-
-    private void StopCapture()
-    {
-        if (captureProgress <= 0f)
+        if (HackingSystem.Instance != null && HackingSystem.Instance.IsHacking)
             return;
 
-        if (resetCaptureWhenOutOfRange)
-            captureProgress = 0f;
-
-        if (captureUI != null)
-            captureUI.ResetProgress();
-    }
-
-    private void CompleteCapture()
-    {
-        if (isCaptured)
-            return;
-
-        isCaptured = true;
-
-        Debug.Log(
-            $"[HackableObject] {objectType} 사이보그 점령 성공! 효과 발동!"
-        );
-
-        if (captureUI != null)
-            captureUI.ShowCompleted();
-
-        DestroyIdleVFX();
-        ActivateEffect();
+        StartHacking();
     }
 
     private void CheckForPlayer()
@@ -184,8 +106,7 @@ public class HackableObject : MonoBehaviour
 
     private void StartHacking()
     {
-        if (cachedPlayer == null ||
-            cachedPlayer.CharacterType != CharacterType.Hacker)
+        if (cachedPlayer == null)
             return;
 
         if (HackingSystem.Instance == null)
@@ -206,7 +127,7 @@ public class HackableObject : MonoBehaviour
         );
 
         Debug.Log(
-            $"[HackableObject] {objectType} 해킹 시작"
+            $"[HackableObject] {objectType} 해킹 시작 ({cachedPlayer.CharacterType})"
         );
 
         HackingSystem.Instance.StartHacking(
@@ -231,9 +152,6 @@ public class HackableObject : MonoBehaviour
             $"[HackableObject] {objectType} 해킹 성공! 효과 발동!"
         );
 
-        if (captureUI != null)
-            captureUI.ResetProgress();
-
         DestroyIdleVFX();
         ActivateEffect();
     }
@@ -249,9 +167,6 @@ public class HackableObject : MonoBehaviour
         Debug.Log(
             $"[HackableObject] {objectType} 해킹 실패! 사이코잠식도 +{psychoIncreaseOnFail}%"
         );
-
-        if (captureUI != null)
-            captureUI.ResetProgress();
 
         DestroyIdleVFX();
         SpawnFailVFX();
@@ -398,9 +313,6 @@ public class HackableObject : MonoBehaviour
 
     private void ActivateEffect()
     {
-        // =========================
-        // ★ 이벤트 호출
-        // =========================
         OnActivated?.Invoke();
 
         switch (objectType)
@@ -441,11 +353,6 @@ public class HackableObject : MonoBehaviour
                 break;
             }
 
-            // =========================
-            // ★ Synapse / Beacon 직접 호출 제거
-            // 이벤트 기반으로 동작
-            // =========================
-
             default:
                 break;
         }
@@ -469,11 +376,16 @@ public class HackableObject : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.cyan;
+        Vector3 center = transform.position;
 
-        Gizmos.DrawWireSphere(
-            transform.position,
-            hackRange
+        Gizmos.color = new Color(1f, 0.92f, 0.2f, 0.9f);
+        Gizmos.DrawWireSphere(center, hackRange);
+
+        float zoneRadius = HackingZoneGizmoDraw.ResolveCyborgZoneRadius();
+        HackingZoneGizmoDraw.DrawWireCircle(
+            center,
+            zoneRadius,
+            new Color(0f, 0.85f, 0.95f, 0.95f)
         );
     }
 }

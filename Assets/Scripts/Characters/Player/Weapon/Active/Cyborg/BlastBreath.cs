@@ -126,6 +126,9 @@ namespace NeoSurvive.Weapon
     {
       if (breathAreaPrefab == null) return;
 
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayBlastBreathFire();
+
       Vector3 aimOrigin = firePoint ? firePoint.position : transform.position;
 
       Transform target = FindClosestTarget(aimOrigin);

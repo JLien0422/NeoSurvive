@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3521933443991052514}
   - component: {fileID: 9217191601215895476}
   - component: {fileID: 189806787830236226}
+  - component: {fileID: 4485312531882447933}
   m_Layer: 0
   m_Name: ChainSaw
   m_TagString: Untagged
@@ -184,3 +185,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4485312531882447933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068046529786470421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

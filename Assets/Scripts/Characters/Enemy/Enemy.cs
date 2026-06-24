@@ -97,6 +97,11 @@ public class Enemy : Character
     // 부모의 Die 메서드를 먼저 호출하여 기본적인 사망 처리를 수행합니다.
     base.Die();
 
+    if (SoundManager.Instance != null)
+    {
+      SoundManager.Instance.PlayEnemyDeath();
+    }
+
     // 싱글플레이: 경험치 오브 드랍 메서드 호출 (추가)
     DropExpOrbs();
     // 골드 드랍 메서드 호출

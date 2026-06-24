@@ -68,6 +68,11 @@ namespace NeoSurvive.Buff
             return ids;
         }
 
+        public bool HasAnyActiveBuffs()
+        {
+            return activeBuffs.Count > 0;
+        }
+
         private void AddBuffInternal(IBuff buff, uint? buffId, uint stacks, float duration)
         {
             if (buff == null) return;

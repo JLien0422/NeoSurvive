@@ -81,8 +81,12 @@ namespace NeoSurvive.Weapon
 
       ApplyStatsFromCSV(currentLevel);
 
-      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
+      float expansionMul = Player.Instance != null ? Player.Instance.GetCompileNodeExpansionMultiplier() : 1f;
+      float inertiaMul = Player.Instance != null ? Player.Instance.GetInertiaChargeMultiplier() : 1f;
+
+      range = baseRange * (1f + (currentLevel - 1) * rangePerLevel) * expansionMul;
       fireRate = baseFireRate * Mathf.Pow(fireRateMulPerLevel, (currentLevel - 1));
+      fireRate /= Mathf.Max(0.0001f, inertiaMul);
     }
 
     private void ApplyStatsFromCSV(int level)

@@ -6741,6 +6741,7 @@ MonoBehaviour:
   weaponIconPrefab: {fileID: 6931289576150443170, guid: f90abdd30d215f44caa32264cef75a37, type: 3}
   expSlider: {fileID: 433421087}
   levelText: {fileID: 1558483951}
+  expFillDuration: 0.25
   gameTimeText: {fileID: 1450491671}
   killCountText: {fileID: 2096946303}
   playerHealthSlider: {fileID: 1205811752}
@@ -6785,6 +6786,7 @@ MonoBehaviour:
   quitButton: {fileID: 0}
   weaponStatsPanel: {fileID: 0}
   settingsUI: {fileID: 0}
+  weaponChoiceUI: {fileID: 0}
   quitSceneName: 
 --- !u!1 &524172791
 GameObject:
@@ -7034,6 +7036,29 @@ MonoBehaviour:
   effectOpacitySlider: {fileID: 1212416617}
   effectOpacityText: {fileID: 1673810315}
   screenShakeToggle: {fileID: 1292922380}
+  fullscreenOnSprite: {fileID: 0}
+  fullscreenOffSprite: {fileID: 0}
+  vSyncOnSprite: {fileID: 0}
+  vSyncOffSprite: {fileID: 0}
+  postProcessingOnSprite: {fileID: 0}
+  postProcessingOffSprite: {fileID: 0}
+  showDamageNumbersOnSprite: {fileID: 0}
+  showDamageNumbersOffSprite: {fileID: 0}
+  screenShakeOnSprite: {fileID: 0}
+  screenShakeOffSprite: {fileID: 0}
+  resolutionOptionFormat: '{0} x {1}'
+  targetFpsOptions:
+  - 30
+  - 60
+  - 120
+  - 144
+  - 240
+  - "\uBB34\uC81C\uD55C"
+  backgroundFpsOptions:
+  - 10
+  - 15
+  - 30
+  - 60
   masterVolumeSlider: {fileID: 1289732780}
   masterVolumeText: {fileID: 715147082}
   bgmVolumeSlider: {fileID: 23157267}
@@ -7041,10 +7066,13 @@ MonoBehaviour:
   sfxVolumeSlider: {fileID: 587067741}
   sfxVolumeText: {fileID: 1311275305}
   muteOnFocusLostToggle: {fileID: 1870415885}
+  muteOnFocusLostOnSprite: {fileID: 0}
+  muteOnFocusLostOffSprite: {fileID: 0}
   pauseOnFocusLostToggle: {fileID: 1115085353}
+  pauseOnFocusLostOnSprite: {fileID: 0}
+  pauseOnFocusLostOffSprite: {fileID: 0}
   settingsPanel: {fileID: 100267514}
-  applyToggleSizeOnStart: 1
-  commonToggleSize: {x: 40, y: 40}
+  closeButton: {fileID: 0}
 --- !u!1 &556891367
 GameObject:
   m_ObjectHideFlags: 0
@@ -13604,9 +13632,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae758385935e1b489d6fe1b7b50b26d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseTilePrefabs: []
+  decoTilePrefabs: []
   baseTilePrefab: {fileID: 511734254542703334, guid: 99d9c2e74bb554744819d13b52fb8556, type: 3}
-  flowerPrefabs: []
-  grassPrefabs: []
   autoSizeFromPrefab: 1
   tilePixelSize: 32
   pixelsPerUnit: 32
@@ -13616,8 +13644,8 @@ MonoBehaviour:
   viewDistanceY: 5
   despawnMargin: 2
   seed: 42
-  flowerChance: 0.1
-  grassChance: 0.2
+  decoTileChance: 0.01
+  decoTileMinSpacing: 3
   playerTransform: {fileID: 0}
 --- !u!1001 &1000662606
 PrefabInstance:
@@ -22537,6 +22565,7 @@ MonoBehaviour:
   quitButton: {fileID: 2009246831}
   weaponStatsPanel: {fileID: 1375788615}
   settingsUI: {fileID: 553265340}
+  weaponChoiceUI: {fileID: 0}
   quitSceneName: LobbyScene
 --- !u!1 &1575553343
 GameObject:
@@ -23957,7 +23986,11 @@ MonoBehaviour:
   - {fileID: 1149695538210919475, guid: af73f41edfd07a149ad9302d71a60828, type: 3}
   - {fileID: 2388062192151467424, guid: 95de08d3d257f6045b6316c45e21d641, type: 3}
   - {fileID: 7370841270425998504, guid: acaca08da3fa73a4b85d21f18908e61f, type: 3}
-  spawnInterval: 0.2
+  minSpawnInterval: 1.8
+  maxSpawnInterval: 2.2
+  minSpawnCount: 1
+  maxSpawnCount: 1
+  spawnIntervalMultiplier: 1
   minSpawnRadius: 5
   maxSpawnRadius: 10
   basicWeight: 0
@@ -30709,6 +30742,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentRunGold: 0
   totalGold: 0
+  enableDebugGoldCommitKey: 1
+  debugGoldCommitKey: 112
   hackerPlayerPrefab: {fileID: 533545058544290356, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}
   cyborgPlayerPrefab: {fileID: 3605631510505107744, guid: c5ab88b5249a3cd45ad71d2a0e64059b, type: 3}
 --- !u!114 &2078993013
@@ -30731,12 +30766,16 @@ MonoBehaviour:
   - {fileID: 7370841270425998504, guid: acaca08da3fa73a4b85d21f18908e61f, type: 3}
   innerRadius: 9.5
   outerRadius: 14.5
+  enemiesPerFrame: 1
   outerCount: 10
   innerCountP2: 18
   innerCountP3: 24
   innerCountP4: 28
   innerCountP5: 32
   siegeDuration: 10
+  enableRewardChest: 1
+  rewardChestDelaySeconds: 15
+  rewardChestSpawnRadius: 2.5
 --- !u!114 &2078993014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30754,6 +30793,8 @@ MonoBehaviour:
   phase4Time: 540
   phase5Time: 720
   siegeEvent: {fileID: 2078993013}
+  postSiegeSpawnSlowDuration: 10
+  postSiegeSpawnIntervalMultiplier: 5
   hackablePrefabs:
   - {fileID: 733874190501676579, guid: e34d5199262cb1a4ab57c961ebcd5fa3, type: 3}
   - {fileID: 6535094812701155988, guid: 2aacc1100fe79814eb758ad2c8210a94, type: 3}

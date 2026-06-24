@@ -25,17 +25,28 @@ namespace NeoSurvive.Buff
     {
         private Rigidbody2D rb;
         private Coroutine knockbackRoutine;
+        private Player player;
 
         public bool IsKnockbackActive { get; private set; }
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            player = GetComponent<Player>();
+            if (player == null)
+                player = GetComponentInParent<Player>();
         }
 
         public void ApplyKnockback(Vector2 velocity, float duration)
         {
             if (rb == null) return;
+
+            if (Player.Instance != null && Player.Instance.HasTrait("inertia_frame"))
+            {
+                float resistance = Player.Instance.GetKnockbackResistanceMultiplier();
+                velocity *= resistance;
+                duration *= resistance;
+            }
 
             if (knockbackRoutine != null)
                 StopCoroutine(knockbackRoutine);

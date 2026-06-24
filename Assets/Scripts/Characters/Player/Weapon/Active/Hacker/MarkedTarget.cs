@@ -35,7 +35,7 @@ namespace NeoSurvive.Weapon
     [Header("표식 유지 시간")]
     [SerializeField] private float duration = 5f;
     [SerializeField] private Vector3 iconLocalOffset = new Vector3(0f, 1.2f, 0f);
-    [SerializeField] private Vector3 iconScale = new Vector3(1.35f, 1.35f, 1f);
+    [SerializeField] private Vector3 iconScale = new Vector3(0.45f, 0.45f, 1f);
     [SerializeField] private int iconSortingOrder = 50;
 
     private float timer;

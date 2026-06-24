@@ -23,6 +23,8 @@ public abstract class Character : MonoBehaviour
   private StatusFlags _baseFlags; // (추가)
   private int _nullWeaponWarnCount = 0;
   private const int NULL_WEAPON_WARN_LIMIT = 5;
+  private WeaponBase _lastSourceWeapon;
+  private float _lastDamageAmount;
 
   protected virtual void Awake()
   {
@@ -52,6 +54,22 @@ public abstract class Character : MonoBehaviour
       amount = mark.ApplyHackerWeaponDamageBonus(amount, sourceWeapon);
     }
 
+    if (sourceWeapon != null && Player.Instance != null)
+    {
+      if (Player.Instance.HasTrait("critical_breakthrough"))
+      {
+        amount *= Player.Instance.GetCriticalBreakthroughMultiplier();
+      }
+
+      if (Player.Instance.HasTrait("virus_development") && HasAnyActiveBuffs())
+      {
+        amount *= Player.Instance.GetVirusDevelopmentMultiplier();
+      }
+    }
+
+    _lastSourceWeapon = sourceWeapon;
+    _lastDamageAmount = amount;
+
     // 무기별 대미지 통계 기록
     if (sourceWeapon != null && WeaponDamageStats.Instance != null)
     {
@@ -68,6 +86,11 @@ public abstract class Character : MonoBehaviour
     if (_baseFlags != null) amount *= _baseFlags.incomingDamageMul;   // (추가)
 
     currentHP.CurrentValue -= amount;
+
+    if (amount > 0f)
+    {
+      PlayHitSound();
+    }
 
     // 데미지 텍스트 표시
     if (UIManager.Instance != null)
@@ -101,6 +124,72 @@ public abstract class Character : MonoBehaviour
   {
     if (IsDead) return;
     IsDead = true;
+
+    TryTriggerChainDischarge();
+  }
+
+  protected bool HasAnyActiveBuffs()
+  {
+    BuffHandler buffHandler = GetComponent<BuffHandler>();
+    return buffHandler != null && buffHandler.HasAnyActiveBuffs();
+  }
+
+  private void TryTriggerChainDischarge()
+  {
+    if (_lastSourceWeapon == null)
+      return;
+
+    if (Player.Instance == null || !Player.Instance.HasTrait("chain_discharge"))
+      return;
+
+    if (Random.value > 0.30f)
+      return;
+
+    Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 4f);
+    Character nearest = null;
+    float nearestDistance = float.MaxValue;
+
+    foreach (Collider2D hit in hits)
+    {
+      if (hit == null || hit.gameObject == gameObject)
+        continue;
+
+      if (!hit.CompareTag("Enemy"))
+        continue;
+
+      Character target = hit.GetComponentInParent<Character>();
+      if (target == null || target == this || target.IsDead)
+        continue;
+
+      float distance = Vector2.Distance(transform.position, target.transform.position);
+      if (distance < nearestDistance)
+      {
+        nearestDistance = distance;
+        nearest = target;
+      }
+    }
+
+    if (nearest != null)
+    {
+      nearest.TakeDamage(Mathf.Max(1f, _lastDamageAmount), _lastSourceWeapon);
+    }
+  }
+
+  private void PlayHitSound()
+  {
+    if (SoundManager.Instance == null)
+      return;
+
+    if (this is Player)
+    {
+      SoundManager.Instance.PlayPlayerHit();
+      return;
+    }
+
+    if (this is Enemy)
+    {
+      SoundManager.Instance.PlayEnemyHit();
+    }
   }
 
   /// <summary>

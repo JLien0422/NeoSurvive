@@ -1,0 +1,1038 @@
+fileFormatVersion: 2
+guid: 26f1420140840004f94d8c78d80e421a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 234
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a5800765dab3f246b116626b1925221
+      internalID: -1866833737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_1
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 234
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4db80bebfda65404c9b046f9d82499b5
+      internalID: -158671254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_2
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 234
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 339a3f4a11873da4e846d4d774a8e468
+      internalID: -1248260985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_3
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 234
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1fba2f78e56fa147a6014c59ab8db97
+      internalID: 130074708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY PANEL_HACKER_BORDER
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 81
+        width: 81
+        height: 189
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59f9823a6832ce0458f3be0ae593997c
+      internalID: 1488757896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_5
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 82
+        width: 81
+        height: 189
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2df1cff54481fb84bbbff6e39da7e2ee
+      internalID: -205605744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_6
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 83
+        width: 81
+        height: 189
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af93aef03ba6a3d41abce64bd2777dae
+      internalID: -1702681839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY PANEL_HACKER_BG
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 91
+        width: 75
+        height: 181
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60300bd5d3cd52348bd3af045bc96db8
+      internalID: -1543015146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_8
+      rect:
+        serializedVersion: 2
+        x: 652
+        y: 90
+        width: 75
+        height: 181
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a661ebceb0e6e4340aeaf4fa3671f973
+      internalID: 1670246930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_9
+      rect:
+        serializedVersion: 2
+        x: 761
+        y: 91
+        width: 75
+        height: 181
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a551167d73d18614188605f9e47c5796
+      internalID: -1296568402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY LINE_2
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 159
+        width: 13
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 30}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ef506841447aa74988ecc6da32d513f
+      internalID: 1329894766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_11
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 159
+        width: 20
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9765bc348081fc04380487066d82cc34
+      internalID: -1212049772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_12
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 141
+        width: 15
+        height: 83
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f62b0071302730f419671e0b1875c110
+      internalID: -1200663172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_13
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 159
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d934497c7612b47449dd4bc9c2daa387
+      internalID: -2138069306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_14
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 200
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb48ce5b168a7de4589fd1837e4f74ce
+      internalID: 248153467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_15
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 150
+        width: 16
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01a5112b906bdb445961ab47c87864b5
+      internalID: 1097088348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY LINE_1
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 154
+        width: 3
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c69e4506ad48b924b9b858f5da03a371
+      internalID: -627714724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_17
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 116
+        width: 70
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e37d66b45b011f445aa905bc26d772a0
+      internalID: 424987208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_18
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 81
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8211279b26cc94e4496dd1613fbf9fcf
+      internalID: -1416791667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_19
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 91
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a386cd9eca90184aa5d269403a77f6d
+      internalID: -2002750365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_20
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 87
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 045b8b4d9f5bc8242ade2ddd302c420a
+      internalID: 208444952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_21
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 78
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25604a6d88cd50d4e8f4a68bee37649c
+      internalID: -233852470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_22
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 79
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 194d127c7046b4d4bbebcef9b67c7ab6
+      internalID: 112461182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_23
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 80
+        width: 7
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92560eedb9a0ece4dbda7e019e9390ac
+      internalID: -1056204058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_24
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 81
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 295b85907f9a4d141b877e2180cbb8a9
+      internalID: 1510675232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_25
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 0
+        width: 20
+        height: 70
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a80e4b8329d77940a3c86fc923ac4a8
+      internalID: 1468080618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_26
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 2
+        width: 23
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b537d8ea939a7c24982fb211c49f09eb
+      internalID: -692664841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_27
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 3
+        width: 12
+        height: 59
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 094a6216d854f98419d74fb624040213
+      internalID: -669150390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_28
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 51
+        width: 70
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 68003d7c19d35c34d8c7d4db52e14293
+      internalID: -1422714013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_29
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 9
+        width: 17
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60e293afeb685674ea7db4254510b9d4
+      internalID: -366327214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_30
+      rect:
+        serializedVersion: 2
+        x: 334
+        y: 59
+        width: 21
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ecfa9ce9a91faf429162569f2693b12
+      internalID: 1894702676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_31
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 26
+        width: 31
+        height: 43
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dde4b110477edba4a9cf395e7062e949
+      internalID: 1335305296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_32
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 23
+        width: 33
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5357e7a533e1ad64d8fbf3bc838a13f8
+      internalID: -1279248109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_33
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 22
+        width: 33
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3d4c7e2fdb9eb74db4f5708ba43014f
+      internalID: -52678682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_34
+      rect:
+        serializedVersion: 2
+        x: 477
+        y: 23
+        width: 33
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f65aa318692fd84987ace692c36fb67
+      internalID: -1889716609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_35
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 1
+        width: 13
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6649fa13d8f95b8479a3176641175d9c
+      internalID: 681913860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_36
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 3
+        width: 12
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2558e22dac6c4741935f4188841e652
+      internalID: 23259998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_37
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 9
+        width: 14
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3586300180414a14881af9d1a851a05c
+      internalID: -1871968395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_38
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 9
+        width: 8
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2f0eeeaab3e3e54594559b2cfec204f
+      internalID: -248015160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_39
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 34
+        width: 70
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a13c7b3079709d4c9d4b0e7dc623312
+      internalID: 1863533094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_40
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 34
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 869e07ff04d3e7c4b8b55528698817f9
+      internalID: -2087294831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_UI ABILITY TAB_41
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 9
+        width: 70
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ade66d3cb4c3d1445a1eba6dde7aee1d
+      internalID: -875496243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      SPR_UI ABILITY LINE_1: -627714724
+      SPR_UI ABILITY LINE_2: 1329894766
+      SPR_UI ABILITY PANEL_HACKER_BG: -1543015146
+      SPR_UI ABILITY PANEL_HACKER_BORDER: 1488757896
+      SPR_UI ABILITY TAB_0: -1866833737
+      SPR_UI ABILITY TAB_1: -158671254
+      SPR_UI ABILITY TAB_11: -1212049772
+      SPR_UI ABILITY TAB_12: -1200663172
+      SPR_UI ABILITY TAB_13: -2138069306
+      SPR_UI ABILITY TAB_14: 248153467
+      SPR_UI ABILITY TAB_15: 1097088348
+      SPR_UI ABILITY TAB_17: 424987208
+      SPR_UI ABILITY TAB_18: -1416791667
+      SPR_UI ABILITY TAB_19: -2002750365
+      SPR_UI ABILITY TAB_2: -1248260985
+      SPR_UI ABILITY TAB_20: 208444952
+      SPR_UI ABILITY TAB_21: -233852470
+      SPR_UI ABILITY TAB_22: 112461182
+      SPR_UI ABILITY TAB_23: -1056204058
+      SPR_UI ABILITY TAB_24: 1510675232
+      SPR_UI ABILITY TAB_25: 1468080618
+      SPR_UI ABILITY TAB_26: -692664841
+      SPR_UI ABILITY TAB_27: -669150390
+      SPR_UI ABILITY TAB_28: -1422714013
+      SPR_UI ABILITY TAB_29: -366327214
+      SPR_UI ABILITY TAB_3: 130074708
+      SPR_UI ABILITY TAB_30: 1894702676
+      SPR_UI ABILITY TAB_31: 1335305296
+      SPR_UI ABILITY TAB_32: -1279248109
+      SPR_UI ABILITY TAB_33: -52678682
+      SPR_UI ABILITY TAB_34: -1889716609
+      SPR_UI ABILITY TAB_35: 681913860
+      SPR_UI ABILITY TAB_36: 23259998
+      SPR_UI ABILITY TAB_37: -1871968395
+      SPR_UI ABILITY TAB_38: -248015160
+      SPR_UI ABILITY TAB_39: 1863533094
+      SPR_UI ABILITY TAB_40: -2087294831
+      SPR_UI ABILITY TAB_41: -875496243
+      SPR_UI ABILITY TAB_5: -205605744
+      SPR_UI ABILITY TAB_6: -1702681839
+      SPR_UI ABILITY TAB_8: 1670246930
+      SPR_UI ABILITY TAB_9: -1296568402
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -145,7 +145,7 @@ namespace NeoSurvive.Weapon
         Debug.Log("[GravityHammer] Slam!");
 
       if (InGameSoundManager.Instance != null)
-        InGameSoundManager.Instance.PlayGravityHammerFire();
+        InGameSoundManager.Instance.PlayGravityHammerSwing();
 
       Transform target = FindClosestTarget();
 
@@ -252,6 +252,9 @@ namespace NeoSurvive.Weapon
       SpawnHammerEffect(forward);
       SpawnSwingEffect(forward);
       SpawnImpactEffect(forward);
+
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayGravityHammerImpact();
 
       if (enableMaster && currentLevel >= 5)
       {
@@ -384,6 +387,9 @@ namespace NeoSurvive.Weapon
 
     private void SpawnBlackhole(Vector3 pos)
     {
+      if (InGameSoundManager.Instance != null)
+        InGameSoundManager.Instance.PlayGravityHammerBlackhole();
+
       if (blackholePrefab != null)
       {
         GameObject obj =

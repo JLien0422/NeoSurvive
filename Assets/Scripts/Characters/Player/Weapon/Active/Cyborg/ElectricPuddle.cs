@@ -15,6 +15,7 @@ namespace NeoSurvive.Weapon
     private LayerMask hitMask;
     private string enemyTag;
     private WeaponBase sourceWeapon;
+    private AudioSource sustainAudioSource;
 
     private bool initialized = false;
 
@@ -39,8 +40,25 @@ namespace NeoSurvive.Weapon
 
       initialized = true;
 
+      PlaySustainLoop();
+
       StartCoroutine(DamageRoutine());
       Destroy(gameObject, duration);
+    }
+
+    private void PlaySustainLoop()
+    {
+      if (SoundManager.Instance == null || sourceWeapon == null)
+        return;
+
+      if (sustainAudioSource == null)
+        sustainAudioSource = GetComponent<AudioSource>();
+
+      if (sustainAudioSource == null)
+        sustainAudioSource = gameObject.AddComponent<AudioSource>();
+
+      sustainAudioSource.spatialBlend = 0f;
+      SoundManager.Instance.ConfigureWeaponSustainLoop(sustainAudioSource, sourceWeapon);
     }
 
     private IEnumerator DamageRoutine()

@@ -172,12 +172,6 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                 $"tag={currentPlayerInZone.tag}"
             );
 
-            if (!currentPlayerInZone.CharacterType.Equals(CharacterType.Hacker))
-            {
-                Debug.Log("[ElectricLeakZone] 해킹 불가: 플레이어가 Hacker 타입이 아님");
-                return;
-            }
-
             if (HackingSystem.Instance == null)
             {
                 Debug.Log("[ElectricLeakZone] 해킹 불가: HackingSystem.Instance == null");

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3452206962012137511}
   - component: {fileID: 5786020975898320340}
   - component: {fileID: -1853699642672368360}
+  - component: {fileID: 937983171984302385}
   m_Layer: 0
   m_Name: GFX_EMP_Pulse
   m_TagString: Untagged
@@ -120,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 5
-  radius: 2
+  radius: 0.2
   duration: 1
   destroyProjectile: 0
   animator: {fileID: 5786020975898320340}

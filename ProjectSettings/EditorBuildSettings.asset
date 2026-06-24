@@ -26,4 +26,5 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/JmgScene.unity
     guid: 2e5d1f275394fe545921442482af065e
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 419a9f3c16c6adb4cac824a0375df451, type: 2}

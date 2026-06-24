@@ -32,6 +32,28 @@ public class SettingsUI : MonoBehaviour
     public Slider effectOpacitySlider;
     public TextMeshProUGUI effectOpacityText;
     public Toggle screenShakeToggle;
+    [Header("토글 스프라이트")]
+    [SerializeField] private Sprite fullscreenOnSprite;
+    [SerializeField] private Sprite fullscreenOffSprite;
+    [SerializeField] private Sprite vSyncOnSprite;
+    [SerializeField] private Sprite vSyncOffSprite;
+    [SerializeField] private Sprite postProcessingOnSprite;
+    [SerializeField] private Sprite postProcessingOffSprite;
+    [SerializeField] private Sprite showDamageNumbersOnSprite;
+    [SerializeField] private Sprite showDamageNumbersOffSprite;
+    [SerializeField] private Sprite screenShakeOnSprite;
+    [SerializeField] private Sprite screenShakeOffSprite;
+
+    [Header("드롭박스 옵션 데이터")]
+    [SerializeField] private string resolutionOptionFormat = "{0} x {1}";
+    [SerializeField]
+    private List<string> targetFpsOptions = new List<string> {
+        "30", "60", "120", "144", "240", "무제한"
+        };
+    [SerializeField]
+    private List<string> backgroundFpsOptions = new List<string> {
+        "10", "15", "30", "60"
+        };
 
     [Header("오디오 설정 UI")]
     public Slider masterVolumeSlider;
@@ -41,9 +63,13 @@ public class SettingsUI : MonoBehaviour
     public Slider sfxVolumeSlider;
     public TextMeshProUGUI sfxVolumeText;
     public Toggle muteOnFocusLostToggle;
+    [SerializeField] private Sprite muteOnFocusLostOnSprite;
+    [SerializeField] private Sprite muteOnFocusLostOffSprite;
 
     [Header("게임플레이 설정 UI")]
     public Toggle pauseOnFocusLostToggle;
+    [SerializeField] private Sprite pauseOnFocusLostOnSprite;
+    [SerializeField] private Sprite pauseOnFocusLostOffSprite;
 
     [Header("계정 탭")]
     // 계정 탭은 UI만 있고 기능은 이현승이 구현
@@ -52,10 +78,7 @@ public class SettingsUI : MonoBehaviour
     public GameObject settingsPanel; // 메인 설정 패널 (자동 생성됨)
     public Button closeButton; // 닫기 버튼은 인스펙터에서 OnClick에 CloseSettings 연결
 
-    [Header("공통 토글 크기 설정")]
-    [Tooltip("Start 시점에 SettingsPanel 하위 모든 Toggle의 크기를 이 값으로 맞춥니다.")]
-    [SerializeField] private bool applyToggleSizeOnStart = true;
-    [SerializeField] private Vector2 commonToggleSize = new Vector2(40f, 40f);
+
 
     private SettingsManager settingsManager;
     private bool isSettingsOpen = false;
@@ -80,8 +103,6 @@ public class SettingsUI : MonoBehaviour
                     go.AddComponent<SettingsManager>();
                 settingsManager = SettingsManager.Instance;
             }
-            if (settingsManager == null)
-                Debug.LogError("[SettingsUI] SettingsManager를 찾을 수 없습니다!");
         }
 
         // SettingsUI GameObject는 항상 활성화 (Update 실행을 위해)
@@ -113,8 +134,7 @@ public class SettingsUI : MonoBehaviour
         InitializeAudioSettings();
         InitializeGameplaySettings();
 
-        // 토글 공통 크기 적용 (해상도 바뀌어도 클릭 영역이 충분히 크게)
-        ApplyCommonToggleSize();
+
 
         // 기본적으로 비디오 탭 표시
         ShowTab(0);
@@ -123,24 +143,7 @@ public class SettingsUI : MonoBehaviour
         // Update에서 처리
     }
 
-    /// <summary>
-    /// SettingsPanel 하위에 있는 모든 Toggle의 RectTransform 크기를 공통 값으로 맞춥니다.
-    /// </summary>
-    private void ApplyCommonToggleSize()
-    {
-        if (!applyToggleSizeOnStart) return;
-        if (settingsPanel == null) return;
 
-        var toggles = settingsPanel.GetComponentsInChildren<Toggle>(true);
-        foreach (var t in toggles)
-        {
-            var rt = t.GetComponent<RectTransform>();
-            if (rt != null)
-            {
-                rt.sizeDelta = commonToggleSize;
-            }
-        }
-    }
 
     private void Update()
     {
@@ -176,6 +179,9 @@ public class SettingsUI : MonoBehaviour
 
         settingsPanel.SetActive(isSettingsOpen);
         Debug.Log($"[SettingsUI] Settings 패널 {(isSettingsOpen ? "열림" : "닫힘")}, settingsPanel.activeSelf: {settingsPanel.activeSelf}");
+
+        if (isSettingsOpen)
+            ShowTab(0);
 
         // 설정 패널이 보이도록 Canvas Sort Order를 최상위로 설정
         if (isSettingsOpen)
@@ -321,7 +327,6 @@ public class SettingsUI : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 비디오 설정 초기화
     /// </summary>
     private void InitializeVideoSettings()
@@ -332,12 +337,7 @@ public class SettingsUI : MonoBehaviour
         if (resolutionDropdown != null)
         {
             resolutionDropdown.ClearOptions();
-            List<string> options = new List<string>();
-            foreach (var res in settingsManager.resolutions)
-            {
-                options.Add($"{res.width} x {res.height}");
-            }
-            resolutionDropdown.AddOptions(options);
+            resolutionDropdown.AddOptions(BuildResolutionOptions());
             resolutionDropdown.value = settingsManager.resolutionIndex;
             resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
         }
@@ -345,22 +345,30 @@ public class SettingsUI : MonoBehaviour
         // 전체화면 토글
         if (fullscreenToggle != null)
         {
-            fullscreenToggle.isOn = settingsManager.isFullscreen;
-            fullscreenToggle.onValueChanged.AddListener(OnFullscreenChanged);
+            ConfigureToggleWithSprites(
+                fullscreenToggle,
+                settingsManager.isFullscreen,
+                fullscreenOnSprite,
+                fullscreenOffSprite,
+                OnFullscreenChanged);
         }
 
         // 수직동기화 토글
         if (vSyncToggle != null)
         {
-            vSyncToggle.isOn = settingsManager.vSyncEnabled;
-            vSyncToggle.onValueChanged.AddListener(OnVSyncChanged);
+            ConfigureToggleWithSprites(
+                vSyncToggle,
+                settingsManager.vSyncEnabled,
+                vSyncOnSprite,
+                vSyncOffSprite,
+                OnVSyncChanged);
         }
 
         // 프레임 제한 드롭다운
         if (targetFPSDropdown != null)
         {
             targetFPSDropdown.ClearOptions();
-            targetFPSDropdown.AddOptions(new List<string> { "30", "60", "120", "144", "240", "무제한" });
+            targetFPSDropdown.AddOptions(targetFpsOptions);
             int fpsIndex = GetFPSIndex(settingsManager.targetFPS);
             targetFPSDropdown.value = fpsIndex;
             targetFPSDropdown.onValueChanged.AddListener(OnTargetFPSChanged);
@@ -369,7 +377,7 @@ public class SettingsUI : MonoBehaviour
         if (backgroundFPSDropdown != null)
         {
             backgroundFPSDropdown.ClearOptions();
-            backgroundFPSDropdown.AddOptions(new List<string> { "10", "15", "30", "60" });
+            backgroundFPSDropdown.AddOptions(backgroundFpsOptions);
             int fpsIndex = GetBackgroundFPSIndex(settingsManager.backgroundFPS);
             backgroundFPSDropdown.value = fpsIndex;
             backgroundFPSDropdown.onValueChanged.AddListener(OnBackgroundFPSChanged);
@@ -378,15 +386,23 @@ public class SettingsUI : MonoBehaviour
         // 포스트 프로세싱 토글
         if (postProcessingToggle != null)
         {
-            postProcessingToggle.isOn = settingsManager.postProcessingEnabled;
-            postProcessingToggle.onValueChanged.AddListener(OnPostProcessingChanged);
+            ConfigureToggleWithSprites(
+                postProcessingToggle,
+                settingsManager.postProcessingEnabled,
+                postProcessingOnSprite,
+                postProcessingOffSprite,
+                OnPostProcessingChanged);
         }
 
         // 데미지 숫자 표시 토글
         if (showDamageNumbersToggle != null)
         {
-            showDamageNumbersToggle.isOn = settingsManager.showDamageNumbers;
-            showDamageNumbersToggle.onValueChanged.AddListener(OnShowDamageNumbersChanged);
+            ConfigureToggleWithSprites(
+                showDamageNumbersToggle,
+                settingsManager.showDamageNumbers,
+                showDamageNumbersOnSprite,
+                showDamageNumbersOffSprite,
+                OnShowDamageNumbersChanged);
         }
 
         // 이펙트 투명도 슬라이더
@@ -400,8 +416,12 @@ public class SettingsUI : MonoBehaviour
         // 화면 흔들림 토글
         if (screenShakeToggle != null)
         {
-            screenShakeToggle.isOn = settingsManager.screenShakeEnabled;
-            screenShakeToggle.onValueChanged.AddListener(OnScreenShakeChanged);
+            ConfigureToggleWithSprites(
+                screenShakeToggle,
+                settingsManager.screenShakeEnabled,
+                screenShakeOnSprite,
+                screenShakeOffSprite,
+                OnScreenShakeChanged);
         }
     }
 
@@ -439,8 +459,12 @@ public class SettingsUI : MonoBehaviour
         // 백그라운드 음소거 토글
         if (muteOnFocusLostToggle != null)
         {
-            muteOnFocusLostToggle.isOn = settingsManager.muteOnFocusLost;
-            muteOnFocusLostToggle.onValueChanged.AddListener(OnMuteOnFocusLostChanged);
+            ConfigureToggleWithSprites(
+                muteOnFocusLostToggle,
+                settingsManager.muteOnFocusLost,
+                muteOnFocusLostOnSprite,
+                muteOnFocusLostOffSprite,
+                OnMuteOnFocusLostChanged);
         }
     }
 
@@ -454,8 +478,12 @@ public class SettingsUI : MonoBehaviour
         // 백그라운드 자동 일시정지 토글
         if (pauseOnFocusLostToggle != null)
         {
-            pauseOnFocusLostToggle.isOn = settingsManager.pauseOnFocusLost;
-            pauseOnFocusLostToggle.onValueChanged.AddListener(OnPauseOnFocusLostChanged);
+            ConfigureToggleWithSprites(
+                pauseOnFocusLostToggle,
+                settingsManager.pauseOnFocusLost,
+                pauseOnFocusLostOnSprite,
+                pauseOnFocusLostOffSprite,
+                OnPauseOnFocusLostChanged);
         }
     }
 
@@ -662,6 +690,67 @@ public class SettingsUI : MonoBehaviour
                 return i;
         }
         return 2; // 기본값: 30
+    }
+
+    private void PlayToggleHighlightedAnimation(Toggle toggle)
+    {
+        if (toggle == null)
+            return;
+
+        Animator animator = toggle.GetComponent<Animator>();
+        if (animator == null)
+            animator = toggle.GetComponentInChildren<Animator>(true);
+
+        if (animator == null)
+            return;
+
+        string highlightedTrigger = toggle.animationTriggers.highlightedTrigger;
+        if (!string.IsNullOrEmpty(highlightedTrigger))
+        {
+            animator.SetTrigger(highlightedTrigger);
+        }
+    }
+
+    private void ConfigureToggleWithSprites(Toggle toggle, bool initialValue, Sprite onSprite, Sprite offSprite, System.Action<bool> onValueChanged)
+    {
+        if (toggle == null)
+            return;
+
+        toggle.SetIsOnWithoutNotify(initialValue);
+        ApplyToggleSprite(toggle, initialValue, onSprite, offSprite);
+
+        toggle.onValueChanged.AddListener(isOn =>
+        {
+            onValueChanged?.Invoke(isOn);
+            ApplyToggleSprite(toggle, isOn, onSprite, offSprite);
+            PlayToggleHighlightedAnimation(toggle);
+        });
+    }
+
+    private void ApplyToggleSprite(Toggle toggle, bool isOn, Sprite onSprite, Sprite offSprite)
+    {
+        if (toggle == null)
+            return;
+
+        Image targetImage = toggle.targetGraphic as Image;
+        if (targetImage == null)
+            return;
+
+        targetImage.sprite = isOn ? onSprite : offSprite;
+    }
+
+    private List<string> BuildResolutionOptions()
+    {
+        List<string> options = new List<string>();
+        if (settingsManager == null || settingsManager.resolutions == null)
+            return options;
+
+        foreach (var res in settingsManager.resolutions)
+        {
+            options.Add(string.Format(resolutionOptionFormat, res.width, res.height));
+        }
+
+        return options;
     }
 
     // ===================== UI 자동 생성 =====================

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7025330092140550850}
   - component: {fileID: -4315742687912966545}
+  - component: {fileID: -2408586812976270693}
   m_Layer: 0
   m_Name: BlastBreath
   m_TagString: Untagged

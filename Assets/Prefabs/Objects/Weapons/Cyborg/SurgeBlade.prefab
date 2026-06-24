@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4084931485455372990}
   - component: {fileID: -2583530873562033625}
+  - component: {fileID: -571592962930609889}
   m_Layer: 4
   m_Name: SurgeBlade
   m_TagString: Untagged
@@ -63,3 +64,18 @@ MonoBehaviour:
   enableMaster: 1
   masterMultiplier: 2
   debugDraw: 1
+--- !u!114 &-571592962930609889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2939297242810992302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d23a866b4579d74f8a8d0ad529b642c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applyToSpriteRenderers: 1
+  applyToParticleSystems: 1
+  isProjectile: 0

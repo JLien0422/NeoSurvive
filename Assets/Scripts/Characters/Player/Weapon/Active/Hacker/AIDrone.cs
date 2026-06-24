@@ -49,6 +49,11 @@ namespace NeoSurvive.Weapon
 
     private void Start()
     {
+      if (InGameSoundManager.Instance != null)
+      {
+        InGameSoundManager.Instance.PlayAIDroneSpawn();
+      }
+
       player = GameObject.FindWithTag("Player");
       anim = GetComponent<Animator>();
       spriteRenderer = GetComponent<SpriteRenderer>();
@@ -60,6 +65,10 @@ namespace NeoSurvive.Weapon
 
       offset = Random.insideUnitCircle.normalized * followDistance;
 
+      // 발사 타이머가 개별로 돌도록 약간의 랜덤 시간을 줍니다.
+      fireElapsed = Random.Range(0f, 1f / Mathf.Max(attackSpeed, 0.01f));
+
+      // ★ 메인 드론만 CSV 적용
       if (!isSubDrone)
       {
         currentLevel = 1;
@@ -128,6 +137,11 @@ namespace NeoSurvive.Weapon
       attackSpeed = row.attackspeed;
       projectileSpeed = row.projectilespeed;
 
+      if (Player.Instance != null)
+      {
+        attackSpeed *= Player.Instance.GetComputeOptimizationCooldownMultiplier();
+      }
+
       UpdateAnimationSpeed();
     }
 
@@ -148,6 +162,11 @@ namespace NeoSurvive.Weapon
     private void UpdateSubDroneCount(int level)
     {
       int desiredSubCount = GetSubDroneCountFromCSV(level);
+
+      if (Player.Instance != null)
+      {
+        desiredSubCount += Player.Instance.GetBandwidthExpansionBonusCount();
+      }
 
       // =========================
       // ★ Lv5 마스터면 드론 수 2배

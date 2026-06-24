@@ -27,7 +27,7 @@ public class TotalGoldTextBinder : MonoBehaviour
         }
     }
 
-    private void RefreshNow()
+    public void RefreshNow()
     {
         if (GameManager.Instance != null)
         {

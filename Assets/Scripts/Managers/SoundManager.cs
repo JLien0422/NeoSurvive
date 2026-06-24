@@ -23,6 +23,7 @@ public class SoundManager : MonoBehaviour
 
     public const string KeyPlayerHit = "player.hit";
     public const string KeyPlayerDeath = "player.death";
+    public const string KeyGameOver = "game.over";
     public const string KeyEnemyHit = "enemy.hit";
     public const string KeyEnemyDeath = "enemy.death";
     public const string KeyChestOpened = "pickup.chest.opened";
@@ -117,7 +118,6 @@ public class SoundManager : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        if (Instance == this) Instance = null;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -417,6 +417,25 @@ public class SoundManager : MonoBehaviour
             Play(KeyWeaponHitGeneric);
     }
 
+    public bool ConfigureWeaponSustainLoop(AudioSource targetSource, WeaponBase weapon)
+    {
+        if (targetSource == null || weapon == null || weapon.weaponId <= 0) return false;
+        if (!weaponProfileMap.TryGetValue(weapon.weaponId, out var profile) || profile == null) return false;
+
+        AudioClip clip = profile.PickClip(WeaponSoundProfileDefinition.WeaponSoundType.SustainLoop);
+        if (clip == null) return false;
+
+        float settingsSfx = SettingsManager.Instance != null ? SettingsManager.Instance.sfxVolume : 1f;
+
+        targetSource.playOnAwake = false;
+        targetSource.loop = true;
+        targetSource.clip = clip;
+        targetSource.pitch = profile.PickPitch();
+        targetSource.volume = profile.Volume * masterSfxVolume * settingsSfx;
+        targetSource.Play();
+        return true;
+    }
+
     private bool TryPlayWeapon(int weaponId, WeaponSoundProfileDefinition.WeaponSoundType type)
     {
         if (sfxSource == null || weaponId <= 0) return false;
@@ -452,6 +471,7 @@ public class SoundManager : MonoBehaviour
     // Game wrappers
     public void PlayPlayerHit() => Play(KeyPlayerHit);
     public void PlayPlayerDeath() => Play(KeyPlayerDeath);
+    public void PlayGameOver() => Play(KeyGameOver);
     public void PlayEnemyHit() => Play(KeyEnemyHit);
     public void PlayEnemyDeath() => Play(KeyEnemyDeath);
     public void PlayChestOpened() => Play(KeyChestOpened);

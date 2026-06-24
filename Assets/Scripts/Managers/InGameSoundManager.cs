@@ -39,8 +39,12 @@ public class InGameSoundManager : MonoBehaviour
     BoosterKnuckleFire,
     BlastBreathFire,
     ChainSawFire,
-    GravityHammerFire,
+    GravityHammerFire, // Deprecated: 개별 Swing/Impact/Blackhole 이벤트로 대체
+    GravityHammerSwing,
+    GravityHammerImpact,
+    GravityHammerBlackhole,
     LightningStrikeFire,
+    LightningStrikePuddleLoop,
     PlasmaPhotonGunFire,
     SurgeBladeFire,
     TeslaCoilArmorFire,
@@ -93,7 +97,7 @@ public class InGameSoundManager : MonoBehaviour
   [SerializeField] private List<SfxSlot> sfxSlots = new List<SfxSlot>();
 
   private readonly Dictionary<InGameSfxEvent, SfxSlot> slotMap = new Dictionary<InGameSfxEvent, SfxSlot>();
-  
+
   // (추가) 같은 사운드가 짧은 시간 내에 중첩되어 볼륨이 커지는 현상 방지
   private readonly Dictionary<InGameSfxEvent, float> lastPlayTimes = new Dictionary<InGameSfxEvent, float>();
 
@@ -161,10 +165,10 @@ public class InGameSoundManager : MonoBehaviour
     // 중첩 방지 (0.05초 이내에 동일한 사운드가 여러 번 재생되어 볼륨이 폭증하는 것 방지)
     if (lastPlayTimes.TryGetValue(eventType, out float lastTime))
     {
-        if (Time.unscaledTime - lastTime < 0.05f)
-        {
-            return; 
-        }
+      if (Time.unscaledTime - lastTime < 0.05f)
+      {
+        return;
+      }
     }
     lastPlayTimes[eventType] = Time.unscaledTime;
 
@@ -235,8 +239,11 @@ public class InGameSoundManager : MonoBehaviour
   public void PlayBoosterKnuckleFire() => Play(InGameSfxEvent.BoosterKnuckleFire);
   public void PlayBlastBreathFire() => Play(InGameSfxEvent.BlastBreathFire);
   public void PlayChainSawFire() => Play(InGameSfxEvent.ChainSawFire);
-  public void PlayGravityHammerFire() => Play(InGameSfxEvent.GravityHammerFire);
+  public void PlayGravityHammerSwing() => Play(InGameSfxEvent.GravityHammerSwing);
+  public void PlayGravityHammerImpact() => Play(InGameSfxEvent.GravityHammerImpact);
+  public void PlayGravityHammerBlackhole() => Play(InGameSfxEvent.GravityHammerBlackhole);
   public void PlayLightningStrikeFire() => Play(InGameSfxEvent.LightningStrikeFire);
+  public void PlayLightningStrikePuddleLoop() => Play(InGameSfxEvent.LightningStrikePuddleLoop);
   public void PlayPlasmaPhotonGunFire() => Play(InGameSfxEvent.PlasmaPhotonGunFire);
   public void PlaySurgeBladeFire() => Play(InGameSfxEvent.SurgeBladeFire);
   public void PlayTeslaCoilArmorFire() => Play(InGameSfxEvent.TeslaCoilArmorFire);

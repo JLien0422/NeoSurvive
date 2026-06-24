@@ -45,8 +45,7 @@ public class UIManager : MonoBehaviour
   public GameObject characterChoicePanel;
 
   [Header("사이코 잠식도 UI")]
-  public Slider psychoCorruptionSlider;
-  public TextMeshProUGUI psychoCorruptionText;
+  [SerializeField] private PsychoMeterUI psychoMeterUI;
 
   [Header("화면 노이즈 효과")]
   public GameObject screenNoiseOverlay; // 화면 모서리 노이즈 오버레이 (60% 이상일 때 표시)
@@ -182,6 +181,12 @@ public class UIManager : MonoBehaviour
     }
 
     UpdatePlayerHealthUI(p != null ? p.CurrentHP.CurrentValue : 0, p != null ? p.MaxHP.CurrentValue : 100.0f);
+
+    if (psychoMeterUI != null && p != null)
+    {
+      psychoMeterUI.SetCharacter(p.CharacterType);
+      psychoMeterUI.SetCorruption(p.PsychoCorruption);
+    }
 
     CreateScreenNoiseOverlay(canvas); // 화면 노이즈 오버레이 생성
   }
@@ -384,7 +389,7 @@ public class UIManager : MonoBehaviour
   {
     if (levelText != null)
     {
-      levelText.text = $"Lv. {level}";
+      levelText.text = level.ToString();
     }
   }
 
@@ -583,16 +588,8 @@ public class UIManager : MonoBehaviour
   /// </summary>
   private void UpdatePsychoCorruptionUI(float current, float max)
   {
-    if (psychoCorruptionSlider != null)
-    {
-      psychoCorruptionSlider.maxValue = max;
-      psychoCorruptionSlider.value = current;
-    }
-
-    if (psychoCorruptionText != null)
-    {
-      psychoCorruptionText.text = $"과부하: {current:F1}%";
-    }
+    if (psychoMeterUI != null)
+      psychoMeterUI.SetCorruption(current);
   }
 
   /// <summary>

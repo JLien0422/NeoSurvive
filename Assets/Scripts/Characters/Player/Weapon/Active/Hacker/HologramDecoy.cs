@@ -83,6 +83,51 @@ namespace NeoSurvive.Weapon
             base.TakeDamage(amount, sourceWeapon);
         }
 
+        protected override void Die()
+        {
+            if (IsDead)
+                return;
+
+            base.Die();
+            PlayDeathEffects();
+            Destroy(gameObject);
+        }
+
+        private void PlayDeathEffects()
+        {
+            if (!initialized || destroyedHandled)
+                return;
+
+            destroyedHandled = true;
+
+            Vector3 pos = transform.position;
+
+            if (bodyVfxInstance != null)
+            {
+                Destroy(bodyVfxInstance);
+                bodyVfxInstance = null;
+            }
+
+            SpawnOneShotVFX(
+                fieldEndVfxPrefab,
+                pos,
+                fieldEndVfxLifetime,
+                vfxScale
+            );
+
+            SpawnOneShotVFX(
+                baseEndVfxPrefab,
+                pos,
+                baseEndVfxLifetime,
+                vfxScale
+            );
+
+            if (spawnPrisonOnDeath)
+            {
+                SpawnDataPrison();
+            }
+        }
+
         private void SetupDecoyHitBody()
         {
             float radius = 0.25f;
@@ -177,38 +222,10 @@ namespace NeoSurvive.Weapon
 
         private void OnDestroy()
         {
-            if (!initialized)
-                return;
-
-            if (destroyedHandled)
-                return;
-
-            destroyedHandled = true;
-
-            Vector3 pos = transform.position;
-
             if (bodyVfxInstance != null)
             {
                 Destroy(bodyVfxInstance);
-            }
-
-            SpawnOneShotVFX(
-                fieldEndVfxPrefab,
-                pos,
-                fieldEndVfxLifetime,
-                vfxScale
-            );
-
-            SpawnOneShotVFX(
-                baseEndVfxPrefab,
-                pos,
-                baseEndVfxLifetime,
-                vfxScale
-            );
-
-            if (spawnPrisonOnDeath)
-            {
-                SpawnDataPrison();
+                bodyVfxInstance = null;
             }
         }
 
@@ -218,7 +235,7 @@ namespace NeoSurvive.Weapon
             float lifetime,
             float scale)
         {
-            if (prefab == null)
+            if (prefab == null || !Application.isPlaying)
                 return;
 
             GameObject vfx =
@@ -236,6 +253,9 @@ namespace NeoSurvive.Weapon
 
         private void SpawnDataPrison()
         {
+            if (!Application.isPlaying)
+                return;
+
             GameObject prison =
                 new GameObject("DataPrison");
 

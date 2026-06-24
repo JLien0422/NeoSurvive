@@ -53,6 +53,12 @@ namespace NeoSurvive.Weapon
       this.enemyTag = enemyTag;
       this.sourceWeapon = sourceWeapon;
 
+      if (Player.Instance != null)
+      {
+        this.tickInterval *= Player.Instance.GetOverchargedBatteryTickMultiplier();
+        this.duration *= Player.Instance.GetFacilityAugmentationDurationMultiplier();
+      }
+
       life = 0f;
       timer = 0f;
     }
@@ -198,14 +204,14 @@ namespace NeoSurvive.Weapon
         return;
 
       if (applySlowInCold)
-        BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration));
+        BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
 
       if (freezeOnHit)
       {
         if (freezeAsStun)
-          BuffUtil.Apply(target, new StunDebuff(freezeDuration));
+          BuffUtil.Apply(target, new StunDebuff(freezeDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
         else
-          BuffUtil.Apply(target, new RootDebuff(freezeDuration));
+          BuffUtil.Apply(target, new RootDebuff(freezeDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
       }
     }
 

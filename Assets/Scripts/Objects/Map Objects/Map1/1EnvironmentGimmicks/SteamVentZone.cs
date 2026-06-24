@@ -186,12 +186,6 @@ namespace NeoSurvive.Map.Map1.Gimmicks
                 $"tag={currentPlayerInZone.tag}"
             );
 
-            if (!currentPlayerInZone.CharacterType.Equals(CharacterType.Hacker))
-            {
-                Debug.Log("[SteamVentZone] 해킹 불가: 플레이어가 Hacker 타입이 아님");
-                return;
-            }
-
             if (hackableObject == null)
             {
                 Debug.Log("[SteamVentZone] 해킹 불가: hackableObject == null");

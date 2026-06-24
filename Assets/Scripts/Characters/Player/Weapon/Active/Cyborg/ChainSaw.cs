@@ -498,6 +498,15 @@ namespace NeoSurvive.Weapon
       if (row.halfwidth > 0f) halfWidth = row.halfwidth;
       if (row.halfheight > 0f) halfHeight = row.halfheight;
 
+      if (Player.Instance != null)
+      {
+        float expansionMul = Player.Instance.GetCompileNodeExpansionMultiplier();
+        halfWidth *= expansionMul;
+        halfHeight *= expansionMul;
+        hitRadius *= expansionMul;
+        speed *= Player.Instance.GetInertiaChargeMultiplier();
+      }
+
       Debug.Log(
         $"[ChainSaw] CSV 적용 완료 | " +
         $"Lv={clampedLevel}, " +

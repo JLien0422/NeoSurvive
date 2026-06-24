@@ -8,7 +8,8 @@ public class WeaponSoundProfileDefinition : ScriptableObject
         Equip,
         LevelUp,
         Use,
-        Hit
+        Hit,
+        SustainLoop
     }
 
     [Header("Identity")]
@@ -21,6 +22,7 @@ public class WeaponSoundProfileDefinition : ScriptableObject
     [SerializeField] private AudioClip[] levelUpClips;
     [SerializeField] private AudioClip[] useClips;
     [SerializeField] private AudioClip[] hitClips;
+    [SerializeField] private AudioClip[] sustainLoopClips;
 
     [Header("Playback")]
     [SerializeField, Range(0f, 1f)] private float volume = 1f;
@@ -41,6 +43,7 @@ public class WeaponSoundProfileDefinition : ScriptableObject
             case WeaponSoundType.LevelUp: source = levelUpClips; break;
             case WeaponSoundType.Use: source = useClips; break;
             case WeaponSoundType.Hit: source = hitClips; break;
+            case WeaponSoundType.SustainLoop: source = sustainLoopClips; break;
         }
 
         if (source == null || source.Length == 0) return null;

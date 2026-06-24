@@ -29,20 +29,38 @@ public class HackingSystem : MonoBehaviour
     [SerializeField] private float spawnRadius = 3f;        // 플레이어 주변 스폰 반경
 
     [Header("사이보그 해킹 설정")]
-    [SerializeField] private float cyborgZoneRadius = 4f;   // 수비 원 반경
-    [SerializeField] private float cyborgTotalTime = 10f;   // 총 해킹 제한 시간 (초)
+    [SerializeField, Range(0.5f, 15f), Tooltip("수비 원 반경 (월드 유닛). 적 감지·바닥 원 크기 공통")]
+    private float cyborgZoneRadius = 2.5f;
+    [SerializeField, Range(1f, 30f), Tooltip("수비 제한 시간 (초)")]
+    private float cyborgTotalTime = 10f;
+    [SerializeField, Range(1, 10), Tooltip("원 안 허용 적 수. 이 값 초과 시 즉시 실패")]
+    private int cyborgMaxEnemyCount = 3;
+    [SerializeField, Range(0.02f, 0.5f), Tooltip("수비 원 테두리 두께")]
+    private float cyborgZoneBorderWidth = 0.08f;
+    [SerializeField, Range(0f, 1f), Tooltip("바닥 반투명 원 알파")]
+    private float cyborgZoneBackgroundAlpha = 0.25f;
+    [SerializeField, Range(0f, 1f), Tooltip("시계방향 타이머 채움 알파")]
+    private float cyborgZoneTimerFillAlpha = 0.85f;
+    [SerializeField, Tooltip("바닥 원 렌더 순서. 맵 타일(-10)보다 높게 (예: -5~-8). -20이면 바닥에 가려져 안 보임")]
+    private int cyborgZoneSortingOrder = -5;
+
+    private const string KEY_CYBORG_ZONE_RADIUS = "HackingSystem_CyborgZoneRadius";
+    private const string KEY_CYBORG_TOTAL_TIME = "HackingSystem_CyborgTotalTime";
+    private const string KEY_CYBORG_MAX_ENEMY = "HackingSystem_CyborgMaxEnemyCount";
+    private const string KEY_CYBORG_BORDER_WIDTH = "HackingSystem_CyborgBorderWidth";
+    private const string KEY_CYBORG_BG_ALPHA = "HackingSystem_CyborgBackgroundAlpha";
+    private const string KEY_CYBORG_FILL_ALPHA = "HackingSystem_CyborgTimerFillAlpha";
+    private const string KEY_CYBORG_SORTING_ORDER = "HackingSystem_CyborgSortingOrder";
+    private bool cyborgSettingsLoaded;
 
     // 현재 진행 중인 미니게임
     private HackingMinigameBase currentMinigame;
     private bool isHacking = false;
-
-    // 캐릭터 타입 (해커 vs 사이보그)
-    private bool isHacker = true;
+    private bool pausedTimeForHacking = false;
 
     // 사이보그 해킹 관련
     private Coroutine cyborgHackingCoroutine; // 사이보그 해킹 코루틴 참조
-    private GameObject cyborgZoneVisual;      // 월드 스페이스 원형 수비 영역 시각화
-    private Transform cyborgHackingRoot;      // 사이보그 해킹 UI 루트 (패널 아래)
+    private CyborgZoneTimerVisual cyborgZoneVisual; // 바닥 수비 원 + 시계방향 타이머
 
     // 각 미니게임 루트 (UI 패널 아래)
     private Transform numberSequenceRoot;
@@ -59,6 +77,86 @@ public class HackingSystem : MonoBehaviour
             return;
         }
         Instance = this;
+        LoadCyborgSettings();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this)
+            return;
+
+        SaveCyborgSettings();
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (Instance != this)
+            return;
+
+        SaveCyborgSettings();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (!pause || Instance != this)
+            return;
+
+        SaveCyborgSettings();
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (Application.isPlaying && cyborgSettingsLoaded)
+            SaveCyborgSettings();
+    }
+#endif
+
+    private bool HasSavedCyborgSettings()
+    {
+        return ES3.KeyExists(KEY_CYBORG_ZONE_RADIUS);
+    }
+
+    public void LoadCyborgSettings()
+    {
+        // ES3에 저장된 적 없으면 씬/빌드에 박힌 인스펙터 값 그대로 사용 (exe 첫 실행 포함)
+        if (HasSavedCyborgSettings())
+        {
+            cyborgZoneRadius = ES3.Load(KEY_CYBORG_ZONE_RADIUS, cyborgZoneRadius);
+            cyborgTotalTime = ES3.Load(KEY_CYBORG_TOTAL_TIME, cyborgTotalTime);
+            cyborgMaxEnemyCount = ES3.Load(KEY_CYBORG_MAX_ENEMY, cyborgMaxEnemyCount);
+            cyborgZoneBorderWidth = ES3.Load(KEY_CYBORG_BORDER_WIDTH, cyborgZoneBorderWidth);
+            cyborgZoneBackgroundAlpha = ES3.Load(KEY_CYBORG_BG_ALPHA, cyborgZoneBackgroundAlpha);
+            cyborgZoneTimerFillAlpha = ES3.Load(KEY_CYBORG_FILL_ALPHA, cyborgZoneTimerFillAlpha);
+            cyborgZoneSortingOrder = ES3.Load(KEY_CYBORG_SORTING_ORDER, cyborgZoneSortingOrder);
+        }
+
+        cyborgSettingsLoaded = true;
+
+        Debug.Log(
+            $"[HackingSystem] 사이보그 해킹 설정 로드 | " +
+            $"fromES3={HasSavedCyborgSettings()}, " +
+            $"radius={cyborgZoneRadius:F2}, time={cyborgTotalTime:F0}, " +
+            $"maxEnemy={cyborgMaxEnemyCount}, sorting={cyborgZoneSortingOrder}, " +
+            $"path={Application.persistentDataPath}"
+        );
+    }
+
+    public void SaveCyborgSettings()
+    {
+        ES3.Save(KEY_CYBORG_ZONE_RADIUS, cyborgZoneRadius);
+        ES3.Save(KEY_CYBORG_TOTAL_TIME, cyborgTotalTime);
+        ES3.Save(KEY_CYBORG_MAX_ENEMY, cyborgMaxEnemyCount);
+        ES3.Save(KEY_CYBORG_BORDER_WIDTH, cyborgZoneBorderWidth);
+        ES3.Save(KEY_CYBORG_BG_ALPHA, cyborgZoneBackgroundAlpha);
+        ES3.Save(KEY_CYBORG_FILL_ALPHA, cyborgZoneTimerFillAlpha);
+        ES3.Save(KEY_CYBORG_SORTING_ORDER, cyborgZoneSortingOrder);
+
+        Debug.Log(
+            $"[HackingSystem] 사이보그 해킹 설정 저장 | " +
+            $"radius={cyborgZoneRadius:F2}, sorting={cyborgZoneSortingOrder}, " +
+            $"path={Application.persistentDataPath}"
+        );
     }
 
     private void Start()
@@ -79,25 +177,16 @@ public class HackingSystem : MonoBehaviour
         frequencyOverrideRoot = hackingUIPanel.transform.Find("FrequencyOverride_Root");
         networkBridgeRoot = hackingUIPanel.transform.Find("NetworkBridge_Root");
 
-        cyborgHackingRoot = hackingUIPanel.transform.Find("CyborgHacking_Root");
-
         Debug.Log($"[HackingSystem] 루트 탐색 결과:" +
             $"\n NumberSequence={numberSequenceRoot != null}" +
             $"\n CommandBypass={commandBypassRoot != null}" +
             $"\n SynapseSync={synapseSyncRoot != null}" +
             $"\n FrequencyOverride={frequencyOverrideRoot != null}" +
-            $"\n NetworkBridge={networkBridgeRoot != null}" +
-            $"\n CyborgHacking={cyborgHackingRoot != null}");
+            $"\n NetworkBridge={networkBridgeRoot != null}");
 
         // 모든 루트 비활성화 후 패널도 비활성화
         SetAllRootsInactive();
         hackingUIPanel.SetActive(false);
-
-        // 캐릭터 타입 확인
-        if (GameManager.Instance != null)
-        {
-            isHacker = GameManager.Instance.GetSelectedCharacter() == NeoSurvive.Characters.CharacterType.Hacker;
-        }
     }
 
     // ─────────────────────────────────────────────
@@ -147,22 +236,35 @@ public class HackingSystem : MonoBehaviour
     {
         if (isHacking) return;
         isHacking = true;
+        pausedTimeForHacking = false;
 
-        // UI 패널 활성화
-        if (hackingUIPanel != null)
-            hackingUIPanel.SetActive(true);
-
-        if (isHacker)
+        if (IsCurrentPlayerHacker())
         {
+            if (hackingUIPanel != null)
+                hackingUIPanel.SetActive(true);
+
             // 해커: 게임 시간 정지 후 미니게임 시작
+            pausedTimeForHacking = true;
             Time.timeScale = 0f;
             StartMinigame(objectType, onSuccess, onFailure);
         }
         else
         {
-            // 사이보그: 게임 시간 유지, 자동 진척도 방식
+            // 사이보그: 게임 시간 유지, 바닥 수비 원 10초 방어
             StartCyborgHacking(onSuccess, onFailure, hackPosition);
         }
+    }
+
+    private bool IsCurrentPlayerHacker()
+    {
+        Player player = FindObjectOfType<Player>();
+        if (player != null)
+            return player.CharacterType == NeoSurvive.Characters.CharacterType.Hacker;
+
+        if (GameManager.Instance != null)
+            return GameManager.Instance.GetSelectedCharacter() == NeoSurvive.Characters.CharacterType.Hacker;
+
+        return true;
     }
 
     private void StartMinigame(HackableObjectType objectType, System.Action onSuccess, System.Action onFailure)
@@ -285,145 +387,92 @@ public class HackingSystem : MonoBehaviour
     // ─────────────────────────────────────────────
 
     /// <summary>
-    /// 사이보그 해킹 시작: 자동 진척도 방식 (미니게임 없음)
+    /// 사이보그 해킹 시작: 바닥 수비 원 10초 방어 (미니게임 없음)
     /// </summary>
     private void StartCyborgHacking(System.Action onSuccess, System.Action onFailure, Vector3 zoneCenter)
     {
-        if (cyborgHackingRoot == null)
+        var visualSettings = new CyborgZoneTimerVisual.Settings
         {
-            Debug.LogWarning("[HackingSystem] CyborgHacking_Root가 없습니다! 유니티 에디터에서 HackingUIPanel 아래에 추가해주세요.");
-            // 루트 없어도 코루틴은 동작하도록 계속 진행
-        }
-        else
-        {
-            cyborgHackingRoot.gameObject.SetActive(true);
-        }
+            radius = cyborgZoneRadius,
+            borderWidth = cyborgZoneBorderWidth,
+            backgroundAlpha = cyborgZoneBackgroundAlpha,
+            timerFillAlpha = cyborgZoneTimerFillAlpha,
+            sortingOrder = cyborgZoneSortingOrder,
+            sortingLayerName = "Default"
+        };
 
-        // 월드 스페이스 원형 수비 영역 생성
-        cyborgZoneVisual = CreateZoneVisual(zoneCenter, cyborgZoneRadius);
-
-        // 자동 진척도 코루틴 시작
+        cyborgZoneVisual = CyborgZoneTimerVisual.Create(zoneCenter, visualSettings);
         cyborgHackingCoroutine = StartCoroutine(CyborgHackingCoroutine(zoneCenter, onSuccess, onFailure));
     }
 
     /// <summary>
     /// 사이보그 해킹 코루틴
-    /// - 1초당 20% 진척도 자동 증가
-    /// - 원 안에 적이 있으면 진척도 정지
-    /// - 10초 안에 100% 달성 시 성공, 시간 초과 시 실패
+    /// - 10초 동안 원 안 적이 cyborgMaxEnemyCount 이하 유지 시 성공
+    /// - 적이 cyborgMaxEnemyCount 초과 시 즉시 실패
+    /// - 플레이어 위치는 검사하지 않음
     /// </summary>
     private IEnumerator CyborgHackingCoroutine(Vector3 zoneCenter, System.Action onSuccess, System.Action onFailure)
     {
-        // UI 슬라이더 참조
-        Slider progressSlider = (cyborgHackingRoot != null) ? FindSlider(cyborgHackingRoot, "ProgressGauge") : null;
-        Slider timerSlider = (cyborgHackingRoot != null) ? FindSlider(cyborgHackingRoot, "TimerGauge") : null;
-        TextMeshProUGUI statusText = (cyborgHackingRoot != null) ? FindTMP(cyborgHackingRoot, "StatusText") : null;
+        float elapsed = 0f;
 
-        // 슬라이더 초기화
-        if (progressSlider != null) { progressSlider.minValue = 0f; progressSlider.maxValue = 100f; progressSlider.value = 0f; }
-        if (timerSlider != null) { timerSlider.minValue = 0f; timerSlider.maxValue = cyborgTotalTime; timerSlider.value = cyborgTotalTime; }
-
-        float elapsed = 0f;   // 경과 시간
-        float hackProgress = 0f;  // 해킹 진척도 (0~100)
-
-        while (elapsed < cyborgTotalTime && hackProgress < 100f)
+        while (elapsed < cyborgTotalTime)
         {
             elapsed += Time.deltaTime;
 
-            // 수비 영역 내 적 존재 여부 확인
-            bool enemyInZone = IsEnemyInZone(zoneCenter, cyborgZoneRadius);
+            int enemyCount = CountEnemiesInZone(zoneCenter, cyborgZoneRadius);
 
-            if (!enemyInZone)
+            if (enemyCount > cyborgMaxEnemyCount)
             {
-                // 적이 없으면 1초당 20% 진척도 증가
-                hackProgress = Mathf.Min(hackProgress + 20f * Time.deltaTime, 100f);
+                cyborgHackingCoroutine = null;
+                EndHacking();
+                onFailure?.Invoke();
+                yield break;
             }
 
-            // 원형 영역 색상: 적 침입 시 빨강, 안전 시 청록
-            UpdateZoneVisualColor(enemyInZone);
-
-            // 상태 텍스트 갱신 (영문 사용 - 한국어 폰트 미지원 대응)
-            if (statusText != null)
-                statusText.text = enemyInZone ? "ENEMY DETECTED!" : "HACKING...";
-
-            // UI 슬라이더 갱신
-            if (progressSlider != null) progressSlider.value = hackProgress;
-            if (timerSlider != null) timerSlider.value = cyborgTotalTime - elapsed;
+            if (cyborgZoneVisual != null)
+            {
+                float remainingNormalized = 1f - (elapsed / cyborgTotalTime);
+                cyborgZoneVisual.SetTimeRemaining(remainingNormalized);
+                cyborgZoneVisual.SetBorderColor(GetZoneBorderColor(enemyCount));
+            }
 
             yield return null;
         }
 
-        // 코루틴 참조 초기화
         cyborgHackingCoroutine = null;
-
-        bool isSuccess = hackProgress >= 100f;
-
-        if (isSuccess)
-        {
-            EndHacking();
-            onSuccess?.Invoke();
-        }
-        else
-        {
-            EndHacking();
-            onFailure?.Invoke();
-        }
+        EndHacking();
+        onSuccess?.Invoke();
     }
 
-    /// <summary>
-    /// 수비 원 안에 적(Enemy 태그)이 있는지 확인
-    /// </summary>
-    private bool IsEnemyInZone(Vector3 center, float radius)
+    private int CountEnemiesInZone(Vector3 center, float radius)
     {
         Collider2D[] cols = Physics2D.OverlapCircleAll(center, radius);
-        foreach (var col in cols)
+        HashSet<GameObject> uniqueEnemies = new HashSet<GameObject>();
+
+        foreach (Collider2D col in cols)
         {
-            if (col.CompareTag("Enemy")) return true;
-        }
-        return false;
-    }
+            if (col == null || !col.CompareTag("Enemy"))
+                continue;
 
-    /// <summary>
-    /// LineRenderer로 월드 스페이스 원형 수비 영역 생성
-    /// </summary>
-    private GameObject CreateZoneVisual(Vector3 center, float radius)
-    {
-        GameObject zoneObj = new GameObject("CyborgHackingZone");
-        zoneObj.transform.position = center;
+            EnemyController enemy =
+                col.GetComponent<EnemyController>()
+                ?? col.GetComponentInParent<EnemyController>();
 
-        LineRenderer lr = zoneObj.AddComponent<LineRenderer>();
-        lr.useWorldSpace = false;  // 부모(zoneObj) 기준 로컬 좌표 사용
-        lr.loop = true;
-        lr.startWidth = 0.08f;
-        lr.endWidth = 0.08f;
-        lr.material = new Material(Shader.Find("Sprites/Default"));
-        lr.startColor = Color.cyan;
-        lr.endColor = Color.cyan;
-
-        // 원을 36개 선분으로 근사
-        int segments = 36;
-        lr.positionCount = segments;
-        for (int i = 0; i < segments; i++)
-        {
-            float angle = i * Mathf.PI * 2f / segments;
-            lr.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0f));
+            uniqueEnemies.Add(enemy != null ? enemy.gameObject : col.gameObject);
         }
 
-        return zoneObj;
+        return uniqueEnemies.Count;
     }
 
-    /// <summary>
-    /// 수비 원 색상 업데이트: 적 침입 시 빨강, 안전 시 청록
-    /// </summary>
-    private void UpdateZoneVisualColor(bool enemyInZone)
+    private Color GetZoneBorderColor(int enemyCount)
     {
-        if (cyborgZoneVisual == null) return;
-        var lr = cyborgZoneVisual.GetComponent<LineRenderer>();
-        if (lr == null) return;
+        if (enemyCount <= 0)
+            return Color.cyan;
 
-        Color targetColor = enemyInZone ? Color.red : Color.cyan;
-        lr.startColor = targetColor;
-        lr.endColor = targetColor;
+        if (enemyCount <= cyborgMaxEnemyCount)
+            return new Color(1f, 0.75f, 0.1f);
+
+        return Color.red;
     }
 
     // ─────────────────────────────────────────────
@@ -434,8 +483,10 @@ public class HackingSystem : MonoBehaviour
         isHacking = false;
 
         // 해커: 게임시간 재개 (사이보그는 시간이 멈추지 않았으므로 해커만 해제)
-        if (isHacker)
+        if (pausedTimeForHacking)
             Time.timeScale = 1f;
+
+        pausedTimeForHacking = false;
 
         // 사이보그 해킹 코루틴이 아직 돌고 있으면 강제 중단
         if (cyborgHackingCoroutine != null)
@@ -447,7 +498,7 @@ public class HackingSystem : MonoBehaviour
         // 수비 원 시각화 오브젝트 제거
         if (cyborgZoneVisual != null)
         {
-            Destroy(cyborgZoneVisual);
+            Destroy(cyborgZoneVisual.gameObject);
             cyborgZoneVisual = null;
         }
 
@@ -471,7 +522,6 @@ public class HackingSystem : MonoBehaviour
         if (synapseSyncRoot != null) synapseSyncRoot.gameObject.SetActive(false);
         if (frequencyOverrideRoot != null) frequencyOverrideRoot.gameObject.SetActive(false);
         if (networkBridgeRoot != null) networkBridgeRoot.gameObject.SetActive(false);
-        if (cyborgHackingRoot != null) cyborgHackingRoot.gameObject.SetActive(false);
     }
 
     private T GetOrAddMinigame<T>(GameObject root) where T : HackingMinigameBase
@@ -536,4 +586,9 @@ public class HackingSystem : MonoBehaviour
     }
 
     public bool IsHacking => isHacking;
+
+    /// <summary>에디터 Scene 미리보기·Gizmo용</summary>
+    public float CyborgZoneRadius => cyborgZoneRadius;
+    public float CyborgTotalTime => cyborgTotalTime;
+    public int CyborgMaxEnemyCount => cyborgMaxEnemyCount;
 }

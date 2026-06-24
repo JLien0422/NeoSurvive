@@ -106,6 +106,38 @@ namespace NeoSurvive.Weapon
                     bodyVfxScale
                 );
             }
+
+            if (Player.Instance != null && Player.Instance.HasTrait("bandwidth_expansion"))
+            {
+                SpawnExtraDecoy(spawnPos + Vector3.left * 0.7f);
+            }
+        }
+
+        private void SpawnExtraDecoy(Vector3 spawnPos)
+        {
+            if (decoyPrefab == null) return;
+
+            GameObject obj = Instantiate(decoyPrefab, spawnPos, Quaternion.identity);
+
+            if (obj.TryGetComponent<HologramDecoy>(out var decoy))
+            {
+                float cloneMul = Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f;
+                bool spawnPrison = currentLevel >= 5;
+
+                decoy.Initialize(
+                    hp * cloneMul,
+                    spawnPrison,
+                    prisonDuration,
+                    prisonRange,
+                    bodyVfxPrefab,
+                    fieldEndVfxPrefab,
+                    baseEndVfxPrefab,
+                    fieldEndLifetime,
+                    baseEndLifetime,
+                    vfxScale,
+                    bodyVfxScale * cloneMul
+                );
+            }
         }
 
         private void SpawnOneShotVFX(
@@ -160,6 +192,12 @@ namespace NeoSurvive.Weapon
 
             prisonDuration = row.prisonduration;
             prisonRange = row.prisonrange;
+
+            if (Player.Instance != null)
+            {
+                cooldown *= Player.Instance.GetComputeOptimizationCooldownMultiplier();
+                prisonDuration *= Player.Instance.GetSuperconductiveCircuitsDurationMultiplier();
+            }
 
             Debug.Log(
                 $"[Hologram Decoy] CSV 적용 | Lv={level}, HP={hp}, Cooldown={cooldown}, " +

@@ -19,7 +19,6 @@ namespace NeoSurvive.Weapon
 
     private const float DamageStartOffset = 0.5f;
     private const float DamageInterval = 1f;
-
     public Animator animator;
 
     [Header("Enemy Projectile Block")]
@@ -30,7 +29,8 @@ namespace NeoSurvive.Weapon
     public void Initialize(float damage, float radius, float duration, bool destroyProjectile, WeaponBase weaponBase = null)
     {
       this.damage = damage;
-      this.radius = radius;
+      float expansionMul = Player.Instance != null ? Player.Instance.GetCompileNodeExpansionMultiplier() : 1f;
+      this.radius = radius * expansionMul;
       this.duration = duration;
       this.destroyProjectile = destroyProjectile;
       this.sourceWeapon = weaponBase;

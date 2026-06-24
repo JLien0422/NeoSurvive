@@ -195,6 +195,14 @@ public class GameManager : MonoBehaviour
     return true;
   }
 
+  public void AddTotalGold(int amount)
+  {
+    if (amount <= 0) return;
+    totalGold += amount;
+    SaveTotalGold();
+    OnTotalGoldChanged?.Invoke(totalGold);
+  }
+
   public void CommitRunGoldToTotal()
   {
     if (currentRunGold != 0)

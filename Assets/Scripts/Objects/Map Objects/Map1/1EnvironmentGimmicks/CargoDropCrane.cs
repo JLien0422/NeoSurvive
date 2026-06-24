@@ -447,15 +447,13 @@ namespace NeoSurvive.Map.Map1.Gimmicks
         }
 
         /// <summary>
-        /// 해커 플레이어가 가까이 있을 때 H 입력으로 해킹 시작
+        /// 플레이어가 가까이 있을 때 E 입력으로 해킹 시작
         /// </summary>
         private void HandleHackInput()
         {
             if (!isActive) return;
             if (currentPlayer == null) return;
             if (isHacked) return;
-
-            if (!currentPlayer.CharacterType.Equals(CharacterType.Hacker)) return;
 
             float dist = Vector2.Distance(currentPlayer.transform.position, transform.position);
             if (dist > hackInteractRange) return;

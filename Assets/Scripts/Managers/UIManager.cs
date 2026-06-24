@@ -103,6 +103,7 @@ public class UIManager : MonoBehaviour
 
   private void Update()
   {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     if (Input.GetKeyDown(KeyCode.F12))
     {
       ShowWeaponChoice(
@@ -111,6 +112,7 @@ public class UIManager : MonoBehaviour
         (idx) => Debug.Log($"선택한 무기 인덱스: {idx}")
       );
     }
+#endif
 
     UpdateExpSliderAnimation();
   }

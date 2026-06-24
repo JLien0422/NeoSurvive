@@ -58,7 +58,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
     /// </summary>
     [DefaultExecutionOrder(-100)]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class CargoDropCrane : MonoBehaviour
+    public class CargoDropCrane : MonoBehaviour, IHackPromptProvider
     {
         [Header("CSV")]
         [SerializeField] private string mapId = "Map1";
@@ -194,6 +194,34 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
             if (craneRenderer != null)
                 craneRenderer.color = normalColor;
+
+            EnsurePromptAnchor();
+        }
+
+        public Transform PromptAnchorRoot => transform;
+        public float HackInteractRange => hackInteractRange;
+        public bool IsHackInteractionComplete => isHacked;
+        public bool IsHackInteractionEnabled => isActive;
+        public bool ShouldShowHackPrompt
+        {
+            get
+            {
+                if (!isActive || isHacked || currentPlayer == null)
+                    return false;
+
+                float dist = Vector2.Distance(
+                    currentPlayer.transform.position,
+                    transform.position
+                );
+
+                return dist <= hackInteractRange;
+            }
+        }
+
+        private void EnsurePromptAnchor()
+        {
+            if (GetComponent<HackInteractPromptAnchor>() == null)
+                gameObject.AddComponent<HackInteractPromptAnchor>();
         }
 
         private void Start()

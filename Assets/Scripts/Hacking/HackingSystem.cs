@@ -28,6 +28,18 @@ public class HackingSystem : MonoBehaviour
     [Header("설정")]
     [SerializeField] private float spawnRadius = 3f;        // 플레이어 주변 스폰 반경
 
+    [Header("해킹 상호작용 프롬프트 (E 버튼)")]
+    [SerializeField] private GameObject hackInteractPromptPrefab;
+    [SerializeField, Min(0.01f), Tooltip("E 버튼 월드 스케일 (픽셀 아트: 1 전후)")]
+    private float promptWorldScale = 1f;
+    [SerializeField] private Vector2 promptWorldOffset = new Vector2(0.1f, 0.1f);
+    [SerializeField] private int promptSortingOrderOffset = 5;
+    [SerializeField] private float promptDepthOffset = -0.1f;
+
+    public Vector2 PromptWorldOffset => promptWorldOffset;
+    public float PromptDepthOffset => promptDepthOffset;
+    public float PromptWorldScale => promptWorldScale;
+
     [Header("사이보그 해킹 설정")]
     [SerializeField, Range(0.5f, 15f), Tooltip("수비 원 반경 (월드 유닛). 적 감지·바닥 원 크기 공통")]
     private float cyborgZoneRadius = 2.5f;
@@ -583,6 +595,199 @@ public class HackingSystem : MonoBehaviour
 
         Debug.LogWarning($"[HackingSystem] '{name}'을 찾을 수 없습니다! ({root.name} 아래 검색)");
         return null;
+    }
+
+    public GameObject InstantiateHackInteractPrompt()
+    {
+        if (hackInteractPromptPrefab == null)
+            return null;
+
+        Image image = hackInteractPromptPrefab.GetComponentInChildren<Image>(true);
+        TextMeshProUGUI sourceLabel =
+            hackInteractPromptPrefab.GetComponentInChildren<TextMeshProUGUI>(true);
+
+        if (image != null && image.sprite != null)
+        {
+            GameObject spritePrompt = new GameObject("HackInteractPrompt(Runtime)");
+            SpriteRenderer spriteRenderer = spritePrompt.AddComponent<SpriteRenderer>();
+            spriteRenderer.sprite = image.sprite;
+            spriteRenderer.color = Color.white;
+            spriteRenderer.drawMode = SpriteDrawMode.Simple;
+            spritePrompt.transform.localScale = Vector3.one * promptWorldScale;
+
+            if (sourceLabel != null)
+            {
+                GameObject labelObject = new GameObject("E");
+                labelObject.transform.SetParent(spritePrompt.transform, false);
+                labelObject.transform.localPosition = Vector3.zero;
+
+                TextMeshPro label = labelObject.AddComponent<TextMeshPro>();
+                label.font = sourceLabel.font;
+                label.text = string.IsNullOrWhiteSpace(sourceLabel.text) ? "E" : sourceLabel.text;
+                label.color = sourceLabel.color;
+                label.alignment = TextAlignmentOptions.Center;
+                label.enableWordWrapping = false;
+                label.overflowMode = TextOverflowModes.Overflow;
+                label.fontSize = GetPromptLabelFontSize(
+                    image.sprite,
+                    sourceLabel,
+                    image
+                );
+
+                float labelOffsetY = GetPromptLabelOffsetY(image.sprite, sourceLabel, image);
+                labelObject.transform.localPosition = new Vector3(0f, labelOffsetY, 0f);
+            }
+
+            return spritePrompt;
+        }
+
+        GameObject instance = Instantiate(hackInteractPromptPrefab);
+        instance.name = "HackInteractPrompt(Runtime)";
+
+        Transform root = instance.transform;
+        root.SetParent(null, false);
+        root.localScale = Vector3.one;
+
+        Canvas canvas = instance.GetComponentInChildren<Canvas>(true);
+        if (canvas != null)
+        {
+            CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+            if (scaler != null)
+                scaler.enabled = false;
+
+            RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+            canvasRect.localPosition = Vector3.zero;
+            canvasRect.localRotation = Quaternion.identity;
+            canvasRect.localScale = Vector3.one * Mathf.Min(promptWorldScale, 0.05f);
+            canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
+            canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
+            canvasRect.pivot = new Vector2(0.5f, 0.5f);
+            canvasRect.anchoredPosition = Vector2.zero;
+            canvasRect.sizeDelta = new Vector2(1f, 1f);
+
+            for (int i = 0; i < canvasRect.childCount; i++)
+            {
+                if (canvasRect.GetChild(i) is not RectTransform childRect)
+                    continue;
+
+                childRect.anchorMin = new Vector2(0.5f, 0.5f);
+                childRect.anchorMax = new Vector2(0.5f, 0.5f);
+                childRect.pivot = new Vector2(0.5f, 0.5f);
+                childRect.anchoredPosition = Vector2.zero;
+                childRect.localScale = Vector3.one;
+            }
+
+            canvas.renderMode = RenderMode.WorldSpace;
+
+            Camera cam = Camera.main;
+            if (cam != null)
+                canvas.worldCamera = cam;
+        }
+
+        return instance;
+    }
+
+    public void ApplyPromptSorting(SpriteRenderer promptRenderer, Transform anchor)
+    {
+        if (promptRenderer == null || anchor == null)
+            return;
+
+        ApplyPromptHierarchySorting(promptRenderer.gameObject, anchor);
+    }
+
+    public void ApplyPromptHierarchySorting(GameObject promptRoot, Transform anchor)
+    {
+        if (promptRoot == null || anchor == null)
+            return;
+
+        SpriteRenderer baseRenderer = anchor.GetComponent<SpriteRenderer>();
+        int sortingLayerId = baseRenderer != null ? baseRenderer.sortingLayerID : 0;
+        int baseOrder = baseRenderer != null
+            ? baseRenderer.sortingOrder + promptSortingOrderOffset
+            : promptSortingOrderOffset + 100;
+
+        SpriteRenderer[] spriteRenderers =
+            promptRoot.GetComponentsInChildren<SpriteRenderer>(true);
+        foreach (SpriteRenderer renderer in spriteRenderers)
+        {
+            if (renderer == null)
+                continue;
+
+            renderer.sortingLayerID = sortingLayerId;
+            renderer.sortingOrder = baseOrder;
+        }
+
+        MeshRenderer[] meshRenderers =
+            promptRoot.GetComponentsInChildren<MeshRenderer>(true);
+        foreach (MeshRenderer renderer in meshRenderers)
+        {
+            if (renderer == null)
+                continue;
+
+            renderer.sortingLayerID = sortingLayerId;
+            renderer.sortingOrder = baseOrder + 1;
+        }
+    }
+
+    private static float GetPromptLabelFontSize(
+        Sprite backgroundSprite,
+        TextMeshProUGUI sourceLabel,
+        Image sourceImage)
+    {
+        if (backgroundSprite == null)
+            return 3f;
+
+        float spriteHeight = backgroundSprite.bounds.size.y;
+        if (sourceLabel == null)
+            return spriteHeight * 3.5f;
+
+        float uiButtonHeight = 100f;
+        if (sourceImage != null)
+        {
+            float height = sourceImage.rectTransform.rect.height;
+            if (height > 0f)
+                uiButtonHeight = height;
+        }
+
+        // 프리팹 비율: fontSize(60) / 버튼 높이(100)
+        // TMP 월드 텍스트는 UI 포인트와 단위가 달라 보정 배율 적용
+        const float tmpWorldSizeCorrection = 6.5f;
+        float uiRatio = sourceLabel.fontSize / uiButtonHeight;
+        return Mathf.Max(0.5f, spriteHeight * uiRatio * tmpWorldSizeCorrection);
+    }
+
+    private static float GetPromptLabelOffsetY(
+        Sprite backgroundSprite,
+        TextMeshProUGUI sourceLabel,
+        Image sourceImage)
+    {
+        if (backgroundSprite == null || sourceLabel == null || sourceImage == null)
+            return 0f;
+
+        float uiButtonHeight = sourceImage.rectTransform.rect.height;
+        if (uiButtonHeight <= 0f)
+            return 0f;
+
+        float offsetRatio = sourceLabel.rectTransform.anchoredPosition.y / uiButtonHeight;
+        return backgroundSprite.bounds.size.y * offsetRatio;
+    }
+
+    public void ApplyPromptCanvasSorting(Canvas canvas, Transform anchor)
+    {
+        if (canvas == null || anchor == null)
+            return;
+
+        SpriteRenderer baseRenderer = anchor.GetComponent<SpriteRenderer>();
+        if (baseRenderer == null)
+        {
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = promptSortingOrderOffset + 100;
+            return;
+        }
+
+        canvas.overrideSorting = true;
+        canvas.sortingLayerID = baseRenderer.sortingLayerID;
+        canvas.sortingOrder = baseRenderer.sortingOrder + promptSortingOrderOffset;
     }
 
     public bool IsHacking => isHacking;

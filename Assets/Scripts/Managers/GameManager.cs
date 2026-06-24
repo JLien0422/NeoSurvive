@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
 
   private void Update()
   {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     if (enableDebugGoldCommitKey && Input.GetKeyDown(debugGoldCommitKey))
     {
       int committedGold = currentRunGold;
@@ -281,8 +281,10 @@ public class GameManager : MonoBehaviour
   /// </summary>
   public void DebugSetElapsedTime(float elapsedSeconds) // ***** 추가
   {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     startTime = Time.time - Mathf.Max(0f, elapsedSeconds);
     Debug.Log($"[GameManager] DebugSetElapsedTime => elapsed={elapsedSeconds:F1}s");
+#endif
   }
 
   /// <summary>
@@ -290,7 +292,9 @@ public class GameManager : MonoBehaviour
   /// </summary>
   public void DebugAddTime(float addSeconds) // ***** 추가
   {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     startTime -= Mathf.Max(0f, addSeconds);
     Debug.Log($"[GameManager] DebugAddTime => +{addSeconds:F1}s");
+#endif
   }
 }

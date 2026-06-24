@@ -1,54 +1,66 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.EventSystems;
 
 /// <summary>
 /// 네트워크 브릿지 미니게임
-/// 왼쪽의 색상 단자와 오른쪽의 동일 색상 단자를 선으로 연결합니다.
+/// 왼쪽 노드와 오른쪽 노드를 클릭해서 같은 색 단자끼리 연결합니다.
+/// 
+/// 변경점:
+/// - 노드/라인을 코드로 생성하지 않음
+/// - Hierarchy에 미리 만든 LeftNode_0~4 / RightNode_0~4 / Line_0~4 사용
+/// - 성공 연결 시 Line 오브젝트를 활성화하고 두 노드 사이에 배치
 /// </summary>
 public class NetworkBridgeMinigame : HackingMinigameBase
 {
-    [Header("UI 설정")]
-    [SerializeField]
-    private Transform gameParent; // 게임이 표시될 부모
+    [Header("UI")]
+    [SerializeField] private Transform gameParent;
 
-    private Transform leftContainer;   // 왼쪽 노드 부모
-    private Transform rightContainer;  // 오른쪽 노드 부모
-    private Transform linesContainer;  // 연결선 부모
+    private Transform leftContainer;
+    private Transform rightContainer;
+    private Transform linesContainer;
 
-    private Slider timeGauge;    // 시간 게이지 (빨강, 1→0)
-    private Slider successGauge; // 성공 연결 게이지 (녹색, 0→1)
+    private Slider timeGauge;
+    private Slider successGauge;
 
-    private List<ConnectionNode> leftNodes = new List<ConnectionNode>();
-    private List<ConnectionNode> rightNodes = new List<ConnectionNode>();
-    private List<ConnectionLine> connectionLines = new List<ConnectionLine>();
+    private readonly List<ConnectionNode> leftNodes = new List<ConnectionNode>();
+    private readonly List<ConnectionNode> rightNodes = new List<ConnectionNode>();
+    private readonly List<ConnectionLine> connectionLines = new List<ConnectionLine>();
 
     private ConnectionNode selectedNode = null;
-    private int totalConnections = 5; // 총 연결 개수
-    private int completedConnections = 0;
 
-    private float timeLimit = 15f;
-    private float remainingTime = 0f;
-    private bool isActive = false;
+    [Header("게임 설정")]
+    [SerializeField] private int totalConnections = 5;
+    [SerializeField] private float timeLimit = 15f;
 
-    // 색상 목록
-    private Color[] nodeColors = {
+    [Header("노드 색상")]
+    [SerializeField]
+    private Color[] nodeColors =
+    {
         Color.red,
         Color.blue,
         Color.green,
         Color.yellow,
-        Color.magenta,
-        Color.cyan
+        Color.magenta
     };
 
+    [Header("라인 설정")]
+    [SerializeField] private float lineThickness = 12f;
+
+    private int completedConnections = 0;
+    private float remainingTime = 0f;
+    private bool isActive = false;
+
     /// <summary>
-    /// 손으로 만든 UI 전달 (HackingSystem에서 호출)
+    /// HackingSystem에서 호출
     /// </summary>
-    public void SetPreMadeUI(Transform left, Transform right, Transform lines,
-                              Slider timeSlider, Slider successSlider)
+    public void SetPreMadeUI(
+        Transform left,
+        Transform right,
+        Transform lines,
+        Slider timeSlider,
+        Slider successSlider)
     {
         leftContainer = left;
         rightContainer = right;
@@ -60,41 +72,12 @@ public class NetworkBridgeMinigame : HackingMinigameBase
             gameParent = left.parent;
     }
 
-    public override void Initialize(System.Action onSuccessCallback, System.Action onFailureCallback)
+    public override void Initialize(
+        System.Action onSuccessCallback,
+        System.Action onFailureCallback)
     {
         base.Initialize(onSuccessCallback, onFailureCallback);
-
-        if (gameParent == null)
-            CreateUIParent();
-
         ResetMinigame();
-    }
-
-    private void CreateUIParent()
-    {
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if (canvas == null)
-        {
-            GameObject canvasObj = new GameObject("HackingCanvas");
-            canvas = canvasObj.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
-            canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
-        }
-
-        GameObject panel = new GameObject("NetworkBridgePanel");
-        panel.transform.SetParent(canvas.transform, false);
-
-        RectTransform panelRect = panel.AddComponent<RectTransform>();
-        panelRect.sizeDelta = new Vector2(600, 400);
-        panelRect.anchorMin = new Vector2(0.5f, 0.5f);
-        panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-        panelRect.anchoredPosition = Vector2.zero;
-
-        UnityEngine.UI.Image panelImg = panel.AddComponent<UnityEngine.UI.Image>();
-        panelImg.color = new Color(0.1f, 0.1f, 0.1f, 0.9f);
-
-        gameParent = panel.transform;
     }
 
     private void ResetMinigame()
@@ -102,27 +85,155 @@ public class NetworkBridgeMinigame : HackingMinigameBase
         completedConnections = 0;
         remainingTime = timeLimit;
         isActive = true;
+        selectedNode = null;
 
-        ClearAll();
-        CreateNodes();
+        CachePreMadeNodes();
+        CachePreMadeLines();
+        SetupNodeColors();
+        ResetNodes();
+        ResetLines();
+
         UpdateTimeGauge();
         UpdateSuccessGauge();
     }
 
-    private void CreateNodes()
+    /// <summary>
+    /// Hierarchy의 LeftNode_0~4 / RightNode_0~4를 가져옴
+    /// </summary>
+    private void CachePreMadeNodes()
     {
-        // 왼쪽 단자 생성
-        float nodeSize = 50f;
-        float nodeSpacing = 60f;
-        float startY = (totalConnections - 1) * nodeSpacing / 2f;
+        leftNodes.Clear();
+        rightNodes.Clear();
 
+        if (leftContainer == null)
+        {
+            Debug.LogWarning("[NetworkBridgeMinigame] LeftContainer가 없습니다.");
+            return;
+        }
+
+        if (rightContainer == null)
+        {
+            Debug.LogWarning("[NetworkBridgeMinigame] RightContainer가 없습니다.");
+            return;
+        }
+
+        for (int i = 0; i < totalConnections; i++)
+        {
+            Transform leftChild = leftContainer.Find($"LeftNode_{i}");
+            Transform rightChild = rightContainer.Find($"RightNode_{i}");
+
+            if (leftChild != null)
+            {
+                ConnectionNode node = GetOrAddNode(leftChild.gameObject);
+                node.Initialize(Color.white, true, i);
+                node.onNodeClicked -= OnNodeClicked;
+                node.onNodeClicked += OnNodeClicked;
+                leftNodes.Add(node);
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkBridgeMinigame] LeftNode_{i}를 찾을 수 없습니다.");
+            }
+
+            if (rightChild != null)
+            {
+                ConnectionNode node = GetOrAddNode(rightChild.gameObject);
+                node.Initialize(Color.white, false, i);
+                node.onNodeClicked -= OnNodeClicked;
+                node.onNodeClicked += OnNodeClicked;
+                rightNodes.Add(node);
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkBridgeMinigame] RightNode_{i}를 찾을 수 없습니다.");
+            }
+        }
+    }
+
+    private ConnectionNode GetOrAddNode(GameObject obj)
+    {
+        Button button = obj.GetComponent<Button>();
+        if (button == null)
+            obj.AddComponent<Button>();
+
+        ConnectionNode node = obj.GetComponent<ConnectionNode>();
+        if (node == null)
+            node = obj.AddComponent<ConnectionNode>();
+
+        return node;
+    }
+
+    /// <summary>
+    /// Hierarchy의 Line_0~4를 가져옴
+    /// </summary>
+    private void CachePreMadeLines()
+    {
+        connectionLines.Clear();
+
+        if (linesContainer == null)
+        {
+            Debug.LogWarning("[NetworkBridgeMinigame] LinesContainer가 없습니다.");
+            return;
+        }
+
+        for (int i = 0; i < totalConnections; i++)
+        {
+            Transform lineChild = linesContainer.Find($"Line_{i}");
+
+            if (lineChild == null)
+            {
+                Debug.LogWarning($"[NetworkBridgeMinigame] Line_{i}를 찾을 수 없습니다.");
+                continue;
+            }
+
+            Image img = lineChild.GetComponent<Image>();
+            if (img == null)
+                img = lineChild.gameObject.AddComponent<Image>();
+
+            ConnectionLine line = lineChild.GetComponent<ConnectionLine>();
+            if (line == null)
+                line = lineChild.gameObject.AddComponent<ConnectionLine>();
+
+            connectionLines.Add(line);
+        }
+    }
+
+    /// <summary>
+    /// 왼쪽/오른쪽 노드 색상 세팅
+    /// 왼쪽 색상 순서와 오른쪽 색상 순서를 다르게 섞음
+    /// </summary>
+    private void SetupNodeColors()
+    {
         List<Color> colors = new List<Color>();
+
         for (int i = 0; i < totalConnections; i++)
         {
             colors.Add(nodeColors[i % nodeColors.Length]);
         }
 
-        // 색상 섞기
+        List<Color> leftColors = new List<Color>(colors);
+        List<Color> rightColors = new List<Color>(colors);
+
+        ShuffleColors(leftColors);
+        ShuffleColors(rightColors);
+
+        for (int i = 0; i < leftNodes.Count; i++)
+        {
+            leftNodes[i].Initialize(leftColors[i], true, i);
+            leftNodes[i].onNodeClicked -= OnNodeClicked;
+            leftNodes[i].onNodeClicked += OnNodeClicked;
+        }
+
+        for (int i = 0; i < rightNodes.Count; i++)
+        {
+            rightNodes[i].Initialize(rightColors[i], false, i);
+            rightNodes[i].onNodeClicked -= OnNodeClicked;
+            rightNodes[i].onNodeClicked += OnNodeClicked;
+        }
+    }
+
+    private void ShuffleColors(List<Color> colors)
+    {
         for (int i = colors.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
@@ -130,155 +241,127 @@ public class NetworkBridgeMinigame : HackingMinigameBase
             colors[i] = colors[j];
             colors[j] = temp;
         }
+    }
 
-        // 왼쪽 노드 생성 (LeftContainer 또는 gameParent 사용)
-        Transform leftParent = leftContainer != null ? leftContainer : gameParent;
-        for (int i = 0; i < totalConnections; i++)
+    private void ResetNodes()
+    {
+        foreach (ConnectionNode node in leftNodes)
         {
-            GameObject nodeObj = new GameObject($"LeftNode_{i}");
-            nodeObj.transform.SetParent(leftParent, false);
-
-            RectTransform rect = nodeObj.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(nodeSize, nodeSize);
-            rect.anchoredPosition = new Vector2(0, startY - i * nodeSpacing);
-
-            Image img = nodeObj.AddComponent<Image>();
-            img.color = colors[i];
-
-            nodeObj.AddComponent<Button>();
-            ConnectionNode node = nodeObj.AddComponent<ConnectionNode>();
-            node.Initialize(colors[i], true, i);
-            node.onNodeClicked += OnNodeClicked;
-
-            leftNodes.Add(node);
+            if (node != null)
+            {
+                node.gameObject.SetActive(true);
+                node.ResetVisual();
+            }
         }
 
-        // 오른쪽 노드 생성 (RightContainer 또는 gameParent 사용)
-        List<Color> rightColors = new List<Color>(colors);
-        for (int i = rightColors.Count - 1; i > 0; i--)
+        foreach (ConnectionNode node in rightNodes)
         {
-            int j = Random.Range(0, i + 1);
-            Color temp = rightColors[i];
-            rightColors[i] = rightColors[j];
-            rightColors[j] = temp;
+            if (node != null)
+            {
+                node.gameObject.SetActive(true);
+                node.ResetVisual();
+            }
         }
+    }
 
-        Transform rightParent = rightContainer != null ? rightContainer : gameParent;
-        for (int i = 0; i < totalConnections; i++)
+    private void ResetLines()
+    {
+        foreach (ConnectionLine line in connectionLines)
         {
-            GameObject nodeObj = new GameObject($"RightNode_{i}");
-            nodeObj.transform.SetParent(rightParent, false);
-
-            RectTransform rect = nodeObj.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(nodeSize, nodeSize);
-            rect.anchoredPosition = new Vector2(0, startY - i * nodeSpacing);
-
-            Image img = nodeObj.AddComponent<Image>();
-            img.color = rightColors[i];
-
-            nodeObj.AddComponent<Button>();
-            ConnectionNode node = nodeObj.AddComponent<ConnectionNode>();
-            node.Initialize(rightColors[i], false, i);
-            node.onNodeClicked += OnNodeClicked;
-
-            rightNodes.Add(node);
+            if (line != null)
+            {
+                line.Clear();
+                line.gameObject.SetActive(false);
+            }
         }
     }
 
     private void OnNodeClicked(ConnectionNode node)
     {
-        if (!isActive) return;
+        if (!isActive)
+            return;
+
+        if (node == null || node.isConnected)
+            return;
 
         if (selectedNode == null)
         {
-            // 첫 번째 노드 선택
             selectedNode = node;
-            node.SetSelected(true);
+            selectedNode.SetSelected(true);
+            return;
+        }
+
+        if (selectedNode == node)
+        {
+            selectedNode.SetSelected(false);
+            selectedNode = null;
+            return;
+        }
+
+        bool differentSide = selectedNode.isLeft != node.isLeft;
+        bool sameColor = selectedNode.nodeColor == node.nodeColor;
+
+        if (differentSide && sameColor)
+        {
+            CreateConnection(selectedNode, node);
+
+            selectedNode.SetConnected(true);
+            node.SetConnected(true);
+
+            selectedNode = null;
+
+            completedConnections++;
+            UpdateSuccessGauge();
+
+            if (completedConnections >= totalConnections)
+            {
+                OnSuccess();
+            }
         }
         else
         {
-            // 두 번째 노드 선택
-            if (selectedNode.isLeft != node.isLeft && selectedNode.nodeColor == node.nodeColor)
-            {
-                // 올바른 연결
-                CreateConnection(selectedNode, node);
-                selectedNode.SetConnected(true);
-                node.SetConnected(true);
-                selectedNode = null;
-                completedConnections++;
-                UpdateSuccessGauge();
-
-                if (completedConnections >= totalConnections)
-                {
-                    OnSuccess();
-                }
-            }
-            else
-            {
-                // 잘못된 연결
-                selectedNode.SetSelected(false);
-                selectedNode = null;
-                OnFailure();
-            }
+            selectedNode.SetSelected(false);
+            selectedNode = null;
+            OnFailure();
         }
     }
 
+    /// <summary>
+    /// 미리 만들어둔 Line을 하나 꺼내서 연결선으로 사용
+    /// </summary>
     private void CreateConnection(ConnectionNode from, ConnectionNode to)
     {
-        GameObject lineObj = new GameObject($"Line_{from.index}_{to.index}");
-        Transform lineParent = linesContainer != null ? linesContainer : gameParent;
-        lineObj.transform.SetParent(lineParent, false);
-
-        RectTransform rect = lineObj.AddComponent<RectTransform>();
-        // 라인 기준점을 중앙으로 고정 (Middle Center)
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-
-        Image img = lineObj.AddComponent<Image>();
-        img.color = from.nodeColor;
-
-        ConnectionLine line = lineObj.AddComponent<ConnectionLine>();
-        line.Initialize(from, to);
-        connectionLines.Add(line);
-    }
-
-    private void ClearAll()
-    {
-        foreach (var node in leftNodes)
+        if (completedConnections >= connectionLines.Count)
         {
-            if (node != null) Destroy(node.gameObject);
-        }
-        foreach (var node in rightNodes)
-        {
-            if (node != null) Destroy(node.gameObject);
-        }
-        foreach (var line in connectionLines)
-        {
-            if (line != null) Destroy(line.gameObject);
+            Debug.LogWarning("[NetworkBridgeMinigame] 사용할 수 있는 Line이 부족합니다.");
+            return;
         }
 
-        leftNodes.Clear();
-        rightNodes.Clear();
-        connectionLines.Clear();
-        selectedNode = null;
+        ConnectionLine line = connectionLines[completedConnections];
+
+        if (line == null)
+            return;
+
+        line.gameObject.SetActive(true);
+        line.Initialize(from, to, lineThickness);
     }
 
     private void UpdateTimeGauge()
     {
         if (timeGauge != null)
-            timeGauge.value = remainingTime / timeLimit; // 1→0
+            timeGauge.value = remainingTime / timeLimit;
     }
 
     private void UpdateSuccessGauge()
     {
         if (successGauge != null)
-            successGauge.value = (float)completedConnections / totalConnections; // 0→1
+            successGauge.value = (float)completedConnections / totalConnections;
     }
 
     private void Update()
     {
-        if (!isActive) return;
+        if (!isActive)
+            return;
 
         remainingTime -= Time.unscaledDeltaTime;
         UpdateTimeGauge();
@@ -292,21 +375,29 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     public override void OnSuccess()
     {
         isActive = false;
-        if (timeGauge != null) timeGauge.value = 1f;
-        if (successGauge != null) successGauge.value = 1f;
+
+        if (timeGauge != null)
+            timeGauge.value = 1f;
+
+        if (successGauge != null)
+            successGauge.value = 1f;
+
         base.OnSuccess();
     }
 
     public override void OnFailure()
     {
         isActive = false;
-        if (timeGauge != null) timeGauge.value = 0f;
+
+        if (timeGauge != null)
+            timeGauge.value = 0f;
+
         base.OnFailure();
     }
 }
 
 /// <summary>
-/// 연결 노드 컴포넌트
+/// 연결 노드
 /// </summary>
 public class ConnectionNode : MonoBehaviour, IPointerClickHandler
 {
@@ -325,12 +416,34 @@ public class ConnectionNode : MonoBehaviour, IPointerClickHandler
         nodeColor = color;
         isLeft = left;
         index = idx;
+        isConnected = false;
+        isSelected = false;
+
         image = GetComponent<Image>();
+
+        if (image != null)
+            image.color = nodeColor;
+    }
+
+    public void ResetVisual()
+    {
+        isConnected = false;
+        isSelected = false;
+
+        if (image == null)
+            image = GetComponent<Image>();
+
+        if (image != null)
+            image.color = nodeColor;
     }
 
     public void SetSelected(bool selected)
     {
         isSelected = selected;
+
+        if (image == null)
+            image = GetComponent<Image>();
+
         if (image != null)
         {
             image.color = selected ? Color.white : nodeColor;
@@ -340,23 +453,25 @@ public class ConnectionNode : MonoBehaviour, IPointerClickHandler
     public void SetConnected(bool connected)
     {
         isConnected = connected;
+        isSelected = false;
+
+        if (image == null)
+            image = GetComponent<Image>();
+
         if (image != null)
-        {
             image.color = nodeColor;
-        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (!isConnected)
-        {
             onNodeClicked?.Invoke(this);
-        }
     }
 }
 
 /// <summary>
-/// 연결선 컴포넌트
+/// 연결선
+/// 미리 만들어둔 Line 오브젝트의 위치/길이/회전만 조정
 /// </summary>
 public class ConnectionLine : MonoBehaviour
 {
@@ -364,46 +479,66 @@ public class ConnectionLine : MonoBehaviour
     private ConnectionNode toNode;
     private RectTransform rectTransform;
     private Image image;
+    private float thickness = 12f;
 
-    public void Initialize(ConnectionNode from, ConnectionNode to)
+    public void Initialize(ConnectionNode from, ConnectionNode to, float lineThickness)
     {
         fromNode = from;
         toNode = to;
+        thickness = lineThickness;
+
         rectTransform = GetComponent<RectTransform>();
         image = GetComponent<Image>();
 
-        StartCoroutine(UpdateLineNextFrame());
+        if (image != null && fromNode != null)
+            image.color = fromNode.nodeColor;
+
+        UpdateLine();
     }
 
-    private System.Collections.IEnumerator UpdateLineNextFrame()
+    public void Clear()
     {
-        // Layout Group이 위치 계산을 마친 다음 프레임에 선을 그림
-        yield return null;
-        UpdateLine();
+        fromNode = null;
+        toNode = null;
+
+        rectTransform = GetComponent<RectTransform>();
     }
 
     private void UpdateLine()
     {
-        if (fromNode == null || toNode == null) return;
+        if (fromNode == null || toNode == null)
+            return;
 
-        // 각 노드의 월드 중심 좌표를 구한 뒤 LinesContainer 로컬 좌표로 변환
+        if (rectTransform == null)
+            rectTransform = GetComponent<RectTransform>();
+
         RectTransform fromRect = fromNode.GetComponent<RectTransform>();
-        RectTransform toRect   = toNode.GetComponent<RectTransform>();
+        RectTransform toRect = toNode.GetComponent<RectTransform>();
 
-        Vector3 fromWorld = fromRect.TransformPoint(Vector3.zero);
-        Vector3 toWorld   = toRect.TransformPoint(Vector3.zero);
+        if (fromRect == null || toRect == null || rectTransform == null)
+            return;
 
         RectTransform lineParent = rectTransform.parent as RectTransform;
+
+        if (lineParent == null)
+            return;
+
+        Vector3 fromWorld = fromRect.TransformPoint(Vector3.zero);
+        Vector3 toWorld = toRect.TransformPoint(Vector3.zero);
+
         Vector2 fromLocal = lineParent.InverseTransformPoint(fromWorld);
-        Vector2 toLocal   = lineParent.InverseTransformPoint(toWorld);
+        Vector2 toLocal = lineParent.InverseTransformPoint(toWorld);
 
         Vector2 direction = toLocal - fromLocal;
         float distance = direction.magnitude;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        rectTransform.sizeDelta = new Vector2(distance, 5f);
+        rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+        rectTransform.sizeDelta = new Vector2(distance, thickness);
         rectTransform.localPosition = (fromLocal + toLocal) / 2f;
-        rectTransform.localRotation = Quaternion.Euler(0, 0, angle);
+        rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
     }
 }

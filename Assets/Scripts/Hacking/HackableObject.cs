@@ -2,7 +2,7 @@ using UnityEngine;
 using NeoSurvive.Characters;
 using System;
 
-public class HackableObject : MonoBehaviour
+public class HackableObject : MonoBehaviour, IHackPromptProvider
 {
     [Header("설정")]
     [SerializeField] private HackableObjectType objectType;
@@ -34,6 +34,37 @@ public class HackableObject : MonoBehaviour
 
     private float checkTimer = 0f;
     private const float CheckInterval = 0.1f;
+
+    public Transform PromptAnchorRoot => transform;
+    public float HackInteractRange => hackRange;
+    public bool IsHackInteractionComplete => isHacked;
+    public bool IsHackInteractionEnabled => enabled && !isHacked;
+    public bool ShouldShowHackPrompt
+    {
+        get
+        {
+            if (isHacked || !enabled)
+                return false;
+
+            Player player = cachedPlayer ?? HackPromptBoundsUtility.FindPlayer();
+            if (player == null)
+                return false;
+
+            float sqrDist = (transform.position - player.transform.position).sqrMagnitude;
+            return sqrDist <= hackRange * hackRange;
+        }
+    }
+
+    private void Awake()
+    {
+        EnsurePromptAnchor();
+    }
+
+    private void EnsurePromptAnchor()
+    {
+        if (GetComponent<HackInteractPromptAnchor>() == null)
+            gameObject.AddComponent<HackInteractPromptAnchor>();
+    }
 
     private void Start()
     {

@@ -306,6 +306,11 @@ public class NumberSequenceMinigame : HackingMinigameBase
         foreach (var btn in numberButtons)
         {
             btn.SetActive(true);
+
+            Button buttonComp = btn.GetComponent<Button>();
+            if (buttonComp != null)
+                buttonComp.interactable = true;
+
             UpdateButtonState(btn, false);
         }
 
@@ -327,7 +332,10 @@ public class NumberSequenceMinigame : HackingMinigameBase
             if (clickedButton != null)
             {
                 UpdateButtonState(clickedButton, true);
-                clickedButton.SetActive(false); // 클릭된 버튼 비활성화
+
+                Button btn = clickedButton.GetComponent<Button>();
+                if (btn != null)
+                    btn.interactable = false;
             }
 
             currentTargetNumber++;
@@ -352,9 +360,19 @@ public class NumberSequenceMinigame : HackingMinigameBase
     private void UpdateButtonState(GameObject button, bool isCorrect)
     {
         Image img = button.GetComponent<Image>();
+
         if (img != null)
         {
-            img.color = isCorrect ? Color.green : new Color(0.3f, 0.3f, 0.3f, 1f);
+            if (isCorrect)
+            {
+                // 성공한 번호는 색이 바뀜
+                img.color = new Color(0.12f, 0.12f, 0.12f, 1f);
+            }
+            else
+            {
+                // 기본 상태는 원래 색상
+                img.color = Color.white;
+            }
         }
     }
 

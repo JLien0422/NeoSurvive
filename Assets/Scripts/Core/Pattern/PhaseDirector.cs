@@ -53,8 +53,10 @@ public class PhaseDirector : MonoBehaviour
 
   private void Update()
   {
-    HandlePhaseJumpKeys(); // ***** (추가) 1~5 점프
-    HandleResetKeys();     // ***** (추가) R 리셋
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    HandlePhaseJumpKeys();
+    HandleResetKeys();
+#endif
 
     if (GameManager.Instance == null) return;
 
@@ -148,8 +150,9 @@ public class PhaseDirector : MonoBehaviour
     player = playerObj != null ? playerObj.transform : null;
   }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
   // ============================================================
-  // ***** 디버그: 1~5키로 "해당 페이즈 시작 시각으로 점프"
+  // 디버그: 1~6키로 해당 페이즈 시작 시각으로 점프
   // ============================================================
   private void HandlePhaseJumpKeys()
   {
@@ -195,7 +198,7 @@ public class PhaseDirector : MonoBehaviour
   }
 
   // ============================================================
-  // ***** 디버그: R키로 특수패턴 플래그 리셋
+  // 디버그: R키로 특수패턴 플래그 리셋
   // ============================================================
   private void HandleResetKeys()
   {
@@ -205,4 +208,5 @@ public class PhaseDirector : MonoBehaviour
       Debug.Log("[PhaseDirector] DEBUG: siege flags reset (R)");
     }
   }
+#endif
 }

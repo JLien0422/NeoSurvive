@@ -1,45 +1,61 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// 주파수 오버라이드 미니게임
-/// 방향키로 플레이어 파형을 조절하여 목표 파형과 3초간 일치시킵니다.
-/// LineRenderer 대신 UI Image 점들로 파형을 그립니다.
+/// 방향키로 플레이어 사각파를 조절하여 목표 사각파와 3초간 일치시킵니다.
+/// 
+/// 변경점:
+/// - 기존 Dot 방식 제거
+/// - 가로선/세로선 Segment Image 방식으로 사각파 표시
 /// </summary>
 public class FrequencyOverrideMinigame : HackingMinigameBase
 {
     [Header("UI 설정")]
-    [SerializeField]
-    private Transform gameParent;
+    [SerializeField] private Transform gameParent;
 
-    [SerializeField]
-    private GameObject targetWaveGraph; // 목표 파형 컨테이너 (녹색)
-    [SerializeField]
-    private GameObject playerWaveGraph; // 플레이어 파형 컨테이너 (빨간)
+    [SerializeField] private GameObject targetWaveGraph;
+    [SerializeField] private GameObject playerWaveGraph;
 
     private Slider timeGauge;
     private Slider matchGauge;
     private Slider holdGauge;
+
+    [Header("게임 설정")]
+    [SerializeField] private float timeLimit = 15f;
+    [SerializeField] private float matchThreshold = 0.1f;
+    [SerializeField] private float matchDuration = 3f;
+
+    [Header("파형 표시 설정")]
+    [SerializeField] private float graphWidth = 300f;
+    [SerializeField] private float graphHeight = 35f;
+    [SerializeField] private float lineThickness = 6f;
+    [SerializeField] private int sampleCount = 48;
+
+    [Header("색상")]
+    [SerializeField] private Color targetColor = Color.green;
+    [SerializeField] private Color playerColor = Color.red;
+    [SerializeField] private Color successColor = Color.green;
 
     private float targetFrequency = 1f;
     private float targetAmplitude = 1f;
     private float playerFrequency = 1f;
     private float playerAmplitude = 1f;
 
-    private float matchThreshold = 0.1f;
-    private float matchDuration = 3f;
     private float currentMatchTime = 0f;
-
-    private float timeLimit = 15f;
     private float remainingTime = 0f;
     private bool isActive = false;
 
-    private const int WAVE_POINTS = 50;
-    private RectTransform[] targetDots;
-    private RectTransform[] playerDots;
+    private readonly List<GameObject> targetSegments = new List<GameObject>();
+    private readonly List<GameObject> playerSegments = new List<GameObject>();
 
-    public void SetPreMadeUI(GameObject targetWave, GameObject playerWave,
-                              Slider timeSlider, Slider matchSlider, Slider holdSlider)
+    public void SetPreMadeUI(
+        GameObject targetWave,
+        GameObject playerWave,
+        Slider timeSlider,
+        Slider matchSlider,
+        Slider holdSlider)
     {
         targetWaveGraph = targetWave;
         playerWaveGraph = playerWave;
@@ -51,7 +67,9 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
             gameParent = targetWave.transform.parent;
     }
 
-    public override void Initialize(System.Action onSuccessCallback, System.Action onFailureCallback)
+    public override void Initialize(
+        System.Action onSuccessCallback,
+        System.Action onFailureCallback)
     {
         base.Initialize(onSuccessCallback, onFailureCallback);
 
@@ -61,13 +79,14 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
         if (targetWaveGraph == null || playerWaveGraph == null)
             CreateWaveContainers();
 
-        InitializeWaveDots();
+        PrepareWaveContainers();
         ResetMinigame();
     }
 
     private void CreateUIParent()
     {
         Canvas canvas = FindObjectOfType<Canvas>();
+
         if (canvas == null)
         {
             GameObject canvasObj = new GameObject("HackingCanvas");
@@ -79,13 +98,16 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
 
         GameObject panel = new GameObject("FrequencyOverridePanel");
         panel.transform.SetParent(canvas.transform, false);
+
         RectTransform panelRect = panel.AddComponent<RectTransform>();
         panelRect.sizeDelta = new Vector2(600, 400);
         panelRect.anchorMin = new Vector2(0.5f, 0.5f);
         panelRect.anchorMax = new Vector2(0.5f, 0.5f);
         panelRect.anchoredPosition = Vector2.zero;
+
         Image panelImg = panel.AddComponent<Image>();
         panelImg.color = new Color(0.1f, 0.1f, 0.1f, 0.9f);
+
         gameParent = panel.transform;
     }
 
@@ -95,56 +117,46 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
         {
             targetWaveGraph = new GameObject("TargetWave");
             targetWaveGraph.transform.SetParent(gameParent, false);
+
             RectTransform r = targetWaveGraph.AddComponent<RectTransform>();
-            r.anchoredPosition = new Vector2(0, 60f);
-            r.sizeDelta = new Vector2(300f, 80f);
+            r.anchoredPosition = Vector2.zero;
+            r.sizeDelta = new Vector2(graphWidth, graphHeight * 2f);
         }
+
         if (playerWaveGraph == null)
         {
             playerWaveGraph = new GameObject("PlayerWave");
             playerWaveGraph.transform.SetParent(gameParent, false);
+
             RectTransform r = playerWaveGraph.AddComponent<RectTransform>();
-            r.anchoredPosition = new Vector2(0, -60f);
-            r.sizeDelta = new Vector2(300f, 80f);
+            r.anchoredPosition = Vector2.zero;
+            r.sizeDelta = new Vector2(graphWidth, graphHeight * 2f);
         }
     }
 
-    private void InitializeWaveDots()
+    private void PrepareWaveContainers()
     {
-        // 두 파형 컨테이너를 같은 위치(중앙)에 겹치도록 설정
         RectTransform targetRect = targetWaveGraph.GetComponent<RectTransform>();
         RectTransform playerRect = playerWaveGraph.GetComponent<RectTransform>();
-        if (targetRect != null) targetRect.anchoredPosition = Vector2.zero;
-        if (playerRect != null) playerRect.anchoredPosition = Vector2.zero;
 
-        // 기존 점 정리
-        foreach (Transform child in targetWaveGraph.transform) Destroy(child.gameObject);
-        foreach (Transform child in playerWaveGraph.transform) Destroy(child.gameObject);
+        if (targetRect != null)
+            targetRect.anchoredPosition = Vector2.zero;
 
-        targetDots = CreateDots(targetWaveGraph.transform, Color.green);
-        playerDots = CreateDots(playerWaveGraph.transform, Color.red);
-    }
+        if (playerRect != null)
+            playerRect.anchoredPosition = Vector2.zero;
 
-    private RectTransform[] CreateDots(Transform parent, Color color)
-    {
-        RectTransform[] dots = new RectTransform[WAVE_POINTS];
-        for (int i = 0; i < WAVE_POINTS; i++)
-        {
-            GameObject dot = new GameObject($"Dot_{i}");
-            dot.transform.SetParent(parent, false);
-            RectTransform rect = dot.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(5f, 5f);
-            Image img = dot.AddComponent<Image>();
-            img.color = color;
-            dots[i] = rect;
-        }
-        return dots;
+        ClearSegments(targetWaveGraph.transform);
+        ClearSegments(playerWaveGraph.transform);
+
+        targetSegments.Clear();
+        playerSegments.Clear();
     }
 
     private void ResetMinigame()
     {
         targetFrequency = Random.Range(0.5f, 2f);
         targetAmplitude = Random.Range(0.5f, 1.5f);
+
         playerFrequency = Random.Range(0.3f, 2.5f);
         playerAmplitude = Random.Range(0.3f, 1.8f);
 
@@ -158,53 +170,192 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
         UpdateHoldGauge();
     }
 
+    private void ClearSegments(Transform parent)
+    {
+        if (parent == null)
+            return;
+
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Destroy(parent.GetChild(i).gameObject);
+        }
+    }
+
     private void UpdateWaveGraphs()
     {
-        if (targetDots == null || playerDots == null) return;
+        if (targetWaveGraph == null || playerWaveGraph == null)
+            return;
 
-        float graphWidth = 280f;
-        float graphHeight = 35f;
+        RedrawSquareWave(
+            targetWaveGraph.transform,
+            targetSegments,
+            targetFrequency,
+            targetAmplitude,
+            targetColor
+        );
 
-        for (int i = 0; i < WAVE_POINTS; i++)
+        RedrawSquareWave(
+            playerWaveGraph.transform,
+            playerSegments,
+            playerFrequency,
+            playerAmplitude,
+            playerColor
+        );
+    }
+
+    /// <summary>
+    /// 사각파를 가로/세로 Image 막대로 그림
+    /// </summary>
+    private void RedrawSquareWave(
+        Transform parent,
+        List<GameObject> segmentList,
+        float frequency,
+        float amplitude,
+        Color color)
+    {
+        ClearSegmentObjects(segmentList);
+
+        List<Vector2> points = BuildSquareWavePoints(frequency, amplitude);
+
+        if (points.Count < 2)
+            return;
+
+        for (int i = 0; i < points.Count - 1; i++)
         {
-            float t = i / (float)(WAVE_POINTS - 1);
-            float x = (t - 0.5f) * graphWidth;
-
-            float ty = Mathf.Sin(t * targetFrequency * Mathf.PI * 6f) * targetAmplitude * graphHeight;
-            targetDots[i].anchoredPosition = new Vector2(x, ty);
-
-            float py = Mathf.Sin(t * playerFrequency * Mathf.PI * 6f) * playerAmplitude * graphHeight;
-            playerDots[i].anchoredPosition = new Vector2(x, py);
+            CreateSegment(
+                parent,
+                segmentList,
+                points[i],
+                points[i + 1],
+                color
+            );
         }
+    }
+
+    private void ClearSegmentObjects(List<GameObject> segmentList)
+    {
+        for (int i = segmentList.Count - 1; i >= 0; i--)
+        {
+            if (segmentList[i] != null)
+                Destroy(segmentList[i]);
+        }
+
+        segmentList.Clear();
+    }
+
+    /// <summary>
+    /// 사각파의 꺾이는 점 목록 생성
+    /// </summary>
+    private List<Vector2> BuildSquareWavePoints(float frequency, float amplitude)
+    {
+        List<Vector2> points = new List<Vector2>();
+
+        float halfWidth = graphWidth * 0.5f;
+        float yHigh = amplitude * graphHeight;
+        float yLow = -amplitude * graphHeight;
+
+        bool isHigh = Mathf.Sin(0f) >= 0f;
+        float currentY = isHigh ? yHigh : yLow;
+
+        points.Add(new Vector2(-halfWidth, currentY));
+
+        float previousY = currentY;
+
+        for (int i = 1; i <= sampleCount; i++)
+        {
+            float t = i / (float)sampleCount;
+            float x = Mathf.Lerp(-halfWidth, halfWidth, t);
+
+            float sinValue = Mathf.Sin(t * frequency * Mathf.PI * 6f);
+            bool high = sinValue >= 0f;
+            float y = high ? yHigh : yLow;
+
+            if (!Mathf.Approximately(y, previousY))
+            {
+                float prevT = (i - 1) / (float)sampleCount;
+                float prevX = Mathf.Lerp(-halfWidth, halfWidth, prevT);
+
+                // 이전 높이의 가로선 끝
+                points.Add(new Vector2(prevX, previousY));
+
+                // 같은 X에서 세로 전환
+                points.Add(new Vector2(prevX, y));
+
+                previousY = y;
+            }
+        }
+
+        points.Add(new Vector2(halfWidth, previousY));
+
+        return points;
+    }
+
+    private void CreateSegment(
+        Transform parent,
+        List<GameObject> segmentList,
+        Vector2 from,
+        Vector2 to,
+        Color color)
+    {
+        GameObject segment = new GameObject("WaveSegment");
+        segment.transform.SetParent(parent, false);
+
+        RectTransform rect = segment.AddComponent<RectTransform>();
+        Image img = segment.AddComponent<Image>();
+
+        img.color = color;
+        img.raycastTarget = false;
+
+        Vector2 direction = to - from;
+        float distance = direction.magnitude;
+
+        if (distance <= 0.01f)
+        {
+            Destroy(segment);
+            return;
+        }
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+
+        rect.sizeDelta = new Vector2(distance, lineThickness);
+        rect.anchoredPosition = (from + to) * 0.5f;
+        rect.localRotation = Quaternion.Euler(0f, 0f, angle);
+
+        segmentList.Add(segment);
     }
 
     private void UpdateTimeGauge()
     {
         if (timeGauge != null)
-            timeGauge.value = remainingTime / timeLimit; // 1→0
+            timeGauge.value = remainingTime / timeLimit;
     }
 
     private void UpdateMatchGauge()
     {
-        // 일치도: 두 파형이 얼마나 가까운지 (0→1)
         float freqDiff = Mathf.Abs(playerFrequency - targetFrequency);
         float ampDiff = Mathf.Abs(playerAmplitude - targetAmplitude);
+
         float maxDiff = Mathf.Max(freqDiff, ampDiff);
         float matchValue = Mathf.Clamp01(1f - maxDiff / matchThreshold);
+
         if (matchGauge != null)
             matchGauge.value = matchValue;
     }
 
     private void UpdateHoldGauge()
     {
-        // 유지 시간: 일치 상태를 3초 유지 (0→1)
         if (holdGauge != null)
             holdGauge.value = currentMatchTime / matchDuration;
     }
 
     private void Update()
     {
-        if (!isActive) return;
+        if (!isActive)
+            return;
 
         remainingTime -= Time.unscaledDeltaTime;
         UpdateTimeGauge();
@@ -215,21 +366,34 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
             return;
         }
 
-        // 방향키 입력으로 파형 조절
+        HandleInput();
+        UpdateWaveGraphs();
+        CheckMatch();
+    }
+
+    private void HandleInput()
+    {
         float freqChange = 0f;
         float ampChange = 0f;
 
-        if (Input.GetKey(KeyCode.LeftArrow))  freqChange -= Time.unscaledDeltaTime * 0.5f;
-        if (Input.GetKey(KeyCode.RightArrow)) freqChange += Time.unscaledDeltaTime * 0.5f;
-        if (Input.GetKey(KeyCode.UpArrow))    ampChange  += Time.unscaledDeltaTime * 0.5f;
-        if (Input.GetKey(KeyCode.DownArrow))  ampChange  -= Time.unscaledDeltaTime * 0.5f;
+        if (Input.GetKey(KeyCode.LeftArrow))
+            freqChange -= Time.unscaledDeltaTime * 0.5f;
+
+        if (Input.GetKey(KeyCode.RightArrow))
+            freqChange += Time.unscaledDeltaTime * 0.5f;
+
+        if (Input.GetKey(KeyCode.UpArrow))
+            ampChange += Time.unscaledDeltaTime * 0.5f;
+
+        if (Input.GetKey(KeyCode.DownArrow))
+            ampChange -= Time.unscaledDeltaTime * 0.5f;
 
         playerFrequency = Mathf.Clamp(playerFrequency + freqChange, 0.1f, 3f);
         playerAmplitude = Mathf.Clamp(playerAmplitude + ampChange, 0.1f, 2f);
+    }
 
-        UpdateWaveGraphs();
-
-        // 일치 판정
+    private void CheckMatch()
+    {
         float freqDiff = Mathf.Abs(playerFrequency - targetFrequency);
         float ampDiff = Mathf.Abs(playerAmplitude - targetAmplitude);
 
@@ -239,10 +403,10 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
         {
             currentMatchTime += Time.unscaledDeltaTime;
             UpdateHoldGauge();
+
             if (currentMatchTime >= matchDuration)
             {
                 OnSuccess();
-                return;
             }
         }
         else
@@ -255,20 +419,42 @@ public class FrequencyOverrideMinigame : HackingMinigameBase
     public override void OnSuccess()
     {
         isActive = false;
-        if (timeGauge != null) timeGauge.value = 1f;
-        if (matchGauge != null) matchGauge.value = 1f;
-        if (holdGauge != null) holdGauge.value = 1f;
-        // 성공 시 플레이어 파형 녹색으로 변경
-        if (playerDots != null)
-            foreach (var dot in playerDots)
-                if (dot != null) dot.GetComponent<Image>().color = Color.green;
+
+        if (timeGauge != null)
+            timeGauge.value = 1f;
+
+        if (matchGauge != null)
+            matchGauge.value = 1f;
+
+        if (holdGauge != null)
+            holdGauge.value = 1f;
+
+        SetSegmentsColor(playerSegments, successColor);
+
         base.OnSuccess();
     }
 
     public override void OnFailure()
     {
         isActive = false;
-        if (timeGauge != null) timeGauge.value = 0f;
+
+        if (timeGauge != null)
+            timeGauge.value = 0f;
+
         base.OnFailure();
+    }
+
+    private void SetSegmentsColor(List<GameObject> segments, Color color)
+    {
+        foreach (GameObject segment in segments)
+        {
+            if (segment == null)
+                continue;
+
+            Image img = segment.GetComponent<Image>();
+
+            if (img != null)
+                img.color = color;
+        }
     }
 }

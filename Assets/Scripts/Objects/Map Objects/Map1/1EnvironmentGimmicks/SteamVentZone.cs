@@ -10,7 +10,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
     [DefaultExecutionOrder(-100)]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class SteamVentZone : MonoBehaviour
+    public class SteamVentZone : MonoBehaviour, IHackPromptProvider
     {
         [Header("CSV")]
         [SerializeField] private string mapId = "Map1";
@@ -82,6 +82,23 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             ApplyVisualState();
 
             slowBuffId = (uint)(100000 + Mathf.Abs(GetInstanceID()));
+            EnsurePromptAnchor();
+        }
+
+        public Transform PromptAnchorRoot => transform;
+        public float HackInteractRange => HackPromptBoundsUtility.GetInteractRadius(transform, 2f);
+        public bool IsHackInteractionComplete => isHacked;
+        public bool IsHackInteractionEnabled => canHack && !isHackRequestPending;
+        public bool ShouldShowHackPrompt =>
+            canHack
+            && !isHacked
+            && !isHackRequestPending
+            && currentPlayerInZone != null;
+
+        private void EnsurePromptAnchor()
+        {
+            if (GetComponent<HackInteractPromptAnchor>() == null)
+                gameObject.AddComponent<HackInteractPromptAnchor>();
         }
 
         private void Start()

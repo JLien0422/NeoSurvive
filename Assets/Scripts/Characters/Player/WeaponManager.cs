@@ -220,7 +220,8 @@ namespace NeoSurvive.Weapon
 
     void Update()
     {
-      // 테스트용: 데이터 순서에 의존하지 않고 ID로 직접 무기 찾기 (F1=1, F2=2 ... F10=10)
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+      // 테스트용: F1~F12 = 무기 ID 1~12
       if (Input.GetKeyDown(KeyCode.F1)) AddWeaponById(1);
       if (Input.GetKeyDown(KeyCode.F2)) AddWeaponById(2);
       if (Input.GetKeyDown(KeyCode.F3)) AddWeaponById(3);
@@ -233,6 +234,7 @@ namespace NeoSurvive.Weapon
       if (Input.GetKeyDown(KeyCode.F10)) AddWeaponById(10);
       if (Input.GetKeyDown(KeyCode.F11)) AddWeaponById(11);
       if (Input.GetKeyDown(KeyCode.F12)) AddWeaponById(12);
+#endif
     }
   }
 }

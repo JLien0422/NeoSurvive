@@ -1,0 +1,179 @@
+{
+  "workbook_title": "NeoSurvive Balancing",
+  "entries": [
+    {
+      "sheet": "01_Characters",
+      "category": "Characters",
+      "path": "Assets/Data/Balancing/characters.csv",
+      "keys": ["id"]
+    },
+    {
+      "sheet": "02_EnemyStats",
+      "category": "Enemies",
+      "path": "Assets/Data/Balancing/enemy_stats.csv",
+      "keys": ["enemyid"]
+    },
+    {
+      "sheet": "03_EnemyDrops",
+      "category": "Enemies",
+      "path": "Assets/Data/Balancing/enemy_drops.csv",
+      "keys": ["enemyId"]
+    },
+    {
+      "sheet": "04_SpawnLegacy",
+      "category": "Spawning",
+      "path": "Assets/Data/Balancing/enemy_spawn_table.csv",
+      "keys": ["phase"]
+    },
+    {
+      "sheet": "05_SpawnPhase1",
+      "category": "Spawning",
+      "path": "Assets/Data/Balancing/enemy_spawn_phase1_segments.csv",
+      "keys": ["segment"]
+    },
+    {
+      "sheet": "06_SpawnPhase2_5",
+      "category": "Spawning",
+      "path": "Assets/Data/Balancing/enemy_spawn_phase2_5_table.csv",
+      "keys": ["phase"]
+    },
+    {
+      "sheet": "07_PlayerExp",
+      "category": "Progression",
+      "path": "Assets/Data/Balancing/player_exp_table.csv",
+      "keys": ["level"]
+    },
+    {
+      "sheet": "08_MapObjects",
+      "category": "Map 1",
+      "path": "Assets/Data/Balancing/Objects/Map Objects/Map 1/map1_map_objects.csv",
+      "keys": ["mapId", "id"]
+    },
+    {
+      "sheet": "09_MapGimmicks",
+      "category": "Map 1",
+      "path": "Assets/Data/Balancing/Objects/Map Objects/Map 1/map1_environment_gimmicks.csv",
+      "keys": ["mapId", "id"]
+    },
+    {
+      "sheet": "C01_LaserSword",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/01lasersword_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C02_SurgeBlade",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/02surgeblade_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C03_EnergyShield",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/03energyshield_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C04_PlasmaPhoton",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/04plasmaphotongun_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C05_GravityHammer",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/05gravityhammer_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C06_BoosterKnuckle",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/06boosterknuckle_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C07_BoltLauncher",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/07boltlauncher_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C08_TeslaCoilArmor",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/08teslacoilarmor_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C09_ChainSaw",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/09chainsaw_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "C10_BlastBreath",
+      "category": "Cyborg Weapons",
+      "path": "Assets/Data/Objects/Weapons/Cyborg/10blastbreath.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H01_LinkPistol",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/01linkpistol_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H02_PlasmaRifle",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/02plasmarifle_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H03_DataScrambler",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/03datascrambler_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H04_AIDrone",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/04aidrone_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H05_AutoTurret",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/05autoturret_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H06_EMPPulse",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/06emppulsegenerator_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H07_DigitalShield",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/07digitalshield_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H08_DataOptimization",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/08dataoptimization_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H09_HologramDecoy",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/09hologramdecoy_stats.csv",
+      "keys": ["weaponid", "level"]
+    },
+    {
+      "sheet": "H10_EMPGrenade",
+      "category": "Hacker Weapons",
+      "path": "Assets/Data/Objects/Weapons/Hacker/10empgrenade_stats.csv",
+      "keys": ["weaponid", "level"]
+    }
+  ]
+}

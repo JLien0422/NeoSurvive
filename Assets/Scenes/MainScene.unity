@@ -29307,7 +29307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRunGold: 0
-  totalGold: 228980
+  totalGold: 431740
   enableDebugGoldCommitKey: 1
   debugGoldCommitKey: 112
   hackerPlayerPrefab: {fileID: 533545058544290356, guid: d09d704ff7f744d4194c3594ea64d450, type: 3}

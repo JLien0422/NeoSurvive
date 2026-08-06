@@ -1,0 +1,5 @@
+# NeoSurvive CODEOWNERS
+# These users are requested as reviewers for all changes.
+# Note: making reviews "required" also needs GitHub branch protection settings.
+
+* @Xabuna451 @csy40110 @tttghost

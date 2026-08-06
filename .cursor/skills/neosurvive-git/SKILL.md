@@ -21,8 +21,8 @@ description: >
 - owner: `JLien0422`
 - repo: `NeoSurvive`
 - 기본 리모트: `origin` (없으면 실제 remote 확인)
-- **베이스 / 디폴트 브랜치: `Master`** (구 `lien`)
-- PR base는 항상 `Master`를 기본으로 쓴다. 소문자 `master` / `lien`을 base로 쓰지 않는다.
+- **베이스 / 디폴트 브랜치: `master`** (구 `lien` / `Master`)
+- PR base는 항상 소문자 `master`를 기본으로 쓴다. `Master` / `lien` / `dev`를 base로 쓰지 않는다.
 
 ## 프로젝트 주인 / 기본 리뷰어 (고정 — 항상 전원)
 아래는 NeoSurvive 프로젝트 주인이다. PR 생성/갱신 시 전원 `reviewers`에 넣는다. (한 명이라도 빼지 말 것)

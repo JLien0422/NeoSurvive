@@ -2,8 +2,8 @@
 name: neosurvive-git
 description: >
   NeoSurvive(JLien0422/NeoSurvive) 전용 깃·PR 고정 규칙.
-  기본 리뷰어 Xabuna451, csy40110, tttghost 전원 요청, Unity 잡음 파일 커밋 제외 등.
-  공통 git-pr-auto와 함께 쓰며 NeoSurvive 작업 시 이 값을 우선한다.
+  프로젝트 주인/기본 리뷰어 JLien0422, Xabuna451, csy40110, tttghost 전원 요청,
+  Unity 잡음 파일 커밋 제외 등. 공통 git-pr-auto와 함께 쓰며 NeoSurvive 작업 시 이 값을 우선한다.
   Use when working in NeoSurvive repo on PR, commit, push, issue, merge, reviewers, labels, milestone.
 ---
 
@@ -22,17 +22,18 @@ description: >
 - repo: `NeoSurvive`
 - 기본 리모트: `origin` (없으면 실제 remote 확인)
 
-## 기본 리뷰어 (고정 — 항상 전원)
-PR 생성/갱신 시 아래 3명을 빠짐없이 `reviewers`에 넣는다.
+## 프로젝트 주인 / 기본 리뷰어 (고정 — 항상 전원)
+아래는 NeoSurvive 프로젝트 주인이다. PR 생성/갱신 시 전원 `reviewers`에 넣는다. (한 명이라도 빼지 말 것)
 
-- `Xabuna451`
-- `csy40110`
-- `tttghost`
+- * `JLien0422`
+- * `Xabuna451`
+- * `csy40110`
+- * `tttghost`
 
-한 명이라도 빼지 말 것.
 실패 시 누구까지 성공/실패했는지 보고할 것.
 
-레포 고정 파일: `.github/CODEOWNERS` (`* @Xabuna451 @csy40110 @tttghost`).
+레포 고정 파일: `.github/CODEOWNERS`
+(`* @JLien0422 @Xabuna451 @csy40110 @tttghost`)
 Skill 요청과 CODEOWNERS를 함께 사용한다.
 
 ## 라벨 / 마일스톤
@@ -59,4 +60,4 @@ Skill 요청과 CODEOWNERS를 함께 사용한다.
 공통 Skill 체크리스트 + NeoSurvive임을 한 줄로 명시.
 
 예:
-`NeoSurvive PR: <url> / Reviewers: Xabuna451, csy40110, tttghost / Labels: ... / Milestone: ... / Project: 미지원`
+`NeoSurvive PR: <url> / Reviewers: JLien0422, Xabuna451, csy40110, tttghost / Labels: ... / Milestone: ... / Project: 미지원`

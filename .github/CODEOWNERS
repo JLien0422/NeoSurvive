@@ -1,5 +1,10 @@
 # NeoSurvive CODEOWNERS
-# These users are requested as reviewers for all changes.
+# Project owners (별표 = 이 프로젝트 주인, 전원 리뷰어 대상):
+# * @JLien0422
+# * @Xabuna451
+# * @csy40110
+# * @tttghost
+#
 # Note: making reviews "required" also needs GitHub branch protection settings.
 
-* @Xabuna451 @csy40110 @tttghost
+* @JLien0422 @Xabuna451 @csy40110 @tttghost

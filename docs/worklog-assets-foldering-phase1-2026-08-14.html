@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업 로그 — Assets 폴더링 1차 완료 (2026-08-14)</title>
+  <style>
+    :root {
+      --bg: #0e1318; --panel: #161d26; --panel2: #1c2430; --line: #2b3644;
+      --text: #e8eef5; --muted: #95a3b4; --faint: #6c7a8b;
+      --green: #3ecf8e; --amber: #e6b84d; --red: #ef6b6b; --cyan: #5ec8d8; --blue: #4da3ff;
+      --sans: "Pretendard", "Noto Sans KR", sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: var(--sans); color: var(--text); line-height: 1.65;
+      background: radial-gradient(800px 400px at 0% 0%, #1a2736 0%, transparent 50%), var(--bg);
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.2rem 1.1rem 3rem; }
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.15rem; margin-bottom: 1rem;
+    }
+    .hero h1 { margin: 0 0 .4rem; font-size: 1.35rem; }
+    .hero p { margin: 0; color: var(--muted); }
+    .badge {
+      display: inline-block; font-size: .72rem; font-weight: 700; margin: .55rem .3rem 0 0;
+      padding: .22rem .5rem; border-radius: 999px; border: 1px solid #2d5644; color: var(--green);
+    }
+    section {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1rem 1.05rem; margin-bottom: .85rem;
+    }
+    h2 { margin: 0 0 .65rem; font-size: 1.05rem; color: var(--cyan); }
+    h3 { margin: .85rem 0 .4rem; font-size: .95rem; }
+    code { font-family: var(--mono); font-size: .84em; background: #0b1016; border: 1px solid var(--line); border-radius: 5px; padding: .05rem .3rem; }
+    ul { margin: .3rem 0 .5rem; padding-left: 1.2rem; }
+    li { margin: .18rem 0; }
+    .pill {
+      font-size: .68rem; font-weight: 800; padding: .12rem .4rem; border-radius: 999px;
+      border: 1px solid var(--line); margin-right: .25rem;
+    }
+    .pill.del { color: var(--red); border-color: #5a2e2e; background: #241414; }
+    .pill.move { color: var(--amber); border-color: #5a4a22; background: #241f12; }
+    .pill.edit { color: var(--blue); border-color: #2a4a6a; background: #121c28; }
+    .item {
+      border: 1px solid var(--line); border-radius: 10px; background: #121820;
+      padding: .7rem .8rem; margin: .4rem 0;
+    }
+    .path { font-family: var(--mono); font-size: .82rem; display: block; margin-top: .25rem; }
+    .why { color: var(--muted); font-size: .9rem; margin: .25rem 0 0; }
+    .box {
+      border-left: 3px solid var(--amber); background: var(--panel2); border-radius: 8px;
+      padding: .7rem .8rem; margin: .5rem 0; color: var(--muted);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    th, td { border: 1px solid var(--line); padding: .4rem .5rem; text-align: left; vertical-align: top; }
+    th { background: #121820; color: var(--muted); }
+    .from { color: var(--amber); }
+    .to { color: var(--green); }
+    footer { text-align: center; color: var(--faint); font-size: .78rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>작업 로그 — Assets 폴더링 1차 완료</h1>
+      <p>
+        날짜: 2026-08-14 · 브랜치: <code>chore/assets-cleanup-unused</code><br />
+        범위: <strong>미사용 삭제 + Scripts/Prefabs 도메인 이동</strong>. 코드 내용/namespace 변경 없음. 깃은 작업 완료 후 한 번에 반영.
+      </p>
+      <span class="badge">Part A 삭제 완료</span>
+      <span class="badge">Part B Scripts 이동 완료</span>
+      <span class="badge">Part C Prefabs 이동 완료</span>
+    </header>
+
+    <section>
+      <h2>0. 한 줄 요약</h2>
+      <p>
+        안 쓰는 예제·아카이브·temp·빈 폴더를 지우고,
+        WeaponChoice/Audio/Lobby 스크립트와 해킹 Prefab 위치를 도메인 이름에 맞게 옮겼습니다.
+        Build 씬은 Lobby + Main만 남겼습니다.
+      </p>
+    </section>
+
+    <section>
+      <h2>1. Part A — 삭제한 것</h2>
+
+      <h3>빈 폴더</h3>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Scripts/Items/</span><p class="why">아이템 스크립트 예약 폴더였으나 파일 0개.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Scripts/Hacking/ObjectManager/ , Reward/</span><p class="why">해킹 하위 예약 폴더. 실제 로직은 HackingSystem/Effects/MiniGame에 있음.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Scripts/.../Weapon/Passive/</span><p class="why">패시브 무기 폴더. 비어 있음.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Prefabs/Managers/</span><p class="why">매니저 프리팹용. 비어 있음.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Assets/Packages/</span><p class="why">빈 폴더. 진짜 패키지는 루트 Packages/.</p></div>
+
+      <h3>예제</h3>
+      <div class="item"><span class="pill del">삭제</span><span class="path">TextMesh Pro/Examples &amp; Extras/</span><p class="why">TMP 샘플. 게임 UI 아님. TMP 본체 유지.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">SerializableDictionary/Example/</span><p class="why">라이브러리 예제. 본체 유지.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Plugins/Demigiant/DOTweenPro Examples/</span><p class="why">DOTween 데모. DOTween 본체 유지.</p></div>
+
+      <h3>Resources 쓰레기</h3>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Resources/Sprites/archive/</span><p class="why">옛 스프라이트 더미. 경로 문자열 참조 없음 확인 후 삭제.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Resources/Sprites/UI/Archive/</span><p class="why">UI 아카이브 대량 파일. 경로 참조 없음 확인 후 삭제.</p></div>
+      <div class="item"><span class="pill del">삭제</span><span class="path">Resources/Sounds/SFX/temp/</span><p class="why">임시 효과음.</p></div>
+
+      <h3>씬</h3>
+      <div class="item"><span class="pill del">삭제</span><span class="path">LobbyScene temp / LobbyScene_TEMPPPPP / MainScene_Temp</span><p class="why">작업용 임시 씬.</p></div>
+      <div class="item"><span class="pill move">아카이브</span><span class="path">JmgScene , Trick2Scene → Scenes/_Archive/</span><p class="why">실험 씬. 완전 삭제 대신 격리.</p></div>
+      <div class="item"><span class="pill edit">설정</span><span class="path">ProjectSettings/EditorBuildSettings.asset</span><p class="why">빌드 씬 = LobbyScene + MainScene만.</p></div>
+    </section>
+
+    <section>
+      <h2>2. Part B — Scripts 이동 (내용 변경 없음)</h2>
+      <table>
+        <thead><tr><th>이전</th><th>이후</th><th>뭐하는 것 / 왜</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="from"><code>Scripts/WeaponChoice/*</code></td>
+            <td class="to"><code>Scripts/UI/WeaponChoice/</code></td>
+            <td>무기 선택 UI(패널/카드/컨트롤러/설명빌더). UI인데 밖에 있어서 편입.</td>
+          </tr>
+          <tr>
+            <td class="from"><code>Managers/*Sound*</code> + <code>Managers/Audio/</code></td>
+            <td class="to"><code>Scripts/Audio/</code></td>
+            <td>사운드 매니저·이벤트/무기 사운드 정의. Audio 구역으로 분리.</td>
+          </tr>
+          <tr>
+            <td class="from"><code>Managers/LobbyManager</code>, <code>LobbyCharacterSelector</code></td>
+            <td class="to"><code>Scripts/UI/Lobby/</code></td>
+            <td>로비 흐름·캐릭터 선택. 로비 UI 구역으로.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Managers에 남은 것</h3>
+      <p class="why" style="color:var(--muted)">
+        GameManager, DataManager, MapManager, UIManager, UpgradeManager, TraitManager,
+        SettingsManager, DistanceManager, DamageTextManager, ManagerInitializer,
+        GameAnalyticsInitializer, WeaponDamageStats
+      </p>
+    </section>
+
+    <section>
+      <h2>3. Part C — Prefabs 이동</h2>
+      <div class="item">
+        <span class="pill move">이동</span>
+        <span class="path">Prefabs/Objects/Hacking Objects/* → Prefabs/Hacking/</span>
+        <p class="why">
+          해킹 장치·UI 프리팹 (ElectricFence, MagneticBeacon, SatelliteUplink, SecurityTurret,
+          SynapseServer, CaptureUI, HackInteractPrompt, Tutorial 버튼).
+          Scripts는 이미 <code>Hacking</code>이라 Prefabs도 맞춤.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. 안 한 것 (다음 / 보류)</h2>
+      <ul>
+        <li>Packages(manifest) 제거 — Visual Scripting, Localization 등 조사 후</li>
+        <li>Data CSV 경로 이동 — BalancingSheetCatalog 하드코딩</li>
+        <li>Resources 전체 → Art — Load 경로 위험</li>
+        <li>공백 폴더명 리네임 (<code>Map Objects</code> 등)</li>
+        <li>namespace / 클래스 리팩터 / asmdef</li>
+        <li>깨진 Prefab 파일명·trailing space 리네임</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. 스모크 체크 (주인님/팀)</h2>
+      <ul>
+        <li>Unity 리임포트 → Compile Error 0</li>
+        <li>LobbyScene: 캐릭터 선택, 로비 사운드</li>
+        <li>MainScene: 이동/공격, 무기 선택 UI, 해킹 오브젝트 1회</li>
+        <li>Missing Script / Missing Prefab / Missing 스프라이트(옛 Archive GUID) 없는지</li>
+      </ul>
+      <div class="box">
+        스크립트·프리팹은 <code>.meta</code>와 함께 이동했습니다. GUID 참조는 유지되는 것이 정상입니다.
+        Archive 이미지는 경로 문자열 참조는 없었으나, GUID로만 묶인 잔여가 있으면 Missing이 날 수 있습니다.
+      </div>
+    </section>
+
+    <section>
+      <h2>6. 관련 문서</h2>
+      <ul>
+        <li><code>docs/plan-folder-mgmt-junior-2026-08-14.html</code> — 주니어용 규칙·절차</li>
+        <li><code>docs/plan-folder-catalog-what-is-2026-08-14.html</code> — 대상별 “뭐하는 것”</li>
+        <li><code>docs/plan-assets-foldering-2026-08-14.html</code> — 초기 폴더링 계획</li>
+        <li><strong>본 파일</strong> — 실제 수행 작업 로그 (최종)</li>
+      </ul>
+    </section>
+
+    <footer>
+      docs/worklog-assets-foldering-phase1-2026-08-14.html
+    </footer>
+  </div>
+</body>
+</html>

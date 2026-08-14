@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — 정리 대상 “이게 뭐 하는 건지” 백과</title>
+  <style>
+    :root {
+      --bg: #0e1318;
+      --panel: #161d26;
+      --panel2: #1c2430;
+      --line: #2b3644;
+      --text: #e8eef5;
+      --muted: #95a3b4;
+      --faint: #6c7a8b;
+      --blue: #4da3ff;
+      --green: #3ecf8e;
+      --amber: #e6b84d;
+      --red: #ef6b6b;
+      --cyan: #5ec8d8;
+      --violet: #a78bfa;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      line-height: 1.65;
+      background:
+        radial-gradient(900px 400px at 0% 0%, #1a2736 0%, transparent 55%),
+        radial-gradient(700px 360px at 100% 0%, #231a32 0%, transparent 50%),
+        var(--bg);
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: var(--mono);
+      font-size: .84em;
+      background: #0b1016;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: .06rem .32rem;
+    }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 1.2rem 1.1rem 3.5rem; }
+
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.35rem 1.2rem 1.15rem;
+      margin-bottom: 1rem;
+    }
+    .hero .eyebrow {
+      margin: 0 0 .35rem;
+      color: var(--cyan);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 0 0 .45rem;
+      font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+      line-height: 1.3;
+    }
+    .hero p { margin: 0; color: var(--muted); max-width: 44rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .85rem; }
+    .badge {
+      font-size: .7rem; font-weight: 700;
+      padding: .22rem .5rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    }
+    .badge.g { color: var(--green); border-color: #2d5644; }
+    .badge.a { color: var(--amber); border-color: #5a4a22; }
+    .badge.r { color: var(--red); border-color: #5a2e2e; }
+    .badge.v { color: var(--violet); border-color: #4a3a6a; }
+    .badge.b { color: var(--blue); border-color: #2a4a6a; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static !important; }
+    }
+
+    .toc {
+      position: sticky; top: .75rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .8rem .75rem;
+    }
+    .toc h2 {
+      margin: 0 0 .45rem;
+      font-size: .7rem;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .toc ol { margin: 0; padding-left: 1.05rem; font-size: .82rem; }
+    .toc li { margin: .22rem 0; }
+    .toc a { color: var(--muted); }
+    .toc a:hover { color: var(--text); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.05rem 1.05rem 1.1rem;
+      margin-bottom: .85rem;
+    }
+    section > h2 {
+      margin: 0 0 .7rem;
+      font-size: 1.08rem;
+      display: flex; align-items: center; gap: .45rem;
+    }
+    .num {
+      width: 1.45rem; height: 1.45rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 7px; font-size: .75rem; font-weight: 800;
+      background: var(--panel2); border: 1px solid var(--line); color: var(--cyan);
+    }
+    h3 {
+      margin: 1.05rem 0 .4rem;
+      font-size: .95rem;
+      color: var(--cyan);
+    }
+    p { margin: .35rem 0; }
+    .muted { color: var(--muted); }
+    ul { margin: .3rem 0 .5rem; padding-left: 1.15rem; }
+    li { margin: .18rem 0; }
+
+    .intro {
+      background: #121820;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .8rem .85rem;
+      margin-bottom: .7rem;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #121820;
+      padding: .8rem .85rem;
+      margin: .55rem 0;
+    }
+    .card .top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem .55rem;
+      align-items: center;
+      margin-bottom: .45rem;
+    }
+    .card .name {
+      font-family: var(--mono);
+      font-size: .84rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .pill {
+      font-size: .68rem; font-weight: 800;
+      padding: .16rem .42rem; border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+    .pill.del { color: var(--red); background: #241414; border-color: #5a2e2e; }
+    .pill.move { color: var(--amber); background: #241f12; border-color: #5a4a22; }
+    .pill.keep { color: var(--green); background: #13231c; border-color: #2d5644; }
+    .pill.later { color: var(--violet); background: #1a1528; border-color: #4a3a6a; }
+    .pill.info { color: var(--blue); background: #121c28; border-color: #2a4a6a; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: .25rem .55rem;
+      font-size: .9rem;
+      margin: .2rem 0;
+    }
+    .row .k {
+      color: var(--faint);
+      font-weight: 700;
+      font-size: .8rem;
+      padding-top: .12rem;
+    }
+    .row .v { color: var(--muted); }
+    .row .v strong { color: var(--text); font-weight: 700; }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .45rem;
+      margin: .6rem 0;
+    }
+    @media (max-width: 720px) { .legend { grid-template-columns: 1fr 1fr; } }
+    .leg {
+      text-align: center;
+      background: #121820;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .55rem .4rem;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+    .leg b { display: block; font-size: .92rem; margin-bottom: .15rem; }
+    .leg.del b { color: var(--red); }
+    .leg.move b { color: var(--amber); }
+    .leg.keep b { color: var(--green); }
+    .leg.later b { color: var(--violet); }
+
+    .box {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      padding: .7rem .8rem;
+      margin: .55rem 0;
+    }
+    .box.tip { border-left: 3px solid var(--blue); }
+    .box.warn { border-left: 3px solid var(--amber); }
+    .box .t { font-weight: 800; font-size: .84rem; margin-bottom: .15rem; }
+    .box.tip .t { color: var(--blue); }
+    .box.warn .t { color: var(--amber); }
+
+    .table-wrap { overflow-x: auto; margin: .5rem 0; }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: .85rem; min-width: 520px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: .42rem .5rem;
+      text-align: left; vertical-align: top;
+    }
+    th { background: #121820; color: var(--muted); }
+
+    footer {
+      margin-top: .9rem;
+      text-align: center;
+      color: var(--faint);
+      font-size: .78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Catalog · What is this?</p>
+      <h1>정리 대상 백과<br />“이게 뭐 하는 건지” 전부 설명</h1>
+      <p>
+        앞에서 <strong>삭제 / 이동 / 유지 / 보류</strong>로 분류한 것들을
+        하나씩 “원래 역할이 뭐냐”부터 풀어 쓴 문서입니다.
+        주니어도 <em>이름만 보고 추측하지 말고</em>, 여기서 역할을 확인한 뒤 분류를 이해하면 됩니다.
+      </p>
+      <div class="badges">
+        <span class="badge b">2026-08-14</span>
+        <span class="badge r">삭제</span>
+        <span class="badge a">이동</span>
+        <span class="badge g">유지</span>
+        <span class="badge v">보류</span>
+        <span class="badge">역할 설명 중심</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc">
+        <h2>목차</h2>
+        <ol>
+          <li><a href="#s0">읽는 법</a></li>
+          <li><a href="#s1">큰 폴더들이 뭐 하는 곳?</a></li>
+          <li><a href="#s2">삭제 대상 설명</a></li>
+          <li><a href="#s3">이동 대상 설명</a></li>
+          <li><a href="#s4">유지 대상 설명</a></li>
+          <li><a href="#s5">보류 대상 설명</a></li>
+          <li><a href="#s6">Packages 각각이 뭐지?</a></li>
+          <li><a href="#s7">Managers 스크립트 역할표</a></li>
+        </ol>
+      </nav>
+
+      <div>
+        <!-- 0 -->
+        <section id="s0">
+          <h2><span class="num">0</span> 읽는 법</h2>
+          <div class="legend">
+            <div class="leg del"><b>삭제</b>없어도 되는 것</div>
+            <div class="leg move"><b>이동</b>쓰이지만 자리 이상</div>
+            <div class="leg keep"><b>유지</b>지금 필요한 것</div>
+            <div class="leg later"><b>보류</b>조사 후 결정</div>
+          </div>
+          <div class="intro">
+            각 카드는 이렇게 읽습니다.
+            <ul>
+              <li><strong>뭐하는 것?</strong> — 게임/프로젝트에서 원래 역할</li>
+              <li><strong>분류</strong> — 삭제·이동·유지·보류</li>
+              <li><strong>왜 그 분류?</strong> — 관리 관점 이유</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 1 big folders -->
+        <section id="s1">
+          <h2><span class="num">1</span> 큰 폴더들이 뭐 하는 곳?</h2>
+          <p class="muted">분류 전에, Assets 안의 “동네”부터 이해합니다.</p>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Scripts/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>게임 로직 C# 코드</strong>가 모여 있는 곳. 플레이어, 적, UI, 매니저, 해킹 등.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill move">일부 이동</span> <span class="pill del">빈 폴더 삭제</span> <span class="pill keep">대부분 유지</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Prefabs/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>미리 조립해 둔 게임 오브젝트 틀</strong>. 적 프리팹, 무기, UI 패널, 해킹 장치 등. 씬에 꺼내 쓰거나 런타임에 스폰.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill move">해킹만 이동 예정</span> <span class="pill keep">나머지 유지</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Data/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>숫자·설정 데이터</strong>. CSV 밸런스 표, 캐릭터 ScriptableObject, 무기 스탯, 특성(Trait) JSON, 사운드 이벤트 정의 등.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">1차 유지</span> (경로를 코드가 직접 알고 있어서 함부로 안 옮김)</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Resources/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>코드에서 이름(경로 문자열)으로 불러오는 에셋</strong>을 두는 특수 폴더. 스프라이트, 폰트, 사운드, 애니, 타일맵 등. 여기 넣으면 빌드에 잘 포함되지만 남용하면 무거워짐.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">구조 유지</span> <span class="pill later">안 쓰는 archive는 보류</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Scenes/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>게임 화면 단위(씬)</strong>. 로비, 인게임 메인 등.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">Lobby/Main 유지</span> <span class="pill move">temp는 아카이브</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Plugins/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>외부에서 가져온 플러그인/미들웨어</strong>. 저장, 트윈 연출, 인스펙터 강화, 셰이더 등.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">본체 유지</span> <span class="pill del">예제만 삭제 후보</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Packages/ (프로젝트 루트)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">Unity Package Manager가 관리하는 <strong>공식/원격 패키지 목록</strong> (<code>manifest.json</code>). URP, TMP, 분석 SDK, MCP 등.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">필수 유지</span> <span class="pill later">애매한 건 보류</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/Settings/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>URP(렌더 파이프라인) 설정 에셋</strong>. 화면이 어떻게 그려질지 정하는 프로젝트 설정.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">유지</span></div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill info">동네</span><span class="name">Assets/TextMesh Pro/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">유니티 글자(텍스트) 시스템 TMP의 <strong>리소스·폰트·설정</strong>. UI 글씨 표시에 필요.</div></div>
+            <div class="row"><div class="k">분류</div><div class="v"><span class="pill keep">본체 유지</span> <span class="pill del">Examples만 삭제 후보</span></div></div>
+          </div>
+        </section>
+
+        <!-- 2 DELETE -->
+        <section id="s2">
+          <h2><span class="num">2</span> 삭제 대상 — 뭐 하는 것들이길래?</h2>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제</span><span class="name">Scripts/Items/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">원래 <strong>아이템 시스템 스크립트</strong>를 넣을 자리로 만든 폴더로 보임. (드랍/골드/칩 등과 별개로 “아이템” 코드를 모으려던 자리)</div></div>
+            <div class="row"><div class="k">지금 상태</div><div class="v">파일이 하나도 없음. <strong>빈 상자</strong>.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">빈 폴더는 “여기 뭔가 있을 것 같음”만 주고 실제로는 검색·온보딩을 방해함.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제</span><span class="name">Scripts/Hacking/ObjectManager/ , Reward/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              해킹 기능의 하위 구역으로 예약된 자리.
+              <strong>ObjectManager</strong> = 해킹 오브젝트들을 관리하는 코드 자리,
+              <strong>Reward</strong> = 해킹 성공 보상 관련 코드 자리로 보임.
+            </div></div>
+            <div class="row"><div class="k">지금 상태</div><div class="v">둘 다 비어 있음. 실제 해킹 로직은 <code>HackingSystem</code>, <code>Effects</code>, <code>MiniGame</code> 등에 있음.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">쓸 내용 없는 예약 폴더. 나중에 필요하면 다시 만들면 됨.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제(조건부)</span><span class="name">Scripts/.../Weapon/Passive/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>패시브 무기</strong>(항상 발동/보유형) 스크립트를 넣으려고 만든 자리. Active(능동 무기)는 Cyborg/Hacker 아래로 이미 있음.</div></div>
+            <div class="row"><div class="k">지금 상태</div><div class="v">비어 있음.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">앞으로 패시브 무기를 이 폴더에 안 넣을 거면 삭제. 넣을 계획이면 유지.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제</span><span class="name">Prefabs/Managers/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>매니저 전용 프리팹</strong>(예: DontDestroyOnLoad용 GameManager 오브젝트 틀)을 두려던 자리.</div></div>
+            <div class="row"><div class="k">지금 상태</div><div class="v">비어 있음. 매니저는 씬에 직접 붙어 있거나 다른 방식으로 존재.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">빈 폴더 정리.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제</span><span class="name">Assets/Packages/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">이름만 보면 패키지 같지만, <strong>진짜 패키지 목록은 프로젝트 루트 <code>Packages/</code></strong>에 있음. Assets 안 Packages는 보통 쓰이지 않거나 실수로 생긴 빈 자리.</div></div>
+            <div class="row"><div class="k">지금 상태</div><div class="v">비어 있음.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">주니어가 “패키지가 두 군데?”라고 헷갈림.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제 추천</span><span class="name">TextMesh Pro/Examples &amp; Extras/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">TMP(텍스트) 패키지가 넣어 준 <strong>튜토리얼·데모 씬, 샘플 스크립트, 예제용 텍스처</strong>. “TMP로 글자 애니메이션 이렇게 한다” 같은 학습용.</div></div>
+            <div class="row"><div class="k">우리 게임에서?</div><div class="v">로비/인게임 UI는 우리 Scripts/UI와 Prefabs/UI를 씀. 이 Examples는 게임이 아님.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">용량·검색 노이즈. TMP 본체(Resources/Fonts 설정 등)는 그대로 둠.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제 추천</span><span class="name">SerializableDictionary/Example/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              <code>SerializableDictionary</code>는 인스펙터에서 보이기 쉬운
+              <strong>직렬화 가능한 Dictionary</strong> 유틸 라이브러리.
+              Example은 그 사용법을 보여 주는 <strong>예제 씬/스크립트</strong>.
+            </div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">예제만 지움. 라이브러리 본체(<code>SerializableDictionary.cs</code> 등)는 유지.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill del">삭제 추천</span><span class="name">Plugins/Demigiant/DOTweenPro Examples/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              <strong>DOTween</strong> = UI/오브젝트 움직임·페이드 같은 연출을 코드로 부드럽게 만드는 트윈 라이브러리.
+              Examples = 제작사가 넣은 <strong>데모</strong>.
+            </div></div>
+            <div class="row"><div class="k">우리 게임에서?</div><div class="v">GameClearUI, GameOverUI 등에서 DOTween 사용 중. 예제 폴더는 불필요.</div></div>
+            <div class="row"><div class="k">왜 삭제?</div><div class="v">데모만 제거. DOTween 본체는 유지.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill move">아카이브(사실상 치우기)</span><span class="name">Scenes 임시 씬들</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              <ul style="margin:0;padding-left:1.1rem">
+                <li><code>LobbyScene temp</code>, <code>LobbyScene_TEMPPPPP</code> — 로비 작업 중 복사본/실험 씬</li>
+                <li><code>MainScene_Temp</code> — 인게임 실험 씬</li>
+                <li><code>JmgScene</code>, <code>Trick2Scene</code> — 개인/실험용으로 보이는 씬 (팀 확인)</li>
+              </ul>
+            </div></div>
+            <div class="row"><div class="k">정식 씬은?</div><div class="v"><code>LobbyScene</code>(로비·캐릭터 선택), <code>MainScene</code>(실제 플레이).</div></div>
+            <div class="row"><div class="k">왜 치우나?</div><div class="v">임시 씬이 옆에 있으면 “어느 게 진짜?”가 됨. <code>_Archive</code>로 격리.</div></div>
+          </div>
+        </section>
+
+        <!-- 3 MOVE -->
+        <section id="s3">
+          <h2><span class="num">3</span> 이동 대상 — 뭐 하는 것들이길래?</h2>
+
+          <h3>3-1. WeaponChoice (무기 선택 UI)</h3>
+          <div class="card">
+            <div class="top"><span class="pill move">이동</span><span class="name">Scripts/WeaponChoice/ → Scripts/UI/WeaponChoice/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">레벨업·상자 등에서 <strong>무기 3장 중 고르는 UI</strong> 전체.</div></div>
+            <div class="row"><div class="k">파일별</div><div class="v">
+              <ul style="margin:0;padding-left:1.1rem">
+                <li><code>WeaponChoiceUI</code> — 패널 열고 카드 3장 보여 줌</li>
+                <li><code>WeaponChoiceCard</code> — 카드 한 장(이름/설명/레벨)</li>
+                <li><code>WeaponChoiceController</code> — 언제 선택창을 띄울지 큐/흐름 관리</li>
+                <li><code>Cyborg/Hacker…DescriptionBuilder</code> — 캐릭터별 설명 문장 만들기</li>
+              </ul>
+            </div></div>
+            <div class="row"><div class="k">왜 이동?</div><div class="v">하는 일이 UI인데 Scripts 최상위에 혼자 떨어져 있음. Prefabs도 <code>UI/Ingame</code> 쪽에 있음.</div></div>
+          </div>
+
+          <h3>3-2. Sound / Audio</h3>
+          <div class="card">
+            <div class="top"><span class="pill move">이동</span><span class="name">Managers 안 Sound* → Scripts/Audio/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>게임 소리(BGM/SFX)를 재생·관리</strong>하는 코드들.</div></div>
+            <div class="row"><div class="k">파일별</div><div class="v">
+              <ul style="margin:0;padding-left:1.1rem">
+                <li><code>SoundManager</code> — 사운드 시스템의 중심. 이벤트 정의/프로필 경로도 알고 있음</li>
+                <li><code>LobbySoundManager</code> — 로비 씬 소리</li>
+                <li><code>InGameSoundManager</code> / <code>MainSceneSoundManager</code> — 인게임 소리</li>
+                <li><code>ItemSoundManager</code> — 아이템/픽업 관련 소리</li>
+                <li><code>GameSoundEventDefinition</code> — “이 이벤트면 이 소리” 같은 데이터 정의</li>
+                <li><code>WeaponSoundProfileDefinition</code> — 무기별 사운드 프로필 정의</li>
+              </ul>
+            </div></div>
+            <div class="row"><div class="k">왜 이동?</div><div class="v">Managers에 너무 많이 섞여 있음. “소리”는 Audio 구역이 더 찾기 쉬움.</div></div>
+          </div>
+
+          <h3>3-3. Lobby 스크립트</h3>
+          <div class="card">
+            <div class="top"><span class="pill move">이동</span><span class="name">LobbyManager, LobbyCharacterSelector → Scripts/UI/Lobby/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              <ul style="margin:0;padding-left:1.1rem">
+                <li><code>LobbyManager</code> — 로비 씬 전체 흐름(화면 전환, 로비 상태)</li>
+                <li><code>LobbyCharacterSelector</code> — 로비에서 캐릭터 고르기 쪽 로직</div></div>
+            <div class="row"><div class="k">왜 이동?</div><div class="v">로비 전용 UI/흐름인데 전역 Managers와 섞이면 “진짜 전역 매니저”와 구분이 안 됨.</div></div>
+          </div>
+
+          <h3>3-4. 해킹 Prefabs</h3>
+          <div class="card">
+            <div class="top"><span class="pill move">이동</span><span class="name">Prefabs/Objects/Hacking Objects/ → Prefabs/Hacking/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">맵에 두고 플레이어가 <strong>해킹으로 점령/발동</strong>하는 장치 프리팹들 + UI 조각.</div></div>
+            <div class="row"><div class="k">프리팹별</div><div class="v">
+              <ul style="margin:0;padding-left:1.1rem">
+                <li><code>ElectricFence</code> — 전기 울타리 해킹 오브젝트</li>
+                <li><code>MagneticBeacon</code> — 자기 비콘</li>
+                <li><code>SatelliteUplink</code> — 위성 업링크</li>
+                <li><code>SecurityTurret</code> — 보안 터렛</li>
+                <li><code>SynapseServer</code> — 시냅스 서버</li>
+                <li><code>CaptureUI</code> — 점령/캡처 진행 UI</li>
+                <li><code>HackInteractPrompt</code> — “해킹하려면 …” 프롬프트</li>
+                <li><code>HackingObjectButtonTutorial</code> — 튜토리얼용 버튼/안내</li>
+              </ul>
+            </div></div>
+            <div class="row"><div class="k">Scripts 쪽은?</div><div class="v">이미 <code>Scripts/Hacking/</code>에 시스템·미니게임·이펙트가 있음. Prefabs만 Objects 아래라 이름이 안 맞음.</div></div>
+            <div class="row"><div class="k">왜 이동?</div><div class="v">같은 기능(해킹)은 같은 동네 이름(<code>Hacking</code>)으로.</div></div>
+          </div>
+
+          <div class="box tip">
+            <div class="t">참고: 해킹 Scripts가 하는 일 (이동 대상은 아님, 이해용)</div>
+            <code>HackingSystem</code> = 해킹 전체 진행,
+            <code>HackableObject</code> = 해킹 가능한 오브젝트,
+            <code>MiniGame/*</code> = 해킹 미니게임들,
+            <code>Effects/*</code> = 해킹 성공 후 발동 효과.
+            이건 이미 자리가 좋아서 <strong>유지</strong>.
+          </div>
+        </section>
+
+        <!-- 4 KEEP -->
+        <section id="s4">
+          <h2><span class="num">4</span> 유지 대상 — 뭐 하는 것들이길래?</h2>
+
+          <h3>4-1. Plugins 본체</h3>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Plugins/Demigiant (DOTween)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">UI 페이드, 연출 애니메이션을 코드로 쉽게 만드는 <strong>트윈 엔진</strong>.</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">클리어/게임오버 UI 등에서 사용 중.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Plugins/Easy Save 3</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>세이브/로드</strong> 플러그인 (<code>ES3.Save</code> / <code>ES3.Load</code>). 골드, 특성 레벨, 설정값 저장 등.</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">TraitManager, SettingsManager, UI 골드 표시 등에서 사용 중.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Plugins/Sirenix (Odin Inspector)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">유니티 인스펙터를 강력하게 만드는 <strong>에디터 확장</strong>. 데이터 작업·디버그 생산성용.</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">팀 작업 도구. 런타임 필수와 별개로 개발 효율에 중요.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Plugins/AllIn1SpriteShader</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">2D 스프라이트에 효과(아웃라인, 히트 플래시 등)를 주기 쉬운 <strong>셰이더 팩</strong>.</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">비주얼/머티리얼에서 사용. 1차에 제거하면 화면이 깨질 수 있음.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Plugins/Protobuf</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">데이터 직렬화 포맷 <strong>Protocol Buffers</strong> 관련 파일 자리. (네트워크/바이너리 데이터용으로 흔히 씀)</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">1차에 사용처 전수 확정이 어렵고, 플러그인 삭제는 사고 위험. 필요 시 2차 조사.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">SerializableDictionary 본체</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">인스펙터에서 편집 가능한 Dictionary/HashSet 유틸.</div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">예제만 지우고 라이브러리는 남김. (게임 Scripts에서 직접 using이 안 보여도, 다른 에셋/향후 사용 가능)</div></div>
+          </div>
+
+          <h3>4-2. 게임 콘텐츠 동네</h3>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Scripts/Characters , Prefabs/Characters , Data/Characters</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">플레이어(Cyborg/Hacker), 적, 보스, 버프/디버프, 스탯 — <strong>캐릭터 관련 전부</strong>.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Scripts/Objects , Prefabs/Objects , Data/Objects</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">드랍(경험치·골드·상자), 맵 오브젝트/기믹, 무기 프리팹·무기 스탯 CSV 등 <strong>월드/장비 오브젝트</strong>.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Scripts/Hacking (폴더 자체)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">해킹 시스템·미니게임·효과. NeoSurvive 핵심 시스템 중 하나.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Scripts/UI , Prefabs/UI</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">HP바, 일시정지, 설정, 특성 UI, 클리어/게임오버, 로비 UI 프리팹 등 <strong>화면</strong>.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Scripts/Core</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">카메라, 맵 타일 스폰, 페이즈/공성 이벤트, CSV 밸런스 로더 등 <strong>게임 뼈대</strong>.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Data/Balancing , Traits , Sounds</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              Balancing = 적 스탯/스폰/경험치 CSV,
+              Traits = 특성(업그레이드) JSON,
+              Sounds = 사운드 이벤트 ScriptableObject.
+            </div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Resources (애니/스프라이트/사운드/폰트/타일맵…)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">화면에 보이는·들리는 실제 에셋 저장소. 일부는 <code>Resources.Load</code>로 코드가 직접 부름.</div></div>
+            <div class="row"><div class="k">왜 구조 유지?</div><div class="v">경로 문자열 때문에 함부로 옮기면 런타임에 “못 찾음”.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">LobbyScene.unity , MainScene.unity</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">로비(시작·선택) / 인게임(생존 플레이) <strong>정식 씬</strong>.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">Settings/ (URP)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">2D URP 렌더러·파이프라인 에셋. 그래픽 출력의 기본 설정.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지(팀 도구)</span><span class="name">ParrelSync , vFavorites</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              ParrelSync = 같은 프로젝트를 복제해서 멀티플레이/동시 테스트하기 쉬운 에디터 도구.
+              vFavorites = 에디터에서 자주 쓰는 에셋 즐겨찾기.
+            </div></div>
+            <div class="row"><div class="k">왜 유지?</div><div class="v">빌드 게임플레이와 무관해도 개발 편의. 팀이 쓰면 유지.</div></div>
+          </div>
+        </section>
+
+        <!-- 5 LATER -->
+        <section id="s5">
+          <h2><span class="num">5</span> 보류 대상 — 뭐 하는 것들이길래?</h2>
+
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">Resources/Sprites/archive/ , UI/Archive/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">예전에 쓰였거나 후보로 받아 둔 <strong>스프라이트 더미/아카이브</strong>. 폭발, 마법, UI 조각 등 대량 이미지.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">파일이 수천 개라 지우고 싶지만, 어딘가 참조가 남아 있을 수 있음. 확인 후 삭제/격리.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">Resources/Sounds/SFX/temp/</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">임시로 넣어 둔 효과음 후보.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">실제 재생 경로에 연결됐는지 확인 필요.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">공백 있는 폴더명 (Map Objects, Drop Objects…)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">맵 기믹/드랍 오브젝트 등 <strong>정상 콘텐츠 폴더</strong>. 이름에 공백만 문제.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">리네임은 경로 하드코딩·습관을 많이 깨뜨림. 폴더링 안정화 후.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">Resources → Art 이전, namespace 통일, asmdef</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">구조 개선·코드 규약 작업. “정리”가 아니라 <strong>리팩터/아키텍처</strong>에 가까움.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">1차 임무(폴더·파일 관리) 범위 밖.</div></div>
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">이상한 Prefab 파일명 / 끝 공백</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">프리팹 자체는 게임 오브젝트 틀. 이름만 지저분하거나 공백이 들어간 경우.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">이름만 바꿔도 참조가 깨질 수 있어 폴더 이동과 같은 날에 하지 않음.</div></div>
+          </div>
+        </section>
+
+        <!-- 6 Packages -->
+        <section id="s6">
+          <h2><span class="num">6</span> Packages — 각각이 뭐 하는 건지</h2>
+          <div class="box warn">
+            <div class="t">주의</div>
+            여기 목록은 <code>Packages/manifest.json</code> 기준입니다.
+            1차에 삭제하지 않고, “역할 이해 + 보류/유지”만 합니다.
+          </div>
+
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.unity.render-pipelines.universal (URP)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">유니티의 <strong>렌더 파이프라인</strong>. 2D/현대적 렌더링의 기반.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.unity.feature.2d</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">스프라이트, 타일맵, 2D 물리 등 <strong>2D 게임 기능 묶음</strong>.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.unity.textmeshpro / ugui</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">텍스트(TMP)와 UI 시스템. 버튼·패널·글자 표시의 뼈대.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.unity.test-framework / ide.*</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">테스트 실행, Rider/Visual Studio 연결. 개발 도구.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.gameanalytics.sdk</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v"><strong>플레이 데이터 분석</strong> SDK. 플레이 시작, 해킹 결과 등 이벤트 전송.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지</span><span class="name">com.coplaydev.unity-mcp</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">에디터를 외부 AI/툴과 연결하는 <strong>MCP</strong>. 지금 팀이 쓰는 작업 도구.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">com.unity.visualscripting</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">노드 그래프(비주얼 스크립트)로 로직을 짜는 유니티 기능.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">우리 게임 그래프는 거의 안 보임. 다만 Easy Save 등이 관련 코드를 포함할 수 있어 바로 제거 금지.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">com.unity.localization</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">다국어(한/영 등) 문자열 테이블을 관리하는 패키지.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">게임 쪽 번역 테이블은 안 보이지만 Odin Localization 모듈과 엮일 수 있음.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">NuGetForUnity (+ 빈 packages.config)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">C# NuGet 라이브러리를 유니티로 가져오는 도구.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">지금 설치된 NuGet 패키지가 비어 있음. 앞으로도 안 쓰면 제거 후보.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">NativeWebSocket</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">웹소켓 통신 라이브러리. 실시간 서버 연결용으로 많이 씀.</div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">게임 Scripts에서 직접 사용이 바로 안 보임. 멀티/서버 계획 여부 확인 후.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill later">보류</span><span class="name">Timeline / Project Auditor</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">
+              Timeline = 컷신/연출 트랙.
+              Project Auditor = 프로젝트 성능·문제 분석 도구.
+            </div></div>
+            <div class="row"><div class="k">왜 보류?</div><div class="v">팀에서 쓰는지 확인 후 유지/제거.</div></div>
+          </div>
+          <div class="card">
+            <div class="top"><span class="pill keep">유지(보통)</span><span class="name">EDM (External Dependency Manager)</span></div>
+            <div class="row"><div class="k">뭐하는 것?</div><div class="v">안드로이드/iOS 네이티브 의존성을 맞춰 주는 Google 쪽 매니저. 모바일 SDK와 자주 같이 옴.</div></div>
+          </div>
+        </section>
+
+        <!-- 7 Managers table -->
+        <section id="s7">
+          <h2><span class="num">7</span> Managers 안 스크립트 — 각각 뭐 함? (이동/유지 구분)</h2>
+          <p class="muted">“Managers에 있다고 다 같은 종류”가 아닙니다. 역할표입니다.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>스크립트</th><th>뭐 하는 것?</th><th>1차</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>GameManager</code></td><td>게임 전체 상태(진행, 골드 등)의 중심</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>DataManager</code></td><td>데이터/에셋 로드·보관</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>MapManager</code></td><td>맵 관련 관리</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>UIManager</code></td><td>인게임 UI 흐름(무기선택 표시 등 포함)</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>UpgradeManager</code></td><td>업그레이드 관련</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>TraitManager</code></td><td>특성(영구/메타 업그레이드) 관리·세이브</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>SettingsManager</code></td><td>해상도·볼륨·옵션 저장/적용</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>ManagerInitializer</code></td><td>매니저들 초기화 순서</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>DistanceManager</code></td><td>거리 관련 계산/관리</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>DamageTextManager</code></td><td>데미지 숫자 연출 관리</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>GameAnalyticsInitializer</code></td><td>분석 SDK 시작 설정</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>WeaponDamageStats</code></td><td>무기 데미지 통계/집계</td><td><span class="pill keep">유지</span></td></tr>
+                <tr><td><code>SoundManager</code> 및 *Sound*</td><td>소리 재생·씬별 사운드</td><td><span class="pill move">Audio로 이동</span></td></tr>
+                <tr><td><code>LobbyManager</code> / <code>LobbyCharacterSelector</code></td><td>로비 흐름·캐릭터 선택</td><td><span class="pill move">UI/Lobby로 이동</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="box tip">
+          <div class="t">이 문서의 위치</div>
+          역할 설명 백과입니다. “어떻게 작업할지” 절차서는
+          <code>docs/plan-folder-mgmt-junior-2026-08-14.html</code> 를 보세요.
+        </div>
+
+        <footer>
+          파일: <code>docs/plan-folder-catalog-what-is-2026-08-14.html</code><br />
+          삭제·이동·유지·보류 대상의 “뭐 하는 건지” 설명서
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

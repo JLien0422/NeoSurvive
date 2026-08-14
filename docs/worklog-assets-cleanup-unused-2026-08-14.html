@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업 로그 — Assets 미사용 삭제 (2026-08-14)</title>
+  <style>
+    :root {
+      --bg: #0e1318; --panel: #161d26; --line: #2b3644; --text: #e8eef5;
+      --muted: #95a3b4; --green: #3ecf8e; --amber: #e6b84d; --red: #ef6b6b;
+      --cyan: #5ec8d8; --blue: #4da3ff;
+      --sans: "Pretendard", "Noto Sans KR", sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: var(--sans); color: var(--text); line-height: 1.65;
+      background: radial-gradient(800px 400px at 0% 0%, #1a2736 0%, transparent 50%), var(--bg);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 1.25rem 1.1rem 3rem; }
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.15rem; margin-bottom: 1rem;
+    }
+    .hero h1 { margin: 0 0 .4rem; font-size: 1.35rem; }
+    .hero p { margin: 0; color: var(--muted); }
+    .badge {
+      display: inline-block; font-size: .72rem; font-weight: 700; margin-top: .7rem;
+      padding: .22rem .5rem; border-radius: 999px; border: 1px solid #2d5644; color: var(--green);
+    }
+    section {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1rem 1.05rem; margin-bottom: .85rem;
+    }
+    h2 { margin: 0 0 .65rem; font-size: 1.05rem; color: var(--cyan); }
+    h3 { margin: .9rem 0 .4rem; font-size: .95rem; }
+    code { font-family: var(--mono); font-size: .84em; background: #0b1016; border: 1px solid var(--line); border-radius: 5px; padding: .05rem .3rem; }
+    ul { margin: .3rem 0 .5rem; padding-left: 1.2rem; }
+    li { margin: .2rem 0; }
+    .pill {
+      font-size: .68rem; font-weight: 800; padding: .12rem .4rem; border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+    .pill.del { color: var(--red); border-color: #5a2e2e; background: #241414; }
+    .pill.move { color: var(--amber); border-color: #5a4a22; background: #241f12; }
+    .pill.keep { color: var(--green); border-color: #2d5644; background: #13231c; }
+    .item {
+      border: 1px solid var(--line); border-radius: 10px; background: #121820;
+      padding: .7rem .8rem; margin: .45rem 0;
+    }
+    .item .path { font-family: var(--mono); font-size: .82rem; }
+    .why { color: var(--muted); font-size: .9rem; margin: .25rem 0 0; }
+    .box {
+      border-left: 3px solid var(--blue); background: #1c2430; border-radius: 8px;
+      padding: .7rem .8rem; margin: .5rem 0; color: var(--muted);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    th, td { border: 1px solid var(--line); padding: .4rem .5rem; text-align: left; vertical-align: top; }
+    th { background: #121820; color: var(--muted); }
+    footer { text-align: center; color: #6c7a8b; font-size: .78rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>작업 로그 — Assets 미사용 삭제 (1차)</h1>
+      <p>
+        브랜치 <code>chore/assets-cleanup-unused</code> · 2026-08-14<br />
+        목표: <strong>안 쓰는 것 삭제</strong> 우선. 코드 리팩터·Scripts/Prefabs 대규모 이동은 이번 PR에 포함하지 않음.
+      </p>
+      <span class="badge">완료 · 작업 내역 기록</span>
+    </header>
+
+    <section>
+      <h2>1. 한 줄 요약</h2>
+      <p>
+        빈 폴더, TMP/DOTween/Dictionary <strong>예제</strong>, Resources <strong>archive/temp</strong>,
+        임시 씬을 삭제하고, 실험 씬 2개는 <code>Scenes/_Archive/</code>로 옮겼습니다.
+        Build Settings는 Lobby + Main만 남겼습니다.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. 삭제한 것</h2>
+
+      <h3>빈 폴더</h3>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Scripts/Items/</div>
+        <p class="why">뭐하는 자리였나: 아이템 스크립트용 예약 폴더. 파일이 없어서 삭제.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Scripts/Hacking/ObjectManager/ , Reward/</div>
+        <p class="why">뭐하는 자리였나: 해킹 오브젝트 관리/보상 코드 예약. 비어 있어서 삭제. 실제 해킹 코드는 HackingSystem·Effects·MiniGame에 있음.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Scripts/Characters/Player/Weapon/Passive/</div>
+        <p class="why">뭐하는 자리였나: 패시브 무기 스크립트 폴더. 비어 있어서 삭제.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Prefabs/Managers/</div>
+        <p class="why">뭐하는 자리였나: 매니저 프리팹용. 비어 있어서 삭제.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Packages/</div>
+        <p class="why">뭐하는 자리였나: Assets 안 빈 Packages 폴더. 진짜 패키지는 루트 Packages/. 헷갈림 제거.</p>
+      </div>
+
+      <h3>예제 / 샘플</h3>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/TextMesh Pro/Examples &amp; Extras/</div>
+        <p class="why">뭐하는 것이었나: TMP 학습용 예제 씬·샘플(~249 files). 게임 UI가 아님. TMP 본체는 유지.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/SerializableDictionary/Example/</div>
+        <p class="why">뭐하는 것이었나: SerializableDictionary 사용 예제. 라이브러리 본체는 유지.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Plugins/Demigiant/DOTweenPro Examples/</div>
+        <p class="why">뭐하는 것이었나: DOTween 데모. DOTween 본체(연출용)는 유지.</p>
+      </div>
+
+      <h3>Resources 쓰레기</h3>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Resources/Sprites/archive/</div>
+        <p class="why">뭐하는 것이었나: 옛/후보 스프라이트 더미(~728 files). 코드·에셋 경로 문자열 참조 없음 확인 후 삭제.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Resources/Sprites/UI/Archive/</div>
+        <p class="why">뭐하는 것이었나: UI 스프라이트 아카이브(~8332 files). 경로 문자열 참조 없음 확인 후 삭제. Resources 경량화 목적.</p>
+      </div>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">Assets/Resources/Sounds/SFX/temp/</div>
+        <p class="why">뭐하는 것이었나: 임시 효과음 폴더. 참조 경로 없음 확인 후 삭제.</p>
+      </div>
+
+      <h3>임시 씬 (완전 삭제)</h3>
+      <div class="item">
+        <span class="pill del">삭제</span>
+        <div class="path">LobbyScene temp.unity , LobbyScene_TEMPPPPP.unity , MainScene_Temp.unity</div>
+        <p class="why">뭐하는 것이었나: 작업용 복사/실험 씬. 정식 씬이 아님.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. 이동한 것</h2>
+      <div class="item">
+        <span class="pill move">이동</span>
+        <div class="path">JmgScene.unity , Trick2Scene.unity → Assets/Scenes/_Archive/</div>
+        <p class="why">뭐하는 것이었나: 개인/실험 씬으로 보임. 바로 지우지 않고 아카이브로 격리. 정식은 Lobby/Main만.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. 설정 변경</h2>
+      <div class="item">
+        <span class="pill keep">수정</span>
+        <div class="path">ProjectSettings/EditorBuildSettings.asset</div>
+        <p class="why">
+          Build Settings 씬 목록을 <strong>LobbyScene + MainScene만</strong> 남김.
+          삭제된 MainScene_Temp, 없는 lhsScene/multiScene, 아카이브로 뺀 Trick2/Jmg 엔트리 제거.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. 이번 작업에서 안 한 것</h2>
+      <ul>
+        <li>Scripts WeaponChoice / Audio / Lobby <strong>이동</strong> (다음 Phase)</li>
+        <li>Prefabs Hacking 폴더 승격 (다음 Phase)</li>
+        <li>Packages(manifest) 제거 (Visual Scripting 등) — 조사 후</li>
+        <li>코드/namespace 리팩터</li>
+        <li>Plugins 본체, Data CSV, Resources 전체 구조 변경</li>
+        <li>이미 dirty였던 AllIn1/ES3/LobbyScene 등 <strong>무관 변경은 커밋에 넣지 않음</strong></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. 확인(스모크) 권장</h2>
+      <ul>
+        <li>Unity에서 프로젝트 리임포트 후 Compile Error 없는지</li>
+        <li>LobbyScene / MainScene 로드</li>
+        <li>콘솔에 Missing 스프라이트(옛 Archive GUID) 경고가 있는지 — 있으면 알려 주세요</li>
+        <li>UI 글자(TMP) 정상 표시 (Examples만 지웠으므로 본체는 유지)</li>
+      </ul>
+      <div class="box">
+        Archive 스프라이트는 경로 문자열 참조는 없었습니다.
+        만약 Prefab이 GUID로 옛 아카이브 이미지를 잡고 있었다면 Missing이 날 수 있습니다.
+        그때는 해당 프리팹만 교체하면 됩니다.
+      </div>
+    </section>
+
+    <section>
+      <h2>7. 결과 표</h2>
+      <table>
+        <thead>
+          <tr><th>종류</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>빈 폴더 삭제</td><td>6곳 (Items, ObjectManager, Reward, Passive, Prefabs/Managers, Assets/Packages)</td></tr>
+          <tr><td>예제 삭제</td><td>TMP Examples, SerializableDictionary Example, DOTweenPro Examples</td></tr>
+          <tr><td>Resources 삭제</td><td>Sprites/archive, Sprites/UI/Archive, Sounds/SFX/temp</td></tr>
+          <tr><td>씬 삭제</td><td>temp 씬 3개</td></tr>
+          <tr><td>씬 아카이브</td><td>JmgScene, Trick2Scene → _Archive</td></tr>
+          <tr><td>Build Settings</td><td>Lobby + Main만</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      관련 기획: plan-folder-mgmt-junior-2026-08-14.html , plan-folder-catalog-what-is-2026-08-14.html<br />
+      본 파일: docs/worklog-assets-cleanup-unused-2026-08-14.html
+    </footer>
+  </div>
+</body>
+</html>

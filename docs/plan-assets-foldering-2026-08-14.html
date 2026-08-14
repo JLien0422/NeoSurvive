@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — Assets 폴더링 상세 계획</title>
+  <style>
+    :root {
+      --bg: #0e1217;
+      --surface: #161c24;
+      --surface2: #1c2430;
+      --border: #2a3441;
+      --text: #e8eef5;
+      --muted: #93a0b0;
+      --faint: #6b7888;
+      --blue: #4da3ff;
+      --green: #3ecf8e;
+      --amber: #e6b84d;
+      --red: #ef6b6b;
+      --cyan: #5ec8d8;
+      --violet: #9b8cff;
+      --radius: 12px;
+      --shadow: 0 8px 28px rgba(0,0,0,.28);
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #182433 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #1a1828 0%, transparent 45%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: var(--mono);
+      font-size: .86em;
+      background: #0b1016;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .1rem .35rem;
+    }
+    pre {
+      font-family: var(--mono);
+      font-size: .82rem;
+      background: #0b1016;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      line-height: 1.45;
+      margin: .75rem 0 0;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 4rem;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(160deg, #1a2431, #121820 70%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.6rem 1.5rem 1.35rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.25rem;
+    }
+    .hero .eyebrow {
+      color: var(--cyan);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin: 0 0 .45rem;
+    }
+    .hero h1 {
+      margin: 0 0 .55rem;
+      font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+      line-height: 1.25;
+    }
+    .hero .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 46rem;
+      font-size: .98rem;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-top: 1rem;
+    }
+    .badge {
+      font-size: .75rem;
+      padding: .28rem .6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .badge.green { color: var(--green); border-color: #2d5644; }
+    .badge.amber { color: var(--amber); border-color: #5a4a22; }
+    .badge.red { color: var(--red); border-color: #5a2e2e; }
+    .badge.blue { color: var(--blue); border-color: #2a4a6a; }
+
+    /* Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1.1rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static !important; }
+    }
+
+    /* TOC */
+    .toc {
+      position: sticky;
+      top: .85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem .85rem;
+    }
+    .toc h2 {
+      margin: 0 0 .55rem;
+      font-size: .78rem;
+      color: var(--faint);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .toc ol {
+      margin: 0;
+      padding-left: 1.15rem;
+      font-size: .86rem;
+    }
+    .toc li { margin: .28rem 0; }
+    .toc a { color: var(--muted); }
+    .toc a:hover { color: var(--text); }
+
+    /* Sections */
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    section > h2 {
+      margin: 0 0 .85rem;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+    }
+    section > h2 .num {
+      display: inline-flex;
+      width: 1.55rem;
+      height: 1.55rem;
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--cyan);
+      font-weight: 700;
+    }
+    h3 {
+      margin: 1.15rem 0 .5rem;
+      font-size: 1rem;
+      color: var(--cyan);
+    }
+    h4 {
+      margin: 0 0 .45rem;
+      font-size: .95rem;
+    }
+    p { margin: .45rem 0; color: var(--text); }
+    .muted { color: var(--muted); }
+    ul, ol { margin: .4rem 0 .6rem; padding-left: 1.2rem; }
+    li { margin: .22rem 0; }
+
+    .callout {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      padding: .85rem .95rem;
+      margin: .75rem 0;
+    }
+    .callout.tip { border-left: 3px solid var(--blue); }
+    .callout.warn { border-left: 3px solid var(--amber); }
+    .callout.danger { border-left: 3px solid var(--red); }
+    .callout.ok { border-left: 3px solid var(--green); }
+    .callout .title {
+      font-weight: 700;
+      font-size: .88rem;
+      margin-bottom: .25rem;
+    }
+    .callout.tip .title { color: var(--blue); }
+    .callout.warn .title { color: var(--amber); }
+    .callout.danger .title { color: var(--red); }
+    .callout.ok .title { color: var(--green); }
+
+    /* Cards / grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+    @media (max-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem .9rem;
+    }
+    .card.full { grid-column: 1 / -1; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: .6rem 0 .2rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+      min-width: 560px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: .48rem .55rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #121820;
+      color: var(--muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    td.from { color: var(--amber); }
+    td.to { color: var(--green); }
+    tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+
+    /* Phase block */
+    .phase {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: .9rem 0;
+      background: var(--surface2);
+    }
+    .phase-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem .75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: .8rem .95rem;
+      background: #121820;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase-head h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: 1.02rem;
+    }
+    .phase-body { padding: .85rem .95rem 1rem; }
+    .pill {
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .22rem .5rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .pill.do { color: var(--green); border-color: #2d5644; background: #13231c; }
+    .pill.later { color: var(--amber); border-color: #5a4a22; background: #241f12; }
+    .pill.skip { color: var(--red); border-color: #5a2e2e; background: #241414; }
+    .pill.info { color: var(--blue); border-color: #2a4a6a; background: #121c28; }
+
+    .check { list-style: none; padding-left: 0; }
+    .check li {
+      position: relative;
+      padding-left: 1.45rem;
+      margin: .3rem 0;
+    }
+    .check li::before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+      color: var(--faint);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: .35rem .75rem;
+      font-size: .9rem;
+    }
+    .kv .k { color: var(--faint); font-weight: 600; }
+    @media (max-width: 560px) {
+      .kv { grid-template-columns: 1fr; }
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: .75rem;
+      align-items: start;
+      padding: .8rem .85rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #121820;
+      margin: .55rem 0;
+    }
+    .decision .id {
+      font-weight: 800;
+      color: var(--violet);
+      font-size: .9rem;
+      padding-top: .1rem;
+    }
+    .decision .rec {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--green);
+      white-space: nowrap;
+      padding-top: .15rem;
+    }
+    @media (max-width: 640px) {
+      .decision { grid-template-columns: 1fr; }
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+    @media (max-width: 720px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+    .compare .label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: .35rem;
+    }
+
+    footer.note {
+      margin-top: 1.25rem;
+      color: var(--faint);
+      font-size: .82rem;
+      text-align: center;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .35rem; }
+    .mini-tag {
+      font-size: .7rem;
+      padding: .15rem .4rem;
+      border-radius: 6px;
+      background: #0b1016;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">NeoSurvive · Planning</p>
+      <h1>Assets 폴더링 상세 계획<br /><span style="font-weight:600;color:var(--muted);font-size:.72em">리팩터는 후순위 · 이동만 먼저</span></h1>
+      <p class="lead">
+        <code>Assets/</code> 전체를 대상으로, 같은 콘텐츠는 Scripts / Prefabs / Data에서
+        <strong>같은 도메인 이름</strong>으로 찾히게 정리한다.
+        코드·namespace·로직 변경은 하지 않고, <strong>폴더/파일 이동 + .meta(GUID) 보존</strong>만 한다.
+      </p>
+      <div class="badges">
+        <span class="badge green">기획 문서</span>
+        <span class="badge blue">2026-08-14</span>
+        <span class="badge amber">리팩터 = 후순위</span>
+        <span class="badge red">Plugins / TMP 비범위</span>
+        <span class="badge">Resources 대이동 제외</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc" aria-label="목차">
+        <h2>목차</h2>
+        <ol>
+          <li><a href="#s1">한눈에 보기</a></li>
+          <li><a href="#s2">도메인 언어란?</a></li>
+          <li><a href="#s3">원칙 · 안전수칙</a></li>
+          <li><a href="#s4">현재 vs 목표</a></li>
+          <li><a href="#s5">결정 사항 D1~D4</a></li>
+          <li><a href="#s6">Phase A~F</a></li>
+          <li><a href="#s7">이동 체크리스트</a></li>
+          <li><a href="#s8">리스크 · 하드코딩</a></li>
+          <li><a href="#s9">스모크 테스트</a></li>
+          <li><a href="#s10">비범위</a></li>
+          <li><a href="#s11">진행 순서</a></li>
+        </ol>
+      </nav>
+
+      <div class="main">
+        <!-- 1 -->
+        <section id="s1">
+          <h2><span class="num">1</span> 한눈에 보기</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h4>하는 것</h4>
+              <ul>
+                <li>Scripts / Prefabs / Scenes 폴더 정리</li>
+                <li>빈 폴더 삭제</li>
+                <li>해킹·UI·Audio 경로 통일</li>
+                <li>temp 씬 아카이브</li>
+                <li>작은 PR로 Phase별 진행</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>안 하는 것 (1차)</h4>
+              <ul>
+                <li>namespace / 클래스 리팩터</li>
+                <li>Managers 책임 분리(코드)</li>
+                <li>공백 폴더명 일괄 리네임</li>
+                <li>Resources → Art 대이동</li>
+                <li>Data CSV 경로 대규모 변경</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout ok">
+            <div class="title">한 줄 전략</div>
+            도메인 이름 통일 + Unity 안전 이동(.meta 동반) + Phase당 1 PR.
+            Scripts → Prefabs → Scenes 순. Data/Resources는 건드리지 않거나 최소만.
+          </div>
+        </section>
+
+        <!-- 2 -->
+        <section id="s2">
+          <h2><span class="num">2</span> “같은 도메인 언어”란?</h2>
+          <p>
+            <strong>도메인</strong> = 게임 안의 구역 이름
+            (<code>Characters</code>, <code>Hacking</code>, <code>UI</code>, <code>Audio</code> …).<br />
+            <strong>같은 언어</strong> = Scripts / Prefabs / Data에서 그 이름을
+            <em>최대한 똑같이</em> 쓰자는 규칙.
+          </p>
+          <p class="muted">
+            코드 리팩터(클래스 쪼개기)와 다름. <strong>이름·위치 규칙</strong>에 가깝다.
+          </p>
+
+          <h3>이미 잘 맞는 예</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>의미</th><th>Scripts</th><th>Prefabs</th><th>Data</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>캐릭터</td>
+                  <td><code>Scripts/Characters</code></td>
+                  <td><code>Prefabs/Characters</code></td>
+                  <td><code>Data/Characters</code></td>
+                </tr>
+                <tr>
+                  <td>무기 데이터/프리팹</td>
+                  <td><code>.../Weapon</code> 등</td>
+                  <td><code>Prefabs/Objects/Weapons</code></td>
+                  <td><code>Data/Objects/Weapons</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>지금 어긋난 예 (고칠 대상)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>의미</th><th>Scripts</th><th>Prefabs / 기타</th><th>문제</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>해킹</td>
+                  <td><code>Scripts/Hacking</code> (최상위)</td>
+                  <td><code>Prefabs/Objects/Hacking Objects</code></td>
+                  <td>같은 기능인데 계층이 다름</td>
+                </tr>
+                <tr>
+                  <td>무기 선택 UI</td>
+                  <td><code>Scripts/WeaponChoice</code> (따로)</td>
+                  <td>Prefabs는 <code>UI/Ingame</code></td>
+                  <td>UI인데 Scripts만 별도 루트</td>
+                </tr>
+                <tr>
+                  <td>사운드</td>
+                  <td><code>Managers/*Sound*</code></td>
+                  <td>Data는 <code>Data/Sounds</code></td>
+                  <td>Managers에 섞여 있음</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout tip">
+            <div class="title">정리하면</div>
+            “해킹이면 <code>Hacking</code>에 있다”가 Scripts든 Prefabs든 같게 읽히게 만드는 것.
+          </div>
+        </section>
+
+        <!-- 3 -->
+        <section id="s3">
+          <h2><span class="num">3</span> 원칙 · 안전수칙</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h4>강제 원칙</h4>
+              <ul>
+                <li><strong>GUID 보존</strong> — 파일과 <code>.meta</code>를 항상 같이 이동</li>
+                <li><strong>폴더링 ≠ 리팩터</strong> — 스크립트 내용/namespace 변경 금지</li>
+                <li><strong>미러링</strong> — 가능하면 Scripts ↔ Prefabs 같은 도메인명</li>
+                <li><strong>작은 PR</strong> — Phase 하나 = PR 하나</li>
+                <li><strong>서드파티 금지</strong> — Plugins / TMP / ParrelSync / vFavorites</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>이동 방법</h4>
+              <ul>
+                <li>Unity 에디터 안 Move 권장</li>
+                <li>또는 Unity MCP <code>manage_asset</code></li>
+                <li>git만 쓸 경우 meta 포함 필수</li>
+                <li>Explorer에서 meta 빼고 옮기기 금지</li>
+                <li>이동 후 Missing Script / Prefab 스모크</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout warn">
+            <div class="title">Windows 주의</div>
+            <code>tiles</code> → <code>Tiles</code> 같은 대소문자만 바꾸는 리네임은 Git/Windows에서 깨지기 쉽다.
+            1차 폴더링에서는 하지 않는다.
+          </div>
+        </section>
+
+        <!-- 4 -->
+        <section id="s4">
+          <h2><span class="num">4</span> 현재 vs 목표 트리</h2>
+          <div class="compare">
+            <div>
+              <div class="label">현재 (요약)</div>
+              <pre>Assets/
+  Scripts/
+    Characters/
+    Core/
+    Editor/
+    Hacking/
+    Items/          ← 빈 폴더
+    Managers/       ← Sound·Lobby 혼재
+    Objects/
+    UI/
+    Utils/
+    WeaponChoice/   ← UI인데 분리
+  Prefabs/
+    Characters/
+    Managers/       ← 비어 있음
+    Objects/
+      Hacking Objects/  ← Scripts와 불일치
+      Drop Objects/
+      Map Objects/
+      Weapons/
+      Others/
+    UI/
+  Data/             ← 대체로 OK (경로 하드코딩 주의)
+  Resources/        ← ~7500 files, 1차 유지
+  Scenes/           ← temp 씬 혼재
+  Plugins/ …</pre>
+            </div>
+            <div>
+              <div class="label">1차 목표 (폴더링 후)</div>
+              <pre>Assets/
+  Scripts/
+    Characters/
+    Core/
+    Editor/
+    Hacking/        ← 유지
+    Objects/
+    UI/
+      Lobby/        ← Lobby* 이동
+      WeaponChoice/ ← 편입
+    Audio/          ← Sound* 이동
+    Managers/       ← 진짜 매니저만
+    Utils/
+  Prefabs/
+    Characters/
+    Hacking/        ← Objects에서 승격 (D1)
+    Objects/
+      Drop Objects/
+      Map Objects/
+      Weapons/
+      Others/
+    UI/
+    Managers/       ← 필요 시만
+  Data/             ← 1차 대규모 이동 없음
+  Resources/        ← 1차 유지
+  Scenes/
+    LobbyScene.unity
+    MainScene.unity
+    _Archive/       ← temp들
+  Plugins/ …</pre>
+            </div>
+          </div>
+
+          <h3>규모 참고</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>영역</th><th>대략 파일 수 (meta 제외)</th><th>1차 조치</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Scripts</td><td>~203</td><td>이동 중심 (Phase B)</td></tr>
+                <tr><td>Prefabs</td><td>~106</td><td>해킹 등 정렬 (Phase C)</td></tr>
+                <tr><td>Data</td><td>~55</td><td>이동 최소화 (점검)</td></tr>
+                <tr><td>Resources</td><td>~7555</td><td>유지 (Phase E 후순위)</td></tr>
+                <tr><td>Scenes</td><td>7</td><td>아카이브 (Phase D)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5 -->
+        <section id="s5">
+          <h2><span class="num">5</span> 결정 사항 (시작 전 확정)</h2>
+          <p class="muted">구현 들어가기 전에 주인님 Yes/No만 받으면 됩니다. 아래는 추천안.</p>
+
+          <div class="decision">
+            <div class="id">D1</div>
+            <div>
+              <strong>Prefabs 해킹 위치</strong>
+              <p class="muted" style="margin:.25rem 0 0">
+                <code>Prefabs/Objects/Hacking Objects/</code> → <code>Prefabs/Hacking/</code> 로 올려
+                Scripts와 맞출까?
+              </p>
+            </div>
+            <div class="rec">추천 Yes</div>
+          </div>
+
+          <div class="decision">
+            <div class="id">D2</div>
+            <div>
+              <strong>Lobby / Sound 스크립트 이동</strong>
+              <p class="muted" style="margin:.25rem 0 0">
+                Lobby* → <code>Scripts/UI/Lobby/</code>, Sound* → <code>Scripts/Audio/</code>
+                (파일 이동만, namespace·코드 변경 없음)
+              </p>
+            </div>
+            <div class="rec">추천 Yes</div>
+          </div>
+
+          <div class="decision">
+            <div class="id">D3</div>
+            <div>
+              <strong>Art/ 폴더를 1차에 만들까?</strong>
+              <p class="muted" style="margin:.25rem 0 0">
+                Resources 정리 전 빈 Art 폴더는 실익이 적음. Resources Phase에서 함께.
+              </p>
+            </div>
+            <div class="rec">추천 No (미룸)</div>
+          </div>
+
+          <div class="decision">
+            <div class="id">D4</div>
+            <div>
+              <strong>공백 폴더명 제거</strong>
+              <p class="muted" style="margin:.25rem 0 0">
+                <code>Map Objects</code> → <code>MapObjects</code> 등.
+                BalancingSheetCatalog 하드코딩·대량 참조 리스크 → 리팩터 단계.
+              </p>
+            </div>
+            <div class="rec">추천 No</div>
+          </div>
+        </section>
+
+        <!-- 6 -->
+        <section id="s6">
+          <h2><span class="num">6</span> Phase A ~ F</h2>
+
+          <!-- A -->
+          <article class="phase" id="phase-a">
+            <div class="phase-head">
+              <h3>Phase A — 준비 · 결정 확정</h3>
+              <div class="tag-row">
+                <span class="pill info">문서</span>
+                <span class="pill do">에셋 이동 없음</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <div class="kv">
+                <div class="k">범위</div>
+                <div>D1~D4 확정, 본 문서 기준 고정, 이동 목록 최종화</div>
+                <div class="k">파일</div>
+                <div><code>docs/</code>만 (게임 에셋 변경 없음)</div>
+                <div class="k">브랜치</div>
+                <div>없어도 됨 / 또는 <code>docs/assets-foldering-plan</code></div>
+              </div>
+              <h4>AC</h4>
+              <ul class="check">
+                <li>D1~D4 답이 문서에 반영됨</li>
+                <li>비범위(Plugins, Resources 대이동 등)가 명시됨</li>
+                <li>Phase B 이동 파일 목록이 확정됨</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- B -->
+          <article class="phase" id="phase-b">
+            <div class="phase-head">
+              <h3>Phase B — Scripts 폴더링</h3>
+              <div class="tag-row">
+                <span class="pill do">이동만</span>
+                <span class="pill info">1차 핵심</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <div class="kv">
+                <div class="k">브랜치 예</div>
+                <div><code>chore/assets-foldering-scripts</code></div>
+                <div class="k">대상</div>
+                <div><code>Assets/Scripts/**</code></div>
+              </div>
+
+              <h4>삭제 (빈 폴더)</h4>
+              <ul>
+                <li><code>Scripts/Items/</code></li>
+                <li><code>Scripts/Hacking/ObjectManager/</code> (0 cs)</li>
+                <li><code>Scripts/Hacking/Reward/</code> (0 cs)</li>
+                <li><code>Scripts/Characters/Player/Weapon/Passive/</code> — 쓸 계획 없으면 삭제</li>
+              </ul>
+
+              <h4>이동 맵</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>현재</th><th>목표</th><th>파일</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="from"><code>Scripts/WeaponChoice/</code></td>
+                      <td class="to"><code>Scripts/UI/WeaponChoice/</code></td>
+                      <td>
+                        WeaponChoiceUI, WeaponChoiceCard, WeaponChoiceController,<br />
+                        Cyborg/Hacker WeaponChoiceDescriptionBuilder
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="from"><code>Managers/*Sound*</code> + <code>Managers/Audio/</code></td>
+                      <td class="to"><code>Scripts/Audio/</code></td>
+                      <td>
+                        SoundManager, InGameSoundManager, ItemSoundManager,<br />
+                        LobbySoundManager, MainSceneSoundManager,<br />
+                        GameSoundEventDefinition, WeaponSoundProfileDefinition
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="from"><code>Managers/Lobby*</code></td>
+                      <td class="to"><code>Scripts/UI/Lobby/</code></td>
+                      <td>LobbyManager, LobbyCharacterSelector</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h4>Managers에 남김 (예시)</h4>
+              <p class="muted">진짜 싱글톤/부트스트랩·게임 흐름 쪽.</p>
+              <p>
+                <code>GameManager</code>, <code>DataManager</code>, <code>MapManager</code>,
+                <code>UIManager</code>, <code>UpgradeManager</code>, <code>TraitManager</code>,
+                <code>SettingsManager</code>, <code>DistanceManager</code>,
+                <code>DamageTextManager</code>, <code>ManagerInitializer</code>,
+                <code>GameAnalyticsInitializer</code>, <code>WeaponDamageStats</code>
+              </p>
+
+              <div class="callout warn">
+                <div class="title">이 Phase에서 하면 안 되는 것</div>
+                namespace 변경, Data/Sounds 경로 이동, Prefabs 이동, Resources 이동.
+                <code>SoundManager</code>가 <code>Assets/Data/Sounds/Ingame</code> 문자열을 쓰므로 Data는 不动.
+              </div>
+
+              <h4>AC</h4>
+              <ul class="check">
+                <li>위 경로가 목표 트리와 일치</li>
+                <li>스크립트 내용 diff ≈ 없음 (경로/.meta만)</li>
+                <li>Compile Error 0</li>
+                <li>LobbyScene / MainScene Missing Script 없음</li>
+                <li>무기 선택 UI·사운드 로드 스모크 통과</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- C -->
+          <article class="phase" id="phase-c">
+            <div class="phase-head">
+              <h3>Phase C — Prefabs 폴더링</h3>
+              <div class="tag-row">
+                <span class="pill do">이동만</span>
+                <span class="pill info">D1=Yes 시</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <div class="kv">
+                <div class="k">브랜치 예</div>
+                <div><code>chore/assets-foldering-prefabs</code></div>
+                <div class="k">대상</div>
+                <div><code>Assets/Prefabs/**</code></div>
+              </div>
+
+              <h4>이동 (D1=Yes)</h4>
+              <p>
+                <code>Prefabs/Objects/Hacking Objects/</code> → <code>Prefabs/Hacking/</code>
+              </p>
+              <ul>
+                <li>CaptureUI.prefab</li>
+                <li>ElectricFence.prefab</li>
+                <li>MagneticBeacon.prefab</li>
+                <li>SatelliteUplink.prefab</li>
+                <li>SecurityTurret.prefab</li>
+                <li>SynapseServer.prefab</li>
+                <li>HackingObjectButtonTutorial.prefab</li>
+                <li>HackInteractPrompt .prefab <span class="mini-tag">파일명 끝 공백 있음 — 리네임은 별도</span></li>
+              </ul>
+
+              <h4>1차 유지</h4>
+              <ul>
+                <li><code>Drop Objects</code>, <code>Map Objects</code>, <code>Weapons</code>, <code>Others</code> (공백명 유지)</li>
+                <li><code>UI/Ingame</code>, <code>UI/Lobby</code>, <code>UI/tiles</code></li>
+              </ul>
+
+              <h4>위생 후보 (폴더링과 분리 권장)</h4>
+              <ul>
+                <li>Prefabs 루트 깨진/이상 이름 프리팹</li>
+                <li>파일명 trailing space</li>
+                <li>한글 깨진 tiles 프리팹 이름</li>
+              </ul>
+
+              <h4>AC</h4>
+              <ul class="check">
+                <li>GUID 유지, Missing Prefab 0</li>
+                <li><code>Prefabs/Hacking/</code> 존재, Objects 아래 Hacking Objects 없음</li>
+                <li>해킹 오브젝트 상호작용 스모크 통과</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- D -->
+          <article class="phase" id="phase-d">
+            <div class="phase-head">
+              <h3>Phase D — Scenes (+ Data 점검)</h3>
+              <div class="tag-row">
+                <span class="pill do">씬 아카이브</span>
+                <span class="pill later">Data는 최소</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <h4>Scenes</h4>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>씬</th><th>조치</th><th>비고</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>LobbyScene.unity</code></td><td>유지</td><td>Build enabled</td></tr>
+                    <tr><td><code>MainScene.unity</code></td><td>유지</td><td>Build enabled</td></tr>
+                    <tr><td><code>LobbyScene temp</code>, <code>LobbyScene_TEMPPPPP</code>, <code>MainScene_Temp</code></td><td><code>Scenes/_Archive/</code></td><td>temp</td></tr>
+                    <tr><td><code>JmgScene</code>, <code>Trick2Scene</code></td><td>아카이브 또는 유지(팀 결정)</td><td>Build disabled</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="muted">
+                Build Settings에 없는 경로(<code>lhsScene</code>, <code>multiScene</code>) 엔트리 정리.
+                <code>MainScene_Temp</code>는 disabled로 등록되어 있으므로 아카이브 시
+                <code>EditorBuildSettings.asset</code>도 함께 수정.
+              </p>
+
+              <h4>Data</h4>
+              <div class="callout danger">
+                <div class="title">대규모 Data 이동 비추천 (1차)</div>
+                <code>BalancingSheetCatalog</code>에 CSV 경로가 하드코딩되어 있음
+                (예: <code>Assets/Data/Balancing/Objects/Map Objects/Map 1/...</code>).
+                Data를 옮기면 코드 수정이 필요 → 리팩터 경계.
+                1차는 <strong>점검만</strong> 하거나, 코드 수정 없는 초소형 정렬만.
+              </div>
+
+              <h4>AC</h4>
+              <ul class="check">
+                <li>활성 빌드 씬 = Lobby + Main (의도대로)</li>
+                <li>temp 씬이 <code>_Archive</code>에 있음</li>
+                <li>데이터 로드/밸런싱 시트 경로 스모크 (이동 없었다면 회귀만)</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- E -->
+          <article class="phase" id="phase-e">
+            <div class="phase-head">
+              <h3>Phase E — Resources → Art (후순위)</h3>
+              <div class="tag-row">
+                <span class="pill later">고위험</span>
+                <span class="pill skip">1차 제외</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <p>~7555 파일. <code>Resources.Load</code> 경로가 깨질 수 있음. 별도 승인·별도 기획.</p>
+              <p><strong>현재 확인된 Load 예:</strong></p>
+              <ul>
+                <li><code>Characters/HackerData</code>, <code>Characters/CyborgData</code></li>
+                <li><code>Fonts/Maplestory Light SDF</code></li>
+                <li><code>Sprites/UI/SPR_MENU UI</code></li>
+              </ul>
+              <p class="muted">사용처 전수 grep → 미사용분만 Art로 → 사용분은 Addressables/경로 수정과 함께.</p>
+            </div>
+          </article>
+
+          <!-- F -->
+          <article class="phase" id="phase-f">
+            <div class="phase-head">
+              <h3>Phase F — 리팩터 후순위</h3>
+              <div class="tag-row">
+                <span class="pill skip">폴더링 아님</span>
+              </div>
+            </div>
+            <div class="phase-body">
+              <ul>
+                <li>공백 폴더명 → PascalCase</li>
+                <li>namespace를 경로에 맞게 통일</li>
+                <li>Managers 코드 수준 책임 분리</li>
+                <li>asmdef 도입 검토</li>
+                <li>파일명 trailing space / 깨진 이름 정리</li>
+              </ul>
+            </div>
+          </article>
+        </section>
+
+        <!-- 7 -->
+        <section id="s7">
+          <h2><span class="num">7</span> 이동 체크리스트 (복붙용)</h2>
+
+          <h3>Phase B — Scripts</h3>
+          <ul class="check">
+            <li>Items 폴더 삭제</li>
+            <li>Hacking/ObjectManager, Reward 빈 폴더 삭제</li>
+            <li>WeaponChoice → UI/WeaponChoice (5 cs + meta)</li>
+            <li>Sound* 5개 → Audio/</li>
+            <li>Managers/Audio 2개 → Audio/</li>
+            <li>LobbyManager, LobbyCharacterSelector → UI/Lobby/</li>
+            <li>컴파일 / Lobby / Main / 무기선택 / 사운드 스모크</li>
+          </ul>
+
+          <h3>Phase C — Prefabs</h3>
+          <ul class="check">
+            <li>Hacking Objects 8 prefab → Prefabs/Hacking/</li>
+            <li>빈 Objects/Hacking Objects 폴더 제거</li>
+            <li>해킹 상호작용 스모크</li>
+            <li>Missing Prefab 검색</li>
+          </ul>
+
+          <h3>Phase D — Scenes</h3>
+          <ul class="check">
+            <li>Scenes/_Archive 생성</li>
+            <li>temp 씬 이동</li>
+            <li>EditorBuildSettings 정리</li>
+            <li>Lobby/Main 진입 확인</li>
+          </ul>
+        </section>
+
+        <!-- 8 -->
+        <section id="s8">
+          <h2><span class="num">8</span> 리스크 · 하드코딩 경로</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>종류</th><th>위치</th><th>폴더링 영향</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CSV AssetPath 하드코딩</td>
+                  <td><code>BalancingSheetCatalog.cs</code></td>
+                  <td>Data 이동 시 코드 수정 필요 → 1차 Data 不动</td>
+                </tr>
+                <tr>
+                  <td>Sound Data 경로 SerializeField 기본값</td>
+                  <td><code>SoundManager</code> → <code>Assets/Data/Sounds/Ingame</code></td>
+                  <td>Data/Sounds 이동 시 깨짐</td>
+                </tr>
+                <tr>
+                  <td>Resources.Load</td>
+                  <td>CharacterSelector, SettingsUI, DamageText 등</td>
+                  <td>Resources 이동 시 깨짐 → Phase E</td>
+                </tr>
+                <tr>
+                  <td>GUID 참조 (씬/프리팹)</td>
+                  <td>대부분</td>
+                  <td>meta 동반 이동이면 보통 안전</td>
+                </tr>
+                <tr>
+                  <td>파일명 trailing space</td>
+                  <td>일부 prefab</td>
+                  <td>리네임은 별도 커밋 권장</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 9 -->
+        <section id="s9">
+          <h2><span class="num">9</span> 스모크 테스트 (공통)</h2>
+          <ul class="check">
+            <li>Console Compile Error 0</li>
+            <li>LobbyScene 로드 + 캐릭터 선택 UI</li>
+            <li>MainScene 진입 + 이동/공격</li>
+            <li>무기 선택 패널 1회 (Phase B 이후)</li>
+            <li>해킹 오브젝트 상호작용 1회 (Phase C 이후)</li>
+            <li>Missing Script / Missing Prefab 0</li>
+            <li>(선택) BGM/SFX 한 번 재생</li>
+          </ul>
+        </section>
+
+        <!-- 10 -->
+        <section id="s10">
+          <h2><span class="num">10</span> 전체 비범위</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h4>절대 1차에 넣지 않음</h4>
+              <ul>
+                <li>Plugins / TextMesh Pro / 서드파티</li>
+                <li>게임플레이·밸런스 변경</li>
+                <li>namespace·API 리팩터</li>
+                <li>Resources 전량 이동</li>
+                <li>공백 폴더명 일괄 변경</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>구현 모드 전환 조건</h4>
+              <ul>
+                <li>D1~D4 확정</li>
+                <li>주인님 <code>HTML OK</code> / <code>구현 진행</code> / <code>승인</code></li>
+                <li>이후 Phase B부터 승인 재질문 없이 진행</li>
+                <li><code>기획으로</code> / <code>코드 그만</code> 시 즉시 중단</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11 -->
+        <section id="s11">
+          <h2><span class="num">11</span> 진행 순서</h2>
+          <ol>
+            <li>주인님: D1~D4 Yes/No</li>
+            <li>본 HTML에 결정 반영 (필요 시)</li>
+            <li><code>HTML OK</code> → Phase B PR → C PR → D PR</li>
+            <li>안정화 후 E/F는 새 기획으로</li>
+          </ol>
+          <div class="callout tip">
+            <div class="title">다음 액션</div>
+            채팅에서 D1~D4만 답해 주시면 됩니다. 예: <code>D1 Yes / D2 Yes / D3 No / D4 No</code>
+          </div>
+        </section>
+
+        <p class="note">
+          문서 경로: <code>docs/plan-assets-foldering-2026-08-14.html</code> ·
+          기획 모드 산출물 · 구현은 명시적 승인 후
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

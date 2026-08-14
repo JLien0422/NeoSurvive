@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — 폴더·파일 관리 1차 임무 (주니어용)</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #171e27;
+      --panel2: #1d2631;
+      --line: #2c3644;
+      --text: #e9eef4;
+      --muted: #97a4b4;
+      --faint: #6e7c8d;
+      --blue: #4da3ff;
+      --green: #3ecf8e;
+      --amber: #e6b84d;
+      --red: #ef6b6b;
+      --cyan: #5ec8d8;
+      --violet: #a78bfa;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      line-height: 1.65;
+      background:
+        radial-gradient(900px 420px at 0% 0%, #1a2838 0%, transparent 50%),
+        radial-gradient(700px 380px at 100% 0%, #221a30 0%, transparent 45%),
+        var(--bg);
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: var(--mono);
+      font-size: .85em;
+      background: #0b1016;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: .08rem .35rem;
+    }
+    pre {
+      margin: .6rem 0 0;
+      padding: .9rem 1rem;
+      background: #0b1016;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: .8rem;
+      line-height: 1.45;
+    }
+
+    .wrap { max-width: 980px; margin: 0 auto; padding: 1.25rem 1.1rem 3.5rem; }
+
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.4rem 1.25rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .hero .who {
+      margin: 0 0 .4rem;
+      color: var(--cyan);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 0 0 .5rem;
+      font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+      line-height: 1.3;
+    }
+    .hero p { margin: 0; color: var(--muted); max-width: 42rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }
+    .badge {
+      font-size: .72rem; font-weight: 700;
+      padding: .25rem .55rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    }
+    .badge.g { color: var(--green); border-color: #2d5644; }
+    .badge.a { color: var(--amber); border-color: #5a4a22; }
+    .badge.r { color: var(--red); border-color: #5a2e2e; }
+    .badge.b { color: var(--blue); border-color: #2a4a6a; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static !important; }
+    }
+
+    .toc {
+      position: sticky; top: .8rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .85rem .8rem;
+    }
+    .toc h2 {
+      margin: 0 0 .5rem;
+      font-size: .72rem;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .toc ol { margin: 0; padding-left: 1.1rem; font-size: .84rem; }
+    .toc li { margin: .25rem 0; }
+    .toc a { color: var(--muted); }
+    .toc a:hover { color: var(--text); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.1rem 1.1rem 1.15rem;
+      margin-bottom: .9rem;
+    }
+    section > h2 {
+      margin: 0 0 .75rem;
+      font-size: 1.12rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .num {
+      width: 1.5rem; height: 1.5rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 7px; font-size: .78rem; font-weight: 800;
+      background: var(--panel2); border: 1px solid var(--line); color: var(--cyan);
+    }
+    h3 { margin: 1rem 0 .45rem; font-size: .98rem; color: var(--cyan); }
+    h4 { margin: 0 0 .35rem; font-size: .92rem; }
+    p { margin: .4rem 0; }
+    .muted { color: var(--muted); }
+    ul, ol { margin: .35rem 0 .55rem; padding-left: 1.2rem; }
+    li { margin: .2rem 0; }
+
+    .box {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .8rem .85rem;
+      margin: .65rem 0;
+    }
+    .box.tip { border-left: 3px solid var(--blue); }
+    .box.warn { border-left: 3px solid var(--amber); }
+    .box.danger { border-left: 3px solid var(--red); }
+    .box.ok { border-left: 3px solid var(--green); }
+    .box .t { font-weight: 800; font-size: .86rem; margin-bottom: .2rem; }
+    .box.tip .t { color: var(--blue); }
+    .box.warn .t { color: var(--amber); }
+    .box.danger .t { color: var(--red); }
+    .box.ok .t { color: var(--green); }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .7rem;
+    }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .bins {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .55rem;
+      margin: .7rem 0;
+    }
+    @media (max-width: 800px) { .bins { grid-template-columns: 1fr 1fr; } }
+    .bin {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #121820;
+      padding: .7rem .65rem;
+      text-align: center;
+    }
+    .bin strong { display: block; font-size: .95rem; margin-bottom: .2rem; }
+    .bin span { font-size: .78rem; color: var(--muted); }
+    .bin.del strong { color: var(--red); }
+    .bin.move strong { color: var(--amber); }
+    .bin.keep strong { color: var(--green); }
+    .bin.later strong { color: var(--violet); }
+
+    .item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #121820;
+      padding: .75rem .8rem;
+      margin: .5rem 0;
+    }
+    .item .head {
+      display: flex; flex-wrap: wrap; gap: .4rem .6rem;
+      align-items: center; margin-bottom: .35rem;
+    }
+    .item .path { font-family: var(--mono); font-size: .82rem; color: var(--text); }
+    .pill {
+      font-size: .7rem; font-weight: 800;
+      padding: .18rem .45rem; border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+    .pill.del { color: var(--red); background: #241414; border-color: #5a2e2e; }
+    .pill.move { color: var(--amber); background: #241f12; border-color: #5a4a22; }
+    .pill.keep { color: var(--green); background: #13231c; border-color: #2d5644; }
+    .pill.later { color: var(--violet); background: #1a1528; border-color: #4a3a6a; }
+    .why { color: var(--muted); font-size: .9rem; margin: 0; }
+    .why b { color: var(--text); font-weight: 700; }
+
+    .table-wrap { overflow-x: auto; margin: .55rem 0; }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: .86rem; min-width: 540px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: .45rem .5rem;
+      text-align: left; vertical-align: top;
+    }
+    th { background: #121820; color: var(--muted); font-weight: 700; }
+    tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    td.to { color: var(--green); }
+    td.from { color: var(--amber); }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: .65rem;
+      align-items: start;
+      padding: .7rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #121820;
+      margin: .45rem 0;
+    }
+    .decision .id { font-weight: 900; color: var(--violet); }
+    .decision .rec { font-size: .78rem; font-weight: 800; color: var(--green); white-space: nowrap; }
+    @media (max-width: 600px) {
+      .decision { grid-template-columns: 1fr; }
+    }
+
+    .check { list-style: none; padding-left: 0; }
+    .check li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin: .28rem 0;
+    }
+    .check li::before {
+      content: "☐";
+      position: absolute; left: 0; color: var(--faint);
+    }
+
+    .phase {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: .7rem 0;
+      background: var(--panel2);
+    }
+    .phase-h {
+      display: flex; flex-wrap: wrap; gap: .4rem .7rem;
+      justify-content: space-between; align-items: center;
+      padding: .7rem .85rem;
+      background: #121820;
+      border-bottom: 1px solid var(--line);
+    }
+    .phase-h h3 { margin: 0; color: var(--text); font-size: 1rem; }
+    .phase-b { padding: .8rem .85rem .9rem; }
+
+    footer {
+      margin-top: 1rem;
+      text-align: center;
+      color: var(--faint);
+      font-size: .8rem;
+    }
+
+    .simple {
+      font-size: 1.02rem;
+      background: linear-gradient(90deg, #13231c, #121820);
+      border: 1px solid #2d5644;
+      border-radius: 10px;
+      padding: .85rem .9rem;
+      margin: .6rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="who">Senior onboarding · Junior guide</p>
+      <h1>NeoSurvive 폴더·파일 관리<br />1차 임무 설명서</h1>
+      <p>
+        새로 합류한 시니어가 팀에 남기는 첫 문서입니다.
+        <strong>0년차 주니어도</strong> “이거 지울까? 옮길까? 왜?”를 바로 이해할 수 있게 썼습니다.
+        코드 리팩터는 아직 안 합니다. <strong>폴더·파일 정리만</strong> 합니다.
+      </p>
+      <div class="badges">
+        <span class="badge g">기획 문서</span>
+        <span class="badge b">2026-08-14</span>
+        <span class="badge a">1차 = 확실한 것만</span>
+        <span class="badge r">Packages 대삭제 금지</span>
+        <span class="badge">Assets + Packages 점검</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc">
+        <h2>목차</h2>
+        <ol>
+          <li><a href="#s1">한 줄 목표</a></li>
+          <li><a href="#s2">시니어가 생각하는 법</a></li>
+          <li><a href="#s3">폴더 규칙 (쉬움)</a></li>
+          <li><a href="#s4">4칸 분류법</a></li>
+          <li><a href="#s5">삭제할 것</a></li>
+          <li><a href="#s6">이동할 것</a></li>
+          <li><a href="#s7">유지할 것</a></li>
+          <li><a href="#s8">보류할 것</a></li>
+          <li><a href="#s9">Packages 점검</a></li>
+          <li><a href="#s10">1차 작업 순서</a></li>
+          <li><a href="#s11">결정 D1~D5</a></li>
+          <li><a href="#s12">주니어 체크리스트</a></li>
+        </ol>
+      </nav>
+
+      <div>
+        <!-- 1 -->
+        <section id="s1">
+          <h2><span class="num">1</span> 한 줄 목표</h2>
+          <div class="simple">
+            <strong>1차 임무:</strong>
+            규칙 정하고 → 확실한 쓰레기만 치우고 → Scripts/Prefabs 자리만 맞춘다.<br />
+            <span class="muted">Packages·Resources·Data 큰 정리는 조사 후 2차.</span>
+          </div>
+          <div class="grid2">
+            <div class="box ok">
+              <div class="t">하는 것</div>
+              빈 폴더 삭제, 예제/temp 정리, WeaponChoice·Audio·Hacking 위치 맞추기
+            </div>
+            <div class="box danger">
+              <div class="t">안 하는 것</div>
+              코드 로직 변경, namespace 통일, Packages 막 삭제, Resources 전체 이동
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 -->
+        <section id="s2">
+          <h2><span class="num">2</span> 시니어가 생각하는 법</h2>
+          <p>유니티 폴더 정리는 “예쁘게”가 목표가 아닙니다. 목표는 세 가지뿐입니다.</p>
+          <div class="grid2">
+            <div class="box tip">
+              <div class="t">1. 찾기 쉽게</div>
+              “해킹이면 Hacking”처럼 이름이 같아야 신입도 바로 찾습니다.
+            </div>
+            <div class="box tip">
+              <div class="t">2. 가볍게</div>
+              안 쓰는 예제·아카이브·빈 폴더가 있으면 찾기·빌드가 느려집니다.
+            </div>
+            <div class="box warn">
+              <div class="t">3. 안 부수기</div>
+              지웠다가 게임 깨지면 안 됩니다. <strong>확실한 것부터, 작게</strong> 합니다.
+            </div>
+            <div class="box ok">
+              <div class="t">순서</div>
+              규칙 → 쓰레기 치우기 → 이름/위치 맞추기 → (나중에) 큰 정리·코드 리팩터
+            </div>
+          </div>
+          <div class="box tip">
+            <div class="t">주니어에게 매번 말할 문장</div>
+            “이건 <strong>삭제</strong>야, 이유: ___ / 이건 <strong>이동</strong>이야, 이유: ___ / 이건 <strong>아직 둬</strong>, 이유: ___”
+          </div>
+        </section>
+
+        <!-- 3 -->
+        <section id="s3">
+          <h2><span class="num">3</span> 폴더 규칙 (초간단)</h2>
+          <p>
+            게임을 <strong>구역(도메인)</strong>으로 나눕니다.
+            같은 구역이면 <code>Scripts</code> / <code>Prefabs</code> / <code>Data</code>에서도
+            <strong>비슷한 이름</strong>을 씁니다.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>구역 이름</th><th>쉽게 말하면</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Characters</code></td><td>플레이어, 적</td></tr>
+                <tr><td><code>Objects</code></td><td>드랍, 맵 기믹, 무기 프리팹 등</td></tr>
+                <tr><td><code>Hacking</code></td><td>해킹 시스템</td></tr>
+                <tr><td><code>UI</code></td><td>화면, 버튼, 패널</td></tr>
+                <tr><td><code>Audio</code></td><td>소리</td></tr>
+                <tr><td><code>Data</code></td><td>숫자/설정 데이터 (CSV, SO)</td></tr>
+                <tr><td><code>Scenes</code></td><td>씬</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid2">
+            <div class="box ok">
+              <div class="t">좋은 예</div>
+              <code>Scripts/Characters</code><br />
+              ↔ <code>Prefabs/Characters</code><br />
+              ↔ <code>Data/Characters</code>
+            </div>
+            <div class="box danger">
+              <div class="t">나쁜 예</div>
+              스크립트는 <code>Hacking</code><br />
+              프리팹은 <code>Objects/Hacking Objects</code><br />
+              → 같은 기능인데 찾는 길이 다름
+            </div>
+          </div>
+          <p class="muted">
+            비유: 부서 이름을 팀마다 다르게 부르면 신입이 서류를 못 찾습니다. 폴더도 똑같습니다.
+            이게 바로 <strong>“같은 도메인 언어”</strong>입니다.
+          </p>
+        </section>
+
+        <!-- 4 -->
+        <section id="s4">
+          <h2><span class="num">4</span> 파일을 보면 4칸 중 하나로</h2>
+          <div class="bins">
+            <div class="bin del"><strong>삭제</strong><span>없어도 게임 돌아감<br/>(확실할 때만)</span></div>
+            <div class="bin move"><strong>이동</strong><span>쓰이지만<br/>자리가 이상함</span></div>
+            <div class="bin keep"><strong>유지</strong><span>정상 / 아직<br/>판단 불가</span></div>
+            <div class="bin later"><strong>보류</strong><span>지우고 싶지만<br/>위험·조사 필요</span></div>
+          </div>
+          <div class="box warn">
+            <div class="t">중요</div>
+            한 번에 전체 대청소 금지. <strong>한 PR = 한 종류</strong>
+            (예: 빈 폴더만 / Scripts 이동만).
+          </div>
+        </section>
+
+        <!-- 5 DELETE -->
+        <section id="s5">
+          <h2><span class="num">5</span> 삭제할 것 (1차 후보)</h2>
+          <p class="muted">“왜 지우냐?”에 바로 답할 수 있는 것만 모았습니다.</p>
+
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제</span>
+              <span class="path">Scripts/Items/</span>
+            </div>
+            <p class="why"><b>왜?</b> 안에 파일이 없음(빈 상자). 있으면 있을 것 같아서 헷만 줌.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제</span>
+              <span class="path">Scripts/Hacking/ObjectManager/ , Reward/</span>
+            </div>
+            <p class="why"><b>왜?</b> 빈 폴더. 해킹 코드는 이미 다른 하위 폴더에 있음.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제(조건부)</span>
+              <span class="path">Scripts/Characters/Player/Weapon/Passive/</span>
+            </div>
+            <p class="why"><b>왜?</b> 비어 있음. 패시브 무기 폴더를 앞으로 쓸 계획 없으면 삭제. 쓸 거면 유지.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제</span>
+              <span class="path">Prefabs/Managers/ (비어 있으면)</span>
+            </div>
+            <p class="why"><b>왜?</b> 빈 프리팹 폴더. 필요해지면 그때 다시 만들면 됨.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제</span>
+              <span class="path">Assets/Packages/ (빈 폴더)</span>
+            </div>
+            <p class="why"><b>왜?</b> 진짜 패키지는 프로젝트 루트 <code>Packages/</code>에 있음. Assets 안 빈 Packages는 헷갈리게만 함.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제 추천</span>
+              <span class="path">TextMesh Pro/Examples &amp; Extras/</span>
+            </div>
+            <p class="why"><b>왜?</b> TMP가 넣어 준 <strong>샘플</strong>. 우리 게임 UI가 아님. 용량·검색 노이즈만 생김. (~249 files)</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제 추천</span>
+              <span class="path">SerializableDictionary/Example/</span>
+            </div>
+            <p class="why"><b>왜?</b> 플러그인 예제 씬/스크립트. 게임에서 안 씀. 코어(<code>SerializableDictionary.cs</code>)는 유지.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill del">삭제 추천</span>
+              <span class="path">Plugins/Demigiant/DOTweenPro Examples/</span>
+            </div>
+            <p class="why"><b>왜?</b> DOTween 예제. 게임은 DOTween을 쓰지만 예제 폴더는 필요 없음.</p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill move">삭제 대신 아카이브</span>
+              <span class="path">Scenes/*temp* , *_TEMP* , MainScene_Temp</span>
+            </div>
+            <p class="why">
+              <b>왜?</b> 작업하다 남은 임시 씬. 정식은 <code>LobbyScene</code>, <code>MainScene</code>만.
+              바로 영구 삭제보다 먼저 <code>Scenes/_Archive/</code>로 옮기는 게 안전.
+            </p>
+          </div>
+          <div class="item">
+            <div class="head">
+              <span class="pill later">삭제 보류(확인 후)</span>
+              <span class="path">Resources/Sprites/archive/ , UI/Archive/ , Sounds/SFX/temp/</span>
+            </div>
+            <p class="why">
+              <b>왜 눈에 띄나?</b> 파일이 엄청 많음(수천 개). Resources 안이면 빌드/임포트에 부담.
+              <b>왜 1차에 바로 안 지움?</b> 어딘가에서 쓰일 수도 있음. 참조 확인 후 2차에서 삭제/격리.
+            </p>
+          </div>
+        </section>
+
+        <!-- 6 MOVE -->
+        <section id="s6">
+          <h2><span class="num">6</span> 이동할 것 (1차)</h2>
+          <p class="muted">코드 내용은 안 바꿉니다. <strong>자리만</strong> 옮깁니다. <code>.meta</code>도 반드시 같이.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>지금</th><th>어디로</th><th>왜 옮기나 (쉽게)</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="from"><code>Scripts/WeaponChoice/</code></td>
+                  <td class="to"><code>Scripts/UI/WeaponChoice/</code></td>
+                  <td>무기 선택 <strong>화면</strong>인데 UI 밖에 혼자 있음</td>
+                </tr>
+                <tr>
+                  <td class="from"><code>Managers/*Sound*</code> + <code>Managers/Audio/</code></td>
+                  <td class="to"><code>Scripts/Audio/</code></td>
+                  <td>소리는 Managers가 아니라 Audio 구역이 맞음</td>
+                </tr>
+                <tr>
+                  <td class="from"><code>Managers/LobbyManager</code> 등</td>
+                  <td class="to"><code>Scripts/UI/Lobby/</code></td>
+                  <td>로비 UI/흐름용. 전역 Managers와 섞이면 찾기 힘듦</td>
+                </tr>
+                <tr>
+                  <td class="from"><code>Prefabs/Objects/Hacking Objects/</code></td>
+                  <td class="to"><code>Prefabs/Hacking/</code></td>
+                  <td>Scripts는 이미 <code>Hacking</code>. 이름 맞추기</td>
+                </tr>
+                <tr>
+                  <td class="from">temp 씬들</td>
+                  <td class="to"><code>Scenes/_Archive/</code></td>
+                  <td>버리지 않고 치워 두기</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Managers에 남는 것 (예시)</h3>
+          <p class="muted">진짜 “게임 전체 관리자”만 남깁니다.</p>
+          <p>
+            <code>GameManager</code>, <code>DataManager</code>, <code>MapManager</code>,
+            <code>UIManager</code>, <code>UpgradeManager</code>, <code>TraitManager</code>,
+            <code>SettingsManager</code>, <code>ManagerInitializer</code> 등
+          </p>
+
+          <div class="box warn">
+            <div class="t">이동할 때 절대 규칙</div>
+            파일과 <code>.meta</code>를 같이 이동해야 합니다.
+            Unity는 경로보다 GUID로 연결합니다. meta를 잃으면 Missing이 납니다.
+          </div>
+        </section>
+
+        <!-- 7 KEEP -->
+        <section id="s7">
+          <h2><span class="num">7</span> 유지할 것</h2>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지</span><span class="path">Plugins/ (Odin, Easy Save, DOTween, AllIn1…)</span></div>
+            <p class="why"><b>왜?</b> 게임/툴이 실제로 사용 중. 1차에 손대면 사고 큼.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지</span><span class="path">Data/ 구조 (CSV, 캐릭터/무기 SO)</span></div>
+            <p class="why"><b>왜?</b> 코드에 경로가 박혀 있음(<code>BalancingSheetCatalog</code> 등). 옮기면 코드 수정 = 리팩터.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지</span><span class="path">Resources/ 전체 위치 (1차)</span></div>
+            <p class="why"><b>왜?</b> <code>Resources.Load("…")</code> 문자열이 있음. 폴더 옮기면 런타임에 못 찾음.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지</span><span class="path">LobbyScene.unity , MainScene.unity</span></div>
+            <p class="why"><b>왜?</b> 정식 빌드 씬.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지</span><span class="path">Settings/ (URP 설정)</span></div>
+            <p class="why"><b>왜?</b> 렌더 파이프라인 설정. 게임 필수.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill keep">유지(팀 편의)</span><span class="path">ParrelSync , vFavorites</span></div>
+            <p class="why"><b>왜?</b> 에디터 작업 도구. 빌드에 거의 안 들어가지만 팀이 쓰면 유지.</p>
+          </div>
+        </section>
+
+        <!-- 8 LATER -->
+        <section id="s8">
+          <h2><span class="num">8</span> 보류할 것 (2차 이후)</h2>
+          <div class="item">
+            <div class="head"><span class="pill later">보류</span><span class="path">공백 폴더명 (Map Objects, Drop Objects…)</span></div>
+            <p class="why"><b>왜 나중에?</b> 이름 바꾸면 하드코딩 경로·습관이 많이 깨짐. 폴더링 안정화 후.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill later">보류</span><span class="path">namespace 통일 / Managers 코드 분리 / asmdef</span></div>
+            <p class="why"><b>왜 나중에?</b> 그건 <strong>리팩터</strong>. 이번 임무는 폴더·파일 관리.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill later">보류</span><span class="path">Resources → Art 이전</span></div>
+            <p class="why"><b>왜 나중에?</b> 파일 ~7500개 + Load 경로. 별도 조사·승인 필요.</p>
+          </div>
+          <div class="item">
+            <div class="head"><span class="pill later">보류</span><span class="path">깨진/이상한 Prefab 파일명, trailing space</span></div>
+            <p class="why"><b>왜 나중에?</b> 리네임은 참조 리스크. 폴더 이동과 같은 PR에 넣지 말 것.</p>
+          </div>
+        </section>
+
+        <!-- 9 Packages -->
+        <section id="s9">
+          <h2><span class="num">9</span> Packages 폴더 점검</h2>
+          <p>
+            여기 말하는 Packages는 프로젝트 루트 <code>Packages/manifest.json</code> 입니다.
+            (<code>Assets/Packages</code> 빈 폴더와 다름!)
+          </p>
+          <div class="box danger">
+            <div class="t">1차 규칙</div>
+            Packages를 막 삭제하지 않습니다. 컴파일·에디터가 한꺼번에 깨질 수 있습니다.
+            1차는 <strong>목록만 정리</strong>, 제거는 2차(팀 확인 후).
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>패키지</th><th>판단</th><th>쉽게 말하면</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>URP, 2D, TMP, uGUI, Test, IDE</td>
+                  <td><span class="pill keep">유지</span></td>
+                  <td>엔진/툴 기본. 없으면 프로젝트 성립 안 됨</td>
+                </tr>
+                <tr>
+                  <td>GameAnalytics</td>
+                  <td><span class="pill keep">유지</span></td>
+                  <td>코드에서 이벤트 추적 사용 중</td>
+                </tr>
+                <tr>
+                  <td>unity-mcp</td>
+                  <td><span class="pill keep">유지</span></td>
+                  <td>에디터 MCP 툴</td>
+                </tr>
+                <tr>
+                  <td>visualscripting</td>
+                  <td><span class="pill later">보류</span></td>
+                  <td>게임 그래프는 거의 안 보임. Easy Save가 참조할 수 있음 → 조사 후</td>
+                </tr>
+                <tr>
+                  <td>localization</td>
+                  <td><span class="pill later">보류</span></td>
+                  <td>게임 번역 테이블은 안 보임. Odin 모듈과 관련 가능</td>
+                </tr>
+                <tr>
+                  <td>NuGetForUnity + 빈 packages.config</td>
+                  <td><span class="pill later">보류</span></td>
+                  <td>지금 NuGet 패키지 비어 있음. 제거 여부는 팀 확인</td>
+                </tr>
+                <tr>
+                  <td>NativeWebSocket</td>
+                  <td><span class="pill later">보류</span></td>
+                  <td>게임 코드 사용 여부 재확인 후</td>
+                </tr>
+                <tr>
+                  <td>Timeline / Project Auditor</td>
+                  <td><span class="pill later">보류</span></td>
+                  <td>쓰면 유지, 안 쓰면 나중에 제거</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="muted">
+            Plugins 쪽 DOTween / Easy Save / Odin은 Package Manager가 아니라
+            <code>Assets/Plugins</code>에 들어 있는 에셋입니다. 1차 유지.
+          </p>
+        </section>
+
+        <!-- 10 phases -->
+        <section id="s10">
+          <h2><span class="num">10</span> 1차 작업 순서 (이렇게 한다)</h2>
+
+          <article class="phase">
+            <div class="phase-h">
+              <h3>Step 0 — 규칙·결정 합의</h3>
+              <span class="pill keep">이동 없음</span>
+            </div>
+            <div class="phase-b">
+              D1~D5 답을 받습니다. 이 HTML이 기준 문서가 됩니다.
+            </div>
+          </article>
+
+          <article class="phase">
+            <div class="phase-h">
+              <h3>Step 1 — 확실한 삭제·씬 아카이브</h3>
+              <span class="pill del">청소</span>
+            </div>
+            <div class="phase-b">
+              빈 폴더, TMP Examples, Dictionary Example, DOTween Examples,
+              temp 씬 → <code>_Archive</code>.
+              Build Settings에서 죽은 씬 경로 정리.
+            </div>
+          </article>
+
+          <article class="phase">
+            <div class="phase-h">
+              <h3>Step 2 — Scripts 이동</h3>
+              <span class="pill move">이동</span>
+            </div>
+            <div class="phase-b">
+              WeaponChoice → UI, Sound → Audio, Lobby → UI/Lobby.
+              컴파일 0에러 + Lobby/Main/무기선택/사운드 스모크.
+            </div>
+          </article>
+
+          <article class="phase">
+            <div class="phase-h">
+              <h3>Step 3 — Prefabs 이동</h3>
+              <span class="pill move">이동</span>
+            </div>
+            <div class="phase-b">
+              Hacking Objects → Prefabs/Hacking. 해킹 상호작용 스모크.
+            </div>
+          </article>
+
+          <article class="phase">
+            <div class="phase-h">
+              <h3>Step 4 — 리포트만 (삭제 X)</h3>
+              <span class="pill later">보류 목록</span>
+            </div>
+            <div class="phase-b">
+              Resources Archive 사용 여부, Packages 제거 후보를 문서로 남기고
+              팀 확인 후 2차 진행.
+            </div>
+          </article>
+        </section>
+
+        <!-- 11 decisions -->
+        <section id="s11">
+          <h2><span class="num">11</span> 결정이 필요한 것 (D1~D5)</h2>
+          <p class="muted">구현 전에 Yes/No만 찍어 주세요. 아래는 시니어 추천입니다.</p>
+
+          <div class="decision">
+            <div class="id">D1</div>
+            <div>
+              <strong>Prefabs 해킹 → <code>Prefabs/Hacking</code> ?</strong>
+              <p class="muted" style="margin:.2rem 0 0">Scripts와 이름 맞추기</p>
+            </div>
+            <div class="rec">추천 Yes</div>
+          </div>
+          <div class="decision">
+            <div class="id">D2</div>
+            <div>
+              <strong>Lobby / Sound 스크립트 → UI / Audio 이동?</strong>
+              <p class="muted" style="margin:.2rem 0 0">파일 이동만, 코드 내용 변경 없음</p>
+            </div>
+            <div class="rec">추천 Yes</div>
+          </div>
+          <div class="decision">
+            <div class="id">D3</div>
+            <div>
+              <strong>TMP Examples / Dictionary Example / DOTween Examples 1차 삭제?</strong>
+              <p class="muted" style="margin:.2rem 0 0">샘플은 보통 삭제</p>
+            </div>
+            <div class="rec">추천 Yes</div>
+          </div>
+          <div class="decision">
+            <div class="id">D4</div>
+            <div>
+              <strong>Sprites archive / UI Archive 1차 삭제?</strong>
+              <p class="muted" style="margin:.2rem 0 0">용량 큼 → 참조 확인 전엔 위험</p>
+            </div>
+            <div class="rec">추천 보류</div>
+          </div>
+          <div class="decision">
+            <div class="id">D5</div>
+            <div>
+              <strong>Packages(Visual Scripting 등) 1차 제거?</strong>
+              <p class="muted" style="margin:.2rem 0 0">조사·팀 확인 후 2차</p>
+            </div>
+            <div class="rec">추천 No</div>
+          </div>
+
+          <div class="box tip">
+            <div class="t">답변 예시</div>
+            <code>D1 Yes / D2 Yes / D3 Yes / D4 보류 / D5 No</code>
+          </div>
+        </section>
+
+        <!-- 12 checklist -->
+        <section id="s12">
+          <h2><span class="num">12</span> 주니어 체크리스트 · 스모크</h2>
+          <h3>작업할 때마다</h3>
+          <ul class="check">
+            <li>이건 삭제 / 이동 / 유지 / 보류 중 어디에 넣었는지 말할 수 있다</li>
+            <li>삭제·이동 이유를 한 줄로 적을 수 있다</li>
+            <li>.meta를 같이 옮겼다</li>
+            <li>Plugins / Data 대이동 / Resources 대이동을 이번 PR에 안 넣었다</li>
+          </ul>
+          <h3>스모크 (이동 PR 공통)</h3>
+          <ul class="check">
+            <li>Compile Error 0</li>
+            <li>LobbyScene 로드 + 캐릭터 선택</li>
+            <li>MainScene 진입 + 이동/공격</li>
+            <li>무기 선택 UI 1회 (Scripts 이동 후)</li>
+            <li>해킹 상호작용 1회 (Prefabs 이동 후)</li>
+            <li>Missing Script / Missing Prefab 없음</li>
+          </ul>
+          <div class="box ok">
+            <div class="t">구현 시작 조건</div>
+            D1~D5 확정 + 주인님의 <code>HTML OK</code> / <code>구현 진행</code> / <code>승인</code>
+          </div>
+        </section>
+
+        <footer>
+          파일 위치: <code>docs/plan-folder-mgmt-junior-2026-08-14.html</code><br />
+          기획 모드 산출물 · Assets + Packages 1차 관리 가이드
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

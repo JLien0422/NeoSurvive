@@ -100,6 +100,8 @@ namespace VFavorites
             {
                 if (!curEvent.isScroll) return;
                 if (!VFavoritesMenu.pageScrollEnabled) return;
+                // DefaultPage에서는 Project 트리 스크롤을 가로채지 않는다.
+                if (FolderDockPinToggle.IsOnDefaultPage) return;
 
 
 
@@ -107,6 +109,16 @@ namespace VFavorites
 
                 if (scrollDelta == 0 && curEvent.holdingShift)
                     scrollDelta = curEvent.mouseDelta.x;
+
+                if (scrollDelta < 0 && data.curPageIndex == 0)
+                {
+                    FolderDockPinToggle.IsOnDefaultPage = true;
+                    prevPageButtonBrightness = 2;
+                    CancelDragging();
+                    CancelRowAnimations();
+                    curEvent.Use();
+                    return;
+                }
 
                 if (scrollDelta < 0 && data.curPageIndex == 0) return;
 
@@ -575,7 +587,11 @@ namespace VFavorites
                 var textSize = 11;
                 var textBrightness = .65f;
 
-                widgetRect_groupSpace = totalRect_groupSpace.SetWidthFromMid(data.curPage.name.GetLabelWidth(textSize) + widthToAdd).SetHeightFromBottom(height).MoveY(-distToBottom);
+                var pageTitle = FolderDockPinToggle.IsOnDefaultPage ? "DefaultPage" : data.curPage.name;
+
+                widgetRect_groupSpace = totalRect_groupSpace.SetWidthFromMid(pageTitle.GetLabelWidth(textSize) + widthToAdd).SetHeightFromBottom(height).MoveY(-distToBottom);
+
+                var pinToggleRect = FolderDockPinToggle.GetToggleRect(totalRect_groupSpace);
 
 
                 void shadow()
@@ -592,7 +608,7 @@ namespace VFavorites
                     if (renamingPage) return;
 
 
-                    var buttonRect = widgetRect_groupSpace.SetWidthFromMid(data.curPage.name.GetLabelWidth(textSize) - 2);
+                    var buttonRect = widgetRect_groupSpace.SetWidthFromMid(pageTitle.GetLabelWidth(textSize) - 2);
 
                     buttonRect.MarkInteractive();
 
@@ -607,13 +623,14 @@ namespace VFavorites
                     SetLabelFontSize(textSize);
                     SetLabelBold();
 
-                    GUI.Label(widgetRect_groupSpace, data.curPage.name);
+                    GUI.Label(widgetRect_groupSpace, pageTitle);
 
                     ResetGUIColor();
                     ResetLabelStyle();
 
 
                     if (!activated) return;
+                    if (FolderDockPinToggle.IsOnDefaultPage) return;
 
                     renamingPage = true;
                     prevPageName = data.curPage.name;
@@ -627,11 +644,14 @@ namespace VFavorites
 
                     var iconRect = widgetRect_groupSpace.SetWidth(chevronOffset * 2).SetSizeFromMid(chevronSize, chevronSize);
                     var buttonRect = Rect.zero.SetX(0).SetY(widgetRect_groupSpace.y).SetXMax(iconRect.xMax + 4).SetYMax(totalRect_groupSpace.yMax);
+                    // 고정 창 토글과 겹치지 않게
+                    if (buttonRect.xMax > pinToggleRect.x)
+                        buttonRect.xMax = pinToggleRect.x - 2f;
 
                     buttonRect.MarkInteractive();
 
 
-                    var active = data.curPageIndex > 0;
+                    var active = !FolderDockPinToggle.IsOnDefaultPage;
                     var activated = curEvent.isMouseUp && buttonRect.IsHovered();
 
 
@@ -656,7 +676,10 @@ namespace VFavorites
                     CancelDragging();
                     CancelRowAnimations();
 
-                    data.curPageIndex--;
+                    if (data.curPageIndex <= 0)
+                        FolderDockPinToggle.IsOnDefaultPage = true;
+                    else
+                        data.curPageIndex--;
 
 
                 }
@@ -665,12 +688,15 @@ namespace VFavorites
                     if (renamingPage) return;
 
                     var iconRect = widgetRect_groupSpace.SetWidthFromRight(chevronOffset * 2).SetSizeFromMid(chevronSize, chevronSize);
-                    var buttonRect = Rect.zero.SetX(iconRect.x - 6).SetY(widgetRect_groupSpace.y).SetXMax(totalRect_groupSpace.xMax).SetYMax(totalRect_groupSpace.yMax);
+                    // ▶ 히트박스를 쉐브론 근처로만 제한 (우하단 고정 창 토글과 충돌 방지)
+                    var buttonRect = iconRect.SetSizeFromMid(28f, height + 8f);
+                    if (buttonRect.Overlaps(pinToggleRect))
+                        buttonRect.xMax = Mathf.Min(buttonRect.xMax, pinToggleRect.x - 2f);
 
                     buttonRect.MarkInteractive();
 
 
-                    var active = true;// data.curPageIndex < data.pages.Count - 1 && data.curPage.items.Any();
+                    var active = true;
                     var activated = curEvent.isMouseUp && buttonRect.IsHovered();
 
 
@@ -695,7 +721,13 @@ namespace VFavorites
                     CancelDragging();
                     CancelRowAnimations();
 
-                    data.curPageIndex++;
+                    if (FolderDockPinToggle.IsOnDefaultPage)
+                    {
+                        FolderDockPinToggle.IsOnDefaultPage = false;
+                        data.curPageIndex = 0;
+                    }
+                    else
+                        data.curPageIndex++;
 
                 }
 
@@ -830,17 +862,56 @@ namespace VFavorites
             {
                 if (isWrappedBrowserLocked && !totalRect_browserSpace.IsHovered()) return;
 
+                // DefaultPage에서는 페이지 이동만 허용 (트리 선택 키는 Project에 맡김)
+                if (FolderDockPinToggle.IsOnDefaultPage)
+                {
+                    void nextFromDefault()
+                    {
+                        if (curEvent.keyCode != KeyCode.RightArrow) return;
+                        if (!curEvent.isKeyDown) return;
+                        if (!VFavoritesMenu.arrowKeysEnabled) return;
+
+                        CancelDragging();
+                        CancelRowAnimations();
+                        FolderDockPinToggle.IsOnDefaultPage = false;
+                        data.curPageIndex = 0;
+                        nextPageButtonBrightness = 2;
+                        curEvent.Use();
+                    }
+
+                    void numberFromDefault()
+                    {
+                        if (!curEvent.isKeyDown) return;
+                        if (!VFavoritesMenu.numberKeysEnabled) return;
+                        if (EditorGUIUtility.editingTextField) return;
+
+                        var i = ((int)curEvent.keyCode - 48);
+                        if (i == 0) i = 10;
+                        if (!i.IsInRange(1, 10)) return;
+
+                        FolderDockPinToggle.IsOnDefaultPage = false;
+                        data.curPageIndex = i - 1;
+                        curEvent.Use();
+                    }
+
+                    nextFromDefault();
+                    numberFromDefault();
+                    return;
+                }
+
                 void prevPage()
                 {
                     if (!curEvent.isKeyDown) return;
                     if (curEvent.keyCode != KeyCode.LeftArrow) return;
                     if (!VFavoritesMenu.arrowKeysEnabled) return;
-                    if (data.curPageIndex == 0) return;
 
                     CancelDragging();
                     CancelRowAnimations();
 
-                    data.curPageIndex--;
+                    if (data.curPageIndex <= 0)
+                        FolderDockPinToggle.IsOnDefaultPage = true;
+                    else
+                        data.curPageIndex--;
 
                     prevPageButtonBrightness = 2;
 
@@ -910,7 +981,7 @@ namespace VFavorites
 
                     if (!i.IsInRange(1, 10)) return;
 
-
+                    FolderDockPinToggle.IsOnDefaultPage = false;
                     data.curPageIndex = i - 1;
 
                     curEvent.Use();
@@ -933,9 +1004,15 @@ namespace VFavorites
                 GUI.BeginGroup(totalRect_browserSpace);
                 GUI.color = GUI.color.SetAlpha(currentOpacity);
 
-                background();
-                pages();
+                if (!FolderDockPinToggle.IsOnDefaultPage)
+                {
+                    background();
+                    pages();
+                }
+
                 widget();
+                // 배경/페이지 위에 그려야 보임
+                FolderDockPinToggle.Draw(totalRect_groupSpace, currentOpacity);
 
                 GUI.color = GUI.color.SetAlpha(1);
                 GUI.EndGroup();
@@ -948,13 +1025,19 @@ namespace VFavorites
 
                 GUI.BeginGroup(totalRect_browserSpace);
 
+                if (!FolderDockPinToggle.IsOnDefaultPage)
+                {
+                    pages();
+                }
+
                 widget();
-                pages();
+                FolderDockPinToggle.Draw(totalRect_groupSpace, currentOpacity);
 
                 GUI.EndGroup();
 
-                if (totalRect_browserSpace.IsHovered())
-                    if (curEvent.isMouseUp || curEvent.isMouseDrag || curEvent.isScroll) // prevents these events from reaching original gui
+                // DefaultPage에서는 원본 Project 입력을 막지 않는다.
+                if (!FolderDockPinToggle.IsOnDefaultPage && totalRect_browserSpace.IsHovered())
+                    if (curEvent.isMouseUp || curEvent.isMouseDrag || curEvent.isScroll)
                         curEvent.Use();
 
                 originalBrowserGUI();
@@ -965,11 +1048,15 @@ namespace VFavorites
             {
                 if (origBrowserOnGUIDelegate.GetMethodInfo().DeclaringType.Name.Contains("VTabs")) return;
 
-                if (isOneColumn && currentOpacity.Approx(1)) // to optimize locked one-column browser functioning as a dedicated favorites window
-                    if (originalGUICalledOnce) // needs to be called once to init stuff so pinging object won't throw exceptions
-                        return;
+                // DefaultPage는 항상 원본 Project GUI를 그린다 (폴더 안 파일 표시).
+                var skipOriginalForFavoritesOverlay =
+                    !FolderDockPinToggle.IsOnDefaultPage
+                    && isOneColumn
+                    && currentOpacity.Approx(1)
+                    && originalGUICalledOnce;
 
-
+                if (skipOriginalForFavoritesOverlay)
+                    return;
 
                 if (origBrowserOnGUIDelegate.GetMethodInfo().IsStatic) // wrapped by vFolders 
                     origBrowserOnGUIDelegate.GetMethodInfo().Invoke(null, new[] { wrappedBrowser });
@@ -1204,6 +1291,36 @@ namespace VFavorites
 
             }
 
+            // DefaultPage: Project 트리/스크롤바 입력을 가로채지 않는다. 하단 페이지만 처리.
+            if (FolderDockPinToggle.IsOnDefaultPage)
+            {
+                mousePosiion_browserSpace = curEvent.mousePosition;
+
+                var overFooter = curEvent.mousePosition.y >= widgetRect_browserSpace.y;
+
+                if (curEvent.isMouseDown)
+                {
+                    mousePressed = overFooter;
+                    mousePressedOnWidget = overFooter;
+                    mousePressedOnCrossButtonArea = false;
+                    pressedItem = null;
+                    doubleclickUnhandled = false;
+                    mouseDownPosiion_browserSpace = curEvent.mousePosition;
+
+                    if (overFooter)
+                        curEvent.Use();
+                }
+
+                if (curEvent.isMouseUp)
+                {
+                    mousePressed = false;
+                    doubleclickUnhandled = false;
+                    pressedItem = null;
+                }
+
+                return;
+            }
+
             void position()
             {
                 mousePosiion_browserSpace = curEvent.mousePosition;
@@ -1393,6 +1510,8 @@ namespace VFavorites
 
         static void UpdateDragging() // called from WrappedOnGUI 
         {
+            if (FolderDockPinToggle.IsOnDefaultPage) return;
+
             void initFromOutside()
             {
                 if (draggingItem) return;
@@ -1646,6 +1765,8 @@ namespace VFavorites
             void unwrap()
             {
                 if (!wrappedBrowser) return;
+                // 고정 창 ON이면 Alt를 떼도 Project 래핑 유지
+                if (FolderDockPinToggle.IsPinned && isWrappedBrowserLocked) return;
                 if (shortcutPressed && wrappedBrowser.hasFocus) return;
                 if (currentOpacity > 0 && wrappedBrowser.hasFocus) return;
 
@@ -1822,7 +1943,7 @@ namespace VFavorites
             void wrap()
             {
                 if (!lockedBrowser) return;
-                if (!lockedBrowser.hasFocus) return;
+                if (!lockedBrowser.hasFocus && !FolderDockPinToggle.IsPinned) return;
                 if (isWrappedBrowserLocked) return;
 
                 WrapBrowserGUI(lockedBrowser);
@@ -1833,12 +1954,83 @@ namespace VFavorites
 
             }
 
+            void handleNeoSurvivePin()
+            {
+                if (FolderDockPinToggle.UnpinRequested)
+                {
+                    FolderDockPinToggle.UnpinRequested = false;
+                    FolderDockPinToggle.PinRequested = false;
+                    FolderDockPinToggle.EnsurePinnedRequested = false;
+
+                    var browserToUnlock = lockedBrowser ?? wrappedBrowser;
+                    if (browserToUnlock != null)
+                    {
+                        browserToUnlock.SetMemberValue("isLocked", false);
+                        try
+                        {
+                            browserToUnlock.titleContent =
+                                browserToUnlock.InvokeMethod<GUIContent>("GetLocalizedTitleContent");
+                        }
+                        catch { /* ignore */ }
+
+                        browserToUnlock.Repaint();
+                    }
+
+                    lockedBrowser = null;
+                    EditorPrefsCached.SetInt("vFavorites-lockedBrowserHash", 0);
+                    EditorPrefsCached.SetInt("vFavorites-lockedBrowserDockAreaInstanceId", 0);
+                    return;
+                }
+
+                if (!FolderDockPinToggle.PinRequested && !FolderDockPinToggle.EnsurePinnedRequested)
+                    return;
+                if (!FolderDockPinToggle.IsPinned)
+                {
+                    FolderDockPinToggle.PinRequested = false;
+                    FolderDockPinToggle.EnsurePinnedRequested = false;
+                    return;
+                }
+
+                FolderDockPinToggle.PinRequested = false;
+                FolderDockPinToggle.EnsurePinnedRequested = false;
+
+                var browser = wrappedBrowser
+                    ?? lockedBrowser
+                    ?? allBrowsers?.FirstOrDefault();
+
+                if (browser == null)
+                {
+                    // Project 창이 아직 없으면 다음 프레임에 재시도
+                    FolderDockPinToggle.EnsurePinnedRequested = true;
+                    return;
+                }
+
+                if (wrappedBrowser != browser)
+                {
+                    if (wrappedBrowser)
+                        UnwrapBrowserGUI();
+
+                    WrapBrowserGUI(browser);
+                    wrappedBrowser = browser;
+                }
+
+                wrappedBrowserWasLockedBeforeWrapping = false;
+                currentOpacity = 1;
+
+                if (!browser.GetMemberValue<bool>("isLocked"))
+                    browser.SetMemberValue("isLocked", true);
+
+                lockedBrowser = browser;
+                browser.Repaint();
+            }
+
 
             unsetWrappedBrowser();
             markLockedBrowser();
             setMinWidthOnLockedBrowser();
             setTitle();
 
+            handleNeoSurvivePin();
             lock_();
             unlock();
             wrap();

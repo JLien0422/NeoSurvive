@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업 로그 — Phase F 미사용 삭제 (2026-08-26)</title>
+  <style>
+    body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:#0e1318;color:#e8eef5;margin:0;line-height:1.65}
+    .wrap{max-width:860px;margin:0 auto;padding:1.2rem}
+    .hero{background:#121820;border:1px solid #2b3644;border-radius:12px;padding:1.1rem;margin-bottom:1rem}
+    h1{margin:0 0 .4rem;font-size:1.25rem}
+    p{color:#95a3b4;margin:0}
+    section{background:#161d26;border:1px solid #2b3644;border-radius:12px;padding:1rem;margin-bottom:.8rem}
+    h2{margin:0 0 .5rem;color:#5ec8d8;font-size:1.05rem}
+    code{font-family:Consolas,monospace;font-size:.84em;background:#0b1016;border:1px solid #2b3644;border-radius:4px;padding:.05rem .3rem}
+    ul{margin:.3rem 0;padding-left:1.2rem}
+    .ok{color:#3ecf8e}.keep{color:#e6b84d}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>작업 로그 — Phase F 미사용 삭제</h1>
+      <p>2026-08-26 · 확신 높은 항목만 삭제. visualscripting/localization 유지.</p>
+    </header>
+    <section>
+      <h2>삭제한 것</h2>
+      <ul>
+        <li class="ok">빈 폴더: <code>Assets/Packages</code>, Art 빈 3곳 (Drop Objects / Others×2)</li>
+        <li class="ok">Packages: NativeWebSocket, NuGetForUnity, Timeline, Project Auditor</li>
+        <li class="ok">NuGet 설정: <code>Assets/NuGet.config</code>, <code>packages.config</code></li>
+        <li class="ok"><code>Assets/Plugins/Protobuf/</code></li>
+        <li class="ok"><code>Scenes/_Archive/</code> (JmgScene, Trick2Scene 포함)</li>
+      </ul>
+    </section>
+    <section>
+      <h2>유지한 것</h2>
+      <ul>
+        <li class="keep">visualscripting (Easy Save 참조)</li>
+        <li class="keep">localization (Odin 모듈)</li>
+        <li class="keep">루트 <code>Packages/</code> (manifest 본체)</li>
+        <li class="keep">공백 폴더명 리네임 (F-1 아직 안 함)</li>
+      </ul>
+    </section>
+    <section>
+      <h2>스모크</h2>
+      <ul>
+        <li>Unity 열면 패키지 재해석 → Compile Error 0 확인</li>
+        <li>Lobby / Main 로드</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>

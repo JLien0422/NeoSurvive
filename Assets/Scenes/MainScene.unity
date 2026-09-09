@@ -17556,6 +17556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyStatCsv: {fileID: 4900000, guid: af7d12337275c0c4899aa60e33cc8f50, type: 3}
+  enemyHpScaleCsv: {fileID: 4900000, guid: a8f2c91e4b7d4036a15e9c0d8f3b2764, type: 3}
 --- !u!114 &1310064714
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -30,6 +30,7 @@ namespace NeoSurvive.Editor.BalancingSheets
             {
                 Define("01_Characters", "Assets/Data/Balancing/characters.csv", "id"),
                 Define("02_EnemyStats", "Assets/Data/Balancing/enemy_stats.csv", "enemyid"),
+                Define("02b_EnemyHpScale", "Assets/Data/Balancing/enemy_hp_scale.csv", "phase"),
                 Define("03_EnemyDrops", "Assets/Data/Balancing/enemy_drops.csv", "enemyId"),
                 Define("04_SpawnLegacy", "Assets/Data/Balancing/enemy_spawn_table.csv", "phase"),
                 Define(

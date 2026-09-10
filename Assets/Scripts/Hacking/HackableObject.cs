@@ -35,6 +35,7 @@ public class HackableObject : MonoBehaviour, IHackPromptProvider
     private float checkTimer = 0f;
     private const float CheckInterval = 0.1f;
 
+    public HackableObjectType ObjectType => objectType;
     public Transform PromptAnchorRoot => transform;
     public float HackInteractRange => hackRange;
     public bool IsHackInteractionComplete => isHacked;

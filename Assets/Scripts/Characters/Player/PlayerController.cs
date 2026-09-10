@@ -95,9 +95,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // 수평 및 수직 입력을 받아옵니다. (기본적으로 키보드 화살표 또는 WASD)
-            float moveX = Input.GetAxisRaw("Horizontal");
-            float moveY = Input.GetAxisRaw("Vertical");
+            // WASD만 키보드 이동. 화살표는 해킹 미니게임용.
+            float moveX = 0f;
+            float moveY = 0f;
+            if (Input.GetKey(KeyCode.A)) moveX -= 1f;
+            if (Input.GetKey(KeyCode.D)) moveX += 1f;
+            if (Input.GetKey(KeyCode.S)) moveY -= 1f;
+            if (Input.GetKey(KeyCode.W)) moveY += 1f;
 
             // 입력 값을 Vector2 형태로 저장하고 정규화(normalize)합니다.
             // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.

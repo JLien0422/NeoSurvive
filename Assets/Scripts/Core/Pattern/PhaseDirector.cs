@@ -133,8 +133,12 @@ public class PhaseDirector : MonoBehaviour
       return;
     }
 
-    var prefab = hackablePrefabs[Random.Range(0, hackablePrefabs.Length)];
-    if (prefab == null) return;
+    GameObject prefab = PickActiveHackablePrefab();
+    if (prefab == null)
+    {
+      Debug.LogWarning("[PhaseDirector] 활성 미니게임(터렛/울타리) 프리팹이 없습니다.");
+      return;
+    }
 
     Vector2 offset = Random.insideUnitCircle.normalized * Random.Range(hackableMinDistance, hackableSpawnRadius);
     Vector3 pos = player.position + new Vector3(offset.x, offset.y, 0f);
@@ -142,6 +146,32 @@ public class PhaseDirector : MonoBehaviour
     Instantiate(prefab, pos, Quaternion.identity);
     GameAnalyticsTracker.TrackHackableSpawned(prefab.name, pos);
     Debug.Log($"[PhaseDirector] Hackable spawned: {prefab.name}");
+  }
+
+  private GameObject PickActiveHackablePrefab()
+  {
+    int allowedCount = 0;
+    GameObject picked = null;
+
+    for (int i = 0; i < hackablePrefabs.Length; i++)
+    {
+      GameObject candidate = hackablePrefabs[i];
+      if (candidate == null)
+        continue;
+
+      HackableObject hackable =
+        candidate.GetComponent<HackableObject>()
+        ?? candidate.GetComponentInChildren<HackableObject>(true);
+
+      if (hackable == null || !ActiveHackMinigames.IsActive(hackable.ObjectType))
+        continue;
+
+      allowedCount++;
+      if (Random.Range(0, allowedCount) == 0)
+        picked = candidate;
+    }
+
+    return picked;
   }
 
   private void RefreshPlayerReference()

@@ -237,16 +237,7 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         private HackableObjectType GetRandomHackableObjectType()
         {
-            HackableObjectType[] types =
-            {
-                HackableObjectType.SecurityTurret,
-                HackableObjectType.ElectricFence,
-                HackableObjectType.SatelliteUplink,
-                HackableObjectType.SynapseServer,
-                HackableObjectType.MagneticBeacon
-            };
-
-            return types[Random.Range(0, types.Length)];
+            return ActiveHackMinigames.GetRandom();
         }
 
         public void OnHackEndedFromSystem()

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업 로그 — Phase D Data (2026-08-26)</title>
+  <style>
+    :root {
+      --bg:#0e1318; --panel:#161d26; --line:#2b3644; --text:#e8eef5;
+      --muted:#95a3b4; --green:#3ecf8e; --amber:#e6b84d; --red:#ef6b6b; --cyan:#5ec8d8;
+      --sans:"Pretendard","Noto Sans KR",sans-serif; --mono:ui-monospace,Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);color:var(--text);line-height:1.65;background:var(--bg)}
+    .wrap{max-width:880px;margin:0 auto;padding:1.2rem 1.1rem 3rem}
+    .hero{background:#121820;border:1px solid var(--line);border-radius:14px;padding:1.15rem;margin-bottom:1rem}
+    h1{margin:0 0 .4rem;font-size:1.3rem}
+    .hero p{margin:0;color:var(--muted)}
+    .badge{display:inline-block;margin-top:.6rem;font-size:.72rem;font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid #2d5644;color:var(--green)}
+    section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:.85rem}
+    h2{margin:0 0 .55rem;font-size:1.05rem;color:var(--cyan)}
+    code{font-family:var(--mono);font-size:.84em;background:#0b1016;border:1px solid var(--line);border-radius:5px;padding:.05rem .3rem}
+    ul{margin:.3rem 0 .5rem;padding-left:1.2rem}
+    table{width:100%;border-collapse:collapse;font-size:.86rem}
+    th,td{border:1px solid var(--line);padding:.4rem .5rem;text-align:left;vertical-align:top}
+    th{background:#121820;color:var(--muted)}
+    .ok{color:var(--green)} .del{color:var(--red)} .keep{color:var(--amber)}
+    footer{text-align:center;color:#6c7a8b;font-size:.78rem;margin-top:1rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>작업 로그 — Phase D (Data)</h1>
+      <p>날짜: 2026-08-26 · 브랜치: <code>chore/assets-cleanup-unused</code><br />
+      D-1 인벤토리 + D-2 빈 폴더 삭제. CSV/Data 대규모 이동 없음.</p>
+      <span class="badge">D 완료</span>
+    </header>
+
+    <section>
+      <h2>1. D-1 검증 결과</h2>
+      <ul>
+        <li><code>BalancingSheetCatalog</code> CSV 경로 <strong class="ok">29개 + Sounds/Ingame = 30/30 OK</strong> (MISS 0)</li>
+        <li><code>SoundManager</code> 기본 경로 <code>Assets/Data/Sounds/Ingame</code> 존재</li>
+        <li>무기 CSV 실제 위치는 <code>Data/Objects/Weapons/</code> (Catalog와 일치)</li>
+        <li><code>Data/Balancing/Objects/Weapons/</code> 는 빈 중복 자리였음</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. D-2 삭제한 빈 폴더</h2>
+      <table>
+        <thead><tr><th>경로</th><th>왜 삭제</th></tr></thead>
+        <tbody>
+          <tr><td class="del"><code>Data/Balancing/Objects/Weapons/</code> (+ Cyborg/Hacker)</td><td>파일 0. 무기는 <code>Data/Objects/Weapons</code>에 있음. Catalog 미참조.</td></tr>
+          <tr><td class="del"><code>Data/Characters/Enemy/</code></td><td>파일 0. 코드/Catalog 미참조.</td></tr>
+          <tr><td class="del"><code>Data/Sounds/Lobby/</code></td><td>파일 0. SoundManager는 Ingame만 기본 사용.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. 유지한 Data 구조</h2>
+      <pre style="background:#0b1016;border:1px solid var(--line);border-radius:8px;padding:.8rem;overflow:auto;font-family:var(--mono);font-size:.8rem">Data/
+  Balancing/          CSV (캐릭터/적/스폰/맵)
+    Objects/Map Objects/Map 1/
+  Characters/Player/  CyborgData, HackerData
+  Objects/Weapons/    Cyborg·Hacker CSV+SO
+  Sounds/Ingame/      사운드 이벤트 SO
+  Traits/             JSON</pre>
+      <p class="keep">공백 폴더명(<code>Map Objects</code> 등) 리네임은 Phase F.</p>
+    </section>
+
+    <section>
+      <h2>4. 안 한 것</h2>
+      <ul>
+        <li>CSV 경로 이동 / Catalog 코드 수정</li>
+        <li>CharacterData ↔ Resources 정리 (E)</li>
+        <li>Packages / namespace (F)</li>
+      </ul>
+    </section>
+
+    <footer>docs/worklog-phase-d-data-2026-08-26.html</footer>
+  </div>
+</body>
+</html>

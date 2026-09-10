@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — Assets 폴더링 &amp; vFavorites 활용 공유</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --text: #e7ecf1;
+      --muted: #9aa7b5;
+      --accent: #3d9cf0;
+      --ok: #3ecf8e;
+      --warn: #e6b84d;
+      --line: #2a3542;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
+    h1 { font-size: 1.75rem; margin: 0 0 8px; }
+    h2 {
+      font-size: 1.2rem;
+      margin: 36px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      color: var(--accent);
+    }
+    h3 { font-size: 1.05rem; margin: 20px 0 8px; }
+    .meta { color: var(--muted); font-size: 0.92rem; margin-bottom: 28px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0;
+    }
+    ul, ol { padding-left: 1.25rem; }
+    li { margin: 6px 0; }
+    code, .path {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.88em;
+      background: #0b1015;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 10px 0 16px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #121820; color: var(--muted); font-weight: 600; }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      background: #243040;
+      color: var(--muted);
+    }
+    .tag.ok { background: #163528; color: var(--ok); }
+    .tag.warn { background: #3a3018; color: var(--warn); }
+    .note { color: var(--muted); font-size: 0.9rem; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>NeoSurvive — Assets 폴더링 &amp; vFavorites 활용</h1>
+    <p class="meta">
+      팀 공유용 요약 · 2026-08-26 · 브랜치 <span class="path">chore/assets-cleanup-unused</span>
+      · 관련 PR <a href="https://github.com/JLien0422/NeoSurvive/pull/12">#12</a>
+    </p>
+
+    <div class="card">
+      <span class="tag ok">목적</span>
+      팀원이 Assets 구조를 같은 기준으로 쓰고, Project 창에서 vFavorites / Folder Dock을 바로 쓰게 한다.
+    </div>
+
+    <h2>1. Assets 폴더링 결과 (현재 구조)</h2>
+    <p>도메인 단위로 정리했다. Unity 특수 폴더(<span class="path">Resources</span>, <span class="path">Plugins</span>) 이름은 바꾸지 않는다.</p>
+    <table>
+      <thead>
+        <tr><th>폴더</th><th>역할</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="path">Scripts</span></td><td>게임 로직</td><td>UI / Audio / Lobby 등 도메인 하위</td></tr>
+        <tr><td><span class="path">Prefabs</span></td><td>조립된 오브젝트</td><td>Hacking 등</td></tr>
+        <tr><td><span class="path">Data</span></td><td>밸런싱·스탯 데이터</td><td>CSV/시트 연동</td></tr>
+        <tr><td><span class="path">Art</span></td><td>애니·사운드·스프라이트 등</td><td>Resources에서 대량 이동(Phase E)</td></tr>
+        <tr><td><span class="path">Scenes</span></td><td>Lobby / Main</td><td>Build Settings도 이 둘만</td></tr>
+        <tr><td><span class="path">Resources</span></td><td>런타임 Load 전용</td><td>이름 변경 금지</td></tr>
+        <tr><td><span class="path">Plugins / TextMesh Pro / vFavorites …</span></td><td>벤더·툴</td><td>임의 rename 금지</td></tr>
+      </tbody>
+    </table>
+
+    <h3>진행한 단계 요약</h3>
+    <ul>
+      <li><strong>Phase A~C</strong> — 미사용 삭제, Scripts/Prefabs 이동, 작업 로그</li>
+      <li><strong>Phase D</strong> — Data 경로/카탈로그 정리 (<span class="path">docs/worklog-phase-d-data-2026-08-26.html</span>)</li>
+      <li><strong>Phase E</strong> — Animations/Sounds/Sprites 등 → <span class="path">Assets/Art/</span> (<span class="path">docs/worklog-phase-e-resources-art-2026-08-26.html</span>)</li>
+      <li><strong>Phase F</strong> — 빈 폴더·미사용 패키지·Archive 씬 삭제 (<span class="path">docs/worklog-phase-f-unused-delete-2026-08-26.html</span>)</li>
+    </ul>
+    <p class="note">숫자 prefix(<span class="path">01_Art</span> …)로 정렬하는 방식은 <strong>채택하지 않음</strong>. Unity 특수 폴더·벤더 폴더 rename 리스크가 커서 vFavorites로 대체.</p>
+
+    <h2>2. vFavorites 기본 사용법</h2>
+    <div class="card">
+      <ol>
+        <li>Project 창에 포커스</li>
+        <li><strong>Alt</strong> 길게 → 왼쪽(또는 오버레이)에 즐겨찾기</li>
+        <li>폴더/에셋/씬 오브젝트를 드래그해서 등록</li>
+        <li>페이지는 <strong>1~9</strong> / ◀▶ / 스크롤로 이동</li>
+        <li>데이터: <span class="path">Assets/vFavorites/vFavorites Data.asset</span> (커밋하면 팀 공유)</li>
+      </ol>
+      <p class="note">폴더 <strong>색</strong>은 vFavorites만으로는 불가 → 필요 시 vFolders 2.</p>
+    </div>
+
+    <h3>추천 즐겨찾기 순서 (중요도)</h3>
+    <ol>
+      <li>Scripts</li>
+      <li>Prefabs</li>
+      <li>Data</li>
+      <li>Scenes</li>
+      <li>Art</li>
+      <li>Resources</li>
+    </ol>
+
+    <h2>3. Folder Dock (Project 창 통합)</h2>
+    <p>별도 패널이 아니라 <strong>Project 창 하단</strong>에서 DefaultPage ↔ vFavorites Page를 넘긴다.</p>
+    <table>
+      <thead>
+        <tr><th>화면</th><th>내용</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>DefaultPage</strong></td>
+          <td>일반 Project 트리 (폴더 안 파일 탐색·스크롤 가능)</td>
+        </tr>
+        <tr>
+          <td><strong>Page 1…</strong></td>
+          <td>vFavorites에 등록한 즐겨찾기 목록</td>
+        </tr>
+        <tr>
+          <td><strong>고정 창</strong> 버튼</td>
+          <td>Page(vFavorites)에서만 표시. ON이면 Alt 없이도 하단 바/고정 유지</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Unity 시작 시 Pin이 켜져 있으면 Project 고정 시도</li>
+      <li>닫기(A): Pin 끄면 유지 안 함 → 나중에 Page에서 「고정 창」으로 다시 ON</li>
+      <li>메뉴 안내: <span class="path">Tools → NeoSurvive → Folder Dock</span></li>
+    </ul>
+
+    <h3>관련 코드 (로컬 / 미커밋일 수 있음)</h3>
+    <ul>
+      <li><span class="path">Assets/Scripts/Editor/FolderDock/</span></li>
+      <li><span class="path">Assets/vFavorites/FolderDockPinToggle.cs</span></li>
+      <li><span class="path">Assets/vFavorites/VFavorites.cs</span> (DefaultPage / Pin / 스크롤 패치)</li>
+    </ul>
+
+    <h2>4. 하지 말 것</h2>
+    <ul>
+      <li><span class="path">Resources</span> / <span class="path">Plugins</span> 폴더명 변경</li>
+      <li>탐색기에서 대량 폴더 이동 (Unity 에디터 안에서 이동)</li>
+      <li>벤더 폴더(TMP, ParrelSync, vFavorites 본체 등) 임의 rename</li>
+      <li>Library / Temp 등 Unity 잡음 커밋</li>
+    </ul>
+
+    <h2>5. 팀원 체크리스트</h2>
+    <div class="card">
+      <ul>
+        <li>[ ] <span class="path">chore/assets-cleanup-unused</span> 또는 머지된 master에서 최신 pull</li>
+        <li>[ ] Unity 리임포트 후 Compile Error 0</li>
+        <li>[ ] Lobby / Main 플레이 스모크</li>
+        <li>[ ] Project → DefaultPage에서 폴더 스크롤·파일 확인</li>
+        <li>[ ] ▶ Page 1 → 즐겨찾기·「고정 창」 토글 확인</li>
+        <li>[ ] (선택) vFavorites Data에 팀 공통 즐겨찾기 등록 후 커밋</li>
+      </ul>
+    </div>
+
+    <h2>6. 참고 문서</h2>
+    <ul>
+      <li><span class="path">docs/plan-phase-def-2026-08-14.html</span></li>
+      <li><span class="path">docs/worklog-assets-foldering-phase1-2026-08-14.html</span></li>
+      <li><span class="path">docs/worklog-phase-d-data-2026-08-26.html</span></li>
+      <li><span class="path">docs/worklog-phase-e-resources-art-2026-08-26.html</span></li>
+      <li><span class="path">docs/worklog-phase-f-unused-delete-2026-08-26.html</span></li>
+      <li>이 파일: <span class="path">docs/share-foldering-vfavorites-2026-08-26.html</span></li>
+    </ul>
+
+    <p class="note" style="margin-top:32px;">
+      작성: Cursor 작업 세션 정리 · 공유용 · 구현 세부/버그픽스는 이슈·PR 코멘트 참고
+    </p>
+  </div>
+</body>
+</html>

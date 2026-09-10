@@ -9,7 +9,7 @@ using System;
 /// 해킹 시스템 매니저
 /// - 패턴 발동 시 해킹오브젝트 생성
 /// - 미니게임 시작/종료 관리
-/// - 해커: 게임시간 정지 / 사이보그: 게임시간 유지
+/// - 해커/사이보그: 게임시간 유지 (실시간). 미니게임은 unscaledDeltaTime
 /// </summary>
 public class HackingSystem : MonoBehaviour
 {
@@ -212,13 +212,10 @@ public class HackingSystem : MonoBehaviour
         var player = FindObjectOfType<Player>();
         if (player == null) return;
 
-        // 5종 중 랜덤 선택
+        // 활성 미니게임 2종만 (NumberSequence / CommandBypass)
         GameObject[] prefabs = {
             securityTurretPrefab,
-            electricFencePrefab,
-            satelliteUplinkPrefab,
-            synapseServerPrefab,
-            magneticBeaconPrefab
+            electricFencePrefab
         };
 
         // null 제거 후 랜덤 선택
@@ -255,9 +252,10 @@ public class HackingSystem : MonoBehaviour
             if (hackingUIPanel != null)
                 hackingUIPanel.SetActive(true);
 
-            // 해커: 게임 시간 정지 후 미니게임 시작
-            pausedTimeForHacking = true;
-            Time.timeScale = 0f;
+            // 해커: 전투는 실시간 유지, 미니게임만 진행
+            // pausedTimeForHacking = true;
+            // Time.timeScale = 0f;
+            pausedTimeForHacking = false;
             StartMinigame(objectType, onSuccess, onFailure);
         }
         else
@@ -286,6 +284,9 @@ public class HackingSystem : MonoBehaviour
 
         System.Action wrappedSuccess = () => { EndHacking(); onSuccess?.Invoke(); };
         System.Action wrappedFailure = () => { EndHacking(); onFailure?.Invoke(); };
+
+        if (!ActiveHackMinigames.IsActive(objectType))
+            objectType = ActiveHackMinigames.GetRandom();
 
         switch (objectType)
         {
@@ -494,9 +495,9 @@ public class HackingSystem : MonoBehaviour
     {
         isHacking = false;
 
-        // 해커: 게임시간 재개 (사이보그는 시간이 멈추지 않았으므로 해커만 해제)
-        if (pausedTimeForHacking)
-            Time.timeScale = 1f;
+        // 해커도 해킹 중 시간을 멈추지 않음. 일시정지 메뉴 timeScale을 덮어쓰지 않는다.
+        // if (pausedTimeForHacking)
+        //     Time.timeScale = 1f;
 
         pausedTimeForHacking = false;
 

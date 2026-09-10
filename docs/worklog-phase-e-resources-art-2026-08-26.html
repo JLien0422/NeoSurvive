@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>작업 로그 — Phase E Resources→Art (2026-08-26)</title>
+  <style>
+    :root {
+      --bg:#0e1318; --panel:#161d26; --line:#2b3644; --text:#e8eef5;
+      --muted:#95a3b4; --green:#3ecf8e; --amber:#e6b84d; --cyan:#5ec8d8;
+      --sans:"Pretendard","Noto Sans KR",sans-serif; --mono:ui-monospace,Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);color:var(--text);line-height:1.65;background:var(--bg)}
+    .wrap{max-width:900px;margin:0 auto;padding:1.2rem 1.1rem 3rem}
+    .hero{background:#121820;border:1px solid var(--line);border-radius:14px;padding:1.15rem;margin-bottom:1rem}
+    h1{margin:0 0 .4rem;font-size:1.3rem}
+    .hero p{margin:0;color:var(--muted)}
+    .badge{display:inline-block;margin-top:.6rem;font-size:.72rem;font-weight:700;padding:.2rem .5rem;border-radius:999px;border:1px solid #2d5644;color:var(--green)}
+    section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:.85rem}
+    h2{margin:0 0 .55rem;font-size:1.05rem;color:var(--cyan)}
+    code{font-family:var(--mono);font-size:.84em;background:#0b1016;border:1px solid var(--line);border-radius:5px;padding:.05rem .3rem}
+    ul{margin:.3rem 0 .5rem;padding-left:1.2rem}
+    table{width:100%;border-collapse:collapse;font-size:.86rem}
+    th,td{border:1px solid var(--line);padding:.4rem .5rem;text-align:left;vertical-align:top}
+    th{background:#121820;color:var(--muted)}
+    .ok{color:var(--green)} .keep{color:var(--amber)}
+    footer{text-align:center;color:#6c7a8b;font-size:.78rem;margin-top:1rem}
+    pre{background:#0b1016;border:1px solid var(--line);border-radius:8px;padding:.8rem;overflow:auto;font-family:var(--mono);font-size:.8rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>작업 로그 — Phase E (Resources → Art)</h1>
+      <p>날짜: 2026-08-26 · 브랜치: <code>chore/assets-cleanup-unused</code><br />
+      Resources 통째 이동이 아님. <strong>Load에 필요한 것만 Resources에 남기고</strong> 나머지는 Art로 이동.</p>
+      <span class="badge">E-1·E-2 완료 (E-3 코드 리팩터 제외)</span>
+    </header>
+
+    <section>
+      <h2>1. E-1 Load 화이트리스트 (Resources에 유지)</h2>
+      <table>
+        <thead><tr><th>경로</th><th>사용처</th></tr></thead>
+        <tbody>
+          <tr><td><code>Fonts/</code> 전체</td><td>SettingsUI, DamageText, FontApplierTool</td></tr>
+          <tr><td><code>Sprites/UI/SPR_MENU UI.png</code></td><td>SettingsUI LoadAll</td></tr>
+          <tr><td><code>Dotween/</code></td><td>DOTween 연출 에셋 (안전 유지)</td></tr>
+          <tr><td><code>GameAnalytics/</code></td><td>GA Settings</td></tr>
+        </tbody>
+      </table>
+      <p class="keep">참고: <code>Characters/HackerData</code> Load는 Resources에 원본이 없음(Data에만 있음). 이번 이동과 무관·기존 결손.</p>
+      <p class="keep">참고: Maplestory 폰트도 Resources/Fonts에 없음(기존 결손).</p>
+    </section>
+
+    <section>
+      <h2>2. E-2 이동 (삭제 아님)</h2>
+      <table>
+        <thead><tr><th>이전</th><th>이후</th><th>대략 파일 수</th></tr></thead>
+        <tbody>
+          <tr><td>Resources/Animations</td><td>Art/Animations</td><td class="ok">332</td></tr>
+          <tr><td>Resources/Sounds</td><td>Art/Sounds</td><td class="ok">55</td></tr>
+          <tr><td>Resources/Materials</td><td>Art/Materials</td><td class="ok">2</td></tr>
+          <tr><td>Resources/Shader</td><td>Art/Shader</td><td class="ok">1</td></tr>
+          <tr><td>Resources/TileMap</td><td>Art/TileMap</td><td class="ok">11</td></tr>
+          <tr><td>Resources/Sprites/Characters·Objects·Shader·UI(대부분)</td><td>Art/Sprites/…</td><td class="ok">2729</td></tr>
+        </tbody>
+      </table>
+      <pre>Resources/          (남김)
+  Fonts/
+  Sprites/UI/SPR_MENU UI.png
+  Dotween/
+  GameAnalytics/
+
+Art/                (신규·이동 목적지)
+  Animations/
+  Sounds/
+  Materials/
+  Shader/
+  TileMap/
+  Sprites/</pre>
+    </section>
+
+    <section>
+      <h2>3. 안 한 것 (E-3 / 이후)</h2>
+      <ul>
+        <li>CharacterData·폰트를 SerializeField로 바꿔 Load 제거 (코드 수정)</li>
+        <li>Packages 제거 / 공백 폴더명 (Phase F)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. 스모크</h2>
+      <ul>
+        <li>Unity 리임포트 후 Compile Error 0</li>
+        <li>Lobby / Main — 애니·사운드·스프라이트 Missing 없는지</li>
+        <li>설정 UI 메뉴 스프라이트(SPR_MENU) 로드</li>
+      </ul>
+    </section>
+
+    <footer>docs/worklog-phase-e-resources-art-2026-08-26.html</footer>
+  </div>
+</body>
+</html>

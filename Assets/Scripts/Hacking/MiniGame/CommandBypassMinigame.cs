@@ -37,10 +37,12 @@ public class CommandBypassMinigame : HackingMinigameBase
     private int totalCorrectKeysPressed = 0;
 
     [Header("게임 설정")]
-    [SerializeField] private int totalKeysNeeded = 20;
-    [SerializeField] private float timeLimit = 15f;
+    [SerializeField] private int totalKeysNeeded = 5;
+    [SerializeField] private float timeLimit = 5f;
 
     private const int arrowsPerSequence = 5;
+    private const int ActiveKeysNeeded = 5;
+    private const float ActiveTimeLimit = 5f;
 
     private float remainingTime = 0f;
     private bool isActive = false;
@@ -114,6 +116,8 @@ public class CommandBypassMinigame : HackingMinigameBase
     {
         totalCorrectKeysPressed = 0;
         currentInputIndex = 0;
+        totalKeysNeeded = ActiveKeysNeeded;
+        timeLimit = ActiveTimeLimit;
         remainingTime = timeLimit;
         isActive = true;
 

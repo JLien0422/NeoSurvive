@@ -6,7 +6,7 @@ using TMPro;
 
 /// <summary>
 /// 넘버 시퀀스 미니게임
-/// 1~9 숫자를 키패드 레이아웃에서 순서대로 클릭합니다.
+/// 활성 버튼(기본 1~4)을 순서대로 클릭합니다.
 /// </summary>
 public class NumberSequenceMinigame : HackingMinigameBase
 {
@@ -18,10 +18,11 @@ public class NumberSequenceMinigame : HackingMinigameBase
     private Transform buttonParent; // 버튼들이 배치될 부모 (없으면 자동 생성)
 
     private List<GameObject> numberButtons = new List<GameObject>();
-    private int currentTargetNumber = 1; // 현재 찾아야 할 숫자 (1~9)
-    private const int MAX_NUMBER = 9;
+    private int currentTargetNumber = 1;
+    private const int MAX_NUMBER = 4;
+    private const float DefaultTimeLimit = 5f;
 
-    private float timeLimit = 15f; // 제한 시간 (초)
+    private float timeLimit = DefaultTimeLimit;
     private float remainingTime = 0f;
     private bool isActive = false;
 
@@ -67,7 +68,6 @@ public class NumberSequenceMinigame : HackingMinigameBase
         
         if (usePreMadeUI && preMadeBtnGrid != null)
         {
-            // 손으로 만든 버튼 9개 사용
             UsePreMadeButtons();
         }
         else
@@ -84,41 +84,52 @@ public class NumberSequenceMinigame : HackingMinigameBase
     }
 
     /// <summary>
-    /// 손으로 만든 버튼 9개를 사용 (BtnGrid의 자식 Button들)
-    /// 버튼 텍스트는 1~9로 이미 설정되어 있다고 가정. 위치만 랜덤으로 섞음.
+    /// 씬에서 켜 둔 버튼만 사용. 꺼 둔 5~9는 그대로 둔다.
     /// </summary>
     private void UsePreMadeButtons()
     {
         numberButtons.Clear();
-        var buttons = preMadeBtnGrid.GetComponentsInChildren<Button>(true);
-        if (buttons == null || buttons.Length < 9)
+        Button[] buttons = preMadeBtnGrid.GetComponentsInChildren<Button>(true);
+        if (buttons == null || buttons.Length == 0)
         {
-            Debug.LogError("[NumberSequenceMinigame] BtnGrid에 버튼이 9개 이상 없습니다. 자동 생성으로 대체합니다.");
+            Debug.LogError("[NumberSequenceMinigame] BtnGrid에 버튼이 없습니다. 자동 생성으로 대체합니다.");
             CreateNumberButtons();
             return;
         }
 
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < buttons.Length; i++)
         {
             Button btn = buttons[i];
+            if (btn == null || !btn.gameObject.activeSelf)
+                continue;
+
             GameObject btnObj = btn.gameObject;
             int num = GetNumberFromButton(btnObj);
-            if (num < 1 || num > 9) num = i + 1; // 파싱 실패 시 인덱스+1 사용
+            if (num < 1 || num > MAX_NUMBER)
+                continue;
 
+            int captured = num;
             btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => OnNumberClicked(num));
-            btnObj.name = "NumberButton_" + num;
+            btn.onClick.AddListener(() => OnNumberClicked(captured));
+            btnObj.name = "NumberButton_" + captured;
             numberButtons.Add(btnObj);
         }
 
-        // 버튼 위치만 랜덤으로 섞기 (자식 순서 섞기 → Grid Layout에서 위치 변경)
-        ShuffleSiblingOrder(preMadeBtnGrid);
+        if (numberButtons.Count < MAX_NUMBER)
+        {
+            Debug.LogError(
+                $"[NumberSequenceMinigame] 활성 숫자 버튼이 {numberButtons.Count}개입니다. {MAX_NUMBER}개 필요."
+            );
+            CreateNumberButtons();
+            return;
+        }
 
-        Debug.Log("[NumberSequenceMinigame] 손으로 만든 버튼 9개 적용 완료 (텍스트 유지, 위치만 셔플)");
+        ShuffleUsedButtons();
+        Debug.Log($"[NumberSequenceMinigame] 활성 버튼 {numberButtons.Count}개 적용 (1~{MAX_NUMBER})");
     }
 
     /// <summary>
-    /// 버튼 텍스트에서 숫자 파싱 (1~9)
+    /// 버튼 텍스트에서 숫자 파싱
     /// </summary>
     private int GetNumberFromButton(GameObject btnObj)
     {
@@ -130,13 +141,16 @@ public class NumberSequenceMinigame : HackingMinigameBase
     }
 
     /// <summary>
-    /// 자식 순서를 랜덤으로 섞기 (Grid Layout에서 위치가 바뀜)
+    /// 사용 중인 활성 버튼만 섞는다. 꺼 둔 버튼은 건드리지 않는다.
     /// </summary>
-    private void ShuffleSiblingOrder(Transform parent)
+    private void ShuffleUsedButtons()
     {
         var children = new List<Transform>();
-        for (int i = 0; i < parent.childCount; i++)
-            children.Add(parent.GetChild(i));
+        foreach (GameObject btn in numberButtons)
+        {
+            if (btn != null)
+                children.Add(btn.transform);
+        }
 
         for (int i = children.Count - 1; i > 0; i--)
         {
@@ -146,7 +160,7 @@ public class NumberSequenceMinigame : HackingMinigameBase
             children[j] = temp;
         }
 
-        foreach (var child in children)
+        foreach (Transform child in children)
             child.SetAsLastSibling();
     }
 
@@ -201,26 +215,24 @@ public class NumberSequenceMinigame : HackingMinigameBase
             return;
         }
 
-        // 키패드 레이아웃: 3x3 그리드
-        // 7 8 9
-        // 4 5 6
-        // 1 2 3
+        // 키패드 레이아웃: 2x2
+        // 1 2
+        // 3 4
 
-        int[] numberOrder = { 7, 8, 9, 4, 5, 6, 1, 2, 3 };
+        int[] numberOrder = { 1, 2, 3, 4 };
         float buttonSize = 80f;
         float spacing = 10f;
         
-        // 패널 중앙 기준으로 버튼 배치
-        float totalWidth = (buttonSize * 3) + (spacing * 2);
-        float totalHeight = (buttonSize * 3) + (spacing * 2);
+        float totalWidth = (buttonSize * 2) + spacing;
+        float totalHeight = (buttonSize * 2) + spacing;
         float startX = -totalWidth / 2f + buttonSize / 2f;
         float startY = totalHeight / 2f - buttonSize / 2f;
 
         for (int i = 0; i < numberOrder.Length; i++)
         {
             int number = numberOrder[i];
-            int row = i / 3;
-            int col = i % 3;
+            int row = i / 2;
+            int col = i % 2;
 
             // 버튼 생성
             GameObject buttonObj = new GameObject($"NumberButton_{number}");
@@ -302,10 +314,10 @@ public class NumberSequenceMinigame : HackingMinigameBase
         remainingTime = timeLimit;
         isActive = true;
 
-        // 모든 버튼 활성화
         foreach (var btn in numberButtons)
         {
-            btn.SetActive(true);
+            if (btn == null)
+                continue;
 
             Button buttonComp = btn.GetComponent<Button>();
             if (buttonComp != null)

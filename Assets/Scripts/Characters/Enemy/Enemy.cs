@@ -133,9 +133,9 @@ public class Enemy : Character
 
       maxHP.BaseValue = maxHp;
       currentHP.BaseValue = maxHp;
-      currentHP.CurrentValue = maxHp;
+      currentHP.CurrentValue = currentHP.GetValue();
 
-      Debug.Log($"[Enemy] CSV 체력 적용 완료 | maxHp={maxHp}");
+      Debug.Log($"[Enemy] CSV 체력 적용 완료 | maxHp={maxHp}, current={currentHP.CurrentValue}");
   }
 
   public void ApplyDropTableFromCSV(DropTableDB.Row row)

@@ -1,0 +1,1 @@
+dev/synergy 브랜치 생성 및 master 기준점 확인용 테스트 텍스트입니다.

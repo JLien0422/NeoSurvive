@@ -9,7 +9,7 @@ namespace NeoSurvive.Weapon
     [Header("Stats")]
     public float damage = 20f;
     public float range = 3.0f;
-    public float angle = 50f;
+    public float hitWidth = 0.8f;
     public float fireRate = 1.2f;
 
     [Header("Target Filter")]
@@ -36,7 +36,6 @@ namespace NeoSurvive.Weapon
     private float fireTimer;
 
     private float baseRange;
-    private float baseAngle;
     private float baseFireRate;
 
     private const string weaponId = "surgeblade";
@@ -48,7 +47,6 @@ namespace NeoSurvive.Weapon
     private void Start()
     {
       baseRange = range;
-      baseAngle = angle;
       baseFireRate = fireRate;
 
       ApplyLevel(1);
@@ -68,12 +66,11 @@ namespace NeoSurvive.Weapon
     public void OnLevelUp(int level)
     {
       if (baseRange <= 0f && range > 0f) baseRange = range;
-      if (baseAngle <= 0f && angle > 0f) baseAngle = angle;
       if (baseFireRate <= 0f && fireRate > 0f) baseFireRate = fireRate;
 
       ApplyLevel(level);
 
-      Debug.Log($"[SurgeBlade] Lv.{currentLevel} -> Dmg:{damage}, Range:{range}, MaxTargets:{currentMaxTargets}");
+      Debug.Log($"[SurgeBlade] Lv.{currentLevel} -> Dmg:{damage}, Range:{range}, Width:{hitWidth}, MaxTargets:{currentMaxTargets}");
     }
 
     private void ApplyLevel(int level)
@@ -83,7 +80,6 @@ namespace NeoSurvive.Weapon
       ApplyStatsFromCSV(currentLevel);
 
       range = baseRange * (1f + (currentLevel - 1) * rangePerLevel);
-      angle = baseAngle;
 
       if (currentLevel <= 1)
         currentMaxTargets = baseMaxTargets;
@@ -107,16 +103,17 @@ namespace NeoSurvive.Weapon
       if (levelDict.TryGetValue(1, out var baseRow))
       {
         if (baseRow.range > 0f) baseRange = baseRow.range;
-        if (baseRow.angle > 0f) baseAngle = baseRow.angle;
         if (baseRow.firerate > 0f) baseFireRate = baseRow.firerate;
         if (baseRow.rangeperlevel > 0f) rangePerLevel = baseRow.rangeperlevel;
         if (baseRow.basemaxtargets > 0) baseMaxTargets = baseRow.basemaxtargets;
         if (baseRow.maxtargetsatlv5 > 0) maxTargetsAtLv5 = baseRow.maxtargetsatlv5;
         if (baseRow.mastermultiplier > 0f) masterMultiplier = baseRow.mastermultiplier;
+        if (baseRow.width > 0f) hitWidth = baseRow.width;
       }
 
       if (row.damage > 0f) damage = row.damage;
       if (row.firerate > 0f) fireRate = row.firerate;
+      if (row.width > 0f) hitWidth = row.width;
     }
 
     private void Attack()
@@ -127,7 +124,6 @@ namespace NeoSurvive.Weapon
         InGameSoundManager.Instance.PlaySurgeBladeFire();
 
       float useRange = range;
-      float useAngle = angle;
       float useDamage = damage;
 
       bool empowered = false;
@@ -136,25 +132,34 @@ namespace NeoSurvive.Weapon
       {
         empowered = true;
         useRange *= masterMultiplier;
-        useAngle *= masterMultiplier;
         useDamage *= masterMultiplier;
       }
 
       Transform target = FindClosestTarget(useRange * 1.5f);
 
+      Vector3 origin = transform.position;
       Vector3 forward = transform.parent != null ? transform.parent.right : transform.right;
 
       if (target != null)
-        forward = (target.position - transform.position).normalized;
+        forward = (target.position - origin).normalized;
+
+      BuildThrustBox(origin, forward, useRange, out Vector2 boxCenter, out Vector2 boxSize, out float boxAngleZ);
 
       if (debugDraw)
-      {
-        Debug.DrawRay(transform.position, forward * useRange, empowered ? Color.yellow : Color.cyan, 0.2f);
-        Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, useAngle * 0.5f) * forward * useRange, Color.magenta, 0.2f);
-        Debug.DrawRay(transform.position, Quaternion.Euler(0, 0, -useAngle * 0.5f) * forward * useRange, Color.magenta, 0.2f);
-      }
+        DrawDebugBox(boxCenter, boxSize, boxAngleZ, empowered ? Color.yellow : Color.cyan, 0.2f);
 
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, useRange);
+      Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, boxAngleZ);
+
+      System.Array.Sort(hits, (a, b) =>
+      {
+        if (a == null && b == null) return 0;
+        if (a == null) return 1;
+        if (b == null) return -1;
+
+        float da = ((Vector2)a.transform.position - (Vector2)origin).sqrMagnitude;
+        float db = ((Vector2)b.transform.position - (Vector2)origin).sqrMagnitude;
+        return da.CompareTo(db);
+      });
 
       int damaged = 0;
       HashSet<int> processedIds = new HashSet<int>();
@@ -180,11 +185,6 @@ namespace NeoSurvive.Weapon
 
         // Enemy도 아니고 IDamageable도 아니면 무시
         if (!isEnemy && damageable == null)
-          continue;
-
-        Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
-
-        if (Vector3.Angle(forward, dirToTarget) > useAngle * 0.5f)
           continue;
 
         if (isEnemy)
@@ -236,6 +236,39 @@ namespace NeoSurvive.Weapon
       }
 
       SpawnSurgeEffect(forward, empowered);
+    }
+
+    private void BuildThrustBox(
+      Vector3 origin,
+      Vector3 forward,
+      float useRange,
+      out Vector2 center,
+      out Vector2 size,
+      out float angleZ)
+    {
+      Vector2 dir = forward;
+      center = (Vector2)origin + dir * (useRange * 0.5f);
+      size = new Vector2(useRange, hitWidth);
+      angleZ = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+    }
+
+    private static void DrawDebugBox(Vector2 center, Vector2 size, float angleZ, Color color, float duration)
+    {
+      float rad = angleZ * Mathf.Deg2Rad;
+      Vector2 right = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+      Vector2 up = new Vector2(-right.y, right.x);
+      Vector2 hx = right * (size.x * 0.5f);
+      Vector2 hy = up * (size.y * 0.5f);
+
+      Vector2 c0 = center - hx - hy;
+      Vector2 c1 = center + hx - hy;
+      Vector2 c2 = center + hx + hy;
+      Vector2 c3 = center - hx + hy;
+
+      Debug.DrawLine(c0, c1, color, duration);
+      Debug.DrawLine(c1, c2, color, duration);
+      Debug.DrawLine(c2, c3, color, duration);
+      Debug.DrawLine(c3, c0, color, duration);
     }
 
     private bool IsEnemyCollider(Collider2D col)
@@ -318,8 +351,15 @@ namespace NeoSurvive.Weapon
 
     private void OnDrawGizmosSelected()
     {
+      Vector3 origin = transform.position;
+      Vector3 forward = transform.parent != null ? transform.parent.right : transform.right;
+      BuildThrustBox(origin, forward, range, out Vector2 center, out Vector2 size, out float angleZ);
+
       Gizmos.color = Color.yellow;
-      Gizmos.DrawWireSphere(transform.position, range);
+      Matrix4x4 old = Gizmos.matrix;
+      Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.Euler(0f, 0f, angleZ), Vector3.one);
+      Gizmos.DrawWireCube(Vector3.zero, new Vector3(size.x, size.y, 0.1f));
+      Gizmos.matrix = old;
     }
   }
 }

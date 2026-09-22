@@ -1015,31 +1015,6 @@ namespace VFavorites
                 GUI.EndGroup();
 
             }
-            void doVFavoritesGUIFirst_()
-            {
-                keys();
-                pageScroll();
-
-                GUI.BeginGroup(totalRect_browserSpace);
-
-                if (!FolderDockPinToggle.IsOnDefaultPage)
-                {
-                    pages();
-                }
-
-                widget();
-                FolderDockPinToggle.Draw(totalRect_groupSpace, currentOpacity);
-
-                GUI.EndGroup();
-
-                // DefaultPage에서는 원본 Project 입력을 막지 않는다.
-                if (!FolderDockPinToggle.IsOnDefaultPage && totalRect_browserSpace.IsHovered())
-                    if (curEvent.isMouseUp || curEvent.isMouseDrag || curEvent.isScroll)
-                        curEvent.Use();
-
-                originalBrowserGUI();
-
-            }
 
             void originalBrowserGUI()
             {
@@ -1073,21 +1048,15 @@ namespace VFavorites
             UpdateMouseState();
             UpdateDragging();
 
-
-            var doOriginalGUIFirst = VFavoritesMenu.pageScrollEnabled ? curEvent.isRepaint || curEvent.isLayout
-                                                                      : curEvent.isRepaint;
-
-            if (renamingPage)
-                doOriginalGUIFirst = !curEvent.isMouseDown && !curEvent.isMouseUp;
+            keys();
+            pageScroll();
 
             if (renamingPage && curEvent.isMouseDown)
                 curEvent.Use();
 
-
-            if (doOriginalGUIFirst)
-                doOriginalGUIFirst_();
-            else
-                doVFavoritesGUIFirst_();
+            // 모든 이벤트에서 원본 Project GUI를 먼저 그린다.
+            // 검색창 Layout/MouseDown/Repaint 컨트롤 ID를 맞추고, 오버레이는 그 위에 그린다.
+            doOriginalGUIFirst_();
 
 
             if (isWrappedBrowserLocked)

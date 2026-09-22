@@ -86,8 +86,8 @@ public static class CyborgWeaponChoiceDescriptionBuilder
 
             case "surgeblade":
                 return levelText +
-                    $"강력한 한 방으로 전방 적을 타격합니다.\n" +
-                    $"피해 {F(row.damage)}, 사거리 {F(row.range)}, 각도 {F(row.angle)}도, 동시 타격 {GetSurgeBladeMaxTargets(targetLevel, row)}명, 공격주기 {F(row.firerate)}초";
+                    $"강력한 한 방으로 전방 적을 찌릅니다.\n" +
+                    $"피해 {F(row.damage)}, 사거리 {F(row.range)}, 동시 타격 {GetSurgeBladeMaxTargets(targetLevel, row)}명, 공격주기 {F(row.firerate)}초";
 
             case "energyshield":
                 return levelText +
@@ -143,7 +143,7 @@ public static class CyborgWeaponChoiceDescriptionBuilder
                 return $"5레벨 달성 효과:\n베어간 궤적에 공간 균열이 남아 잔상 피해를 줍니다.\n지속 {F(row.riftduration)}초, 반경 {F(row.riftradius)}, 틱 {F(row.rifttick)}초, 피해계수 {F(row.riftdamagefactor)}";
 
             case "surgeblade":
-                return $"5레벨 달성 효과:\n2회 공격마다 사거리와 범위, 피해가 {F(row.mastermultiplier)}배로 강화됩니다.\n최대 동시 타격 {row.maxtargetsatlv5}명";
+                return $"5레벨 달성 효과:\n2회 공격마다 사거리와 피해가 {F(row.mastermultiplier)}배로 강화됩니다.\n최대 동시 타격 {row.maxtargetsatlv5}명";
 
             case "energyshield":
                 return $"5레벨 달성 효과:\n방패 접촉 피해가 {F(row.masterdamagefactor)}배로 강화됩니다.\n방패 {row.maxorbcount}개까지 확장";

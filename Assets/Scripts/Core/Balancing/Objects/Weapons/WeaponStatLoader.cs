@@ -91,7 +91,7 @@ public class WeaponStatLoader : MonoBehaviour
             SimpleCsv.TryGetFloat(r, "rangeperlevel", out row.rangeperlevel);
             SimpleCsv.TryGetFloat(r, "fireratemulperlevel", out row.fireratemulperlevel);
 
-            // SurgeBlade 전용 스탯
+            // SurgeBlade 전용 스탯 (판정 폭은 공통 width 컬럼)
             if (SimpleCsv.TryGetFloat(r, "basemaxtargets", out float baseTargets))
                 row.basemaxtargets = Mathf.RoundToInt(baseTargets);
 

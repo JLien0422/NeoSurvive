@@ -1074,8 +1074,9 @@ namespace VFavorites
             UpdateDragging();
 
 
-            var doOriginalGUIFirst = VFavoritesMenu.pageScrollEnabled ? curEvent.isRepaint || curEvent.isLayout
-                                                                      : curEvent.isRepaint;
+            // Layout과 MouseDown은 같은 그리기 순서여야 검색창 컨트롤 ID가 맞는다.
+            // Repaint만 원본 먼저 → 그 위에 오버레이. 입력/Layout은 오버레이 먼저.
+            var doOriginalGUIFirst = curEvent.isRepaint;
 
             if (renamingPage)
                 doOriginalGUIFirst = !curEvent.isMouseDown && !curEvent.isMouseUp;

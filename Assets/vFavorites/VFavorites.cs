@@ -469,16 +469,6 @@ namespace VFavorites
 
                         }
 
-                        void normalRow(int i)
-                        {
-                            Space(page.rowGaps[i]);
-                            Space(rowHeight);
-
-                            if (page.items[i] == droppedItem && animatingDroppedItem && page == data.curPage) return;
-
-                            row(lastRect.y, page.items[i]);
-
-                        }
                         void draggedRow()
                         {
                             if (!draggingItem) return;
@@ -504,22 +494,29 @@ namespace VFavorites
                         if (curEvent.holdingShift && curEvent.isScroll)
                             curEvent.e.delta = new Vector2(0, curEvent.e.delta.x + curEvent.e.delta.y);
 
+                        // GUILayout을 쓰면 MouseDown에서 Project 검색창 GetRect가 밀린다.
+                        // 오버레이는 GUI만 써서 검색/툴바 레이아웃과 순서를 분리한다.
+                        var contentHeight = 60f + page.items.Count * rowHeight;
+                        for (int i = 0; i < page.rowGaps.Count; i++)
+                            contentHeight += page.rowGaps[i];
 
-                        GUILayout.BeginArea(pageRect);
-                        page.scrollPos = EditorGUILayout.BeginScrollView(new Vector2(0, page.scrollPos), GUIStyle.none, GUIStyle.none).y;
+                        var viewRect = new Rect(0, 0, pageRect.width, Mathf.Max(pageRect.height, contentHeight));
+                        var scroll = GUI.BeginScrollView(pageRect, new Vector2(0, page.scrollPos), viewRect, false, false, GUIStyle.none, GUIStyle.none);
+                        page.scrollPos = scroll.y;
 
+                        var y = 0f;
                         for (int i = 0; i < page.items.Count; i++)
-                            normalRow(i);
-
-                        Space(page.rowGaps.Last());
-
-                        Space(60);
+                        {
+                            y += page.rowGaps[i];
+                            if (!(page.items[i] == droppedItem && animatingDroppedItem && page == data.curPage))
+                                row(y, page.items[i]);
+                            y += rowHeight;
+                        }
 
                         draggedRow();
                         droppedRow();
 
-                        EditorGUILayout.EndScrollView();
-                        GUILayout.EndArea();
+                        GUI.EndScrollView();
 
 
                     }
@@ -1901,11 +1898,13 @@ namespace VFavorites
 
                 if (!lockedBrowser) return;
                 if (lockedBrowser.GetFieldValue<int>("m_ViewMode") != 0) return; // one column)
-                if (lockedBrowser.titleContent.text == "vFavorites") return;
+                if (lockedBrowser.titleContent.text == "vFavorites"
+                    && lockedBrowser.titleContent.tooltip == lockedBrowserTooltip)
+                    return;
 
                 var icon = EditorIcons.GetIcon("Favorite");
 
-                lockedBrowser.titleContent = new GUIContent("vFavorites", icon);
+                lockedBrowser.titleContent = new GUIContent("vFavorites", icon, lockedBrowserTooltip);
 
             }
 
@@ -2096,9 +2095,39 @@ namespace VFavorites
         }
         static EditorWindow _lockedBrowser;
 
-        static bool IsMarkedAsLocked(EditorWindow browser) => browser.GetMemberValue("m_SearchFilter")?.GetMemberValue<string>("m_OriginalText") == "asd";
-        static void MarkAsLocked(EditorWindow browser) => browser.GetMemberValue("m_SearchFilter")?.SetMemberValue("m_OriginalText", "asd");
-        static void MarkAsUnlocked(EditorWindow browser) => browser.GetMemberValue("m_SearchFilter")?.SetMemberValue("m_OriginalText", "");
+        const string lockedBrowserTooltip = "vFavorites-locked";
+        const string legacySearchLockMarker = "asd";
+
+        static bool IsMarkedAsLocked(EditorWindow browser) =>
+            browser && browser.titleContent != null && browser.titleContent.tooltip == lockedBrowserTooltip;
+
+        static void MarkAsLocked(EditorWindow browser)
+        {
+            if (!browser) return;
+            ClearLegacySearchLockMarker(browser);
+
+            var content = browser.titleContent ?? new GUIContent();
+            if (content.tooltip == lockedBrowserTooltip) return;
+            browser.titleContent = new GUIContent(content.text, content.image, lockedBrowserTooltip);
+        }
+
+        static void MarkAsUnlocked(EditorWindow browser)
+        {
+            if (!browser) return;
+            ClearLegacySearchLockMarker(browser);
+
+            var content = browser.titleContent;
+            if (content == null || content.tooltip != lockedBrowserTooltip) return;
+            browser.titleContent = new GUIContent(content.text, content.image, "");
+        }
+
+        static void ClearLegacySearchLockMarker(EditorWindow browser)
+        {
+            var filter = browser.GetMemberValue("m_SearchFilter");
+            if (filter == null) return;
+            if (filter.GetMemberValue<string>("m_OriginalText") != legacySearchLockMarker) return;
+            filter.SetMemberValue("m_OriginalText", "");
+        }
 
         static bool isWrappedBrowserLocked => wrappedBrowser && wrappedBrowser == lockedBrowser;
 

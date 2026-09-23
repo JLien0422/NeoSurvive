@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NeoSurvive.Weapon
@@ -23,5 +24,8 @@ namespace NeoSurvive.Weapon
         public GameObject weaponPrefab;
         public int level = 1;
         public bool isIndependent = false; // true면 플레이어 자식이 아닌 독립적인 오브젝트로 생성
+
+        [Header("Synergy")]
+        public List<SynergyTag> synergyTags = new List<SynergyTag>();
     }
 }

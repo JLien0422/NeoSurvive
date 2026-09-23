@@ -48,7 +48,36 @@ namespace NeoSurvive.Weapon
     private void Awake()
     {
       Instance = this;
+      if (GetComponent<HackerSynergyHud>() == null)
+      {
+        gameObject.AddComponent<HackerSynergyHud>();
+      }
       EquipStartWeapon();
+    }
+
+    public int GetSynergyStack(SynergyTag tag)
+    {
+      return CountTag(activeWeapons, tag);
+    }
+
+    public int GetSynergyMaximumStack(SynergyTag tag)
+    {
+      return CountTag(allWeaponDatas, tag);
+    }
+
+    private static int CountTag(List<WeaponBase> weapons, SynergyTag tag)
+    {
+      if (weapons == null)
+        return 0;
+
+      int count = 0;
+      foreach (WeaponBase weapon in weapons)
+      {
+        if (weapon != null && weapon.synergyTags != null && weapon.synergyTags.Contains(tag))
+          count++;
+      }
+
+      return count;
     }
 
     private void OnDestroy()

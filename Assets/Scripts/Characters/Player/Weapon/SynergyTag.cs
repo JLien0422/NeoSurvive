@@ -6,6 +6,11 @@ namespace NeoSurvive.Weapon
         Area,
         Disruption,
         Amplification,
-        Deployment
+        Deployment,
+        Melee,
+        Ranged,
+        Physical,
+        Energy,
+        ForceField
     }
 }

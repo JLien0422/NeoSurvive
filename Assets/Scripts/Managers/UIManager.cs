@@ -36,6 +36,18 @@ public class UIManager : MonoBehaviour
   public Slider playerHealthSlider;
   public TextMeshProUGUI playerHealthText;
 
+  [Header("Player Health State Colors")]
+  [SerializeField] private Color healthyHealthColor = new Color(0.08f, 0.92f, 1f, 1f);
+  [SerializeField] private Color cautionHealthColor = new Color(1f, 0.86f, 0.16f, 1f);
+  [SerializeField] private Color dangerHealthColor = new Color(1f, 0.46f, 0.08f, 1f);
+  [SerializeField] private Color criticalHealthColor = new Color(1f, 0.08f, 0.18f, 1f);
+  [SerializeField, Min(0f)] private float criticalPulseSpeed = 4.5f;
+  [SerializeField, Range(0f, 0.5f)] private float criticalPulseStrength = 0.18f;
+
+  private Image playerHealthFillImage;
+  private PlayerHealthVisualState playerHealthVisualState = PlayerHealthVisualState.Healthy;
+  private Color playerHealthStateColor = Color.white;
+
   public GameManager gameManager;
 
   [Header("Gold UI")]
@@ -112,6 +124,7 @@ public class UIManager : MonoBehaviour
 #endif
 
     UpdateExpSliderAnimation();
+    UpdateCriticalHealthPulse();
   }
 
   private void OnDestroy()
@@ -501,16 +514,54 @@ public class UIManager : MonoBehaviour
   private void UpdatePlayerHealthUI(float current, float max)
   {
     Debug.Log("[UIManager] UpdatePlayerHealthUI called: " + current + " / " + max);
+    float safeMax = Mathf.Max(1f, max);
+    float healthRatio = Mathf.Clamp01(current / safeMax);
+    playerHealthVisualState = PlayerHealthVisualStateUtility.Evaluate(current, safeMax);
+    playerHealthStateColor = GetHealthStateColor(playerHealthVisualState);
+
     if (playerHealthSlider != null)
     {
-      playerHealthSlider.maxValue = max;
+      playerHealthSlider.maxValue = safeMax;
       playerHealthSlider.value = current;
+
+      if (playerHealthFillImage == null && playerHealthSlider.fillRect != null)
+        playerHealthFillImage = playerHealthSlider.fillRect.GetComponent<Image>();
+
+      if (playerHealthFillImage != null)
+        playerHealthFillImage.color = playerHealthStateColor;
     }
 
     if (playerHealthText != null)
     {
-      playerHealthText.text = $"{current:F0} / {max:F0}";
+      playerHealthText.text = $"{current:F0} / {safeMax:F0}  ({healthRatio * 100f:F0}%)";
+      playerHealthText.color = playerHealthStateColor;
     }
+  }
+
+  private Color GetHealthStateColor(PlayerHealthVisualState state)
+  {
+    switch (state)
+    {
+      case PlayerHealthVisualState.Caution: return cautionHealthColor;
+      case PlayerHealthVisualState.Danger: return dangerHealthColor;
+      case PlayerHealthVisualState.Critical: return criticalHealthColor;
+      default: return healthyHealthColor;
+    }
+  }
+
+  private void UpdateCriticalHealthPulse()
+  {
+    if (playerHealthVisualState != PlayerHealthVisualState.Critical)
+      return;
+
+    float pulse = (Mathf.Sin(Time.unscaledTime * criticalPulseSpeed) + 1f) * 0.5f;
+    Color pulseColor = Color.Lerp(playerHealthStateColor, Color.white, pulse * criticalPulseStrength);
+
+    if (playerHealthFillImage != null)
+      playerHealthFillImage.color = pulseColor;
+
+    if (playerHealthText != null)
+      playerHealthText.color = pulseColor;
   }
 
   // =========================

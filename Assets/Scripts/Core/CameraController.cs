@@ -26,6 +26,7 @@ public class CameraController : MonoBehaviour
 
   private float shakeTimer = 0f;
   private bool isShaking = false;
+  private float activeShakeMagnitude;
 
   private void Awake()
   {
@@ -91,8 +92,8 @@ public class CameraController : MonoBehaviour
     if (duration < 0) duration = shakeDuration;
     if (magnitude < 0) magnitude = shakeMagnitude;
 
-    shakeTimer = duration;
-    shakeMagnitude = magnitude;
+    shakeTimer = Mathf.Max(shakeTimer, duration);
+    activeShakeMagnitude = Mathf.Max(activeShakeMagnitude, magnitude);
     isShaking = true;
   }
 
@@ -127,13 +128,14 @@ public class CameraController : MonoBehaviour
       if (shakeTimer > 0)
       {
         // 랜덤 오프셋 추가
-        Vector3 shakeOffset = Random.insideUnitCircle * shakeMagnitude;
+        Vector3 shakeOffset = Random.insideUnitCircle * activeShakeMagnitude;
         transform.position = targetPosition + shakeOffset;
       }
       else
       {
         // 흔들림 종료
         isShaking = false;
+        activeShakeMagnitude = 0f;
         transform.position = targetPosition;
       }
     }

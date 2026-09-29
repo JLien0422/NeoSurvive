@@ -438,10 +438,10 @@ public class WeaponChoiceController : MonoBehaviour
 
         int targetLevel = GetTargetLevelAfterPick(weaponManager, weapon);
         if (HackerWeaponChoiceDescriptionBuilder.TryBuild(weapon, targetLevel, out string dynamicDescription))
-            return AppendSynergyStack(weaponManager, weapon, dynamicDescription);
+            return dynamicDescription;
 
         if (CyborgWeaponChoiceDescriptionBuilder.TryBuild(weapon, targetLevel, out dynamicDescription))
-            return AppendSynergyStack(weaponManager, weapon, dynamicDescription);
+            return dynamicDescription;
 
         if (weapon.description == null)
         {
@@ -449,30 +449,7 @@ public class WeaponChoiceController : MonoBehaviour
             return string.Empty;
         }
 
-        return AppendSynergyStack(weaponManager, weapon, weapon.description);
-    }
-
-    private string AppendSynergyStack(WeaponManager weaponManager, WeaponBase weapon, string description)
-    {
-        if (weaponManager == null || weapon == null || weapon.synergyTags == null || weapon.synergyTags.Count == 0)
-            return description;
-
-        bool isNewWeapon = IsNewWeapon(weaponManager, weapon);
-        List<string> stackTexts = new List<string>();
-
-        foreach (SynergyTag tag in weapon.synergyTags)
-        {
-            int current = weaponManager.GetSynergyStack(tag);
-            int maximum = weaponManager.GetSynergyMaximumStack(tag);
-            int afterPick = Mathf.Min(maximum, current + (isNewWeapon ? 1 : 0));
-            string active = maximum > 0 && afterPick >= maximum ? " 활성" : string.Empty;
-            string stackText = $"{HackerSynergyHud.GetDisplayName(tag)} {afterPick}/{maximum}{active}";
-
-            if (!stackTexts.Contains(stackText))
-                stackTexts.Add(stackText);
-        }
-
-        return $"{description}\n\n시너지 스택: {string.Join(", ", stackTexts)}";
+        return weapon.description;
     }
 
     /// <summary>

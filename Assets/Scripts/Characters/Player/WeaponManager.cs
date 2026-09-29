@@ -65,6 +65,24 @@ namespace NeoSurvive.Weapon
       return CountTag(allWeaponDatas, tag);
     }
 
+    public bool IsSynergyComplete(SynergyTag tag)
+    {
+      int maximum = GetSynergyMaximumStack(tag);
+      return maximum > 0 && GetSynergyStack(tag) >= maximum;
+    }
+
+    public int GetSynergyStackAfterAdding(SynergyTag tag, WeaponBase candidate)
+    {
+      int current = GetSynergyStack(tag);
+      if (candidate == null || activeWeapons.Contains(candidate) ||
+          candidate.synergyTags == null || !candidate.synergyTags.Contains(tag))
+      {
+        return current;
+      }
+
+      return Mathf.Min(GetSynergyMaximumStack(tag), current + 1);
+    }
+
     private static int CountTag(List<WeaponBase> weapons, SynergyTag tag)
     {
       if (weapons == null)

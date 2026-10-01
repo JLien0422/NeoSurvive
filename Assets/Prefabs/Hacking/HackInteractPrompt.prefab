@@ -220,7 +220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4749303656023528247}
   m_Layer: 0
-  m_Name: 'HackInteractPrompt '
+  m_Name: HackInteractPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

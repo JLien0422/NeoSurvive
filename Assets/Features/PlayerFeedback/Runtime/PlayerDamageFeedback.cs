@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Player-only hit feedback. Screen shake is reinforced by a short red edge
-/// flash and a body tint, making the cause of the shake immediately readable.
+/// Player-only hit feedback. Screen shake is reinforced only through the
+/// camera-space edge overlay so character sprites and shadows stay untouched.
 /// </summary>
 public static class PlayerDamageFeedback
 {
@@ -13,10 +13,6 @@ public static class PlayerDamageFeedback
     if (target == null) return;
 
     PlayerDamageOverlay.Show(state, damageRatio);
-    PlayerDamageTint tint = target.GetComponent<PlayerDamageTint>();
-    if (tint == null)
-      tint = target.gameObject.AddComponent<PlayerDamageTint>();
-    tint.Play(state);
   }
 }
 
@@ -30,11 +26,20 @@ public sealed class PlayerDamageOverlay : MonoBehaviour
   private Texture2D edgeTexture;
   private Sprite edgeSprite;
   private Coroutine flashRoutine;
+  private PlayerHealthVisualState healthState;
+  private float flashAlpha;
 
   public static void Show(PlayerHealthVisualState state, float damageRatio)
   {
     EnsureInstance();
+    instance.healthState = state;
     instance.PlayFlash(state, damageRatio);
+  }
+
+  public static void SetHealthState(PlayerHealthVisualState state)
+  {
+    EnsureInstance();
+    instance.healthState = state;
   }
 
   private static void EnsureInstance()
@@ -75,6 +80,41 @@ public sealed class PlayerDamageOverlay : MonoBehaviour
     CreateEdgeVisual();
   }
 
+  private void Update()
+  {
+    if (canvasGroup == null) return;
+
+    float minimum;
+    float amplitude;
+    float speed;
+    switch (healthState)
+    {
+      case PlayerHealthVisualState.Caution:
+        minimum = 0.025f;
+        amplitude = 0.055f;
+        speed = 1.6f;
+        break;
+      case PlayerHealthVisualState.Danger:
+        minimum = 0.055f;
+        amplitude = 0.105f;
+        speed = 2.1f;
+        break;
+      case PlayerHealthVisualState.Critical:
+        minimum = 0.10f;
+        amplitude = 0.18f;
+        speed = 2.8f;
+        break;
+      default:
+        minimum = 0f;
+        amplitude = 0f;
+        speed = 1f;
+        break;
+    }
+
+    float wave = (Mathf.Sin(Time.unscaledTime * speed * Mathf.PI * 2f) + 1f) * 0.5f;
+    canvasGroup.alpha = Mathf.Max(flashAlpha, minimum + amplitude * wave);
+  }
+
   private void CreateEdgeVisual()
   {
     edgeTexture = CreateEdgeTexture(128);
@@ -111,7 +151,7 @@ public sealed class PlayerDamageOverlay : MonoBehaviour
     float holdDuration = state == PlayerHealthVisualState.Critical ? 0.055f : 0.035f;
     float fadeDuration = state == PlayerHealthVisualState.Critical ? 0.28f : 0.2f;
 
-    canvasGroup.alpha = peakAlpha;
+    flashAlpha = peakAlpha;
     yield return new WaitForSecondsRealtime(holdDuration);
 
     float elapsed = 0f;
@@ -119,11 +159,11 @@ public sealed class PlayerDamageOverlay : MonoBehaviour
     {
       elapsed += Time.unscaledDeltaTime;
       float t = Mathf.Clamp01(elapsed / fadeDuration);
-      canvasGroup.alpha = Mathf.Lerp(peakAlpha, 0f, t * t);
+      flashAlpha = Mathf.Lerp(peakAlpha, 0f, t * t);
       yield return null;
     }
 
-    canvasGroup.alpha = 0f;
+    flashAlpha = 0f;
     flashRoutine = null;
   }
 
@@ -155,64 +195,5 @@ public sealed class PlayerDamageOverlay : MonoBehaviour
     if (instance == this) instance = null;
     if (edgeSprite != null) Destroy(edgeSprite);
     if (edgeTexture != null) Destroy(edgeTexture);
-  }
-}
-
-[DisallowMultipleComponent]
-public sealed class PlayerDamageTint : MonoBehaviour
-{
-  private SpriteRenderer[] renderers;
-  private Color[] originalColors;
-  private Coroutine tintRoutine;
-
-  public void Play(PlayerHealthVisualState state)
-  {
-    CacheRenderers();
-    if (tintRoutine != null)
-    {
-      StopCoroutine(tintRoutine);
-      RestoreColors();
-    }
-    tintRoutine = StartCoroutine(TintRoutine(state));
-  }
-
-  private void CacheRenderers()
-  {
-    if (renderers == null || renderers.Length == 0)
-      renderers = GetComponentsInChildren<SpriteRenderer>(true);
-    if (originalColors == null || originalColors.Length != renderers.Length)
-      originalColors = new Color[renderers.Length];
-    for (int i = 0; i < renderers.Length; i++)
-      if (renderers[i] != null)
-        originalColors[i] = renderers[i].color;
-  }
-
-  private IEnumerator TintRoutine(PlayerHealthVisualState state)
-  {
-    Color hitColor = state == PlayerHealthVisualState.Critical
-      ? new Color(1f, 0.12f, 0.08f, 1f)
-      : new Color(1f, 0.42f, 0.36f, 1f);
-    for (int i = 0; i < renderers.Length; i++)
-      if (renderers[i] != null)
-        renderers[i].color = hitColor;
-
-    yield return new WaitForSecondsRealtime(0.065f);
-    RestoreColors();
-    tintRoutine = null;
-  }
-
-  private void RestoreColors()
-  {
-    if (renderers == null || originalColors == null) return;
-    for (int i = 0; i < renderers.Length; i++)
-      if (renderers[i] != null)
-        renderers[i].color = originalColors[i];
-  }
-
-  private void OnDisable()
-  {
-    if (tintRoutine != null) StopCoroutine(tintRoutine);
-    tintRoutine = null;
-    RestoreColors();
   }
 }

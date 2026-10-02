@@ -518,6 +518,7 @@ public class UIManager : MonoBehaviour
     float healthRatio = Mathf.Clamp01(current / safeMax);
     playerHealthVisualState = PlayerHealthVisualStateUtility.Evaluate(current, safeMax);
     playerHealthStateColor = GetHealthStateColor(playerHealthVisualState);
+    PlayerDamageOverlay.SetHealthState(playerHealthVisualState);
 
     if (playerHealthSlider != null)
     {

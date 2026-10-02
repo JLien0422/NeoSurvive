@@ -111,6 +111,8 @@ public class Player : Character
   private bool has30PercentEffect = false;
   private bool has60PercentEffect = false;
   private bool has100PercentEffect = false;
+  private const float BerserkWarningDuration = 3f;
+  private Coroutine berserkWarningRoutine;
 
   // 원래 스탯 값 저장 (효과 제거 시 복원용)
   private float originalMoveSpeedPercent = 0f;
@@ -576,6 +578,7 @@ public class Player : Character
     has60PercentEffect = false;
     has100PercentEffect = false;
     IsBerserk = false;
+    CancelBerserkWarning();
 
     TraitCategory category = type == CharacterType.Cyborg
       ? TraitCategory.Cyborg
@@ -666,12 +669,46 @@ public class Player : Character
       has60PercentEffect = false;
     }
 
-    // 100% 효과 적용 (폭주 상태)
-    if (psychoCorruption >= 100f && !has100PercentEffect)
+    // 100% 도달 시 3초간 시각 경고 후 통제 불가 폭주 상태로 전환합니다.
+    if (psychoCorruption >= 100f && !has100PercentEffect && berserkWarningRoutine == null)
     {
-      StartBerserkState();
-      has100PercentEffect = true;
+      berserkWarningRoutine = StartCoroutine(BerserkWarningCoroutine());
     }
+    else if (psychoCorruption < 100f && berserkWarningRoutine != null)
+    {
+      CancelBerserkWarning();
+    }
+  }
+
+  private IEnumerator BerserkWarningCoroutine()
+  {
+    float elapsed = 0f;
+    while (elapsed < BerserkWarningDuration)
+    {
+      if (psychoCorruption < 100f)
+      {
+        berserkWarningRoutine = null;
+        PsychoCorruptionScreenEffect.SetWarningProgress(0f);
+        yield break;
+      }
+
+      elapsed += Time.unscaledDeltaTime;
+      PsychoCorruptionScreenEffect.SetWarningProgress(Mathf.Clamp01(elapsed / BerserkWarningDuration));
+      yield return null;
+    }
+
+    berserkWarningRoutine = null;
+    PsychoCorruptionScreenEffect.SetWarningProgress(0f);
+    has100PercentEffect = true;
+    StartBerserkState();
+  }
+
+  private void CancelBerserkWarning()
+  {
+    if (berserkWarningRoutine != null)
+      StopCoroutine(berserkWarningRoutine);
+    berserkWarningRoutine = null;
+    PsychoCorruptionScreenEffect.SetWarningProgress(0f);
   }
 
   /// <summary>
@@ -774,6 +811,7 @@ public class Player : Character
     has30PercentEffect = false;
     has60PercentEffect = false;
     has100PercentEffect = false;
+    CancelBerserkWarning();
 
     Debug.Log("폭주 상태 종료. 사이코 잠식도 0%로 리셋");
   }

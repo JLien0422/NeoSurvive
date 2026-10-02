@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — 아트 폴더 정리 계획</title>
+  <style>
+    :root {
+      --bg: #0e1318; --panel: #161d26; --panel2: #1c2430; --line: #2b3644;
+      --text: #e8eef5; --muted: #95a3b4; --faint: #6c7a8b;
+      --green: #3ecf8e; --amber: #e6b84d; --red: #ef6b6b; --cyan: #5ec8d8; --blue: #4da3ff;
+      --sans: "Pretendard", "Noto Sans KR", sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: var(--sans); color: var(--text); line-height: 1.55;
+      background: radial-gradient(900px 420px at 0% 0%, #1a2736 0%, transparent 55%), var(--bg);
+    }
+    a { color: var(--blue); text-decoration: none; }
+    code, .path {
+      font-family: var(--mono); font-size: .82em; background: #0b1016;
+      border: 1px solid var(--line); border-radius: 5px; padding: .04rem .28rem;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 1.2rem 1.1rem 3rem; }
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line); border-radius: 16px; padding: 1.3rem 1.2rem; margin-bottom: 1rem;
+    }
+    .hero .eyebrow { margin: 0 0 .35rem; color: var(--cyan); font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .hero h1 { margin: 0 0 .45rem; font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.3; }
+    .hero p { margin: .35rem 0 0; color: var(--muted); }
+    .badges { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .9rem; }
+    .badge {
+      font-size: .7rem; font-weight: 700; padding: .22rem .5rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    }
+    .badge.a { color: var(--amber); border-color: #5a4a22; }
+    nav.toc {
+      display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1rem;
+    }
+    nav.toc a {
+      font-size: .82rem; color: var(--muted); background: var(--panel);
+      border: 1px solid var(--line); border-radius: 999px; padding: .28rem .7rem;
+    }
+    nav.toc a:hover { color: var(--text); border-color: var(--cyan); }
+    section {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1rem 1rem 1.1rem; margin-bottom: .9rem;
+    }
+    h2 { margin: 0 0 .35rem; font-size: 1.08rem; color: var(--cyan); }
+    .lead { margin: 0 0 .75rem; color: var(--muted); font-size: .92rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 720px; }
+    th, td { border: 1px solid var(--line); padding: .48rem .55rem; text-align: left; vertical-align: top; }
+    th { background: #121820; color: var(--muted); font-weight: 700; white-space: nowrap; }
+    td.from { color: var(--amber); }
+    td.to { color: var(--green); }
+    tr.keep td.to { color: var(--muted); }
+    tr.del td.to { color: var(--red); }
+    .pill {
+      display: inline-block; font-size: .68rem; font-weight: 800; padding: .1rem .42rem;
+      border-radius: 999px; border: 1px solid var(--line); white-space: nowrap;
+    }
+    .pill.move { color: var(--blue); border-color: #2a4a6a; background: #121c28; }
+    .pill.rename { color: var(--amber); border-color: #5a4a22; background: #241f12; }
+    .pill.merge { color: #c4b5fd; border-color: #4a3a6a; background: #1a1528; }
+    .pill.del { color: var(--red); border-color: #5a2e2e; background: #241414; }
+    .pill.keep { color: var(--green); border-color: #2d5644; background: #13231c; }
+    .note {
+      margin: .7rem 0 0; padding: .65rem .75rem; border-radius: 10px;
+      background: var(--panel2); border-left: 3px solid var(--amber); color: var(--muted); font-size: .9rem;
+    }
+    ul { margin: .3rem 0 0; padding-left: 1.15rem; }
+    li { margin: .2rem 0; }
+    footer { text-align: center; color: var(--faint); font-size: .78rem; margin-top: .4rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">계획 · 아직 실행 안 함</p>
+      <h1>아트 폴더를 코드 ID에 맞추는 이동표</h1>
+      <p>기준 이름은 시트 카탈로그와 프리팹에 이미 있는 ID입니다. <code>BlastBreath</code>, <code>BoltLauncher</code>처럼 붙여 씁니다.</p>
+      <p>2026-10-01에 GUID 참조를 다시 세었습니다. 같은 그림이 두 폴더에 있으면, 실제로 애니·프리팹이 물고 있는 쪽만 남깁니다. 참조 0인 사본은 옮기지 않고 지웁니다.</p>
+      <p>이동은 유니티 Project 창에서 합니다. <code>.meta</code>가 같이 가야 GUID가 유지됩니다. 탐색기에서 옮기지 않습니다.</p>
+      <div class="badges">
+        <span class="badge a">에셋 수정 전</span>
+        <span class="badge">2026-10-01</span>
+        <span class="badge">6단계</span>
+      </div>
+    </header>
+
+    <nav class="toc">
+      <a href="#s1">1. 사이보그 스프라이트</a>
+      <a href="#s2">2. 사이보그 애니</a>
+      <a href="#s3">3. 해커 스프라이트</a>
+      <a href="#s4">4. 해커 애니</a>
+      <a href="#s5">5. 셰이더</a>
+      <a href="#s6">6. 맵·해킹·상자</a>
+      <a href="#out">그대로 두는 것</a>
+      <a href="#effect">옮긴 뒤 효과</a>
+      <a href="#demerit">디메리트</a>
+      <a href="#ac">확인</a>
+    </nav>
+
+    <section id="s1">
+      <h2>1. 사이보그 무기 스프라이트</h2>
+      <p class="lead"><code>Art/Sprites/Characters/Cyborg/</code> 열 개 폴더를 통째로 옮기는 계획은 틀렸습니다. 대부분 시트가 <code>Art/Animations/Objects/Weapons/Cyborg/</code> 안 그림과 해시가 같고, 애니·프리팹은 애니 폴더 GUID를 물고 있습니다. 그 사본은 지웁니다. 실제로 연결됐거나 다른 곳에 없는 파일만 <code>Art/Sprites/Objects/Weapons/Cyborg/</code>로 옮깁니다. 비면 <code>Characters/Cyborg</code>는 삭제합니다. <code>Icons</code>는 이미 제자리입니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>참조</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="from">Laser Sword 시트</td>
+              <td>Laser Sword.anim, Lasor Sword Effect.prefab. 애니 폴더에 같은 파일 없음</td>
+              <td class="to"><span class="pill move">이동</span> Weapons/Cyborg/LaserSword</td>
+            </tr>
+            <tr>
+              <td class="from">Surge Blade 시트</td>
+              <td>Surge Blade.anim, Surge Blade Effect.prefab. 애니 폴더에 같은 파일 없음</td>
+              <td class="to"><span class="pill move">이동</span> Weapons/Cyborg/SurgeBlade</td>
+            </tr>
+            <tr>
+              <td class="from">Energy Shield/ENERGY SHILED_GFX_16.png</td>
+              <td>참조 0. 다른 폴더에 같은 파일 없음</td>
+              <td class="to"><span class="pill move">이동</span> Weapons/Cyborg/EnergyShield 에 보관</td>
+            </tr>
+            <tr class="del">
+              <td class="from">Energy Shield/ENERGY SHILED_ANIM_8.png</td>
+              <td>참조 0. 해커 폴더의 ANIM_ENERGY SHILED.png와 해시 동일하고, 그 파일이 실제 연결</td>
+              <td class="to"><span class="pill del">삭제</span></td>
+            </tr>
+            <tr>
+              <td class="from">Blast Breathe/12프레임</td>
+              <td>픽셀은 같지만 자르기와 PPU가 다름. 스프라이트 시트는 64, 12조각. 애니 폴더 시트는 100, 조각 위치도 다름. BreathArea.prefab은 스프라이트 시트를 쓰고, 무기 VFX는 애니 폴더 시트를 씀</td>
+              <td class="to"><span class="pill move">둘 다 유지</span> GUID는 바꾸지 않음. 파일명이 같아서 한쪽 파일 이름만 바꾼 뒤 BlastBreath 폴더에 같이 둠. 교체하면 브레스 영역 크기와 프레임이 바뀜</td>
+            </tr>
+            <tr class="del">
+              <td class="from">Blast Breathe/파란색, Booster Knuckle, Gravity Hammer 전부, Plasma Photon 시트, Tesla Coil Armor, Volt Launcher, Chain Saw 6프레임 스프라이트 사본</td>
+              <td>참조 0. 이쪽은 거의 한 장으로만 잘려 있고 PPU 32. 실제로 재생되는 시트는 애니 폴더의 잘린 쪽</td>
+              <td class="to"><span class="pill del">삭제</span> 지금 보이는 애니는 유지. 체인소 6프레임의 애니 폴더 시트는 참조 0이지만 잘린 원본이라 남김. 가열 26프레임이 실제 재생</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s2">
+      <h2>2. 사이보그 무기 애니메이션</h2>
+      <p class="lead">위치는 <code>Art/Animations/Objects/Weapons/Cyborg/</code> 그대로입니다. 폴더 이름만 1번과 맞춥니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>바꾼 뒤</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="from">Blast Breathe</td>
+              <td class="to">BlastBreath</td>
+              <td><span class="pill merge">합침</span> 클립·컨트롤러·프리팹을 옮김. 12프레임 PNG는 GUID를 유지한 채 파일명만 겹치지 않게 바꿈. 시트 GUID 교체 없음</td>
+            </tr>
+            <tr><td class="from">Bolt Launcher</td><td class="to">BoltLauncher</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Booster Knuckle</td><td class="to">BoosterKnuckle</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Chain Saw</td><td class="to">ChainSaw</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Energe Shield</td><td class="to">EnergyShield</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Gravity Hammer</td><td class="to">GravityHammer</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Laser Sword</td><td class="to">LaserSword</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Plasma Photon</td><td class="to">PlasmaPhoton</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Surge Blade</td><td class="to">SurgeBlade</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Tesla Coil Armor</td><td class="to">TeslaCoilArmor</td><td><span class="pill rename">이름</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s3">
+      <h2>3. 해커 무기 스프라이트</h2>
+      <p class="lead">위치는 <code>Art/Sprites/Objects/Weapons/Hacker/</code>입니다. 폴더 뿌리의 <code>Drone.png</code>, <code>lazer 1.png</code>, 아이콘 3장은 이전 표에 빠져 있었습니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>바꾼 뒤</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td class="from">Data Scrambler</td><td class="to">DataScrambler</td><td><span class="pill rename">이름</span> 이 폴더 PNG가 Data Scrambler.anim에 연결됨. 애니 폴더의 같은 PNG는 참조 0이라 삭제</td></tr>
+            <tr><td class="from">EMP Pulse Generator</td><td class="to">EMPPulse</td><td><span class="pill rename">이름</span> 시트 참조 있음. 코드 ID는 EMPPulse</td></tr>
+            <tr class="del"><td class="from">Hologram Decoy 시트</td><td class="to">삭제</td><td><span class="pill del">삭제</span> 스프라이트 참조 0. 애니 폴더 시트가 Hologram Decoy Body에 연결. 비면 폴더 삭제</td></tr>
+            <tr><td class="from">Link Pistol</td><td class="to">LinkPistol</td><td><span class="pill rename">이름</span> 시트 참조 있음</td></tr>
+            <tr>
+              <td class="from">Energe Shield/ANIM_ENERGY SHILED.png</td>
+              <td class="to">Weapons/Cyborg/EnergyShield/</td>
+              <td><span class="pill move">이동</span> 지우면 안 됨. Energe Shield.anim과 ShieldOrb.prefab이 이 GUID를 사용. 사이보그 무기다</td>
+            </tr>
+            <tr class="del">
+              <td class="from">Gravity Hammer 4장</td>
+              <td class="to">삭제</td>
+              <td><span class="pill del">삭제</span> 6프레임 포함 전부 사이보그 애니 폴더와 해시 동일. 해커 사본 참조 0. 6프레임은 GravityHammer.anim이 애니 폴더 시트를 사용</td>
+            </tr>
+            <tr>
+              <td class="from">폴더 뿌리 Drone.png</td>
+              <td class="to">Weapons/Hacker/AIDrone/</td>
+              <td><span class="pill move">이동</span> Drone_attack.anim, Drone_idle.anim, AIDronePrefab이 참조</td>
+            </tr>
+            <tr>
+              <td class="from">폴더 뿌리 lazer 1.png</td>
+              <td class="to">Weapons/Cyborg/PlasmaPhoton/</td>
+              <td><span class="pill move">이동</span> PlasmaPhotonProjectile.prefab이 참조. 해커 무기 아님</td>
+            </tr>
+            <tr>
+              <td class="from">폴더 뿌리 ICON_Data_Optimization.png, ICON_DIGITAL_SHIELD.png</td>
+              <td class="to">Hacker/Icons/</td>
+              <td><span class="pill move">이동</span> 07_DigitalShield.asset, 08_DataOptimization.asset이 참조</td>
+            </tr>
+            <tr class="del">
+              <td class="from">폴더 뿌리 ICON_GRENADE.png</td>
+              <td class="to">삭제</td>
+              <td><span class="pill del">삭제</span> Icons/GRENADE.png와 해시 동일. 뿌리 참조 0, Icons 쪽이 참조됨</td>
+            </tr>
+            <tr class="keep"><td class="from">AutoTurret, Icons</td><td class="to">같은 자리</td><td><span class="pill keep">유지</span> 발사 시트와 아이콘은 참조 있음. Icons/ICON_AI_Drone.png만 참조 0이라 이번엔 그대로 둠</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2>4. 해커 무기 애니메이션</h2>
+      <p class="lead">위치는 <code>Art/Animations/Objects/Weapons/Hacker/</code>입니다. <code>Deployed Turret</code>은 <code>AutoTurret</code>으로 합치지 않습니다. 스크립트 <code>DeployedTurret.cs</code>가 따로 있습니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>바꾼 뒤</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td class="from">Data Optimization</td><td class="to">DataOptimization</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Data Scrambler</td><td class="to">DataScrambler</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Deployed Turret</td><td class="to">DeployedTurret</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Digital Shield</td><td class="to">DigitalShield</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">EMP Pulse</td><td class="to">EMPPulse</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Hologram Decoy</td><td class="to">HologramDecoy</td><td><span class="pill rename">이름</span></td></tr>
+            <tr><td class="from">Link Pistol</td><td class="to">LinkPistol</td><td><span class="pill rename">이름</span></td></tr>
+            <tr class="keep"><td class="from">EMPGrenade</td><td class="to">같은 자리</td><td><span class="pill keep">유지</span> H10 무기</td></tr>
+            <tr>
+              <td class="from">Animations/Characters/Player/Hacker/Weapon/AIDrone</td>
+              <td class="to">Animations/Objects/Weapons/Hacker/AIDrone</td>
+              <td><span class="pill move">이동</span> 비면 Weapon 폴더 삭제</td>
+            </tr>
+            <tr>
+              <td class="from">Hacker 폴더 뿌리의 Drone_53.controller, Drone_attack.anim, Drone_idle.anim</td>
+              <td class="to">AIDrone/ 안</td>
+              <td><span class="pill move">이동</span> 파일만</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2>5. 셰이더</h2>
+      <p class="lead"><code>GlitchShader</code>는 이미 <code>Art/Shader</code>에 있습니다. 히트 플래시만 그 옆으로 옮기고, 비면 <code>Art/Sprites/Shader</code>를 삭제합니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>바꾼 뒤</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td class="from">Art/Sprites/Shader/SpriteHitFlash.shader</td><td class="to">Art/Shader/</td><td><span class="pill move">이동</span></td></tr>
+            <tr><td class="from">Art/Sprites/Shader/Mat_SpriteHitFlash.mat</td><td class="to">Art/Shader/</td><td><span class="pill move">이동</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s6">
+      <h2>6. 맵, 해킹, 상자</h2>
+      <p class="lead">기믹 폴더 철자 기준은 스크립트의 <code>1EnvironmentGimmicks</code>입니다. 맵 오브젝트 폴더 기준은 스크립트의 <code>1MapObject</code>입니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지금</th><th>바꾼 뒤</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="from">Prefabs/Objects/Map Objects/Map1/1EnvirmentGimmicks</td>
+              <td class="to">…/1EnvironmentGimmicks</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Art/Animations/Objects/Map Objects/Map1/1Evirment Gimmik</td>
+              <td class="to">…/1EnvironmentGimmicks</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Prefabs/…/Map1/1MapObjects</td>
+              <td class="to">…/1MapObject</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Art/Sprites/Objects/Hacking Objects</td>
+              <td class="to">Art/Sprites/Objects/Hacking</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Art/Animations/Objects/Hacking Objects</td>
+              <td class="to">Art/Animations/Objects/Hacking</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Sprites/…/Hacking/Hacking MiniGame</td>
+              <td class="to">…/Hacking/MiniGame</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Animations/…/Hacking/Mini Game</td>
+              <td class="to">…/Hacking/MiniGame</td>
+              <td><span class="pill rename">이름</span></td>
+            </tr>
+            <tr>
+              <td class="from">Art/Animations/Objects/Chest</td>
+              <td class="to">Art/Animations/Objects/Drop Objects/Chest</td>
+              <td><span class="pill move">이동</span> 스프라이트·스크립트와 같은 부모</td>
+            </tr>
+            <tr>
+              <td class="from">Prefabs/Hacking/HackInteractPrompt .prefab</td>
+              <td class="to">HackInteractPrompt.prefab</td>
+              <td><span class="pill rename">이름</span> 파일명과 프리팹 루트 오브젝트 이름 끝의 공백을 둘 다 제거. 스크립트는 컴포넌트로 찾음</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="out">
+      <h2>그대로 두는 것</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>대상</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td><code>Drop Objects</code>, <code>Map Objects</code> 공백 이름</td><td>시트 카탈로그에 <code>Map Objects/Map 1</code> 경로가 박혀 있음</td></tr>
+            <tr><td>무기 프리팹 파일, 스크립트, CSV</td><td>이미 BlastBreath, BoltLauncher 같은 ID</td></tr>
+            <tr><td><code>Sprites/Characters/Hacker</code> 몸 PNG, 사이보그 몸 애니 폴더</td><td>무기 폴더 문제가 아님</td></tr>
+            <tr><td><code>Resources</code> archive</td><td>로비·WeaponIcon이 아직 참조함</td></tr>
+            <tr><td>UI 키트, 사운드 파일명, Plugins</td><td>이번 범위 밖</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="effect">
+      <h2>옮기면 생기는 효과</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>하는 일</th><th>플레이에 보이는 것</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>폴더 이름 변경, 파일 이동</td>
+              <td class="to">화면 변화 없음</td>
+              <td>씬·프리팹·애니는 경로가 아니라 GUID를 참조함. 코드에 이 폴더 경로 문자열은 없음. 셰이더도 이름 <code>NeoSurvive/SpriteHitFlash</code>와 머티리얼 GUID로 연결됨</td>
+            </tr>
+            <tr>
+              <td>참조 0인 잘리지 않은 사본 삭제</td>
+              <td class="to">지금 재생되는 애니 유지</td>
+              <td>부스터, 중력 망치, 플라즈마 시트, 테슬라, 볼트, 파란 브레스는 애니 폴더의 잘린 시트가 실제로 재생 중. 지우는 쪽은 PPU 32에 조각이 1개인 사본</td>
+            </tr>
+            <tr>
+              <td>블래스트 12프레임 GUID 교체</td>
+              <td class="from">하면 안 됨. 브레스 크기가 바뀜</td>
+              <td><code>BreathArea.prefab</code>은 PPU 64 시트를 쓰고, 무기 VFX는 PPU 100 시트를 씀. 픽셀이 같아도 조각 위치가 다름</td>
+            </tr>
+            <tr>
+              <td>에너지 실드 PNG를 사이보그 폴더로 이동</td>
+              <td class="to">오브와 실드 애니 유지</td>
+              <td><code>Energe Shield.anim</code>과 <code>ShieldOrb.prefab</code>이 해커 폴더에 있는 그 GUID를 씀. 옮기면 GUID가 따라감. 사이보그 폴더의 같은 그림은 조각 1개·참조 0이라 지워도 화면은 그대로</td>
+            </tr>
+            <tr>
+              <td>Drone.png, lazer 1.png, 아이콘 이동</td>
+              <td class="to">드론, 플라즈마 탄, 무기 선택 아이콘 유지</td>
+              <td>애니·<code>AIDronePrefab</code>·<code>PlasmaPhotonProjectile</code>·무기 데이터 에셋이 GUID로 연결</td>
+            </tr>
+            <tr>
+              <td>데이터 스크램블러 애니 폴더의 같은 PNG 삭제</td>
+              <td class="to">스크램블러 이펙트 유지</td>
+              <td>조각 수와 위치가 같고, 애니가 물고 있는 건 스프라이트 폴더 GUID. 애니 폴더 사본은 참조 0</td>
+            </tr>
+            <tr>
+              <td>해킹 프롬프트 이름 끝 공백 제거</td>
+              <td class="to">해킹 프롬프트 유지</td>
+              <td><code>HackingSystem</code>은 프리팹을 GUID로 갖고, 만든 뒤 이름을 <code>HackInteractPrompt(Runtime)</code>으로 바꿈</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">탐색기에서 옮기면 .meta가 떨어져 GUID가 새로 생깁니다. 그러면 위 표와 반대로 애니·프리팹이 Missing이 됩니다. 유니티 안에서만 옮깁니다.</p>
+    </section>
+
+    <section id="demerit">
+      <h2>디메리트</h2>
+      <p class="lead">플레이가 깨지는 경우는 블래스트 시트 GUID를 합치는 것뿐이었고, 그건 하지 않습니다. 아래는 화면은 유지돼도 생기는 손해입니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>디메리트</th><th>확인</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>참조 0인 사본을 지우면, 안 쓰이던 자르기(PPU 32, 조각 1개)가 작업 트리에서 사라짐. 깃 히스토리에는 남음</td>
+              <td>체인소 6프레임의 잘린 애니 시트는 그래서 삭제하지 않음</td>
+            </tr>
+            <tr>
+              <td>블래스트 12프레임은 두 장을 남기므로 폴더가 완전히 깔끔해지지는 않음. 한쪽 파일명은 겹치지 않게 바뀜</td>
+              <td>GUID 교체 시의 크기 변화보다 이 불편이 작음</td>
+            </tr>
+            <tr>
+              <td>폴더 이동 diff가 큼. 유니티를 연 채로 다른 사람이 같은 에셋을 고치면 충돌</td>
+              <td>게임 로직 변경은 없음</td>
+            </tr>
+            <tr>
+              <td>스프라이트 아틀라스, 타임라인, Resources.Load, 사운드 폴더 경로</td>
+              <td>아틀라스·타임라인 파일 없음. 사운드 경로는 <code>Assets/Data/Sounds/Ingame</code>이라 이번 이동과 무관. 아트 폴더 경로 문자열도 스크립트에 없음</td>
+            </tr>
+            <tr>
+              <td>vFavorites</td>
+              <td>GUID로 저장됨. 지울 예정인 대표 GUID 4개는 즐겨찾기에 없음. 삭제 대상 전부를 즐겨찾기와 맞추지는 않음</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">세이브 파일 안의 에셋 참조, 레포 밖의 자료, <code>.shadergraph</code> 같은 다른 확장자는 보지 않았습니다. 그걸 포함해 디메리트를 전부 파악했다고 보지 않습니다.</p>
+    </section>
+
+    <section id="ac">
+      <h2>확인</h2>
+      <ul>
+        <li>유니티에서 Missing 스프라이트·애니·프리팹이 없는지</li>
+        <li>사이보그 무기 10개, 해커 무기, 상자, 해킹 오브젝트, 맵 기믹이 플레이에서 보이는지</li>
+        <li><code>Art/Sprites/Characters/Cyborg</code>와 <code>Art/Sprites/Shader</code>가 비어 사라졌는지</li>
+        <li>기믹 폴더 이름이 스크립트·프리팹·애니에서 <code>1EnvironmentGimmicks</code>로 같은지</li>
+      </ul>
+      <p class="note">이 문서는 이동표입니다. 에셋은 아직 옮기지 않았습니다. 실행은 승인 뒤에 1번부터 순서대로 합니다.</p>
+    </section>
+
+    <footer>docs/plan-art-folder-align-2026-10-01.html</footer>
+  </div>
+</body>
+</html>

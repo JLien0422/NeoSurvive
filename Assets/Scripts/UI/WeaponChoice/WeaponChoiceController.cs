@@ -486,7 +486,7 @@ public class WeaponChoiceController : MonoBehaviour
         int currentLevel = GetCurrentWeaponLevel(weaponManager, weapon);
 
         if (isNewWeapon)
-            return "NEW WEAPON";
+            return "Lv.1  ·  신규 무기";
 
         if (currentLevel >= MAX_WEAPON_LEVEL)
             return $"Lv.{MAX_WEAPON_LEVEL} (MASTER)";

@@ -6,6 +6,10 @@ using NeoSurvive.Weapon;
 
 public class WeaponChoiceCard : MonoBehaviour
 {
+    private const string LogicHeaderColor = "#EAF7FF";
+    private const string StatHeaderColor = "#62DDF5";
+    private const string StatValueColor = "#B9F4FF";
+
     [Header("Card UI")]
     [SerializeField] private Image iconImage;                  // 아이콘 표시만 담당
     [SerializeField] private TextMeshProUGUI nameText;        // 이름 표시만 담당
@@ -71,12 +75,25 @@ public class WeaponChoiceCard : MonoBehaviour
         nameText.enableWordWrapping = false;
         nameText.overflowMode = TextOverflowModes.Ellipsis;
 
-        descriptionText.text = description;
+        descriptionText.text = BuildReadableDescription(description);
+        descriptionText.richText = true;
+        descriptionText.fontSize = 16;
+        descriptionText.lineSpacing = 8f;
         descriptionText.enableWordWrapping = true;
         descriptionText.overflowMode = TextOverflowModes.Overflow;
 
         levelText.text = levelInfo;
+        levelText.gameObject.SetActive(true);
+        levelText.enabled = true;
+        levelText.alpha = 1f;
+        levelText.richText = true;
+        levelText.fontSize = 20;
+        levelText.fontStyle = FontStyles.Bold;
+        levelText.color = levelInfo.Contains("신규 무기")
+            ? new Color(0.35f, 1f, 0.72f)
+            : new Color(1f, 0.82f, 0.22f);
         RefreshSynergyTags(weapon);
+        levelText.transform.SetAsLastSibling();
 
         clickButton.onClick.RemoveAllListeners();
         clickButton.onClick.AddListener(HandleClick);
@@ -94,6 +111,41 @@ public class WeaponChoiceCard : MonoBehaviour
         }
 
         onClick?.Invoke(currentWeapon);
+    }
+
+    private static string BuildReadableDescription(string source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+            return string.Empty;
+
+        string normalized = source.Replace("\r\n", "\n").Trim();
+        string[] lines = normalized.Split('\n');
+        int firstContentLine = lines.Length > 0 && IsLevelHeading(lines[0]) ? 1 : 0;
+
+        if (firstContentLine >= lines.Length)
+            return normalized;
+
+        string logic = lines[firstContentLine].Trim();
+        string numeric = string.Join("\n", lines, firstContentLine + 1, lines.Length - firstContentLine - 1).Trim();
+
+        if (string.IsNullOrEmpty(numeric))
+            return $"<color={LogicHeaderColor}><size=15><b>작동 방식</b></size></color>\n<size=18>{logic}</size>";
+
+        return
+            $"<color={LogicHeaderColor}><size=15><b>작동 방식</b></size></color>\n" +
+            $"<size=18>{logic}</size>\n\n" +
+            $"<color={StatHeaderColor}><size=15><b>수치 변화</b></size></color>\n" +
+            $"<color={StatValueColor}><size=16>{numeric}</size></color>";
+    }
+
+    private static bool IsLevelHeading(string line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+            return false;
+
+        string trimmed = line.Trim();
+        return trimmed.StartsWith("선택 후 Lv.", StringComparison.Ordinal) ||
+               trimmed.StartsWith("5레벨 달성 효과", StringComparison.Ordinal);
     }
 
     private void RefreshSynergyTags(WeaponBase weapon)
@@ -130,16 +182,16 @@ public class WeaponChoiceCard : MonoBehaviour
         synergyContainer.anchorMin = new Vector2(0f, 0f);
         synergyContainer.anchorMax = new Vector2(1f, 0f);
         synergyContainer.pivot = new Vector2(0.5f, 0f);
-        synergyContainer.anchoredPosition = new Vector2(0f, 58f);
-        synergyContainer.sizeDelta = new Vector2(-24f, 62f);
+        synergyContainer.anchoredPosition = new Vector2(0f, 48f);
+        synergyContainer.sizeDelta = new Vector2(-24f, 64f);
 
         GridLayoutGroup layout = container.GetComponent<GridLayoutGroup>();
-        layout.cellSize = new Vector2(126f, 28f);
-        layout.spacing = new Vector2(6f, 5f);
+        layout.cellSize = new Vector2(258f, 28f);
+        layout.spacing = new Vector2(0f, 6f);
         layout.startCorner = GridLayoutGroup.Corner.UpperLeft;
-        layout.startAxis = GridLayoutGroup.Axis.Horizontal;
+        layout.startAxis = GridLayoutGroup.Axis.Vertical;
         layout.childAlignment = TextAnchor.LowerCenter;
-        layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        layout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
         layout.constraintCount = 2;
     }
 
@@ -177,10 +229,10 @@ public class WeaponChoiceCard : MonoBehaviour
         iconLayout.preferredWidth = 16f;
         iconLayout.preferredHeight = 16f;
 
-        Text nameLabel = CreateChipText("Name", chip.transform, SynergyPresentation.GetDisplayName(tag), TextAnchor.MiddleLeft, 48f);
+        Text nameLabel = CreateChipText("Name", chip.transform, SynergyPresentation.GetDisplayName(tag), TextAnchor.MiddleLeft, 142f);
         nameLabel.color = Color.white;
 
-        Text stackLabel = CreateChipText("Stack", chip.transform, $"{current}/{maximum}", TextAnchor.MiddleRight, 34f);
+        Text stackLabel = CreateChipText("Stack", chip.transform, $"{current}/{maximum}", TextAnchor.MiddleRight, 52f);
         stackLabel.fontStyle = FontStyle.Bold;
         stackLabel.color = Color.Lerp(tagColor, Color.white, 0.28f);
     }

@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 20
   range: 3
-  angle: 50
+  hitWidth: 0.8
   fireRate: 1.2
   hitMask:
     serializedVersion: 2

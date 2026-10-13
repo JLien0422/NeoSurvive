@@ -61,30 +61,40 @@ public class EnemyStatLoader : MonoBehaviour
 
         if (enemyHpScaleCsv == null)
         {
-            Debug.LogWarning("[EnemyStatLoader] enemyHpScaleCsv가 없어 페이즈 HP 배율은 1.0으로 둡니다.");
+            Debug.LogWarning("[EnemyStatLoader] enemyHpScaleCsv가 없어 기본 시간 HP 곡선을 씁니다.");
             return;
         }
 
         var parsed = SimpleCsv.Parse(enemyHpScaleCsv.text);
-
-        foreach (var r in parsed)
+        if (parsed.Count == 0)
         {
-            if (!SimpleCsv.TryGetFloat(r, "phase", out float phaseFloat))
-            {
-                Debug.LogWarning("[EnemyStatLoader] hp scale phase 값을 읽지 못했습니다.");
-                continue;
-            }
-
-            int phase = Mathf.RoundToInt(phaseFloat);
-            float multiplier = 1f;
-            SimpleCsv.TryGetFloat(r, "hpmultiplier", out multiplier);
-
-            if (multiplier <= 0f)
-                multiplier = 1f;
-
-            DB.hpMultipliers[phase] = multiplier;
+            Debug.LogWarning("[EnemyStatLoader] enemy_hp_scale.csv가 비어 있어 기본 시간 HP 곡선을 씁니다.");
+            return;
         }
 
-        Debug.Log($"[EnemyStatLoader] hp scale 로드 완료: {DB.hpMultipliers.Count} phases");
+        var r = parsed[0];
+        if (!SimpleCsv.TryGetFloat(r, "durationsec", out float durationSec)
+            || !SimpleCsv.TryGetFloat(r, "exponent", out float exponent)
+            || !SimpleCsv.TryGetFloat(r, "startmultiplier", out float startMul)
+            || !SimpleCsv.TryGetFloat(r, "endmultiplier", out float endMul))
+        {
+            Debug.LogWarning("[EnemyStatLoader] enemy_hp_scale.csv 컬럼을 읽지 못해 기본 시간 HP 곡선을 씁니다.");
+            return;
+        }
+
+        if (durationSec <= 0f || exponent <= 0f || startMul <= 0f || endMul <= 0f)
+        {
+            Debug.LogWarning("[EnemyStatLoader] enemy_hp_scale.csv 값이 0 이하라 기본 시간 HP 곡선을 씁니다.");
+            return;
+        }
+
+        DB.hpScaleDurationSec = durationSec;
+        DB.hpScaleExponent = exponent;
+        DB.hpScaleStartMultiplier = startMul;
+        DB.hpScaleEndMultiplier = endMul;
+
+        Debug.Log(
+            $"[EnemyStatLoader] hp scale 로드 완료: duration={durationSec}, exponent={exponent}, start={startMul}, end={endMul}"
+        );
     }
 }

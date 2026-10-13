@@ -6,10 +6,6 @@ using NeoSurvive.Weapon;
 
 public class WeaponChoiceCard : MonoBehaviour
 {
-    private const string LogicHeaderColor = "#EAF7FF";
-    private const string StatHeaderColor = "#62DDF5";
-    private const string StatValueColor = "#B9F4FF";
-
     [Header("Card UI")]
     [SerializeField] private Image iconImage;                  // 아이콘 표시만 담당
     [SerializeField] private TextMeshProUGUI nameText;        // 이름 표시만 담당
@@ -17,13 +13,22 @@ public class WeaponChoiceCard : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;       // 레벨 문구 표시만 담당
     [SerializeField] private Button clickButton;              // 카드 클릭만 담당
 
+    [Header("Colors")]
+    [SerializeField] private Color newWeaponLevelColor = new Color(0.35f, 1f, 0.72f);
+    [SerializeField] private Color logicHeaderColor = new Color(0.918f, 0.969f, 1f);
+    [SerializeField] private Color statHeaderColor = new Color(0.384f, 0.867f, 0.961f);
+    [SerializeField] private Color statValueColor = new Color(0.725f, 0.957f, 1f);
+
     private WeaponBase currentWeapon;
     private Action<WeaponBase> onClick;
     private RectTransform synergyContainer;
+    private Color levelUpLevelColor = new Color(1f, 0.82f, 0.22f);
 
     private void Awake()
     {
         ValidateReferences();
+        if (levelText != null)
+            levelUpLevelColor = levelText.color;
     }
 
     /// <summary>
@@ -69,29 +74,18 @@ public class WeaponChoiceCard : MonoBehaviour
         iconImage.enabled = weapon.weaponIcon != null;
 
         nameText.text = displayName;
-        nameText.enableAutoSizing = true;
-        nameText.fontSizeMin = 14;
-        nameText.fontSizeMax = 28;
-        nameText.enableWordWrapping = false;
-        nameText.overflowMode = TextOverflowModes.Ellipsis;
 
         descriptionText.text = BuildReadableDescription(description);
         descriptionText.richText = true;
-        descriptionText.fontSize = 16;
-        descriptionText.lineSpacing = 8f;
-        descriptionText.enableWordWrapping = true;
-        descriptionText.overflowMode = TextOverflowModes.Overflow;
 
         levelText.text = levelInfo;
         levelText.gameObject.SetActive(true);
         levelText.enabled = true;
         levelText.alpha = 1f;
         levelText.richText = true;
-        levelText.fontSize = 20;
-        levelText.fontStyle = FontStyles.Bold;
         levelText.color = levelInfo.Contains("신규 무기")
-            ? new Color(0.35f, 1f, 0.72f)
-            : new Color(1f, 0.82f, 0.22f);
+            ? newWeaponLevelColor
+            : levelUpLevelColor;
         RefreshSynergyTags(weapon);
         levelText.transform.SetAsLastSibling();
 
@@ -113,7 +107,7 @@ public class WeaponChoiceCard : MonoBehaviour
         onClick?.Invoke(currentWeapon);
     }
 
-    private static string BuildReadableDescription(string source)
+    private string BuildReadableDescription(string source)
     {
         if (string.IsNullOrWhiteSpace(source))
             return string.Empty;
@@ -127,15 +121,18 @@ public class WeaponChoiceCard : MonoBehaviour
 
         string logic = lines[firstContentLine].Trim();
         string numeric = string.Join("\n", lines, firstContentLine + 1, lines.Length - firstContentLine - 1).Trim();
+        string logicColor = "#" + ColorUtility.ToHtmlStringRGB(logicHeaderColor);
+        string headerColor = "#" + ColorUtility.ToHtmlStringRGB(statHeaderColor);
+        string valueColor = "#" + ColorUtility.ToHtmlStringRGB(statValueColor);
 
         if (string.IsNullOrEmpty(numeric))
-            return $"<color={LogicHeaderColor}><size=15><b>작동 방식</b></size></color>\n<size=18>{logic}</size>";
+            return $"<color={logicColor}><b>작동 방식</b></color>\n{logic}";
 
         return
-            $"<color={LogicHeaderColor}><size=15><b>작동 방식</b></size></color>\n" +
-            $"<size=18>{logic}</size>\n\n" +
-            $"<color={StatHeaderColor}><size=15><b>수치 변화</b></size></color>\n" +
-            $"<color={StatValueColor}><size=16>{numeric}</size></color>";
+            $"<color={logicColor}><b>작동 방식</b></color>\n" +
+            $"{logic}\n\n" +
+            $"<color={headerColor}><b>수치 변화</b></color>\n" +
+            $"<color={valueColor}>{numeric}</color>";
     }
 
     private static bool IsLevelHeading(string line)
@@ -151,9 +148,15 @@ public class WeaponChoiceCard : MonoBehaviour
     private void RefreshSynergyTags(WeaponBase weapon)
     {
         EnsureSynergyContainer();
+        Transform template = synergyContainer.Find("SynergyChipTemplate");
 
         for (int index = synergyContainer.childCount - 1; index >= 0; index--)
-            Destroy(synergyContainer.GetChild(index).gameObject);
+        {
+            Transform child = synergyContainer.GetChild(index);
+            if (child == template)
+                continue;
+            Destroy(child.gameObject);
+        }
 
         if (weapon.synergyTags == null || weapon.synergyTags.Count == 0)
         {
@@ -167,14 +170,30 @@ public class WeaponChoiceCard : MonoBehaviour
         {
             int current = manager != null ? manager.GetSynergyStackAfterAdding(tag, weapon) : 0;
             int maximum = manager != null ? manager.GetSynergyMaximumStack(tag) : 0;
-            CreateSynergyChip(tag, current, maximum);
+            GameObject chip = template != null
+                ? Instantiate(template.gameObject, synergyContainer)
+                : CreateSynergyChip(tag, current, maximum);
+            chip.name = tag + "Tag";
+            chip.SetActive(true);
+            if (template != null)
+                FillSynergyChip(chip, tag, current, maximum);
         }
+
+        if (template != null)
+            template.gameObject.SetActive(false);
     }
 
     private void EnsureSynergyContainer()
     {
         if (synergyContainer != null)
             return;
+
+        Transform existing = transform.Find("SynergyTagContainer");
+        if (existing != null)
+        {
+            synergyContainer = existing as RectTransform;
+            return;
+        }
 
         GameObject container = new GameObject("SynergyTagContainer", typeof(RectTransform), typeof(GridLayoutGroup));
         container.transform.SetParent(transform, false);
@@ -195,7 +214,7 @@ public class WeaponChoiceCard : MonoBehaviour
         layout.constraintCount = 2;
     }
 
-    private void CreateSynergyChip(SynergyTag tag, int current, int maximum)
+    private GameObject CreateSynergyChip(SynergyTag tag, int current, int maximum)
     {
         GameObject chip = new GameObject(tag + "Tag", typeof(RectTransform), typeof(Image), typeof(Outline), typeof(HorizontalLayoutGroup));
         chip.transform.SetParent(synergyContainer, false);
@@ -235,6 +254,56 @@ public class WeaponChoiceCard : MonoBehaviour
         Text stackLabel = CreateChipText("Stack", chip.transform, $"{current}/{maximum}", TextAnchor.MiddleRight, 52f);
         stackLabel.fontStyle = FontStyle.Bold;
         stackLabel.color = Color.Lerp(tagColor, Color.white, 0.28f);
+        return chip;
+    }
+
+    private static void FillSynergyChip(GameObject chip, SynergyTag tag, int current, int maximum)
+    {
+        Color tagColor = SynergyPresentation.GetColor(tag);
+        Image background = chip.GetComponent<Image>();
+        if (background != null)
+            background.color = new Color(tagColor.r * 0.18f, tagColor.g * 0.18f, tagColor.b * 0.18f, 0.94f);
+
+        Outline outline = chip.GetComponent<Outline>();
+        if (outline != null)
+            outline.effectColor = new Color(tagColor.r, tagColor.g, tagColor.b, 0.72f);
+
+        Transform icon = chip.transform.Find("Icon");
+        if (icon != null)
+        {
+            Image iconImage = icon.GetComponent<Image>();
+            if (iconImage != null)
+            {
+                iconImage.sprite = SynergyPresentation.GetIcon(tag);
+                iconImage.color = tagColor;
+            }
+        }
+
+        SetChipLabel(chip.transform.Find("Name"), SynergyPresentation.GetDisplayName(tag), Color.white, false);
+        SetChipLabel(chip.transform.Find("Stack"), current + "/" + maximum, Color.Lerp(tagColor, Color.white, 0.28f), true);
+    }
+
+    private static void SetChipLabel(Transform target, string value, Color color, bool bold)
+    {
+        if (target == null)
+            return;
+
+        TextMeshProUGUI tmp = target.GetComponent<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.text = value;
+            tmp.color = color;
+            tmp.fontStyle = bold ? FontStyles.Bold : FontStyles.Normal;
+            return;
+        }
+
+        Text text = target.GetComponent<Text>();
+        if (text == null)
+            return;
+
+        text.text = value;
+        text.color = color;
+        text.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal;
     }
 
     private static Text CreateChipText(string objectName, Transform parent, string value, TextAnchor alignment, float width)

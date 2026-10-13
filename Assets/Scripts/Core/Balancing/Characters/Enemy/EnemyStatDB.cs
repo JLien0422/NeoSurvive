@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class EnemyStatDB
@@ -10,13 +11,27 @@ public class EnemyStatDB
     }
 
     public Dictionary<string, Row> rows = new Dictionary<string, Row>();
-    public readonly Dictionary<int, float> hpMultipliers = new Dictionary<int, float>();
 
-    public float GetHpMultiplier(int phase)
+    public float hpScaleDurationSec = 900f;
+    public float hpScaleExponent = 2f;
+    public float hpScaleStartMultiplier = 0.416667f;
+    public float hpScaleEndMultiplier = 8.75f;
+
+    public float GetHpMultiplier(float gameTime)
     {
-        if (hpMultipliers.TryGetValue(phase, out float multiplier) && multiplier > 0f)
-            return multiplier;
+        if (hpScaleDurationSec <= 0f)
+            return hpScaleStartMultiplier > 0f ? hpScaleStartMultiplier : 1f;
 
-        return 1f;
+        float t = gameTime / hpScaleDurationSec;
+        if (t < 0f)
+            t = 0f;
+        else if (t > 1f)
+            t = 1f;
+
+        float curve = (float)Math.Pow(t, hpScaleExponent);
+        float multiplier = hpScaleStartMultiplier
+            + (hpScaleEndMultiplier - hpScaleStartMultiplier) * curve;
+
+        return multiplier > 0f ? multiplier : 1f;
     }
 }

@@ -469,8 +469,22 @@ public class CharacterUIGlow : MonoBehaviour
 
     private void OnValidate()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.delayCall -= RefreshGlowLayoutDeferred;
+        UnityEditor.EditorApplication.delayCall += RefreshGlowLayoutDeferred;
+#endif
+    }
+
+#if UNITY_EDITOR
+    private void RefreshGlowLayoutDeferred()
+    {
+        UnityEditor.EditorApplication.delayCall -= RefreshGlowLayoutDeferred;
+        if (this == null)
+            return;
+
         RefreshGlowLayout();
     }
+#endif
 
 
     [ContextMenu("Refresh Glow Layout")]
@@ -488,7 +502,8 @@ public class CharacterUIGlow : MonoBehaviour
         if (Application.isPlaying)
             ApplyGlow(_currentAlpha);
 
-        Canvas.ForceUpdateCanvases();
+        if (Application.isPlaying)
+            Canvas.ForceUpdateCanvases();
     }
 
 

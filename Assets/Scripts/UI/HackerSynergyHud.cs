@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NeoSurvive.Weapon;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -112,8 +113,8 @@ public sealed class HackerSynergyHud : MonoBehaviour
         public Image Background;
         public Outline Outline;
         public Image IconBackground;
-        public Text NameText;
-        public Text StackText;
+        public TextMeshProUGUI NameText;
+        public TextMeshProUGUI StackText;
         public readonly List<WeaponSlot> WeaponSlots = new List<WeaponSlot>();
     }
 
@@ -147,10 +148,12 @@ public sealed class HackerSynergyHud : MonoBehaviour
     private Canvas hudCanvas;
     private RectTransform panelRect;
     private RectTransform hoverPanelRect;
-    private Text hoverTitle;
-    private Font koreanFont;
+    private TextMeshProUGUI hoverTitle;
+    private TMP_FontAsset koreanFont;
     private GameObject ownedCanvasObject;
     private bool isPanelOpen;
+    private bool boundToScenePanel;
+    private float authoredOpenX = OpenX;
 
     private void Awake()
     {
@@ -194,7 +197,9 @@ public sealed class HackerSynergyHud : MonoBehaviour
         if (isPanelOpen && !openedThisFrame && Input.GetMouseButtonDown(0) && !IsPointerInsidePanel(Input.mousePosition))
             ClosePanel();
 
-        float targetX = isPanelOpen ? OpenX : HiddenX;
+        float openX = boundToScenePanel ? authoredOpenX : OpenX;
+        float hiddenX = boundToScenePanel ? 18f - panelRect.rect.width : HiddenX;
+        float targetX = isPanelOpen ? openX : hiddenX;
         Vector2 position = panelRect.anchoredPosition;
         position.x = Mathf.Lerp(position.x, targetX, 1f - Mathf.Exp(-SlideSpeed * Time.unscaledDeltaTime));
         panelRect.anchoredPosition = position;
@@ -216,7 +221,15 @@ public sealed class HackerSynergyHud : MonoBehaviour
 
     private void CreateHud()
     {
-        koreanFont = SynergyPresentation.GetKoreanFont();
+        koreanFont = LoadKoreanFont();
+
+        Transform existingPanel = FindSceneSynergyPanel();
+        if (existingPanel != null)
+        {
+            hudCanvas = existingPanel.GetComponentInParent<Canvas>();
+            BindScenePanel(existingPanel);
+            return;
+        }
 
         hudCanvas = FindHudCanvas();
         if (hudCanvas == null)
@@ -247,15 +260,15 @@ public sealed class HackerSynergyHud : MonoBehaviour
         panelOutline.effectColor = new Color(0.08f, 0.75f, 0.9f, 0.65f);
         panelOutline.effectDistance = new Vector2(2f, -2f);
 
-        Text title = CreateText("Title", panelObject.transform, 25, TextAnchor.MiddleLeft);
+        TextMeshProUGUI title = CreateText("Title", panelObject.transform, 25, TextAlignmentOptions.MidlineLeft);
         SetRect(title.rectTransform, new Vector2(18f, -10f), new Vector2(488f, 36f));
         title.text = "시너지";
-        title.fontStyle = FontStyle.Bold;
+        title.fontStyle = FontStyles.Bold;
         title.color = new Color(0.55f, 0.95f, 1f);
 
         CreateCloseButton(panelObject.transform);
 
-        Text handle = CreateText("Handle", panelObject.transform, 20, TextAnchor.MiddleCenter);
+        TextMeshProUGUI handle = CreateText("Handle", panelObject.transform, 20, TextAlignmentOptions.Center);
         RectTransform handleRect = handle.rectTransform;
         handleRect.anchorMin = new Vector2(1f, 0.5f);
         handleRect.anchorMax = new Vector2(1f, 0.5f);
@@ -280,6 +293,195 @@ public sealed class HackerSynergyHud : MonoBehaviour
         CreateWeaponHoverPanel(panelObject.transform);
     }
 
+    private static Transform FindSceneSynergyPanel()
+    {
+        Canvas[] canvases = FindObjectsOfType<Canvas>(true);
+        for (int i = 0; i < canvases.Length; i++)
+        {
+            if (canvases[i] == null)
+                continue;
+
+            Transform found = canvases[i].transform.Find("SynergyPanel");
+            if (found != null)
+                return found;
+        }
+
+        return null;
+    }
+
+    private void BindScenePanel(Transform panelObject)
+    {
+        boundToScenePanel = true;
+        panelRect = panelObject.GetComponent<RectTransform>();
+        authoredOpenX = panelRect.anchoredPosition.x;
+
+        Transform rowsRoot = panelObject.Find("Rows");
+        RectTransform rowsRect = rowsRoot as RectTransform;
+        Transform hackerGroup = rowsRoot != null ? rowsRoot.Find("HackerRow") : null;
+        Transform cyborgGroup = rowsRoot != null ? rowsRoot.Find("CyborgRow") : null;
+        bool hacker = IsHackerClass();
+        if (hackerGroup != null)
+            hackerGroup.gameObject.SetActive(hacker);
+        if (cyborgGroup != null)
+            cyborgGroup.gameObject.SetActive(!hacker);
+
+        Transform activeGroup = hacker ? hackerGroup : cyborgGroup;
+        Transform inactiveGroup = hacker ? cyborgGroup : hackerGroup;
+        foreach (SynergyTag tag in Tags)
+        {
+            Transform rowTransform = FindSceneRow(rowsRoot, activeGroup, tag);
+            if (rowTransform == null)
+            {
+                bool belongsToInactiveGroup = inactiveGroup != null && inactiveGroup.Find(tag + "Row") != null;
+                if (!belongsToInactiveGroup && rowsRect != null)
+                    rows.Add(tag, CreateRow(rowsRect, tag));
+                continue;
+            }
+
+            rows.Add(tag, BindRow(rowTransform, tag));
+        }
+
+        Transform close = panelObject.Find("CloseButton");
+        if (close != null)
+        {
+            Button button = close.GetComponent<Button>();
+            if (button != null)
+            {
+                button.onClick.RemoveListener(ClosePanel);
+                button.onClick.AddListener(ClosePanel);
+            }
+        }
+
+        Transform hover = panelObject.Find("SynergyWeaponHover");
+        if (hover != null)
+            BindHoverPanel(hover);
+        else
+            CreateWeaponHoverPanel(panelObject);
+
+        if (hoverPanelRect != null)
+            hoverPanelRect.gameObject.SetActive(false);
+    }
+
+    private bool IsHackerClass()
+    {
+        Player player = GetComponent<Player>();
+        if (player != null)
+            return player.CharacterType != NeoSurvive.Characters.CharacterType.Cyborg;
+
+        return PlayerClassSelection.Load() != PlayerClassType.Cyborg;
+    }
+
+    private static Transform FindSceneRow(Transform rowsRoot, Transform activeGroup, SynergyTag tag)
+    {
+        string rowName = tag + "Row";
+        if (activeGroup != null)
+        {
+            Transform nested = activeGroup.Find(rowName);
+            if (nested != null)
+                return nested;
+        }
+
+        return rowsRoot != null ? rowsRoot.Find(rowName) : null;
+    }
+
+    private static Transform FindRowPart(Transform rowObject, string partName)
+    {
+        Transform direct = rowObject.Find(partName);
+        if (direct != null)
+            return direct;
+
+        Transform infoLine = rowObject.Find("InfoLine");
+        if (infoLine != null)
+        {
+            Transform infoPart = infoLine.Find(partName);
+            if (infoPart != null)
+                return infoPart;
+        }
+
+        Transform weaponLine = rowObject.Find("WeaponLine");
+        return weaponLine != null ? weaponLine.Find(partName) : null;
+    }
+
+    private SynergyRow BindRow(Transform rowObject, SynergyTag tag)
+    {
+        SynergyRow row = new SynergyRow
+        {
+            Rect = rowObject.GetComponent<RectTransform>(),
+            Background = rowObject.GetComponent<Image>(),
+            Outline = rowObject.GetComponent<Outline>()
+        };
+
+        Transform icon = FindRowPart(rowObject, "Icon");
+        if (icon != null)
+            row.IconBackground = icon.GetComponent<Image>();
+
+        Transform name = FindRowPart(rowObject, "Name");
+        if (name != null)
+            row.NameText = name.GetComponent<TextMeshProUGUI>();
+
+        Transform stack = FindRowPart(rowObject, "Stack");
+        if (stack != null)
+            row.StackText = stack.GetComponent<TextMeshProUGUI>();
+
+        for (int index = 0; index < 5; index++)
+        {
+            Transform slotTransform = FindRowPart(rowObject, "InlineWeapon" + (index + 1));
+            if (slotTransform != null)
+                row.WeaponSlots.Add(BindInlineSlot(slotTransform));
+        }
+
+        SynergyRowHoverTarget hoverTarget = rowObject.GetComponent<SynergyRowHoverTarget>();
+        if (hoverTarget == null)
+            hoverTarget = rowObject.gameObject.AddComponent<SynergyRowHoverTarget>();
+        hoverTarget.Configure(this, tag);
+        return row;
+    }
+
+    private static WeaponSlot BindInlineSlot(Transform root)
+    {
+        WeaponSlot slot = new WeaponSlot
+        {
+            Root = root.gameObject,
+            Background = root.GetComponent<Image>(),
+            Border = root.GetComponent<Outline>()
+        };
+        Transform icon = root.Find("Icon");
+        if (icon != null)
+            slot.Icon = icon.GetComponent<Image>();
+        return slot;
+    }
+
+    private void BindHoverPanel(Transform panel)
+    {
+        hoverPanelRect = panel.GetComponent<RectTransform>();
+        Transform title = panel.Find("Title");
+        if (title != null)
+            hoverTitle = title.GetComponent<TextMeshProUGUI>();
+
+        for (int index = 0; index < 5; index++)
+        {
+            Transform slotTransform = panel.Find("WeaponSlot" + (index + 1));
+            if (slotTransform != null)
+                hoverSlots.Add(BindHoverSlot(slotTransform));
+        }
+    }
+
+    private static WeaponSlot BindHoverSlot(Transform root)
+    {
+        Outline[] outlines = root.GetComponents<Outline>();
+        WeaponSlot slot = new WeaponSlot
+        {
+            Root = root.gameObject,
+            Background = root.GetComponent<Image>(),
+            Border = outlines.Length > 0 ? outlines[0] : null,
+            Glow = outlines.Length > 1 ? outlines[1] : root.gameObject.AddComponent<Outline>()
+        };
+        Transform icon = root.Find("WeaponIcon");
+        if (icon != null)
+            slot.Icon = icon.GetComponent<Image>();
+        return slot;
+    }
+
     private void CreateCloseButton(Transform parent)
     {
         GameObject buttonObject = new GameObject("CloseButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button), typeof(Outline));
@@ -298,7 +500,7 @@ public sealed class HackerSynergyHud : MonoBehaviour
         outline.effectColor = new Color(0.25f, 0.85f, 1f, 0.75f);
         outline.effectDistance = new Vector2(1f, -1f);
 
-        Text label = CreateText("Label", buttonObject.transform, 22, TextAnchor.MiddleCenter);
+        TextMeshProUGUI label = CreateText("Label", buttonObject.transform, 22, TextAlignmentOptions.Center);
         label.rectTransform.anchorMin = Vector2.zero;
         label.rectTransform.anchorMax = Vector2.one;
         label.rectTransform.offsetMin = Vector2.zero;
@@ -359,13 +561,13 @@ public sealed class HackerSynergyHud : MonoBehaviour
         row.IconBackground.preserveAspect = true;
         row.IconBackground.color = GetTagColor(tag);
 
-        row.NameText = CreateText("Name", rowObject.transform, 19, TextAnchor.MiddleLeft);
+        row.NameText = CreateText("Name", rowObject.transform, 19, TextAlignmentOptions.MidlineLeft);
         SetRect(row.NameText.rectTransform, new Vector2(46f, 0f), new Vector2(102f, RowHeight));
         row.NameText.text = GetDisplayName(tag);
 
-        row.StackText = CreateText("Stack", rowObject.transform, 18, TextAnchor.MiddleRight);
+        row.StackText = CreateText("Stack", rowObject.transform, 18, TextAlignmentOptions.MidlineRight);
         SetRect(row.StackText.rectTransform, new Vector2(150f, 0f), new Vector2(56f, RowHeight));
-        row.StackText.fontStyle = FontStyle.Bold;
+        row.StackText.fontStyle = FontStyles.Bold;
 
         for (int index = 0; index < 5; index++)
             row.WeaponSlots.Add(CreateInlineWeaponSlot(rowObject.transform, index));
@@ -432,7 +634,7 @@ public sealed class HackerSynergyHud : MonoBehaviour
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
 
-        hoverTitle = CreateText("Title", panel.transform, 17, TextAnchor.MiddleLeft);
+        hoverTitle = CreateText("Title", panel.transform, 17, TextAlignmentOptions.MidlineLeft);
         SetRect(hoverTitle.rectTransform, new Vector2(12f, -6f), new Vector2(350f, 26f));
 
         for (int index = 0; index < 5; index++)
@@ -476,7 +678,7 @@ public sealed class HackerSynergyHud : MonoBehaviour
 
     internal void ShowWeaponHover(SynergyTag tag)
     {
-        if (hoverPanelRect == null || weaponManager == null)
+        if (hoverPanelRect == null || weaponManager == null || hoverTitle == null)
             return;
 
         Color tagColor = GetTagColor(tag);
@@ -543,17 +745,24 @@ public sealed class HackerSynergyHud : MonoBehaviour
         return matchingWeapons;
     }
 
-    private Text CreateText(string name, Transform parent, int fontSize, TextAnchor alignment)
+    private TextMeshProUGUI CreateText(string name, Transform parent, int fontSize, TextAlignmentOptions alignment)
     {
-        GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        GameObject textObject = new GameObject(name, typeof(RectTransform));
         textObject.transform.SetParent(parent, false);
-        Text result = textObject.GetComponent<Text>();
+        TextMeshProUGUI result = textObject.AddComponent<TextMeshProUGUI>();
         result.font = koreanFont;
         result.fontSize = fontSize;
         result.alignment = alignment;
         result.color = Color.white;
         result.raycastTarget = false;
+        result.enableWordWrapping = false;
+        result.overflowMode = TextOverflowModes.Overflow;
         return result;
+    }
+
+    private static TMP_FontAsset LoadKoreanFont()
+    {
+        return Resources.Load<TMP_FontAsset>("Fonts/Stardust/PF스타더스트 3.0 ExtraBold SDF");
     }
 
     private static void SetRect(RectTransform rect, Vector2 position, Vector2 size)
@@ -591,6 +800,8 @@ public sealed class HackerSynergyHud : MonoBehaviour
         foreach (SynergyTag tag in Tags)
         {
             int maximum = weaponManager.GetSynergyMaximumStack(tag);
+            if (!rows.ContainsKey(tag))
+                continue;
             if (maximum > 0)
                 visibleTags.Add(tag);
             else
@@ -601,12 +812,16 @@ public sealed class HackerSynergyHud : MonoBehaviour
 
         int visibleCount = visibleTags.Count;
         float contentHeight = visibleCount * RowHeight;
-        panelRect.sizeDelta = new Vector2(PanelWidth, HeaderHeight + contentHeight);
+        if (!boundToScenePanel)
+        {
+            panelRect.sizeDelta = new Vector2(PanelWidth, HeaderHeight + contentHeight);
 
-        RectTransform rowsRect = rows.Count > 0 ? rows[Tags[0]].Rect.parent as RectTransform : null;
-        if (rowsRect != null)
-            rowsRect.sizeDelta = new Vector2(PanelWidth, contentHeight);
+            RectTransform rowsRect = rows.Count > 0 ? rows[Tags[0]].Rect.parent as RectTransform : null;
+            if (rowsRect != null)
+                rowsRect.sizeDelta = new Vector2(PanelWidth, contentHeight);
+        }
 
+        float cursorY = 0f;
         for (int index = 0; index < visibleTags.Count; index++)
         {
             SynergyTag tag = visibleTags[index];
@@ -616,8 +831,19 @@ public sealed class HackerSynergyHud : MonoBehaviour
             SynergyRow row = rows[tag];
 
             row.Rect.gameObject.SetActive(true);
-            row.Rect.sizeDelta = new Vector2(PanelWidth, RowHeight);
-            row.Rect.anchoredPosition = new Vector2(0f, -index * RowHeight);
+            if (boundToScenePanel)
+            {
+                float rowHeight = row.Rect.rect.height > 1f ? row.Rect.rect.height : RowHeight;
+                Vector2 position = row.Rect.anchoredPosition;
+                position.y = -cursorY;
+                row.Rect.anchoredPosition = position;
+                cursorY += rowHeight;
+            }
+            else
+            {
+                row.Rect.sizeDelta = new Vector2(PanelWidth, RowHeight);
+                row.Rect.anchoredPosition = new Vector2(0f, -index * RowHeight);
+            }
             row.Background.color = isActive
                 ? new Color(0.03f, 0.28f, 0.34f, 0.98f)
                 : new Color(0.05f, 0.09f, 0.13f, 0.94f);
@@ -626,9 +852,13 @@ public sealed class HackerSynergyHud : MonoBehaviour
                 : new Color(0.12f, 0.32f, 0.4f, 0.55f);
             row.Outline.effectDistance = isActive ? new Vector2(3f, -3f) : new Vector2(1f, -1f);
             row.IconBackground.color = isActive ? Color.Lerp(GetTagColor(tag), Color.white, 0.25f) : GetTagColor(tag);
-            row.NameText.color = isActive ? new Color(0.75f, 1f, 0.9f) : Color.white;
-            row.StackText.color = isActive ? new Color(0.3f, 1f, 0.75f) : new Color(0.7f, 0.88f, 0.95f);
-            row.StackText.text = current + " / " + maximum;
+            if (row.NameText != null)
+                row.NameText.color = isActive ? new Color(0.75f, 1f, 0.9f) : Color.white;
+            if (row.StackText != null)
+            {
+                row.StackText.color = isActive ? new Color(0.3f, 1f, 0.75f) : new Color(0.7f, 0.88f, 0.95f);
+                row.StackText.text = current + " / " + maximum;
+            }
             RefreshInlineWeaponSlots(row, tag);
         }
     }

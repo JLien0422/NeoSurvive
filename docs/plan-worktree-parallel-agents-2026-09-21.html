@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — 워크트리 병렬 작업 결정안</title>
+  <style>
+    :root {
+      --bg: #0e1318; --panel: #161d26; --panel2: #1c2430; --line: #2b3644;
+      --text: #e8eef5; --muted: #95a3b4; --faint: #6c7a8b;
+      --green: #3ecf8e; --amber: #e6b84d; --red: #ef6b6b; --cyan: #5ec8d8;
+      --blue: #4da3ff; --violet: #a78bfa;
+      --sans: "Pretendard", "Noto Sans KR", sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: var(--sans); color: var(--text); line-height: 1.65;
+      background: radial-gradient(900px 420px at 0% 0%, #1a2736 0%, transparent 55%), var(--bg);
+    }
+    a { color: var(--blue); text-decoration: none; }
+    code {
+      font-family: var(--mono); font-size: .84em; background: #0b1016;
+      border: 1px solid var(--line); border-radius: 6px; padding: .05rem .32rem;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 1.2rem 1.1rem 3rem; }
+    .hero {
+      background: linear-gradient(165deg, #1a2431, #121820);
+      border: 1px solid var(--line); border-radius: 16px; padding: 1.3rem 1.2rem; margin-bottom: 1rem;
+    }
+    .hero .eyebrow { margin: 0 0 .35rem; color: var(--cyan); font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .hero h1 { margin: 0 0 .45rem; font-size: clamp(1.2rem, 2.4vw, 1.6rem); line-height: 1.3; }
+    .hero p { margin: 0; color: var(--muted); max-width: 48rem; }
+    .badges { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .85rem; }
+    .badge {
+      font-size: .7rem; font-weight: 700; padding: .22rem .5rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    }
+    .badge.g { color: var(--green); border-color: #2d5644; }
+    .badge.a { color: var(--amber); border-color: #5a4a22; }
+    .badge.r { color: var(--red); border-color: #5a2e2e; }
+    .badge.v { color: var(--violet); border-color: #4a3a6a; }
+
+    .layout { display: grid; grid-template-columns: 210px 1fr; gap: 1rem; align-items: start; }
+    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } .toc { position: static !important; } }
+    .toc {
+      position: sticky; top: .75rem; background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; padding: .8rem .75rem;
+    }
+    .toc h2 { margin: 0 0 .45rem; font-size: .7rem; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; }
+    .toc ol { margin: 0; padding-left: 1.05rem; font-size: .84rem; }
+    .toc li { margin: .22rem 0; }
+    .toc a { color: var(--muted); }
+    .toc a:hover { color: var(--text); }
+
+    section {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1.05rem 1.05rem 1.1rem; margin-bottom: .85rem;
+    }
+    section > h2 {
+      margin: 0 0 .7rem; font-size: 1.1rem; display: flex; align-items: center; gap: .45rem;
+    }
+    .num {
+      width: 1.45rem; height: 1.45rem; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 7px; font-size: .75rem; font-weight: 800;
+      background: var(--panel2); border: 1px solid var(--line); color: var(--cyan);
+    }
+    h3 { margin: 1rem 0 .4rem; font-size: .98rem; color: var(--cyan); }
+    p { margin: .35rem 0; }
+    .muted { color: var(--muted); }
+    ul, ol { margin: .3rem 0 .5rem; padding-left: 1.15rem; }
+    li { margin: .18rem 0; }
+
+    .phase {
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+      margin: .75rem 0; background: var(--panel2);
+    }
+    .phase-h {
+      display: flex; flex-wrap: wrap; gap: .4rem .7rem; justify-content: space-between; align-items: center;
+      padding: .75rem .9rem; background: #121820; border-bottom: 1px solid var(--line);
+    }
+    .phase-h h3 { margin: 0; color: var(--text); font-size: 1.02rem; }
+    .phase-b { padding: .85rem .9rem .95rem; }
+    .pill {
+      font-size: .7rem; font-weight: 800; padding: .16rem .45rem; border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+    .pill.do { color: var(--green); background: #13231c; border-color: #2d5644; }
+    .pill.warn { color: var(--amber); background: #241f12; border-color: #5a4a22; }
+    .pill.danger { color: var(--red); background: #241414; border-color: #5a2e2e; }
+    .pill.info { color: var(--blue); background: #121c28; border-color: #2a4a6a; }
+
+    .kv { display: grid; grid-template-columns: 110px 1fr; gap: .2rem .6rem; font-size: .9rem; margin: .4rem 0 .7rem; }
+    .kv .k { color: var(--faint); font-weight: 700; }
+    @media (max-width: 560px) { .kv { grid-template-columns: 1fr; } }
+
+    .box {
+      border-radius: 10px; border: 1px solid var(--line); background: #121820;
+      padding: .75rem .85rem; margin: .55rem 0;
+    }
+    .box.ok { border-left: 3px solid var(--green); }
+    .box.warn { border-left: 3px solid var(--amber); }
+    .box.danger { border-left: 3px solid var(--red); }
+    .box.tip { border-left: 3px solid var(--blue); }
+    .box .t { font-weight: 800; font-size: .86rem; margin-bottom: .2rem; }
+    .box.ok .t { color: var(--green); }
+    .box.warn .t { color: var(--amber); }
+    .box.danger .t { color: var(--red); }
+    .box.tip .t { color: var(--blue); }
+
+    .table-wrap { overflow-x: auto; margin: .5rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 520px; }
+    th, td { border: 1px solid var(--line); padding: .42rem .5rem; text-align: left; vertical-align: top; }
+    th { background: #121820; color: var(--muted); }
+
+    .check { list-style: none; padding-left: 0; }
+    .check li { position: relative; padding-left: 1.4rem; margin: .28rem 0; }
+    .check li::before { content: "☐"; position: absolute; left: 0; color: var(--faint); }
+
+    pre {
+      margin: .45rem 0; padding: .7rem .8rem; overflow-x: auto;
+      background: #0b1016; border: 1px solid var(--line); border-radius: 8px;
+      font-family: var(--mono); font-size: .8rem; color: var(--text); line-height: 1.5;
+    }
+    footer { text-align: center; color: var(--faint); font-size: .78rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Workflow · Worktree · 2026-09-21</p>
+      <h1>Unity 1개 + 코딩 2갈래<br />워크트리 병렬 작업 결정안</h1>
+      <p>
+        Cursor CLI / Orca ADE / 헤드 디태치 / git worktree / Unity Editor 제약을
+        카톡 조언과 대조해 확정한 운영안. <strong>게임 코드·에셋은 이 HTML 범위가 아님.</strong>
+      </p>
+      <div class="badges">
+        <span class="badge g">워크트리 병렬 = 찬성</span>
+        <span class="badge a">Orca / CLI = 나중</span>
+        <span class="badge r">헤드 디태치 = 반대</span>
+        <span class="badge v">Unity Play = 폴더 1개만</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc">
+        <h2>목차</h2>
+        <ol>
+          <li><a href="#s0">한 줄 결론</a></li>
+          <li><a href="#s1">카톡 조언 판정</a></li>
+          <li><a href="#s2">도구</a></li>
+          <li><a href="#s3">워크트리</a></li>
+          <li><a href="#s4">Unity 1개</a></li>
+          <li><a href="#s5">현재 레포</a></li>
+          <li><a href="#s6">운영 규칙</a></li>
+          <li><a href="#s7">이슈 단위</a></li>
+          <li><a href="#sOut">비범위</a></li>
+        </ol>
+      </nav>
+
+      <div>
+        <section id="s0">
+          <h2><span class="num">0</span> 한 줄 결론</h2>
+          <div class="box ok">
+            <div class="t">채택</div>
+            작업마다 <strong>named branch worktree</strong>. Unity는 메인 폴더 1개만 연다.
+            에이전트는 다른 폴더에서 코드를 고치고, 끝난 것만 메인에 합친 뒤 Play로 확인한다.
+          </div>
+          <div class="box warn">
+            <div class="t">보류</div>
+            Cursor CLI + Orca ADE. 에이전트를 <strong>자주 2개 이상</strong> 터미널·폰으로 굴리게 된 다음에 깐다.
+            지금은 Cursor IDE <code>/worktree</code>로 같은 효과의 80%를 낸다.
+          </div>
+          <div class="box danger">
+            <div class="t">하지 않음</div>
+            <code>git worktree add --detach</code>로 병렬 작업을 오래 가져가지 않는다.
+            디태치는 Unity 브랜치 잠금 우회일 뿐이고, 커밋이 브랜치에 안 붙으면 유실된다.
+          </div>
+          <p class="muted">
+            “Unity를 보면서 작업 두 개를 동시에” = <strong>모니터는 게임 하나, 뒤에서 코드가 둘</strong>.
+            Editor 한 개가 폴더 두 개를 동시에 Play하지 않는다.
+          </p>
+        </section>
+
+        <section id="s1">
+          <h2><span class="num">1</span> 카톡 조언 판정</h2>
+          <p>상대가 말한 것: GUI 대신 Cursor CLI, 원래 Orca ADE, Orca도 CLI를 깐다, 그게 더 효율, 헤드 디태치로 동시 2개 이상. 채팅에 「그건 좀 위험한데」도 있음.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>말</th><th>판정</th><th>이유</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cursor CLI는 터미널 에이전트</td>
+                  <td><span class="pill do">맞음</span></td>
+                  <td>공식 <code>agent</code>. 이 PC에는 아직 없음.</td>
+                </tr>
+                <tr>
+                  <td>Orca ADE = 에이전트 전용 환경</td>
+                  <td><span class="pill do">맞음</span></td>
+                  <td><a href="https://www.onorca.dev/">onorca.dev</a>. 서드파티. Cursor 공식 문서에는 없음.</td>
+                </tr>
+                <tr>
+                  <td>Orca에서 Cursor 쓰려면 CLI 설치</td>
+                  <td><span class="pill do">맞음</span></td>
+                  <td>Orca는 모델을 안 팜. 있는 Cursor 구독 + CLI를 묶음.</td>
+                </tr>
+                <tr>
+                  <td>그 조합이 더 효율적</td>
+                  <td><span class="pill warn">조건부</span></td>
+                  <td>터미널 함대·폰 모니터링에는 맞음. Unity Play/검증은 안 빨라짐.</td>
+                </tr>
+                <tr>
+                  <td>헤드 디태치가 동시 작업의 핵심</td>
+                  <td><span class="pill danger">아님</span></td>
+                  <td>핵심은 워크트리(폴더 분리) + 작업별 브랜치. 디태치는 우회.</td>
+                </tr>
+                <tr>
+                  <td>디태치가 좀 위험하다</td>
+                  <td><span class="pill do">맞음</span></td>
+                  <td>브랜치 없이 커밋 → 워크트리 삭제 시 유실. PR 가지가 없음.</td>
+                </tr>
+                <tr>
+                  <td>이 컴퓨터 GUI로 작업하기 싫다</td>
+                  <td><span class="pill info">그 사람 취향</span></td>
+                  <td>주인님은 Unity를 이 PC에서 Play해야 함. 동기 그대로 가져오면 안 됨.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="s2">
+          <h2><span class="num">2</span> 도구</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>도구</th><th>역할</th><th>지금</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Cursor IDE</strong></td>
+                  <td>Agents Window, <code>/worktree</code>, <code>/best-of-n</code>, <code>/apply-worktree</code></td>
+                  <td>이미 있음. 병렬 코딩의 1순위.</td>
+                </tr>
+                <tr>
+                  <td><strong>Cursor CLI</strong> (<code>agent</code>)</td>
+                  <td>터미널 에이전트. <code>agent --worktree</code></td>
+                  <td>미설치. Orca에 Cursor를 넣을 때 필요.</td>
+                </tr>
+                <tr>
+                  <td><strong>Orca ADE</strong></td>
+                  <td>여러 CLI 에이전트 + 워크트리를 한 화면/모바일로 관리</td>
+                  <td>미설치. 함대 관리용. 선택.</td>
+                </tr>
+                <tr>
+                  <td><strong>Unity Editor</strong></td>
+                  <td>Play / 씬 / 프리팹 확인. 경로당 락 1개 (<code>Temp/UnityLockfile</code>)</td>
+                  <td>메인 폴더 1개만.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="muted">Windows CLI 설치(나중에): <code>irm 'https://cursor.com/install?win32=true' | iex</code> → <code>agent --version</code> → <code>agent login</code></p>
+        </section>
+
+        <section id="s3">
+          <h2><span class="num">3</span> 워크트리 — 왜 / 어떻게</h2>
+          <p>같은 <code>.git</code>을 공유하고 <strong>작업 폴더만 여러 개</strong> 둔다. 에이전트가 파일을 서로 안 덮고, Unity가 연 메인을 stash/브랜치 왕복으로 안 더럽힌다.</p>
+          <h3>Git 제약</h3>
+          <p>한 브랜치는 워크트리 하나에서만 checkout. Unity가 <code>chore/assets-cleanup-unused</code>를 잡고 있으면 에이전트가 그 브랜치를 다른 폴더에 또 열 수 없다.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>방식</th><th>명령</th><th>쓸 때</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>정석</strong></td>
+                  <td><code>git worktree add -b feat/이름 경로</code></td>
+                  <td>모든 실제 작업. PR 가능.</td>
+                </tr>
+                <tr>
+                  <td>디태치</td>
+                  <td><code>git worktree add --detach 경로 HEAD</code></td>
+                  <td>잠깐 같은 커밋만 볼 때. 오래 금지.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box warn">
+            <div class="t">Cursor 버그 주의</div>
+            UI가 브랜치 없이 워크트리만 만들면 의도치 않은 디태치가 된다. 그건 정석이 아니라 사고.
+            오래 갈 작업은 반드시 <code>git branch --show-current</code>로 브랜치가 있는지 확인.
+          </div>
+        </section>
+
+        <section id="s4">
+          <h2><span class="num">4</span> Unity 1개 + 작업 2개</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>하고 싶은 것</th><th>Unity 1개</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>에이전트 B가 다른 폴더에서 스크립트 수정, Unity는 메인에서 Play</td><td>됨</td></tr>
+                <tr><td>한 Editor가 두 폴더를 동시에 컴파일/Play</td><td>안 됨</td></tr>
+                <tr><td>두 워크트리에서 동시에 Play</td><td>Editor 2개 = Library 2벌. 디스크·RAM 큼</td></tr>
+                <tr><td>같은 씬/프리팹을 두 에이전트가 동시 수정</td><td>워크트리여도 머지 지옥</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <pre>Unity          C:\Users\a3435\NeoSurvive        지금 브랜치, Play는 여기만
+에이전트 A     ..\NeoSurvive-&lt;task-a&gt;           feat/task-a  (코드만)
+에이전트 B     ..\NeoSurvive-&lt;task-b&gt;           feat/task-b  (코드만)</pre>
+          <ol>
+            <li>Unity는 메인만 켠다.</li>
+            <li>A/B는 각자 워크트리에서 고친다. <strong>파일이 안 겹치는 작업만</strong> 동시에.</li>
+            <li>끝난 쪽만 메인에 합친다 (PR 또는 <code>/apply-worktree</code>).</li>
+            <li><strong>그때</strong> Unity에서 Play 확인.</li>
+            <li>다른 쪽도 합치고 다시 Play.</li>
+          </ol>
+          <p class="muted">Unity MCP는 지금 열린 Editor 1개에 붙는다. 워크트리 B의 코드는 그 폴더를 열거나 메인에 합치기 전엔 Play에 안 나온다. Library 심볼릭 링크 공유는 락/DB 꼬임 위험으로 금지.</p>
+        </section>
+
+        <section id="s5">
+          <h2><span class="num">5</span> 현재 레포 상태 (2026-09-21 조사)</h2>
+          <div class="kv">
+            <div class="k">메인</div>
+            <div><code>C:\Users\a3435\NeoSurvive</code> · <code>chore/assets-cleanup-unused</code> · 살아 있음 · Unity는 여기</div>
+            <div class="k">2번째</div>
+            <div><code>C:\Users\a3435\NeoSurvive-balancing-pr</code> · 폴더 없음 · <strong>prunable 죽은 기록</strong></div>
+            <div class="k">설정</div>
+            <div><code>.cursor/worktrees.json</code> 없음 · Cursor CLI (<code>agent</code>) 없음</div>
+          </div>
+          <p>세 번째 워크트리는 작업명/브랜치를 안 정해서 <strong>아직 안 만듦</strong>.</p>
+        </section>
+
+        <section id="s6">
+          <h2><span class="num">6</span> 운영 규칙 (고정안)</h2>
+          <ol>
+            <li>Unity는 <code>C:\Users\a3435\NeoSurvive</code>만 연다.</li>
+            <li>새 작업은 <code>feat/이름</code> 워크트리. 디태치 금지.</li>
+            <li>끝나면 PR → 메인에서 Play. 리뷰어는 NeoSurvive 규칙(전원) 그대로.</li>
+            <li>동시에 넣는 작업은 파일이 안 겹치는 것만.</li>
+            <li>Cursor 3.5+ 머신당 워크트리 기본 25개. 수동 <code>git worktree add</code>도 정리 대상이 될 수 있음.</li>
+            <li>CLI/Orca는 동시 작업을 자주 하게 된 다음에.</li>
+          </ol>
+        </section>
+
+        <section id="s7">
+          <h2><span class="num">7</span> GitHub 이슈 단위 (승인 후)</h2>
+          <p class="muted">아래는 <strong>툴링/운영</strong> 이슈다. 게임플레이 HTML이 아니다. 주인님 <code>HTML OK</code> 전까지 설치·브랜치 생성은 작업명을 받은 것만.</p>
+
+          <article class="phase" id="w0">
+            <div class="phase-h">
+              <h3>W-0 죽은 워크트리 정리</h3>
+              <span class="pill do">즉시 가능</span>
+            </div>
+            <div class="phase-b">
+              <div class="kv">
+                <div class="k">범위</div>
+                <div><code>git worktree prune</code>만. 게임 파일 수정 없음.</div>
+                <div class="k">파일</div>
+                <div>없음 (git 메타만)</div>
+                <div class="k">비범위</div>
+                <div>새 워크트리 생성, CLI/Orca 설치</div>
+              </div>
+              <p><strong>AC</strong></p>
+              <ul class="check">
+                <li><code>git worktree list</code>에 <code>NeoSurvive-balancing-pr</code>이 안 남는다.</li>
+                <li>메인 <code>NeoSurvive</code> 워크트리는 그대로다.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="phase" id="w1">
+            <div class="phase-h">
+              <h3>W-1 첫 코드 전용 워크트리</h3>
+              <span class="pill warn">작업명 필요</span>
+            </div>
+            <div class="phase-b">
+              <div class="kv">
+                <div class="k">범위</div>
+                <div>주인님이 정한 작업 1개에 대해 <code>feat/이름</code> 브랜치 + 옆 폴더 worktree.</div>
+                <div class="k">파일</div>
+                <div>새 폴더 예: <code>C:\Users\a3435\NeoSurvive-&lt;task&gt;</code> (Library 없이 코드 전용)</div>
+                <div class="k">비범위</div>
+                <div>그 폴더를 Unity로 열기, 두 번째 작업 자동 생성, 게임 코드 구현</div>
+              </div>
+              <p><strong>AC</strong></p>
+              <ul class="check">
+                <li>메인은 기존 브랜치 그대로. Unity 경로 불변.</li>
+                <li>새 워크트리는 named branch. <code>HEAD detached</code>가 아니다.</li>
+                <li>Cursor에서 그 폴더를 창/채팅으로 열 수 있다.</li>
+              </ul>
+              <div class="box tip">
+                <div class="t">블로커</div>
+                동시에 넣을 <strong>두 작업 이름</strong>이 아직 없음. 정해져야 W-1/W-1b를 만듦.
+              </div>
+            </div>
+          </article>
+
+          <article class="phase" id="w2">
+            <div class="phase-h">
+              <h3>W-2 (선택) <code>.cursor/worktrees.json</code></h3>
+              <span class="pill info">나중에</span>
+            </div>
+            <div class="phase-b">
+              <div class="kv">
+                <div class="k">범위</div>
+                <div>Windows용 setup 스크립트. Unity Library를 복사/링크하지 않음.</div>
+                <div class="k">파일</div>
+                <div><code>.cursor/worktrees.json</code>, 필요 시 <code>.cursor/setup-worktree-windows.ps1</code></div>
+                <div class="k">비범위</div>
+                <div><code>npm ci</code> 같은 Node 가정, Library junction, 씬/에셋 수정</div>
+              </div>
+              <p><strong>AC</strong></p>
+              <ul class="check">
+                <li>Cursor가 워크트리 만들 때 Windows 스크립트가 돈다.</li>
+                <li>메인 Unity Library를 건드리지 않는다.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="phase" id="w3">
+            <div class="phase-h">
+              <h3>W-3 (나중) Cursor CLI + Orca</h3>
+              <span class="pill warn">동시 작업을 자주 할 때</span>
+            </div>
+            <div class="phase-b">
+              <div class="kv">
+                <div class="k">범위</div>
+                <div>CLI 설치·로그인, Orca 데스크톱, (선택) 모바일 페어링. Unity는 계속 메인만.</div>
+                <div class="k">파일</div>
+                <div>게임 레포 파일 없음. 로컬 툴 설치만.</div>
+                <div class="k">비범위</div>
+                <div>디태치를 기본으로 쓰기, Unity Editor 2개 강제, 게임 코드 변경</div>
+              </div>
+              <p><strong>AC</strong></p>
+              <ul class="check">
+                <li><code>agent --version</code> 성공, 로그인됨.</li>
+                <li>Orca가 Cursor CLI를 PATH에서 잡는다.</li>
+                <li>작업 생성 시 named worktree가 생기고, 메인은 checkout이 안 바뀐다.</li>
+              </ul>
+            </div>
+          </article>
+        </section>
+
+        <section id="sOut">
+          <h2><span class="num">8</span> 공통 비범위</h2>
+          <ul>
+            <li>이 HTML만으로 게임 스크립트·씬·프리팹·에셋 수정</li>
+            <li>헤드 디태치를 병렬의 기본 방식으로 채택</li>
+            <li>Unity Library 공유(심볼릭 링크/정션)</li>
+            <li>승인 없이 Cursor CLI / Orca 설치를 “필수”로 밀기</li>
+            <li>작업명 없이 빈 워크트리 양산</li>
+            <li>같은 씬 YAML을 두 에이전트에 동시에 맡기기</li>
+          </ul>
+          <div class="box ok">
+            <div class="t">다음</div>
+            주인님이 동시에 넣을 <strong>두 작업 이름</strong>을 주시면 W-0 prune + W-1 워크트리.
+            CLI/Orca(W-3)는 따로 <code>HTML OK</code> / <code>진행</code>이 있을 때만.
+          </div>
+        </section>
+
+        <footer>
+          docs/plan-worktree-parallel-agents-2026-09-21.html · 기획 산출물 · 게임 코드 비범위
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

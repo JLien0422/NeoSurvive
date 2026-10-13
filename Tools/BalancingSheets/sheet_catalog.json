@@ -17,7 +17,7 @@
       "sheet": "02b_EnemyHpScale",
       "category": "Enemies",
       "path": "Assets/Data/Balancing/enemy_hp_scale.csv",
-      "keys": ["phase"]
+      "keys": ["durationsec"]
     },
     {
       "sheet": "03_EnemyDrops",

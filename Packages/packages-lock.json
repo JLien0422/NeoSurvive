@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.coffee.ui-effect": {
+      "version": "https://github.com/mob-sakai/UIEffect.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "332340e7bc2f8257816dd28784607a1edf6b6c2a"
+    },
     "com.coplaydev.unity-mcp": {
       "version": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity",
       "depth": 0,
@@ -216,13 +223,6 @@
     },
     "com.unity.mathematics": {
       "version": "1.2.6",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.nuget.mono-cecil": {
-      "version": "1.11.4",
       "depth": 1,
       "source": "registry",
       "dependencies": {},

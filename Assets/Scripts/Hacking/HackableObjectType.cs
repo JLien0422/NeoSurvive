@@ -11,14 +11,14 @@ public enum HackableObjectType
 }
 
 /// <summary>
-/// 현재 플레이에 쓰는 미니게임 풀. 지금은 NumberSequence / CommandBypass 2종만.
+/// 현재 플레이에 쓰는 미니게임 풀. 지금은 NumberSequence와 NetworkBridge.
 /// </summary>
 public static class ActiveHackMinigames
 {
     public static readonly HackableObjectType[] Types =
     {
         HackableObjectType.SecurityTurret,
-        HackableObjectType.ElectricFence
+        HackableObjectType.SatelliteUplink
     };
 
     public static bool IsActive(HackableObjectType type)

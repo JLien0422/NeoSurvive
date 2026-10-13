@@ -28,10 +28,10 @@ public class SynapseSyncMinigame : HackingMinigameBase
     private float targetRadius = 50f;        // CenterCircle 반크기
     private float perfectTimingRange = 15f;  // 허용 범위
 
-    private int requiredHits = 5;
+    private int requiredHits = 3;
     private int currentHits = 0;
 
-    private float timeLimit = 15f;
+    private float timeLimit = 5f;
     private float remainingTime = 0f;
     private bool isActive = false;
     private bool waitingForInput = false;
@@ -250,7 +250,6 @@ public class SynapseSyncMinigame : HackingMinigameBase
             if (img != null) img.color = Color.green;
         }
 
-        // 해킹 중 timeScale=0이어도 다음 라운드로 정상 진행되도록 실시간 대기 사용
         yield return new WaitForSecondsRealtime(0.5f);
 
         ResetCircle();

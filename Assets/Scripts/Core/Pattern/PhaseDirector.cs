@@ -136,7 +136,7 @@ public class PhaseDirector : MonoBehaviour
     GameObject prefab = PickActiveHackablePrefab();
     if (prefab == null)
     {
-      Debug.LogWarning("[PhaseDirector] 활성 미니게임(터렛/울타리) 프리팹이 없습니다.");
+      Debug.LogWarning("[PhaseDirector] 활성 미니게임(터렛/새틀라이트) 프리팹이 없습니다.");
       return;
     }
 

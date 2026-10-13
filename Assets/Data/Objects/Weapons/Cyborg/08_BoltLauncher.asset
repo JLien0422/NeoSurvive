@@ -19,3 +19,6 @@ MonoBehaviour:
   weaponPrefab: {fileID: 2996693542194930770, guid: c0678b67d8703204e98f46bad29b5082, type: 3}
   level: 1
   isIndependent: 0
+  synergyTags:
+  - 6
+  - 8

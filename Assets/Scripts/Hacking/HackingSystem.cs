@@ -68,7 +68,6 @@ public class HackingSystem : MonoBehaviour
     // 현재 진행 중인 미니게임
     private HackingMinigameBase currentMinigame;
     private bool isHacking = false;
-    private bool pausedTimeForHacking = false;
 
     // 사이보그 해킹 관련
     private Coroutine cyborgHackingCoroutine; // 사이보그 해킹 코루틴 참조
@@ -212,10 +211,10 @@ public class HackingSystem : MonoBehaviour
         var player = FindObjectOfType<Player>();
         if (player == null) return;
 
-        // 활성 미니게임 2종만 (NumberSequence / CommandBypass)
+        // 활성 미니게임은 NumberSequence, NetworkBridge
         GameObject[] prefabs = {
             securityTurretPrefab,
-            electricFencePrefab
+            satelliteUplinkPrefab
         };
 
         // null 제거 후 랜덤 선택
@@ -245,17 +244,13 @@ public class HackingSystem : MonoBehaviour
     {
         if (isHacking) return;
         isHacking = true;
-        pausedTimeForHacking = false;
 
         if (IsCurrentPlayerHacker())
         {
             if (hackingUIPanel != null)
                 hackingUIPanel.SetActive(true);
 
-            // 해커: 전투는 실시간 유지, 미니게임만 진행
-            // pausedTimeForHacking = true;
-            // Time.timeScale = 0f;
-            pausedTimeForHacking = false;
+            // 해커 미니게임 중에도 전투 시간은 흐른다. Time.timeScale을 건드리지 않는다.
             StartMinigame(objectType, onSuccess, onFailure);
         }
         else
@@ -389,7 +384,8 @@ public class HackingSystem : MonoBehaviour
         Transform rightContainer = networkBridgeRoot.Find("RightContainer");
         Transform linesContainer = networkBridgeRoot.Find("LinesContainer");
         Slider timeGauge = FindSlider(networkBridgeRoot, "TimeGauge");
-        Slider successGauge = FindSlider(networkBridgeRoot, "SuccessGauge");
+        Transform successTransform = networkBridgeRoot.Find("SuccessGauge");
+        Slider successGauge = successTransform != null ? successTransform.GetComponent<Slider>() : null;
 
         minigame.SetPreMadeUI(leftContainer, rightContainer, linesContainer, timeGauge, successGauge);
         minigame.Initialize(onSuccess, onFailure);
@@ -494,12 +490,6 @@ public class HackingSystem : MonoBehaviour
     public void EndHacking()
     {
         isHacking = false;
-
-        // 해커도 해킹 중 시간을 멈추지 않음. 일시정지 메뉴 timeScale을 덮어쓰지 않는다.
-        // if (pausedTimeForHacking)
-        //     Time.timeScale = 1f;
-
-        pausedTimeForHacking = false;
 
         // 사이보그 해킹 코루틴이 아직 돌고 있으면 강제 중단
         if (cyborgHackingCoroutine != null)

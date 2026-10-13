@@ -95,13 +95,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // WASD만 키보드 이동. 화살표는 해킹 미니게임용.
+            // WASD와 화살표 모두 이동.
             float moveX = 0f;
             float moveY = 0f;
-            if (Input.GetKey(KeyCode.A)) moveX -= 1f;
-            if (Input.GetKey(KeyCode.D)) moveX += 1f;
-            if (Input.GetKey(KeyCode.S)) moveY -= 1f;
-            if (Input.GetKey(KeyCode.W)) moveY += 1f;
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) moveX -= 1f;
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) moveX += 1f;
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) moveY -= 1f;
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) moveY += 1f;
 
             // 입력 값을 Vector2 형태로 저장하고 정규화(normalize)합니다.
             // 정규화를 통해 대각선 이동 시 속도가 더 빨라지는 것을 방지합니다.

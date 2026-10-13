@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeoSurvive — 적 HP/스폰 밸런스 변경 기록</title>
+  <style>
+    :root {
+      --bg: #0e1318; --panel: #161d26; --panel2: #1c2430; --line: #2b3644;
+      --text: #e8eef5; --muted: #95a3b4; --faint: #6c7a8b;
+      --green: #3ecf8e; --amber: #e6b84d; --red: #ef6b6b; --cyan: #5ec8d8; --blue: #4da3ff;
+      --sans: "Pretendard", "Noto Sans KR", sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: var(--sans); color: var(--text); line-height: 1.55;
+      background: var(--bg);
+    }
+    a { color: var(--blue); }
+    code {
+      font-family: var(--mono); font-size: .82em; background: #0b1016;
+      border: 1px solid var(--line); border-radius: 5px; padding: .04rem .28rem;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.2rem 1.1rem 3rem; }
+    .hero {
+      background: #121820; border: 1px solid var(--line); border-radius: 16px;
+      padding: 1.3rem 1.2rem; margin-bottom: 1rem;
+    }
+    .hero .eyebrow { margin: 0 0 .35rem; color: var(--cyan); font-size: .75rem; font-weight: 800; }
+    .hero h1 { margin: 0 0 .45rem; font-size: 1.45rem; }
+    .hero p { margin: .35rem 0 0; color: var(--muted); }
+    section {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1rem 1rem 1.1rem; margin-bottom: .9rem;
+    }
+    h2 { margin: 0 0 .4rem; font-size: 1.08rem; color: var(--cyan); }
+    .lead { margin: 0 0 .7rem; color: var(--muted); font-size: .92rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th, td { border: 1px solid var(--line); padding: .45rem .5rem; text-align: left; }
+    th { background: #121820; color: var(--muted); }
+    td.num, th.num { text-align: right; font-family: var(--mono); }
+    ul { margin: .3rem 0 0; padding-left: 1.15rem; }
+    li { margin: .22rem 0; }
+    .note {
+      margin: .7rem 0 0; padding: .65rem .75rem; border-radius: 10px;
+      background: var(--panel2); border-left: 3px solid var(--amber); color: var(--muted);
+    }
+    .ok {
+      border-left-color: var(--green);
+    }
+    footer { text-align: center; color: var(--faint); font-size: .78rem; margin-top: .4rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">적용 기록 · 2026-10-13</p>
+      <h1>적 HP / 스폰 밸런스를 왜, 어떻게 고쳤는가</h1>
+      <p>
+        초반은 쉽게, 후반은 확실히 빡세게. HP는 페이즈 계단 대신
+        <code>(시간/15분)²</code>. 스폰은 0~3분 유지, 3분부터 3분마다 간격↓ 마리↑.
+      </p>
+    </header>
+
+    <section>
+      <h2>1. 왜 고쳤나</h2>
+      <p class="lead">예전 곡선은 초반과 후반 체감 차이가 작고, 3분에 오히려 허전해졌습니다.</p>
+      <ul>
+        <li>HP가 페이즈 5단(<code>1 / 1.6 / 2.3 / 3.2 / 4.2</code>)이라 3분마다 계단처럼 뛰고, 그 사이는 평평했습니다.</li>
+        <li>basic 기본 36 × 1페이즈 배율 1.0 = 시작부터 36. 레이저 L1(12) 기준 초반이 이미 두껍습니다.</li>
+        <li>15분 HP는 36 × 4.2 = 151 정도라, 초반 36 대비 후반이 충분히 안 셉니다. 목표 초반 15 / 후반 315와 거리가 큽니다.</li>
+        <li>3분 진입 때 P2 스폰이 <code>0.4~0.8 / 1~2마리</code>라 P1 끝(3마리 / 0.35~0.55)보다 밀도가 떨어졌습니다.</li>
+        <li>무기 너프·레거시 스폰 테이블 삭제는 하지 않기로 했습니다. 적 HP와 후반 스폰만 손댑니다.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. 어떻게 고쳤나 — HP</h2>
+      <p class="lead">
+        적이 <strong>새로 스폰될 때</strong>만 그 시각 HP를 받습니다. 이미 나온 적은 시간에 따라 안 커집니다.
+      </p>
+      <table>
+        <thead>
+          <tr><th>항목</th><th>예전</th><th>지금</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>배율 기준</td>
+            <td><code>CurrentPhase</code> 5칸 룩업</td>
+            <td><code>GetGameTime()</code> 연속 곡선</td>
+          </tr>
+          <tr>
+            <td>CSV</td>
+            <td><code>phase, hpmultiplier</code> 5줄</td>
+            <td><code>durationsec, exponent, startmultiplier, endmultiplier</code> 한 줄<br /><code>900, 2, 0.416667, 8.75</code></td>
+          </tr>
+          <tr>
+            <td>공식</td>
+            <td>페이즈 표 그대로 곱</td>
+            <td>
+              <code>mul = 0.416667 + (8.75 − 0.416667) × (t / 900)²</code><br />
+              <code>HP = CSV기본HP × mul</code>
+            </td>
+          </tr>
+          <tr>
+            <td>basic 36 기준</td>
+            <td>0:00 → 36, 15:00 → ~151</td>
+            <td>0:00 → 15, 15:00 → 315</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="lead" style="margin-top:.8rem">시각별 신규 basic HP (다른 종류는 각자 기본 HP × 같은 mul)</p>
+      <table>
+        <thead>
+          <tr>
+            <th>시각</th>
+            <th class="num">mul</th>
+            <th class="num">basic (36)</th>
+            <th class="num">rusher (28)</th>
+            <th class="num">tanker (100)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0:00</td><td class="num">0.417</td><td class="num">15</td><td class="num">11.7</td><td class="num">42</td></tr>
+          <tr><td>3:00</td><td class="num">0.75</td><td class="num">27</td><td class="num">21</td><td class="num">75</td></tr>
+          <tr><td>6:00</td><td class="num">1.75</td><td class="num">63</td><td class="num">49</td><td class="num">175</td></tr>
+          <tr><td>9:00</td><td class="num">3.42</td><td class="num">123</td><td class="num">96</td><td class="num">342</td></tr>
+          <tr><td>12:00</td><td class="num">5.75</td><td class="num">207</td><td class="num">161</td><td class="num">575</td></tr>
+          <tr><td>15:00</td><td class="num">8.75</td><td class="num">315</td><td class="num">245</td><td class="num">875</td></tr>
+        </tbody>
+      </table>
+      <p class="note">
+        4제곱/지수 곡선은 후반이 너무 수직이라 제외했습니다. 제곱만 씁니다.
+        <code>enemy_stats.csv</code> 기본 36은 유지합니다. 15는 배율로만 만듭니다.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. 어떻게 고쳤나 — 스폰</h2>
+      <p class="lead">
+        <code>EnemySpawner</code> 루프는 안 건드렸습니다. P2~P5 CSV 숫자만 바꿨습니다. 0~3분 세그먼트·종류 가중치·포위 수치는 그대로입니다.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>페이즈</th>
+            <th>예전 간격 / 마리</th>
+            <th>지금 간격 / 마리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>P1 0~3분</td><td>세그먼트 CSV 유지</td><td>세그먼트 CSV 유지</td></tr>
+          <tr><td>P2 3분</td><td>0.4~0.8 / 1~2</td><td>0.30~0.45 / 3~4</td></tr>
+          <tr><td>P3 6분</td><td>0.4~0.8 / 2~3</td><td>0.24~0.38 / 4~5</td></tr>
+          <tr><td>P4 9분</td><td>0.4~0.8 / 3~4</td><td>0.18~0.32 / 5~6</td></tr>
+          <tr><td>P5 12분</td><td>0.4~0.8 / 4~6</td><td>0.14~0.26 / 6~8</td></tr>
+        </tbody>
+      </table>
+      <p class="note ok">
+        정수 마리만 의미 있습니다. <code>Random.Range(min, max+1)</code>이라 소수 min/max는 의미 없습니다.
+      </p>
+    </section>
+
+    <section>
+      <h2>4. 파일</h2>
+      <table>
+        <thead>
+          <tr><th>파일</th><th>한 일</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Assets/Data/Balancing/enemy_hp_scale.csv</code></td>
+            <td>페이즈 5줄 → 한 줄 파라미터</td>
+          </tr>
+          <tr>
+            <td><code>EnemyStatDB.cs</code> / <code>EnemyStatLoader.cs</code></td>
+            <td><code>GetHpMultiplier(float gameTime)</code> 제곱 곡선</td>
+          </tr>
+          <tr>
+            <td><code>EnemyController.cs</code></td>
+            <td>스폰 HP에 <code>GetGameTime()</code> 사용</td>
+          </tr>
+          <tr>
+            <td><code>enemy_spawn_phase2_5_table.csv</code></td>
+            <td>간격·마리만 위 표로 교체</td>
+          </tr>
+          <tr>
+            <td>카탈로그 02b 키</td>
+            <td><code>phase</code> → <code>durationsec</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>5. 수용 기준 (AC)</h2>
+      <ul>
+        <li>0:00 근처 신규 basic HP ≈ 15 (레이저 L1 12라 2타)</li>
+        <li>3:00 신규 basic ≈ 27, 스폰 3~4 / 0.30~0.45. 예전처럼 1~2로 안 떨어짐</li>
+        <li>6:00 ≈ 63, 4~5 / 0.24~0.38</li>
+        <li>9:00 ≈ 123, 5~6 / 0.18~0.32</li>
+        <li>12:00 ≈ 207, 6~8 / 0.14~0.26</li>
+        <li>14:50~15:00 신규 basic ≈ 315</li>
+        <li>같은 시각 rusher = 28 × 같은 mul</li>
+        <li>이미 필드에 있는 적 HP는 시간에 따라 안 커짐</li>
+        <li>에디터 시간 점프 후 새로 나온 적 HP가 그 시각 공식과 맞음</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. 비범위 (안 한 것)</h2>
+      <ul>
+        <li>무기 CSV, 캐릭터 DPS, 경험치, 드랍</li>
+        <li><code>enemy_stats.csv</code> 기본 36, 레거시 <code>enemy_spawn_table.csv</code></li>
+        <li>P1 세그먼트, 포위 인원, 종류 등장 타이밍(3분 shooter 등)</li>
+        <li>해킹 UX, 시너지 UI, 특성창</li>
+        <li>필드에 이미 있는 적의 시간 경과 HP 갱신</li>
+      </ul>
+      <p class="note">
+        구글 시트 02b는 아직 <code>phase, hpmultiplier</code> 5줄입니다.
+        로컬 CSV와 다릅니다. <strong>밸런싱 시트 싱크 하면 로컬 곡선을 덮습니다.</strong>
+        인게임 확인 후 시트를 <code>900, 2, 0.416667, 8.75</code> 한 줄로 맞출 것.
+      </p>
+    </section>
+
+    <section>
+      <h2>7. 다음</h2>
+      <ul>
+        <li>로컬 Play로 위 AC 확인</li>
+        <li>숫자 괜찮으면 시트 02b를 한 줄 스키마로 맞춤</li>
+        <li>그전에 시트 → CSV 싱크 금지</li>
+      </ul>
+    </section>
+
+    <footer>NeoSurvive · 2026-10-13 · 적용 기록 (제곱 HP + P2~P5 스폰)</footer>
+  </div>
+</body>
+</html>

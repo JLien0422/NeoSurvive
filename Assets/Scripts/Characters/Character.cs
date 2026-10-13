@@ -3,6 +3,43 @@ using System.Collections.Generic;
 using NeoSurvive.Buff;
 using NeoSurvive.Weapon;
 
+public static class HitFeedbackService
+{
+  private const float EnemyShakeCooldown = 0.08f;
+  private static float nextEnemyShakeTime;
+
+  public static void Play(Character target, float damage)
+  {
+    if (target == null || damage <= 0f)
+      return;
+
+    if (target is Player)
+    {
+      float playerMaximumHealth = target.MaxHP != null ? Mathf.Max(1f, target.MaxHP.GetValue()) : 1f;
+      float playerCurrentHealth = target.CurrentHP != null ? target.CurrentHP.CurrentValue : playerMaximumHealth;
+      PlayerHealthVisualState state = PlayerHealthVisualStateUtility.Evaluate(playerCurrentHealth, playerMaximumHealth);
+      float playerDamageRatio = damage / playerMaximumHealth;
+      PlayerDamageFeedback.Play(target, state, playerDamageRatio);
+      PlayerHealthVisualStateUtility.GetPlayerHitShake(state, out float shakeDuration, out float shakeMagnitude);
+      if (CameraController.Instance != null)
+        CameraController.Instance.Shake(shakeDuration, shakeMagnitude);
+      return;
+    }
+
+    if (CameraController.Instance == null)
+      return;
+
+    float maximumHealth = target.MaxHP != null ? Mathf.Max(1f, target.MaxHP.GetValue()) : 1f;
+    float damageRatio = damage / maximumHealth;
+    if (damageRatio < 0.12f || Time.unscaledTime < nextEnemyShakeTime)
+      return;
+
+    nextEnemyShakeTime = Time.unscaledTime + EnemyShakeCooldown;
+    float magnitude = Mathf.Lerp(0.025f, 0.065f, Mathf.InverseLerp(0.12f, 0.4f, damageRatio));
+    CameraController.Instance.Shake(0.07f, magnitude);
+  }
+}
+
 // Character 클래스는 플레이어와 적 등 모든 캐릭터의 기반이 되는 추상 클래스입니다.
 // MonoBehaviour를 상속받아 유니티 게임 오브젝트에 컴포넌트로 붙일 수 있습니다.
 public abstract class Character : MonoBehaviour
@@ -100,6 +137,7 @@ public abstract class Character : MonoBehaviour
 
     // SpriteHitFlash 컴포넌트가 있을 때만 피격 점멸 (적 프리팹 등)
     GetComponent<SpriteHitFlash>()?.PlayFlash();
+    HitFeedbackService.Play(this, amount);
 
     if (currentHP.CurrentValue <= 0)
     {

@@ -5,11 +5,11 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// 네트워크 브릿지 미니게임
-/// 왼쪽 노드와 오른쪽 노드를 클릭해서 같은 색 단자끼리 연결합니다.
+/// 왼쪽 노드를 집어서 오른쪽의 같은 색 단자에 놓아 연결합니다.
 /// 
 /// 변경점:
 /// - 노드/라인을 코드로 생성하지 않음
-/// - Hierarchy에 미리 만든 LeftNode_0~4 / RightNode_0~4 / Line_0~4 사용
+/// - Hierarchy에 미리 만든 LeftNode_0~2 / RightNode_0~2 / Line_0~2 사용
 /// - 성공 연결 시 Line 오브젝트를 활성화하고 두 노드 사이에 배치
 /// </summary>
 public class NetworkBridgeMinigame : HackingMinigameBase
@@ -31,18 +31,16 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     private ConnectionNode selectedNode = null;
 
     [Header("게임 설정")]
-    [SerializeField] private int totalConnections = 5;
-    [SerializeField] private float timeLimit = 15f;
+    [SerializeField] private int totalConnections = 3;
+    [SerializeField] private float timeLimit = 5f;
 
-    [Header("노드 색상")]
-    [SerializeField]
-    private Color[] nodeColors =
+    private const int ActiveConnectionCount = 3;
+    private const float ActiveTimeLimit = 5f;
+    private static readonly Color[] ActiveColors =
     {
         Color.red,
         Color.blue,
-        Color.green,
-        Color.yellow,
-        Color.magenta
+        Color.green
     };
 
     [Header("라인 설정")]
@@ -83,6 +81,8 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     private void ResetMinigame()
     {
         completedConnections = 0;
+        totalConnections = ActiveConnectionCount;
+        timeLimit = ActiveTimeLimit;
         remainingTime = timeLimit;
         isActive = true;
         selectedNode = null;
@@ -98,7 +98,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     }
 
     /// <summary>
-    /// Hierarchy의 LeftNode_0~4 / RightNode_0~4를 가져옴
+    /// Hierarchy의 LeftNode_0~2 / RightNode_0~2를 가져옴
     /// </summary>
     private void CachePreMadeNodes()
     {
@@ -126,8 +126,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
             {
                 ConnectionNode node = GetOrAddNode(leftChild.gameObject);
                 node.Initialize(Color.white, true, i);
-                node.onNodeClicked -= OnNodeClicked;
-                node.onNodeClicked += OnNodeClicked;
+                BindDrag(node);
                 leftNodes.Add(node);
             }
             else
@@ -139,8 +138,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
             {
                 ConnectionNode node = GetOrAddNode(rightChild.gameObject);
                 node.Initialize(Color.white, false, i);
-                node.onNodeClicked -= OnNodeClicked;
-                node.onNodeClicked += OnNodeClicked;
+                BindDrag(node);
                 rightNodes.Add(node);
             }
             else
@@ -164,7 +162,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     }
 
     /// <summary>
-    /// Hierarchy의 Line_0~4를 가져옴
+    /// Hierarchy의 Line_0~2를 가져옴
     /// </summary>
     private void CachePreMadeLines()
     {
@@ -204,13 +202,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
     /// </summary>
     private void SetupNodeColors()
     {
-        List<Color> colors = new List<Color>();
-
-        for (int i = 0; i < totalConnections; i++)
-        {
-            colors.Add(nodeColors[i % nodeColors.Length]);
-        }
-
+        List<Color> colors = new List<Color>(ActiveColors);
         List<Color> leftColors = new List<Color>(colors);
         List<Color> rightColors = new List<Color>(colors);
 
@@ -220,16 +212,27 @@ public class NetworkBridgeMinigame : HackingMinigameBase
         for (int i = 0; i < leftNodes.Count; i++)
         {
             leftNodes[i].Initialize(leftColors[i], true, i);
-            leftNodes[i].onNodeClicked -= OnNodeClicked;
-            leftNodes[i].onNodeClicked += OnNodeClicked;
+            BindDrag(leftNodes[i]);
         }
 
         for (int i = 0; i < rightNodes.Count; i++)
         {
             rightNodes[i].Initialize(rightColors[i], false, i);
-            rightNodes[i].onNodeClicked -= OnNodeClicked;
-            rightNodes[i].onNodeClicked += OnNodeClicked;
+            BindDrag(rightNodes[i]);
         }
+    }
+
+    private void BindDrag(ConnectionNode node)
+    {
+        if (node == null)
+            return;
+
+        node.onDragBegin -= OnNodeDragBegin;
+        node.onDragBegin += OnNodeDragBegin;
+        node.onDrag -= OnNodeDrag;
+        node.onDrag += OnNodeDrag;
+        node.onDragEnd -= OnNodeDragEnd;
+        node.onDragEnd += OnNodeDragEnd;
     }
 
     private void ShuffleColors(List<Color> colors)
@@ -274,56 +277,154 @@ public class NetworkBridgeMinigame : HackingMinigameBase
                 line.gameObject.SetActive(false);
             }
         }
+
+        HideDragPreview();
     }
 
-    private void OnNodeClicked(ConnectionNode node)
+    private void OnNodeDragBegin(ConnectionNode node, PointerEventData eventData)
     {
-        if (!isActive)
+        if (!isActive || node == null || node.isConnected)
             return;
 
-        if (node == null || node.isConnected)
-            return;
-
-        if (selectedNode == null)
-        {
-            selectedNode = node;
-            selectedNode.SetSelected(true);
-            return;
-        }
-
-        if (selectedNode == node)
-        {
+        if (selectedNode != null && selectedNode != node)
             selectedNode.SetSelected(false);
-            selectedNode = null;
+
+        selectedNode = node;
+        selectedNode.SetSelected(true);
+        ShowDragPreview(eventData);
+    }
+
+    private void OnNodeDrag(ConnectionNode node, PointerEventData eventData)
+    {
+        if (!isActive || selectedNode == null || selectedNode != node)
             return;
-        }
 
-        bool differentSide = selectedNode.isLeft != node.isLeft;
-        bool sameColor = selectedNode.nodeColor == node.nodeColor;
+        ShowDragPreview(eventData);
+    }
 
-        if (differentSide && sameColor)
+    private void OnNodeDragEnd(ConnectionNode node, PointerEventData eventData)
+    {
+        HideDragPreview();
+
+        if (!isActive || selectedNode == null || selectedNode != node)
+            return;
+
+        ConnectionNode target = FindNodeUnderPointer(eventData);
+        bool differentSide = target != null && selectedNode.isLeft != target.isLeft;
+        bool sameColor = target != null && selectedNode.nodeColor == target.nodeColor;
+
+        if (target != null && !target.isConnected && differentSide && sameColor)
         {
-            CreateConnection(selectedNode, node);
-
+            CreateConnection(selectedNode, target);
             selectedNode.SetConnected(true);
-            node.SetConnected(true);
-
+            target.SetConnected(true);
             selectedNode = null;
 
             completedConnections++;
             UpdateSuccessGauge();
 
             if (completedConnections >= totalConnections)
-            {
                 OnSuccess();
-            }
+
+            return;
         }
-        else
+
+        selectedNode.SetSelected(false);
+        selectedNode = null;
+    }
+
+    private ConnectionNode FindNodeUnderPointer(PointerEventData eventData)
+    {
+        if (eventData == null || EventSystem.current == null)
+            return null;
+
+        var hits = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, hits);
+
+        for (int i = 0; i < hits.Count; i++)
         {
-            selectedNode.SetSelected(false);
-            selectedNode = null;
-            OnFailure();
+            GameObject hitObject = hits[i].gameObject;
+            if (hitObject == null)
+                continue;
+
+            ConnectionNode hitNode = hitObject.GetComponent<ConnectionNode>();
+            if (hitNode == null)
+                hitNode = hitObject.GetComponentInParent<ConnectionNode>();
+
+            if (hitNode != null && hitNode != selectedNode)
+                return hitNode;
         }
+
+        return null;
+    }
+
+    private RectTransform dragPreview;
+
+    private void ShowDragPreview(PointerEventData eventData)
+    {
+        if (selectedNode == null || eventData == null || linesContainer == null)
+            return;
+
+        EnsureDragPreview();
+        if (dragPreview == null)
+            return;
+
+        RectTransform lineArea = linesContainer as RectTransform;
+        RectTransform fromRect = selectedNode.GetComponent<RectTransform>();
+        if (lineArea == null || fromRect == null)
+            return;
+
+        Vector3 fromWorld = fromRect.TransformPoint(Vector3.zero);
+        Vector2 fromLocal = lineArea.InverseTransformPoint(fromWorld);
+
+        Camera eventCamera = eventData.pressEventCamera;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                lineArea,
+                eventData.position,
+                eventCamera,
+                out Vector2 toLocal))
+        {
+            return;
+        }
+
+        dragPreview.gameObject.SetActive(true);
+        dragPreview.SetAsLastSibling();
+
+        Image previewImage = dragPreview.GetComponent<Image>();
+        if (previewImage != null)
+        {
+            previewImage.color = selectedNode.nodeColor;
+            previewImage.raycastTarget = false;
+        }
+
+        ConnectionLine.Place(dragPreview, fromLocal, toLocal, lineThickness);
+    }
+
+    private void EnsureDragPreview()
+    {
+        if (dragPreview != null || linesContainer == null)
+            return;
+
+        GameObject previewObject = new GameObject(
+            "DragPreview",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image));
+        previewObject.transform.SetParent(linesContainer, false);
+
+        Image previewImage = previewObject.GetComponent<Image>();
+        previewImage.sprite = ConnectionLine.WhiteSprite;
+        previewImage.raycastTarget = false;
+        previewImage.color = Color.white;
+
+        dragPreview = previewObject.GetComponent<RectTransform>();
+        previewObject.SetActive(false);
+    }
+
+    private void HideDragPreview()
+    {
+        if (dragPreview != null)
+            dragPreview.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -379,6 +480,8 @@ public class NetworkBridgeMinigame : HackingMinigameBase
         if (timeGauge != null)
             timeGauge.value = 1f;
 
+        HideDragPreview();
+
         if (successGauge != null)
             successGauge.value = 1f;
 
@@ -392,6 +495,8 @@ public class NetworkBridgeMinigame : HackingMinigameBase
         if (timeGauge != null)
             timeGauge.value = 0f;
 
+        HideDragPreview();
+
         base.OnFailure();
     }
 }
@@ -399,14 +504,16 @@ public class NetworkBridgeMinigame : HackingMinigameBase
 /// <summary>
 /// 연결 노드
 /// </summary>
-public class ConnectionNode : MonoBehaviour, IPointerClickHandler
+public class ConnectionNode : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Color nodeColor;
     public bool isLeft;
     public int index;
     public bool isConnected = false;
 
-    public System.Action<ConnectionNode> onNodeClicked;
+    public System.Action<ConnectionNode, PointerEventData> onDragBegin;
+    public System.Action<ConnectionNode, PointerEventData> onDrag;
+    public System.Action<ConnectionNode, PointerEventData> onDragEnd;
 
     private Image image;
     private bool isSelected = false;
@@ -462,10 +569,22 @@ public class ConnectionNode : MonoBehaviour, IPointerClickHandler
             image.color = nodeColor;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData eventData)
     {
         if (!isConnected)
-            onNodeClicked?.Invoke(this);
+            onDragBegin?.Invoke(this, eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!isConnected)
+            onDrag?.Invoke(this, eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (!isConnected)
+            onDragEnd?.Invoke(this, eventData);
     }
 }
 
@@ -540,5 +659,42 @@ public class ConnectionLine : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(distance, thickness);
         rectTransform.localPosition = (fromLocal + toLocal) / 2f;
         rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    public static void Place(RectTransform rectTransform, Vector2 fromLocal, Vector2 toLocal, float thickness)
+    {
+        if (rectTransform == null)
+            return;
+
+        Vector2 direction = toLocal - fromLocal;
+        float distance = direction.magnitude;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.sizeDelta = new Vector2(distance, thickness);
+        rectTransform.localPosition = (fromLocal + toLocal) / 2f;
+        rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    private static Sprite whiteSprite;
+
+    public static Sprite WhiteSprite
+    {
+        get
+        {
+            if (whiteSprite != null)
+                return whiteSprite;
+
+            Texture2D texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+            whiteSprite = Sprite.Create(
+                texture,
+                new Rect(0f, 0f, 1f, 1f),
+                new Vector2(0.5f, 0.5f));
+            return whiteSprite;
+        }
     }
 }

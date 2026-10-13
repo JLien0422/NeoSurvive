@@ -1,6 +1,2 @@
-phase,hpmultiplier
-1,1
-2,1.6
-3,2.3
-4,3.2
-5,4.2
+durationsec,exponent,startmultiplier,endmultiplier
+900,2,0.416667,8.75

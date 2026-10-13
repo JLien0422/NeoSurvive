@@ -499,11 +499,11 @@ public class EnemyController : MonoBehaviour
 
     if (row.maxhp > 0f)
     {
-        int phase = GameManager.Instance != null ? GameManager.Instance.CurrentPhase : 1;
-        float hpMultiplier = EnemyStatLoader.DB.GetHpMultiplier(phase);
+        float gameTime = GameManager.Instance != null ? GameManager.Instance.GetGameTime() : 0f;
+        float hpMultiplier = EnemyStatLoader.DB.GetHpMultiplier(gameTime);
         float scaledMaxHp = row.maxhp * hpMultiplier;
         enemy.ApplyMaxHpFromCSV(scaledMaxHp);
-        Debug.Log($"[EnemyController] HP 적용 | base={row.maxhp}, phase={phase}, mul={hpMultiplier}, scaled={scaledMaxHp}");
+        Debug.Log($"[EnemyController] HP 적용 | base={row.maxhp}, time={gameTime:F1}, mul={hpMultiplier}, scaled={scaledMaxHp}");
     }
 
     if (row.movespeed > 0f) moveSpeed = row.movespeed;

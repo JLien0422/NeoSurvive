@@ -4,8 +4,8 @@ using UnityEngine.UI;
 /// <summary>
 /// 사이보그 해킹 수비 존 바닥 비주얼
 /// - 반투명 전체 원 (존 가이드)
-/// - 불투명 원 시계방향 감소 (남은 시간)
-/// - LineRenderer 테두리 (적 수에 따라 색 변경)
+/// - 불투명 원 시계방향 증가 (해킹 진척도). 원 안에 적이 있으면 멈춤
+/// - LineRenderer 테두리 (적 2명 이하면 청록, 3명 이상이면 빨강)
 /// </summary>
 public class CyborgZoneTimerVisual : MonoBehaviour
 {
@@ -85,7 +85,7 @@ public class CyborgZoneTimerVisual : MonoBehaviour
         timerFillImage.fillClockwise = true;
         timerFillImage.raycastTarget = false;
         timerFillImage.color = new Color(0f, 0.85f, 0.95f, settings.timerFillAlpha);
-        timerFillImage.fillAmount = 1f;
+        timerFillImage.fillAmount = 0f;
         StretchRect(timerObj.GetComponent<RectTransform>());
 
         borderLine = gameObject.AddComponent<LineRenderer>();
@@ -122,7 +122,7 @@ public class CyborgZoneTimerVisual : MonoBehaviour
         rect.localScale = Vector3.one;
     }
 
-    public void SetTimeRemaining(float normalized)
+    public void SetProgress(float normalized)
     {
         if (timerFillImage == null)
             return;

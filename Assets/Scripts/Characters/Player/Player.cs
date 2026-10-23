@@ -18,7 +18,7 @@ public class Player : Character
 {
   public static Player Instance { get; private set; }
 
-  /// <summary>플레이어 사망 시 발생 (GameOverUI 등에서 구독). Destroy 직전에 호출됩니다.</summary>
+  /// <summary>플레이어 사망이 확정되면 발생합니다. 사망 클립이 있으면 재생이 끝난 뒤 오브젝트를 제거합니다.</summary>
   public static event System.Action OnPlayerDied;
 
   #region Variables
@@ -499,7 +499,74 @@ public class Player : Character
 
     OnPlayerDied?.Invoke();
 
-    // 싱글플레이인 경우 요청에 따라 게임 오브젝트를 파괴합니다.
+    if (characterType != CharacterType.Hacker || !TryPlayDeathAnimation(out float deathLength))
+    {
+      Destroy(gameObject);
+      return;
+    }
+
+    PlayerController controller = GetComponent<PlayerController>();
+    if (controller != null)
+      controller.enabled = false;
+
+    Rigidbody2D body = GetComponent<Rigidbody2D>();
+    if (body != null)
+    {
+      body.velocity = Vector2.zero;
+      body.simulated = false;
+    }
+
+    Collider2D[] colliders = GetComponents<Collider2D>();
+    for (int i = 0; i < colliders.Length; i++)
+    {
+      if (colliders[i] != null)
+        colliders[i].enabled = false;
+    }
+
+    StartCoroutine(DestroyAfterDeathAnimation(deathLength));
+  }
+
+  private bool TryPlayDeathAnimation(out float clipLength)
+  {
+    clipLength = 0f;
+    Animator animator = GetComponent<Animator>();
+    if (animator == null || animator.runtimeAnimatorController == null)
+      return false;
+
+    bool hasDieTrigger = false;
+    foreach (AnimatorControllerParameter parameter in animator.parameters)
+    {
+      if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == "Die")
+      {
+        hasDieTrigger = true;
+        break;
+      }
+    }
+
+    if (!hasDieTrigger)
+      return false;
+
+    animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+    animator.SetTrigger("Die");
+
+    AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+    for (int i = 0; i < clips.Length; i++)
+    {
+      AnimationClip clip = clips[i];
+      if (clip != null && clip.name == "Hacker_Die")
+      {
+        clipLength = clip.length;
+        return true;
+      }
+    }
+
+    clipLength = 2.0833333f;
+    return true;
+  }
+
+  private IEnumerator DestroyAfterDeathAnimation(float seconds)
+  {
+    yield return new WaitForSecondsRealtime(Mathf.Max(0f, seconds));
     Destroy(gameObject);
   }
 
@@ -523,6 +590,8 @@ public class Player : Character
   // 매 프레임마다 인스펙터 표시용 값 업데이트 및 입력 처리
   private void Update()
   {
+    if (IsDead) return;
+
     SyncBuffMultipliersToStats(); // (추가) 
 
     // R키로 신경링크 발동 (로컬 플레이어만)

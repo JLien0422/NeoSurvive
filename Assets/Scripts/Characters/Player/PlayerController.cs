@@ -1,5 +1,6 @@
 using UnityEngine;
 using NeoSurvive.Buff; // (추가)
+using NeoSurvive.Characters;
 
 // PlayerController 클래스는 플레이어의 입력을 받아 움직임을 처리합니다.
 // 이 컴포넌트는 Player 컴포넌트가 있는 게임 오브젝트에 추가되어야 합니다.
@@ -19,6 +20,9 @@ public class PlayerController : MonoBehaviour
 
     // Animator 파라미터 해시 (문자열 대신 해시 사용 → 성능 최적화)
     private static readonly int IsMovingHash = Animator.StringToHash("isMoving");
+
+    // 프리팹 루트 크기. 좌우 반전 때 ±1로 덮어쓰면 1.25 스케일이 사라진다.
+    private float bodyScale = 1f;
 
     // 해킹 중 고정 상태 (이동 불가)
     private bool isLockedDown = false;
@@ -58,6 +62,9 @@ public class PlayerController : MonoBehaviour
         // 버프/디버프 관련 초기화
         statusFlags = GetComponent<StatusFlags>();
         if (statusFlags == null) statusFlags = gameObject.AddComponent<StatusFlags>();
+
+        bodyScale = Mathf.Abs(transform.localScale.x);
+        if (bodyScale < 0.0001f) bodyScale = 1f;
     }
 
     // 매 프레임마다 호출됩니다. 입력 처리에 적합합니다.
@@ -143,13 +150,14 @@ public class PlayerController : MonoBehaviour
 
         if (moveInput.x < 0)
         {
-            // X축 크기를 -1로 만들어서 전체를 반전
-            transform.localScale = new Vector3(1, 1, 1);
+            // 기본 그림이 왼쪽을 보는 캐릭터는 양수, 오른쪽을 보는 해커는 음수. 크기는 프리팹 스케일을 유지.
+            float facing = player != null && player.CharacterType == CharacterType.Hacker ? -1f : 1f;
+            transform.localScale = new Vector3(facing * bodyScale, bodyScale, bodyScale);
         }
         else if (moveInput.x > 0)
         {
-            // X축 크기를 1로 만들어서 원상복구
-            transform.localScale = new Vector3(-1, 1, 1);
+            float facing = player != null && player.CharacterType == CharacterType.Hacker ? 1f : -1f;
+            transform.localScale = new Vector3(facing * bodyScale, bodyScale, bodyScale);
         }
 
         // Rigidbody의 속도를 변경하여 플레이어를 움직입니다.

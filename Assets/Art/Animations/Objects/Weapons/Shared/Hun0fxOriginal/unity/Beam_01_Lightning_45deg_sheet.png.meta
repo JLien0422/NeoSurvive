@@ -1,0 +1,1412 @@
+fileFormatVersion: 2
+guid: edca33090a157a2c471b1aa80154ffc8
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 4096
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e768dc8aee5c345f4dec678ade48019e
+      internalID: 22588582610888258
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b60dc8cb18afaf3c82c6e7611c5cd894
+      internalID: 47304607406873892
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_2
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a5a3a88cafeca2d0c8cc1933036700a
+      internalID: 34893547080296252
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_3
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d908dbd0ecdca41bbd483d06ed29ebf
+      internalID: 30579936223307759
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_4
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47aaa43125106bef2968240cc074cdb5
+      internalID: 20061286247514486
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_5
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 864
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e833e76194b6608c939b51033d66996
+      internalID: 35198459299056934
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb7b3d0c089685b3f8fb71a10ca614a5
+      internalID: 18122841633272849
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_7
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d49f1ba5dd11e82b3a39cd9a2fd6500f
+      internalID: 6562146660278806
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_8
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a97f9fa6bc9e1e1a14bbdc53fa990a2
+      internalID: 40921672378617716
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_9
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa36f516c5816e73b23b0d85159fd125
+      internalID: 70538577892408350
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_10
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef481161fe724c9fb98f24e164c4ff2c
+      internalID: 54203300279738515
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_11
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 768
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f52bdb3d47085a2250d990fcdbe3323
+      internalID: 13666341442907222
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5ea843876af2f1cd6dfb1edcb16aae0
+      internalID: 67606788280440111
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_13
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce558c30e77035b52e3fdebfd9a50454
+      internalID: 49536926672644356
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_14
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae80b2d647ce8fecd625c43d92538725
+      internalID: 24902769281284815
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_15
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec4a9c1723adf78be94754155d33f8d2
+      internalID: 9290022724613628
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_16
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5789ab34cb669718b99710445d8bda6
+      internalID: 55763247110876045
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_17
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 672
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78b26c116733e53733f70124ca1995ee
+      internalID: 67490140766021800
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 009d802e35637e7804626f99f5c3be40
+      internalID: 19297110773948459
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_19
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab50b7c8069fdc3b250fe07dba42c037
+      internalID: 52622696766793674
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_20
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b45435650f909b9b0e5feaf7b5bd73e
+      internalID: 8489393057551087
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_21
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1e4b47e70ea23232fe9c308970252db
+      internalID: 58734630884071853
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_22
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9c9687a5a824c141f8e736a64561463d
+      internalID: 15890920061343604
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_23
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 576
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a58b444fa53b8db9b1eb18d521d6409e
+      internalID: 12376405953248033
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 392324615c2e5ebf6cf6968230a7786b
+      internalID: 33188115241387126
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_25
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04d31f47841469fb5084392db8cfca7a
+      internalID: 18703265734889867
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_26
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0db5830a3cf1ec84034005560181671
+      internalID: 17687212312962943
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_27
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 899e6f8a151e1d9a989a2dac4c7d9fb9
+      internalID: 43913099117761588
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_28
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d7ba8d85e939f3e716a446f60a9c20fa
+      internalID: 2129545889087937
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_29
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 480
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c07d7462d4c7dcd3e4f3a474945b65a9
+      internalID: 42585141091458670
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d97ade85b4244778c38aac786a2a00b
+      internalID: 31855516214803958
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_31
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1ee676021a380cd87a6f1d62c79890a
+      internalID: 41444120542797409
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_32
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd37864794d72686fdea37e65d2e8d3a
+      internalID: 42471283717838034
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_33
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20990415ec2c35440cce3c08feffbf84
+      internalID: 17643841481189040
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_34
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19f8d18109d42500c2a4732782768af5
+      internalID: 34124230519439039
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_35
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 384
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9632f285b71944e1e2022b678c842ffb
+      internalID: 43448572206572991
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_36
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e419b54c1ed4cdb2ee21abe0e88deb0b
+      internalID: 37544084979402859
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_37
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e7f279d7aad18fc538fb0c422652b21
+      internalID: 39506500318215259
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_38
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69b703d05e3244afe7f3daa5b15564f2
+      internalID: 33509849795729315
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_39
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d409014c180cf71f8c9a57082777cb8
+      internalID: 2585467695977196
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_40
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9205d3bfa9732e6d7e6a389c844b912
+      internalID: 24462413479323064
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_41
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc6bda92880885f4202783cf919f9748
+      internalID: 39933248571287793
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6ab8158f3c040846149fca7dbeaa2ec0
+      internalID: 24248296980942161
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_43
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27cffcc58d1a87df63642cd7106430e8
+      internalID: 18233040304641255
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_44
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a21cf69a942cb65639a778189c96d39
+      internalID: 28876167216370427
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_45
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c9ed91418ce691024dedbc40cc01fd9
+      internalID: 22008920461694530
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_46
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e08db6ef26595737f03fab2d3d359c5
+      internalID: 21566768482866091
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_47
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f7c25da01cd28fda016081f02c513ff
+      internalID: 19680719607376893
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_48
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 48861e0476d57787aa5ac8645e3f8da8
+      internalID: 48963528003862868
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_49
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ce48f2b8820f226b85094a6111738e7
+      internalID: 18047278811997404
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_50
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9bbcf77c1dd56e0439c1655734b14ab
+      internalID: 70517657734378752
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_51
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa30393da4241e8604886026ce345396
+      internalID: 57979878954022534
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_52
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d47b956d9ff1e4c63d18f07295130487
+      internalID: 14319679853116563
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_53
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ba200bc826672386f9dbb14fadd8a82
+      internalID: 61989352363693428
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_54
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 727aef2f425a5ef907dffef479b4fa37
+      internalID: 36901936154897261
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_55
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa8bdec2bde7c45f2b3278b316e906c7
+      internalID: 16212465597703221
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_56
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b86faadebb6daf415655094c99316df9
+      internalID: 18559680725266283
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_57
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04ce8536de1e643dcadc816f25c55888
+      internalID: 50552551308558025
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_58
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac1003e0f48ba2e3aa5787dc524ab7c3
+      internalID: 71723030497046196
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Beam_01_Lightning_45deg_59
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.1046, y: 0.4915}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ac5cf5b9b2083829c895566c86003a2
+      internalID: 32402209470075137
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 0a3a8137ffdc30e85f6df7845af73deb
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Beam_01_Lightning_45deg_0: 22588582610888258
+      Beam_01_Lightning_45deg_1: 47304607406873892
+      Beam_01_Lightning_45deg_2: 34893547080296252
+      Beam_01_Lightning_45deg_3: 30579936223307759
+      Beam_01_Lightning_45deg_4: 20061286247514486
+      Beam_01_Lightning_45deg_5: 35198459299056934
+      Beam_01_Lightning_45deg_6: 18122841633272849
+      Beam_01_Lightning_45deg_7: 6562146660278806
+      Beam_01_Lightning_45deg_8: 40921672378617716
+      Beam_01_Lightning_45deg_9: 70538577892408350
+      Beam_01_Lightning_45deg_10: 54203300279738515
+      Beam_01_Lightning_45deg_11: 13666341442907222
+      Beam_01_Lightning_45deg_12: 67606788280440111
+      Beam_01_Lightning_45deg_13: 49536926672644356
+      Beam_01_Lightning_45deg_14: 24902769281284815
+      Beam_01_Lightning_45deg_15: 9290022724613628
+      Beam_01_Lightning_45deg_16: 55763247110876045
+      Beam_01_Lightning_45deg_17: 67490140766021800
+      Beam_01_Lightning_45deg_18: 19297110773948459
+      Beam_01_Lightning_45deg_19: 52622696766793674
+      Beam_01_Lightning_45deg_20: 8489393057551087
+      Beam_01_Lightning_45deg_21: 58734630884071853
+      Beam_01_Lightning_45deg_22: 15890920061343604
+      Beam_01_Lightning_45deg_23: 12376405953248033
+      Beam_01_Lightning_45deg_24: 33188115241387126
+      Beam_01_Lightning_45deg_25: 18703265734889867
+      Beam_01_Lightning_45deg_26: 17687212312962943
+      Beam_01_Lightning_45deg_27: 43913099117761588
+      Beam_01_Lightning_45deg_28: 2129545889087937
+      Beam_01_Lightning_45deg_29: 42585141091458670
+      Beam_01_Lightning_45deg_30: 31855516214803958
+      Beam_01_Lightning_45deg_31: 41444120542797409
+      Beam_01_Lightning_45deg_32: 42471283717838034
+      Beam_01_Lightning_45deg_33: 17643841481189040
+      Beam_01_Lightning_45deg_34: 34124230519439039
+      Beam_01_Lightning_45deg_35: 43448572206572991
+      Beam_01_Lightning_45deg_36: 37544084979402859
+      Beam_01_Lightning_45deg_37: 39506500318215259
+      Beam_01_Lightning_45deg_38: 33509849795729315
+      Beam_01_Lightning_45deg_39: 2585467695977196
+      Beam_01_Lightning_45deg_40: 24462413479323064
+      Beam_01_Lightning_45deg_41: 39933248571287793
+      Beam_01_Lightning_45deg_42: 24248296980942161
+      Beam_01_Lightning_45deg_43: 18233040304641255
+      Beam_01_Lightning_45deg_44: 28876167216370427
+      Beam_01_Lightning_45deg_45: 22008920461694530
+      Beam_01_Lightning_45deg_46: 21566768482866091
+      Beam_01_Lightning_45deg_47: 19680719607376893
+      Beam_01_Lightning_45deg_48: 48963528003862868
+      Beam_01_Lightning_45deg_49: 18047278811997404
+      Beam_01_Lightning_45deg_50: 70517657734378752
+      Beam_01_Lightning_45deg_51: 57979878954022534
+      Beam_01_Lightning_45deg_52: 14319679853116563
+      Beam_01_Lightning_45deg_53: 61989352363693428
+      Beam_01_Lightning_45deg_54: 36901936154897261
+      Beam_01_Lightning_45deg_55: 16212465597703221
+      Beam_01_Lightning_45deg_56: 18559680725266283
+      Beam_01_Lightning_45deg_57: 50552551308558025
+      Beam_01_Lightning_45deg_58: 71723030497046196
+      Beam_01_Lightning_45deg_59: 32402209470075137
+  spritePackingTag:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

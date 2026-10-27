@@ -40,12 +40,14 @@ namespace NeoSurvive.Weapon
 
     private float baseRange;
     private float baseFireRate;
+    private WeaponHitVfx hitVfx;
 
     private const string weaponId = "lasersword";
     private int currentLevel = 1;
 
     private void Start()
     {
+      hitVfx = GetComponent<WeaponHitVfx>();
       baseRange = range;
       baseFireRate = fireRate;
 
@@ -185,6 +187,7 @@ namespace NeoSurvive.Weapon
 
             var src = GetComponentInParent<WeaponSource>();
             character.TakeDamage(damage, src != null ? src.weaponData : null);
+            PlayHitEffect(col, forward);
 
             continue;
           }
@@ -212,6 +215,15 @@ namespace NeoSurvive.Weapon
       {
         SpawnRift(forward);
       }
+    }
+
+    private void PlayHitEffect(Collider2D target, Vector3 attackDirection)
+    {
+      if (hitVfx == null || target == null)
+        return;
+
+      Vector3 hitPosition = target.ClosestPoint(transform.position);
+      hitVfx.Play(hitPosition, attackDirection);
     }
 
     private bool IsEnemyCollider(Collider2D col)

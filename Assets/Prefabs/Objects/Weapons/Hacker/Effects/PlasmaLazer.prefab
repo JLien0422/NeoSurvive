@@ -4885,6 +4885,7 @@ MonoBehaviour:
   elapsed: 0
   alpha: 1
   trailRenderer: {fileID: 9003968359049257690}
+  beamEffectPrefab: {fileID: 8939610345789605955, guid: ddb9badf17773864a9321c14b413c913, type: 3}
   splitCount: 2
   splitSearchRange: 20
 --- !u!96 &9003968359049257690
@@ -5014,4 +5015,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyToSpriteRenderers: 1
   applyToParticleSystems: 1
+  applyToTMPTexts: 1
   isProjectile: 0

@@ -19,8 +19,14 @@ namespace NeoSurvive.Weapon
     private Vector3 destination;
     private WeaponBase sourceWeapon;
     private bool ricochetUsed;
+    private WeaponHitVfx hitVfx;
 
     public event System.Action OnHitEvent;
+
+    protected virtual void Awake()
+    {
+      hitVfx = GetComponent<WeaponHitVfx>();
+    }
 
     public virtual void Initialize(Vector3 dir, float dmg, float speed)
     {
@@ -59,6 +65,10 @@ namespace NeoSurvive.Weapon
         if (!collision.gameObject.TryGetComponent(out Character character)) return;
 
         character.TakeDamage(damage, sourceWeapon);
+        if (hitVfx != null)
+        {
+          hitVfx.Play(collision.ClosestPoint(transform.position), direction);
+        }
         OnHitEvent?.Invoke();
         OnHit();
         return;
@@ -87,8 +97,6 @@ namespace NeoSurvive.Weapon
       if (TryRicochet())
         return;
 
-      // 명중 이펙트
-      VisualEffectHelper.CreateCircleEffect(transform.position, 0.3f, Color.white, 0.1f);
       // 기본적으로 명중 시 소멸
       Destroy(gameObject);
     }

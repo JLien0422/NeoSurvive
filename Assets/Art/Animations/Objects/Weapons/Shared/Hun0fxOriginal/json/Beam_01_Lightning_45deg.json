@@ -1,0 +1,1377 @@
+{
+ "frames": [
+  {
+   "filename": "Beam_01_Lightning_45deg_00",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_01",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_02",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_03",
+   "frame": {
+    "x": 576,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_04",
+   "frame": {
+    "x": 768,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_05",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_06",
+   "frame": {
+    "x": 0,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_07",
+   "frame": {
+    "x": 192,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_08",
+   "frame": {
+    "x": 384,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_09",
+   "frame": {
+    "x": 576,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_10",
+   "frame": {
+    "x": 768,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_11",
+   "frame": {
+    "x": 960,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_12",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_13",
+   "frame": {
+    "x": 192,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_14",
+   "frame": {
+    "x": 384,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_15",
+   "frame": {
+    "x": 576,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_16",
+   "frame": {
+    "x": 768,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_17",
+   "frame": {
+    "x": 960,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_18",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_19",
+   "frame": {
+    "x": 192,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_20",
+   "frame": {
+    "x": 384,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_21",
+   "frame": {
+    "x": 576,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_22",
+   "frame": {
+    "x": 768,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_23",
+   "frame": {
+    "x": 960,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_24",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_25",
+   "frame": {
+    "x": 192,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_26",
+   "frame": {
+    "x": 384,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_27",
+   "frame": {
+    "x": 576,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_28",
+   "frame": {
+    "x": 768,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_29",
+   "frame": {
+    "x": 960,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_30",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_31",
+   "frame": {
+    "x": 192,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_32",
+   "frame": {
+    "x": 384,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_33",
+   "frame": {
+    "x": 576,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_34",
+   "frame": {
+    "x": 768,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_35",
+   "frame": {
+    "x": 960,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_36",
+   "frame": {
+    "x": 0,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_37",
+   "frame": {
+    "x": 192,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_38",
+   "frame": {
+    "x": 384,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_39",
+   "frame": {
+    "x": 576,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_40",
+   "frame": {
+    "x": 768,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_41",
+   "frame": {
+    "x": 960,
+    "y": 576,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_42",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_43",
+   "frame": {
+    "x": 192,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_44",
+   "frame": {
+    "x": 384,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_45",
+   "frame": {
+    "x": 576,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_46",
+   "frame": {
+    "x": 768,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_47",
+   "frame": {
+    "x": 960,
+    "y": 672,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_48",
+   "frame": {
+    "x": 0,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_49",
+   "frame": {
+    "x": 192,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_50",
+   "frame": {
+    "x": 384,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_51",
+   "frame": {
+    "x": 576,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_52",
+   "frame": {
+    "x": 768,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_53",
+   "frame": {
+    "x": 960,
+    "y": 768,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_54",
+   "frame": {
+    "x": 0,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_55",
+   "frame": {
+    "x": 192,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_56",
+   "frame": {
+    "x": 384,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_57",
+   "frame": {
+    "x": 576,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_58",
+   "frame": {
+    "x": 768,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_59",
+   "frame": {
+    "x": 960,
+    "y": 864,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "hun0fx Pixel Studio",
+  "image": "Beam_01_Lightning_45deg_sheet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1152,
+   "h": 960
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Beam_01_Lightning_45deg",
+    "from": 0,
+    "to": 59,
+    "direction": "forward"
+   }
+  ],
+  "fps": 15,
+  "loop": false,
+  "origin_px": [
+   20.1,
+   48.8
+  ],
+  "effect": "Beam_01_Lightning",
+  "kind": "fx",
+  "element": "lightning",
+  "category": "beam",
+  "camera_deg": 45,
+  "seed": 1,
+  "source_frames": 60,
+  "frame_range": [
+   1,
+   60
+  ],
+  "palette": [
+   "#000000",
+   "#000000",
+   "#000000",
+   "#1b668d",
+   "#297bb0",
+   "#2a7eb3",
+   "#2c84bb",
+   "#328eca",
+   "#43abde",
+   "#45b9f5",
+   "#97dbe8",
+   "#c2e6e9",
+   "#a0f7f8",
+   "#e9f7f7",
+   "#f0fbfb",
+   "#ffffff"
+  ]
+ }
+}

@@ -15,6 +15,9 @@ public class PlasmaLazer : MonoBehaviour
 
   public TrailRenderer trailRenderer;
 
+  [Header("Beam Visual")]
+  [SerializeField] private GameObject beamEffectPrefab;
+
   private Vector3 direction;
   private float traveledDistance = 0f;
   private bool reachedMaxRange = false;
@@ -167,7 +170,45 @@ public class PlasmaLazer : MonoBehaviour
     {
       trailRenderer.Clear();
       trailRenderer.time = duration;
+      trailRenderer.enabled = beamEffectPrefab == null;
     }
+
+    SpawnBeamVisual();
+  }
+
+  private void SpawnBeamVisual()
+  {
+    if (beamEffectPrefab == null || direction.sqrMagnitude <= 0.0001f)
+      return;
+
+    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    GameObject beam = Instantiate(
+      beamEffectPrefab,
+      transform.position,
+      Quaternion.Euler(0f, 0f, angle)
+    );
+
+    SpriteRenderer renderer = beam.GetComponentInChildren<SpriteRenderer>();
+    if (renderer != null && renderer.sprite != null && range > 0f)
+    {
+      // 스프라이트 피벗에서 오른쪽 끝까지의 길이를 실제 공격 사거리에 맞춘다.
+      // Y축은 원본 픽셀 두께를 유지한다.
+      float sourceForwardLength = Mathf.Max(0.01f, renderer.sprite.bounds.max.x);
+      Vector3 beamScale = beam.transform.localScale;
+      beamScale.x *= range / sourceForwardLength;
+      beam.transform.localScale = beamScale;
+    }
+
+    Animator animator = beam.GetComponentInChildren<Animator>();
+    if (animator != null && animator.runtimeAnimatorController != null)
+    {
+      AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+      if (clips != null && clips.Length > 0 && clips[0] != null)
+        animator.speed = clips[0].length / Mathf.Max(0.01f, duration);
+    }
+
+    // 레이저의 시각 효과와 실제 판정 지속시간을 동일하게 유지한다.
+    Destroy(beam, duration);
   }
 
   private bool CanApplyDamageToEnemy(Enemy enemy)

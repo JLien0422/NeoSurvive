@@ -98,8 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 293284e0a919c874d89e8870c41cd40c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionEffectPrefab: {fileID: 1306557926885630770, guid: 2e2f0cf952706b94ab98574d41de929a, type: 3}
-  explosionEffectLifetime: 0.7
+  explosionEffectPrefab: {fileID: 1621390618099583766, guid: 67f12623edbc82149a53f4c300c17d33, type: 3}
+  explosionEffectLifetime: 0.6
   rotateWhileFlying: 1
   rotateSpeed: 720
 --- !u!114 &389519991200156123
@@ -116,4 +116,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyToSpriteRenderers: 1
   applyToParticleSystems: 1
+  applyToTMPTexts: 1
   isProjectile: 0

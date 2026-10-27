@@ -1,0 +1,541 @@
+{
+ "frames": [
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_00",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_01",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_02",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_03",
+   "frame": {
+    "x": 576,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_04",
+   "frame": {
+    "x": 0,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_05",
+   "frame": {
+    "x": 192,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_06",
+   "frame": {
+    "x": 384,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_07",
+   "frame": {
+    "x": 576,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_08",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_09",
+   "frame": {
+    "x": 192,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_10",
+   "frame": {
+    "x": 384,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_11",
+   "frame": {
+    "x": 576,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_12",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_13",
+   "frame": {
+    "x": 192,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_14",
+   "frame": {
+    "x": 384,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_15",
+   "frame": {
+    "x": 576,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_16",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_17",
+   "frame": {
+    "x": 192,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_18",
+   "frame": {
+    "x": 384,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_19",
+   "frame": {
+    "x": 576,
+    "y": 384,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_20",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Beam_01_Lightning_45deg_f1-22_21",
+   "frame": {
+    "x": 192,
+    "y": 480,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 200
+  }
+ ],
+ "meta": {
+  "app": "hun0fx Pixel Studio",
+  "image": "Beam_01_Lightning_45deg_f1-22_sheet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 768,
+   "h": 576
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Beam_01_Lightning_45deg_f1-22",
+    "from": 0,
+    "to": 21,
+    "direction": "forward"
+   }
+  ],
+  "fps": 15,
+  "loop": false,
+  "origin_px": [
+   20.1,
+   48.8
+  ],
+  "effect": "Beam_01_Lightning",
+  "kind": "fx",
+  "element": "lightning",
+  "category": "beam",
+  "camera_deg": 45,
+  "seed": 1,
+  "source_frames": 60,
+  "frame_range": [
+   1,
+   22
+  ],
+  "palette": [
+   "#061a2b",
+   "#061a2b",
+   "#061a2b",
+   "#061a2b",
+   "#0196c9",
+   "#0ca4d3",
+   "#1db3da",
+   "#2ec3e2",
+   "#4fd3e5",
+   "#76dde4",
+   "#90e4e9",
+   "#bee8e9",
+   "#97f7fc",
+   "#d8f5f5",
+   "#dffcfc",
+   "#e8ffff"
+  ]
+ }
+}

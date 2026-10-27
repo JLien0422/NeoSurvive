@@ -127,8 +127,16 @@ namespace NeoSurvive.Weapon
 
       if (explosionEffectPrefab != null)
       {
-        GameObject effect = Instantiate(explosionEffectPrefab, explodePos, Quaternion.identity); // ★ 수정
-        Destroy(effect, explosionEffectLifetime); // ★ 추가
+        GameObject effect = Instantiate(explosionEffectPrefab, explodePos, Quaternion.identity);
+        Animator animator = effect.GetComponentInChildren<Animator>();
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+          AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+          if (clips != null && clips.Length > 0 && clips[0] != null)
+            animator.speed = clips[0].length / Mathf.Max(0.01f, explosionEffectLifetime);
+        }
+
+        Destroy(effect, explosionEffectLifetime);
       }
 
       Collider2D[] hits = Physics2D.OverlapCircleAll(explodePos, explosionRadius);

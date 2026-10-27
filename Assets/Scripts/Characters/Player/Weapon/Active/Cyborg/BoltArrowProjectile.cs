@@ -35,11 +35,14 @@ namespace NeoSurvive.Weapon
     private GameObject owner;
     private Transform ownerRoot;
     private WeaponBase sourceWeapon;
+    private WeaponHitVfx hitVfx;
 
     private readonly HashSet<int> hitIds = new HashSet<int>();
 
     private void Awake()
     {
+      hitVfx = GetComponent<WeaponHitVfx>();
+
       Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
       foreach (Collider2D col in colliders)
       {
@@ -216,6 +219,7 @@ namespace NeoSurvive.Weapon
         return;
 
       character.TakeDamage(Mathf.Max(1f, damage), sourceWeapon);
+      PlayHitVfx(character.transform.position);
 
       if (master)
       {
@@ -373,6 +377,14 @@ namespace NeoSurvive.Weapon
 
       destroyed = true;
       Destroy(gameObject);
+    }
+
+    private void PlayHitVfx(Vector3 position)
+    {
+      if (hitVfx != null)
+      {
+        hitVfx.Play(position, dir);
+      }
     }
 
     private void OnDrawGizmosSelected()

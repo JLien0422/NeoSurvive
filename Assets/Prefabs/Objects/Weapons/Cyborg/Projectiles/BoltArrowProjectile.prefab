@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8317933583151270732}
   - component: {fileID: 964165485638634963}
   - component: {fileID: 9008024795792471677}
+  - component: {fileID: 390100000000000003}
   m_Layer: 0
   m_Name: BoltArrowProjectile
   m_TagString: Untagged
@@ -157,3 +158,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &390100000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6458317052407179808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 4855111246632576351, guid: 32a9a8ce5ad00514e83f7db9aba959d9, type: 3}
+  lifetime: 0.35
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  alignToAttackDirection: 0

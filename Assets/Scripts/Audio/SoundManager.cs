@@ -92,6 +92,8 @@ public class SoundManager : MonoBehaviour
         sfxSource.loop = false;
         sfxSource.spatialBlend = 0f;
 
+        // 26-10-13 Xabuna: 오디오 소스가 준비되면 Start 이전에 저장된 BGM 음량 적용.
+        UpdateVolume();
         PreloadBgmClips();
         RebuildMaps();
     }
@@ -301,6 +303,8 @@ public class SoundManager : MonoBehaviour
         }
 
         bgmSource.clip = activeClips[currentBgmIndex];
+        // 26-10-13 Xabuna: 첫 곡과 다음 곡 모두 재생 전에 현재 설정 음량 적용.
+        UpdateVolume();
         bgmSource.Play();
         currentBgmIndex++;
     }

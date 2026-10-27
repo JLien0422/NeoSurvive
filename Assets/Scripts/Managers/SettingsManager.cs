@@ -51,6 +51,17 @@ public class SettingsManager : MonoBehaviour
   // 사용 가능한 해상도 목록
   public Resolution[] resolutions;
 
+  // 26-10-13 Xabuna: 설정 창을 열기 전부터 저장된 음량을 적용하도록 시작 시 초기화.
+  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+  private static void InitializeBeforeSceneLoad()
+  {
+    // 설정 UI가 비활성화된 씬에서도 첫 소리 재생 전에 저장값을 적용합니다.
+    if (Instance == null)
+    {
+      new GameObject("SettingsManager").AddComponent<SettingsManager>();
+    }
+  }
+
   private void Awake()
   {
     // 싱글톤 패턴
@@ -65,9 +76,18 @@ public class SettingsManager : MonoBehaviour
 
       LoadSettingsAndApply(); // 저장된 설정 불러오기 및 적용
     }
-    else
+    else if (Instance != this) // 26-10-13 Xabuna: 현재 인스턴스는 중복으로 제거하지 않음.
     {
       Destroy(gameObject);
+    }
+  }
+
+  // 26-10-13 Xabuna: 종료/파괴 후 재시작할 때 이전 설정 매니저 참조를 남기지 않음.
+  private void OnDestroy()
+  {
+    if (Instance == this)
+    {
+      Instance = null;
     }
   }
 

@@ -354,11 +354,13 @@ public class Player : Character
       amount *= GetNanoArmorDamageMultiplier();
     }
 
+    float hpBeforeHit = currentHP != null ? currentHP.CurrentValue : 0f;
     base.TakeDamage(amount, sourceWeapon);
+    float hpLost = Mathf.Max(0f, hpBeforeHit - currentHP.CurrentValue);
 
-    if (amount > 0f && HasTrait("reactive_exoskeleton"))
+    if (hpLost > 0f && HasTrait("reactive_exoskeleton"))
     {
-      TriggerReactiveExoskeleton(amount);
+      TriggerReactiveExoskeleton(hpLost);
     }
   }
 

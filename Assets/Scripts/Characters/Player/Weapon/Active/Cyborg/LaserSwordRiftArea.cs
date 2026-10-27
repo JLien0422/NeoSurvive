@@ -57,12 +57,14 @@ namespace NeoSurvive.Weapon
         float tickDamage = weaponDamage * damageFactor;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, hitMask);
+        var processed = new System.Collections.Generic.HashSet<int>();
         foreach (var h in hits)
         {
           if (h == null) continue;
           if (!string.IsNullOrEmpty(enemyTag) && !h.CompareTag(enemyTag)) continue;
 
-          if (h.TryGetComponent<Enemy>(out var e))
+          Character e = RunTraitTarget.Find(h);
+          if (e != null && processed.Add(e.GetInstanceID()))
           {
             e.TakeDamage(tickDamage, sourceWeapon);
           }

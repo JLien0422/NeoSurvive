@@ -54,7 +54,7 @@ public class SwingComboPattern : BossPatternBase
       DamagePlayerInBox(center, normalHitBoxSize, angle, comboDamage);
 
       if (gapBetweenNormalSwings > 0f)
-        yield return new WaitForSeconds(gapBetweenNormalSwings);
+        yield return WaitForPatternSeconds(gapBetweenNormalSwings);
     }
 
     if (!BossAlive || PlayerTarget == null) yield break;
@@ -68,19 +68,22 @@ public class SwingComboPattern : BossPatternBase
     float finalAngle = Mathf.Atan2(finalDir.y, finalDir.x) * Mathf.Rad2Deg;
     yield return PlayTelegraphRect(finalCenter, finalHitBoxSize, finalAngle, telegraphDuration);
 
+    if (!BossAlive || PlayerTarget == null) yield break;
     PlayBossAnimTrigger("Map1Boss Pattern3 Third");
 
     // 돌진
     float elapsed = 0f;
     while (elapsed < finalDashDuration && BossAlive)
     {
+      yield return WaitForMovementReady();
+      if (!BossAlive || PlayerTarget == null) yield break;
       elapsed += Time.deltaTime;
       if (BossRb != null)
-        BossRb.velocity = finalDir * finalDashSpeed;
+        SetPatternVelocity(finalDir * finalDashSpeed);
       yield return null;
     }
     if (BossRb != null)
-      BossRb.velocity = Vector2.zero;
+      SetPatternVelocity(Vector2.zero);
 
     // 돌진 종료 지점 휘두르기 판정
     finalCenter = (Vector2)transform.position + finalDir * finalHitDistance;
@@ -96,10 +99,9 @@ public class SwingComboPattern : BossPatternBase
     var hits = Physics2D.OverlapBoxAll(center, size, angle);
     foreach (var hit in hits)
     {
-      if (hit == null || !hit.CompareTag("Player")) continue;
-      if (hit.TryGetComponent<Player>(out var p))
+      if (TryGetDamageTarget(hit, out var p))
       {
-        GameAnalyticsTracker.TrackBossPatternHit(nameof(SwingComboPattern), "swing_box", damage, p);
+        if (p is Player player) GameAnalyticsTracker.TrackBossPatternHit(nameof(SwingComboPattern), "swing_box", damage, player);
         p.TakeDamage(damage);
         return;
       }

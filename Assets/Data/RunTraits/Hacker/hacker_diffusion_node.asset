@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_diffusion_node
+  m_EditorClassIdentifier: 
+  traitId: hacker_diffusion_node
+  displayName: "\uD655\uC0B0 \uB178\uB4DC"
+  icon: {fileID: 21300000, guid: fa22c800e6b3b2a4aaa788a958c45ab0, type: 3}
+  description: "\uAD11\uC5ED \uBC94\uC704\uAC00 \uC7A5\uB2F9 10% \uC99D\uAC00\uD569\uB2C8\uB2E4.
+    \uCD5C\uB300 50%. \uB77C\uC774\uD50C \uC0AC\uAC70\uB9AC\xB7\uB450\uAED8, \uC2A4\uD06C\uB7A8\uBE14\uB7EC
+    \uC0AC\uAC70\uB9AC\xB7\uAC01\uB3C4, \uC2E4\uB4DC \uD0C0\uACA9 \uBC18\uACBD, \uC218\uB958\uD0C4
+    \uD3ED\uBC1C \uBC18\uACBD\uC5D0 \uC801\uC6A9\uD569\uB2C8\uB2E4."
+  tier: 0
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 1
+  maxStacks: 5
+  effect:
+  - {fileID: 11400000, guid: 76b252c26aa34d4cacf342186a1c02aa, type: 2}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_ricochet_protocol
+  m_EditorClassIdentifier: 
+  traitId: hacker_ricochet_protocol
+  displayName: "도탄 프로토콜"
+  icon: {fileID: 0}
+  description: "명중 시 반경 4 안의 다른 적 1명에게 같은 피해 100%를 1회 전달합니다. 추가 도탄은 없습니다. 라이플은 빔에 맞지 않은 다른 적에게 전달하며 마스터 분열과 별개입니다."
+  tier: 2
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 0
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: a214e2bbbb834c20b424a25f278deb70, type: 2}

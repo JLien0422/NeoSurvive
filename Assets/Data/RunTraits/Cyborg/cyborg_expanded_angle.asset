@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_expanded_angle
+  m_EditorClassIdentifier: 
+  traitId: cyborg_expanded_angle
+  displayName: "확장 각도"
+  icon: {fileID: 0}
+  description: "소드·해머의 부채꼴 각도가 장당 10% 증가합니다. 서지는 찌르기 사거리가 증가합니다. 최대 30%. 해머 사거리는 증가하지 않습니다."
+  tier: 1
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 5
+  maxStacks: 3
+  effect:
+  - {fileID: 11400000, guid: bc614b64cbae421c86c38eb1d4ae678d, type: 2}

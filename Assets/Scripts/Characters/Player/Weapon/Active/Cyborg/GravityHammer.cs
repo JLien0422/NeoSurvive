@@ -7,6 +7,10 @@ namespace NeoSurvive.Weapon
 {
   public class GravityHammer : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Stats")]
     public float damage = 18f;
     public float range = 4.5f;
@@ -77,7 +81,7 @@ namespace NeoSurvive.Weapon
     {
       timer += Time.deltaTime;
 
-      if (timer >= fireRate)
+      if (timer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Slam();
         timer = 0f;
@@ -159,24 +163,24 @@ namespace NeoSurvive.Weapon
 
       if (debugDraw)
       {
-        Debug.DrawRay(transform.position, forward * range, Color.red, 0.2f);
+        Debug.DrawRay(transform.position, forward * TraitStat(range, RunTraitStat.AttackRange), Color.red, 0.2f);
 
         Debug.DrawRay(
           transform.position,
-          Quaternion.Euler(0, 0, angle * 0.5f) * forward * range,
+          Quaternion.Euler(0, 0, TraitStat(angle, RunTraitStat.AttackAngle) * 0.5f) * forward * TraitStat(range, RunTraitStat.AttackRange),
           Color.magenta,
           0.2f
         );
 
         Debug.DrawRay(
           transform.position,
-          Quaternion.Euler(0, 0, -angle * 0.5f) * forward * range,
+          Quaternion.Euler(0, 0, -TraitStat(angle, RunTraitStat.AttackAngle) * 0.5f) * forward * TraitStat(range, RunTraitStat.AttackRange),
           Color.magenta,
           0.2f
         );
       }
 
-      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, TraitStat(range, RunTraitStat.AttackRange));
 
       HashSet<int> processedIds = new HashSet<int>();
 
@@ -203,7 +207,7 @@ namespace NeoSurvive.Weapon
         Vector3 dirToTarget =
           (col.transform.position - transform.position).normalized;
 
-        if (Vector3.Angle(forward, dirToTarget) > angle * 0.5f)
+        if (Vector3.Angle(forward, dirToTarget) > TraitStat(angle, RunTraitStat.AttackAngle) * 0.5f)
           continue;
 
         if (isEnemy)
@@ -221,10 +225,8 @@ namespace NeoSurvive.Weapon
 
             var src = GetComponentInParent<WeaponSource>();
 
-            character.TakeDamage(
-              damage,
-              src != null ? src.weaponData : null
-            );
+            using (new RunTraitDamageContext.Scope(forceFieldContact: true))
+              character.TakeDamage(damage, src != null ? src.weaponData : null);
 
             ApplyKnockback(col.transform, forward);
             continue;
@@ -252,6 +254,15 @@ namespace NeoSurvive.Weapon
       SpawnHammerEffect(forward);
       SpawnSwingEffect(forward);
       SpawnImpactEffect(forward);
+      var replay = new RunTraitAttackSnapshot {
+        shape = RunTraitAttackSnapshot.Shape.Fan, origin = transform.position, forward = forward,
+        range = TraitStat(range, RunTraitStat.AttackRange), angle = TraitStat(angle, RunTraitStat.AttackAngle),
+        damage = damage, mask = hitMask, weapon = GetComponentInParent<WeaponSource>()?.weaponData,
+        knockbackSpeed = knockbackForce, knockbackDuration = 0.15f,
+        vfx = impactEffectPrefab, vfxOffset = impactEffectOffset,
+        vfxScale = impactEffectScale, vfxLifetime = impactEffectDuration
+      };
+      RunTraitSpecialRuntime.Repeat(replay.weapon, RunTraitSpecialKind.Afterimage, hammerEffectDuration, replay.Replay);
 
       if (InGameSoundManager.Instance != null)
         InGameSoundManager.Instance.PlayGravityHammerImpact();
@@ -260,7 +271,7 @@ namespace NeoSurvive.Weapon
       {
         Vector3 center =
           transform.position +
-          forward * Mathf.Min(range, 2.2f);
+          forward * Mathf.Min(TraitStat(range, RunTraitStat.AttackRange), 2.2f);
 
         SpawnBlackhole(center);
       }
@@ -499,12 +510,12 @@ namespace NeoSurvive.Weapon
       Collider2D[] hits =
         Physics2D.OverlapCircleAll(
           transform.position,
-          range * 1.5f
+          TraitStat(range, RunTraitStat.AttackRange) * 1.5f
         );
 
       Transform closest = null;
       float closestDist =
-        range > 0 ? range * 1.5f : 10f;
+        TraitStat(range, RunTraitStat.AttackRange) > 0 ? TraitStat(range, RunTraitStat.AttackRange) * 1.5f : 10f;
 
       foreach (Collider2D hit in hits)
       {

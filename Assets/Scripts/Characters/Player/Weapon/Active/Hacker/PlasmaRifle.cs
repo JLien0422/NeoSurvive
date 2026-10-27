@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class PlasmaRifle : MonoBehaviour
 {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
   [Header("Weapon Settings")]
   public float damage = 5f;
   public float range = 10f;
@@ -82,7 +86,7 @@ public class PlasmaRifle : MonoBehaviour
   {
     fireTimer += Time.deltaTime;
 
-    if (fireTimer >= fireRate)
+    if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
     {
       Attack();
       fireTimer = 0f;
@@ -127,7 +131,7 @@ public class PlasmaRifle : MonoBehaviour
   {
     GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
     GameObject closest = null;
-    float closestDistance = range > 0 ? range : 10f;
+    float closestDistance = TraitStat(range, RunTraitStat.AttackRange) > 0 ? TraitStat(range, RunTraitStat.AttackRange) : 10f;
 
     foreach (GameObject enemy in enemies)
     {

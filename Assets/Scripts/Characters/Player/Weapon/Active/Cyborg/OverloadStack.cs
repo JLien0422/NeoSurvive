@@ -36,6 +36,7 @@ namespace NeoSurvive.Weapon
     private void Explode(float radius, float damage, LayerMask enemyMask, string enemyTag)
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius, enemyMask);
+      var processed = new System.Collections.Generic.HashSet<int>();
       foreach (var col in hits)
       {
         if (col == null) continue;
@@ -46,8 +47,8 @@ namespace NeoSurvive.Weapon
             continue;
         }
 
-        Enemy e = col.GetComponentInParent<Enemy>();
-        if (e != null)
+        Character e = RunTraitTarget.Find(col);
+        if (e != null && processed.Add(e.GetInstanceID()))
         {
           e.TakeDamage(damage, damageSourceWeapon);
         }

@@ -166,6 +166,10 @@ namespace NeoSurvive.Map.Map1.Gimmicks
 
         private void HandleHackStartInput()
         {
+            // E는 모든 증기 구역에 전달됩니다. 범위 밖 입력은 이 구역의 요청이 아닙니다.
+            if (currentPlayerInZone == null)
+                return;
+
             if (!Input.GetKeyDown(hackKey))
                 return;
 
@@ -186,12 +190,6 @@ namespace NeoSurvive.Map.Map1.Gimmicks
             if (isHackRequestPending)
             {
                 Debug.Log("[SteamVentZone] 해킹 불가: 이미 해킹 요청 진행 중");
-                return;
-            }
-
-            if (currentPlayerInZone == null)
-            {
-                Debug.Log("[SteamVentZone] 해킹 불가: currentPlayerInZone == null / 플레이어가 Trigger 안에 잡히지 않음");
                 return;
             }
 

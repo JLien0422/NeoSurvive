@@ -7,6 +7,10 @@ namespace NeoSurvive.Weapon
 {
   public class DataScrambler : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Stats")]
     public float damage = 10f;
     public float range = 5f;
@@ -47,7 +51,7 @@ namespace NeoSurvive.Weapon
     {
       fireTimer += Time.deltaTime;
 
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Attack();
         fireTimer = 0f;
@@ -71,21 +75,30 @@ namespace NeoSurvive.Weapon
 
       // ★ 공격 VFX 생성
       SpawnAttackVFX(forward);
+      var replay = new RunTraitAttackSnapshot {
+        shape = RunTraitAttackSnapshot.Shape.Fan, origin = transform.position, forward = forward,
+        range = TraitStat(range, RunTraitStat.AttackRange), angle = TraitStat(angle, RunTraitStat.AttackAngle),
+        damage = damage, weapon = GetComponentInParent<WeaponSource>()?.weaponData,
+        confusion = true, controlDuration = TraitStat(duration, RunTraitStat.ControlDuration),
+        vfx = attackVfxPrefab, vfxOffset = attackVfxOffset, vfxScale = attackVfxScale, vfxLifetime = attackVfxDuration
+      };
+      RunTraitSpecialRuntime.Repeat(replay.weapon, RunTraitSpecialKind.Echo, attackVfxDuration, replay.Replay);
 
       Debug.DrawRay(
         transform.position,
-        Quaternion.Euler(0, 0, angle / 2) * forward * range,
+        Quaternion.Euler(0, 0, TraitStat(angle, RunTraitStat.AttackAngle) / 2) * forward * TraitStat(range, RunTraitStat.AttackRange),
         Color.magenta,
         0.5f);
 
       Debug.DrawRay(
         transform.position,
-        Quaternion.Euler(0, 0, -angle / 2) * forward * range,
+        Quaternion.Euler(0, 0, -TraitStat(angle, RunTraitStat.AttackAngle) / 2) * forward * TraitStat(range, RunTraitStat.AttackRange),
         Color.magenta,
         0.5f);
 
-      Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range);
+      Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, TraitStat(range, RunTraitStat.AttackRange));
 
+      var processed = new HashSet<int>();
       foreach (var col in enemies)
       {
         if (col == null) continue;
@@ -100,9 +113,10 @@ namespace NeoSurvive.Weapon
         Vector3 dirToEnemy =
           (col.transform.position - transform.position).normalized;
 
-        if (Vector3.Angle(forward, dirToEnemy) < angle / 2)
+        if (Vector3.Angle(forward, dirToEnemy) < TraitStat(angle, RunTraitStat.AttackAngle) / 2)
         {
-          if (col.TryGetComponent<Character>(out var character))
+          Character character = col.GetComponentInParent<Character>();
+          if (character != null && processed.Add(character.GetInstanceID()))
           {
             var src = GetComponentInParent<WeaponSource>();
 
@@ -110,8 +124,8 @@ namespace NeoSurvive.Weapon
               damage,
               src != null ? src.weaponData : null);
 
-            if (character is Enemy)
-              ApplyConfusion(col.gameObject);
+            if (RunTraitTarget.IsCombatant(character))
+              ApplyConfusion(character.gameObject);
           }
         }
       }
@@ -153,6 +167,7 @@ namespace NeoSurvive.Weapon
 
     private void ApplyConfusion(GameObject enemyObj)
     {
+      RunTraitStatus.ApplySlow(enemyObj, GetComponentInParent<WeaponSource>()?.weaponData);
       var confusion = enemyObj.GetComponent<ConfusionEffect>();
 
       if (confusion == null)
@@ -164,7 +179,7 @@ namespace NeoSurvive.Weapon
 
       confusion.Initialize(
         damage,
-        duration,
+        TraitStat(duration, RunTraitStat.ControlDuration),
         explosionRadius,
         enableFrenzyAtLv5 && currentLevel >= 5,
         src != null ? src.weaponData : null,
@@ -173,9 +188,8 @@ namespace NeoSurvive.Weapon
         explosionVfxScale
       );
 
-      BuffUtil.Apply(
-        enemyObj,
-        new FrenzyDebuff(duration));
+      RunTraitControl.Apply(enemyObj, new FrenzyDebuff(TraitStat(duration, RunTraitStat.ControlDuration)),
+        src != null ? src.weaponData : null);
     }
 
     public void OnLevelUp(int level)
@@ -238,7 +252,7 @@ namespace NeoSurvive.Weapon
       GameObject closest = null;
 
       float closestDistance =
-        range > 0 ? (range * 1.5f) : 10f;
+        TraitStat(range, RunTraitStat.AttackRange) > 0 ? (TraitStat(range, RunTraitStat.AttackRange) * 1.5f) : 10f;
 
       foreach (GameObject enemy in enemies)
       {
@@ -278,7 +292,7 @@ namespace NeoSurvive.Weapon
     private bool expired = false;
     private bool hasExploded = false;
     private WeaponBase sourceWeapon;
-    private Enemy targetEnemy;
+    private Character targetEnemy;
 
     // ★ 폭발 VFX
     private GameObject explosionVfxPrefab;
@@ -300,7 +314,7 @@ namespace NeoSurvive.Weapon
       this.explosionRadius = explosionRadius;
       this.explodeOnDeath = explodeOnDeath;
       this.sourceWeapon = source;
-      this.targetEnemy = GetComponent<Enemy>();
+      this.targetEnemy = RunTraitTarget.Find(this);
 
       this.explosionVfxPrefab = explosionVfxPrefab;
       this.explosionVfxLifetime = explosionVfxLifetime;
@@ -359,14 +373,16 @@ namespace NeoSurvive.Weapon
           transform.position,
           explosionRadius);
 
+      var processed = new HashSet<int>();
       foreach (var h in hits)
       {
         if (h.gameObject == gameObject)
           continue;
 
-        if (h.CompareTag("Enemy") &&
-            h.TryGetComponent<Enemy>(out var e))
+        Character e = RunTraitTarget.Find(h);
+        if (e != null)
         {
+          if (!processed.Add(e.GetInstanceID())) continue;
           e.TakeDamage(damage, sourceWeapon);
           continue;
         }

@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class TeslaCoilArmor : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Aura")]
     public float auraDamage = 6f;
     public float auraRadius = 2.2f;
@@ -74,7 +78,7 @@ namespace NeoSurvive.Weapon
     {
       auraTimer += Time.deltaTime;
 
-      if (auraTimer >= auraTick)
+      if (auraTimer >= TraitStat(auraTick, RunTraitStat.HitInterval))
       {
         AuraTickDamage();
         auraTimer = 0f;
@@ -93,7 +97,7 @@ namespace NeoSurvive.Weapon
 
       lightningTimer += Time.deltaTime;
 
-      if (lightningTimer >= lightningInterval)
+      if (lightningTimer >= TraitStat(lightningInterval, RunTraitStat.AttackInterval))
       {
         StrikeRandomTarget();
         lightningTimer = 0f;
@@ -122,7 +126,7 @@ namespace NeoSurvive.Weapon
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(
         transform.position,
-        auraRadius
+        TraitStat(auraRadius, RunTraitStat.AuraRadius)
       );
 
       HashSet<int> processedIds = new HashSet<int>();
@@ -132,7 +136,8 @@ namespace NeoSurvive.Weapon
         if (col == null)
           continue;
 
-        TryDamageTarget(col, auraDamage, processedIds);
+        using (new RunTraitDamageContext.Scope(forceFieldContact: true))
+          TryDamageTarget(col, auraDamage, processedIds);
       }
     }
 
@@ -270,6 +275,7 @@ namespace NeoSurvive.Weapon
           damageValue,
           src != null ? src.weaponData : null
         );
+        RunTraitStatus.ApplySlow(character.gameObject, src != null ? src.weaponData : null);
 
         return true;
       }

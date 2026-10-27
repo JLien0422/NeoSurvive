@@ -48,6 +48,9 @@ public abstract class Character : MonoBehaviour
     if (IsDead) return;
     EnsureHpInitialized(refillToMax: false);
 
+    // 26-10-21 Xabuna: 추가 피해는 대상의 증폭을 다시 계산하되 무기 보너스는 한 번만 적용합니다.
+    float rawDamage = amount;
+    float hpBefore = currentHP.CurrentValue;
     MarkedTarget mark = GetComponent<MarkedTarget>();
     if (mark != null)
     {
@@ -68,7 +71,13 @@ public abstract class Character : MonoBehaviour
     }
 
     _lastSourceWeapon = sourceWeapon;
+    // 연쇄 피해에는 원래 값을 보관해 다음 대상에서 런 특성 배율이 중복되지 않게 합니다.
     _lastDamageAmount = amount;
+
+    if (RunTraitTarget.IsCombatant(this) && sourceWeapon != null && RunTraitManager.Instance != null)
+    {
+      amount *= RunTraitManager.Instance.GetWeaponDamageMultiplier(sourceWeapon);
+    }
 
     // 무기별 대미지 통계 기록
     if (sourceWeapon != null && WeaponDamageStats.Instance != null)
@@ -85,7 +94,16 @@ public abstract class Character : MonoBehaviour
     if (_baseFlags == null) _baseFlags = GetComponent<StatusFlags>(); // (추가)
     if (_baseFlags != null) amount *= _baseFlags.incomingDamageMul;   // (추가)
 
+    if (RunTraitTarget.IsCombatant(this))
+      amount *= GetComponent<RunTraitAmplificationReceiver>()?.TransferredMultiplier(sourceWeapon) ?? 1f;
+    if (this is Player)
+      amount = GetComponent<RunTraitShield>()?.Absorb(amount) ?? amount;
+
     currentHP.CurrentValue -= amount;
+
+    if (RunTraitTarget.IsCombatant(this))
+      RunTraitSpecialRuntime.OnDamage(this, sourceWeapon, rawDamage,
+        Mathf.Min(hpBefore, Mathf.Max(0f, amount)), currentHP.CurrentValue <= 0f);
 
     if (amount > 0f)
     {
@@ -123,7 +141,12 @@ public abstract class Character : MonoBehaviour
   protected virtual void Die()
   {
     if (IsDead) return;
+    // 표식 후 오버레이를 획득해도 전이에는 처치 순간의 증폭 수치를 사용합니다.
+    if (RunTraitTarget.IsCombatant(this)) GetComponent<MarkedTarget>()?.RefreshTransferMetadata();
     IsDead = true;
+
+    if (RunTraitTarget.IsCombatant(this))
+      GetComponent<RunTraitAmplificationReceiver>()?.OnKilled();
 
     TryTriggerChainDischarge();
   }
@@ -131,7 +154,8 @@ public abstract class Character : MonoBehaviour
   protected bool HasAnyActiveBuffs()
   {
     BuffHandler buffHandler = GetComponent<BuffHandler>();
-    return buffHandler != null && buffHandler.HasAnyActiveBuffs();
+    RunTraitSlowReceiver slow = GetComponent<RunTraitSlowReceiver>();
+    return (buffHandler != null && buffHandler.HasAnyActiveBuffs()) || (slow != null && slow.IsActive);
   }
 
   private void TryTriggerChainDischarge()

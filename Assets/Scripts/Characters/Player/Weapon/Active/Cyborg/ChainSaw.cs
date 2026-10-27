@@ -8,6 +8,8 @@ namespace NeoSurvive.Weapon
   [RequireComponent(typeof(Collider2D))]
   public class ChainSaw : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Damage")]
     public float damage = 6f;
     public float hpRatioDamage = 0.05f;
@@ -159,7 +161,9 @@ namespace NeoSurvive.Weapon
         rb.angularVelocity = 0f;
       }
 
+      Vector2 previous = transform.position;
       MoveRectBound();
+      RunTraitProjectileErasure.Sweep(sourceWeapon, previous, transform.position, hitRadius * radiusScale);
       DamageTargets();
       SpinVisual();
 
@@ -197,7 +201,7 @@ namespace NeoSurvive.Weapon
 
       Vector3 nextPos =
         transform.position +
-        (Vector3)(moveDir * speed * Time.deltaTime);
+        (Vector3)(moveDir * TraitStat(speed, RunTraitStat.MovementSpeed) * Time.deltaTime);
 
       float minX = center.x - halfWidth;
       float maxX = center.x + halfWidth;
@@ -244,6 +248,7 @@ namespace NeoSurvive.Weapon
         hitRadius * radiusScale
       );
 
+      RunTraitProjectileErasure.Circle(sourceWeapon, transform.position, hitRadius * radiusScale);
       float now = Time.time;
 
       foreach (var hit in hits)
@@ -295,7 +300,7 @@ namespace NeoSurvive.Weapon
         int id = character.gameObject.GetInstanceID();
 
         if (lastHitTime.TryGetValue(id, out float last) &&
-            now - last < hitCooldown)
+            now - last < TraitStat(hitCooldown, RunTraitStat.HitInterval))
           return false;
 
         lastHitTime[id] = now;
@@ -315,6 +320,8 @@ namespace NeoSurvive.Weapon
           CacheSourceWeapon();
 
         character.TakeDamage(finalDamage, sourceWeapon);
+            RunTraitStatus.ApplyKnockback(character.gameObject, sourceWeapon,
+                Player.Instance != null ? (Vector2)Player.Instance.transform.position : (Vector2)transform.position);
 
         if (debugLog)
           Debug.Log($"[ChainSaw] Hit Character {character.name} dmg={finalDamage}");
@@ -336,7 +343,7 @@ namespace NeoSurvive.Weapon
         int id = mb.gameObject.GetInstanceID();
 
         if (lastHitTime.TryGetValue(id, out float last) &&
-            now - last < hitCooldown)
+            now - last < TraitStat(hitCooldown, RunTraitStat.HitInterval))
           return false;
 
         lastHitTime[id] = now;

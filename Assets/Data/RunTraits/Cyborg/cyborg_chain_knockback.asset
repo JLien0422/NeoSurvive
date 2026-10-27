@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_chain_knockback
+  m_EditorClassIdentifier: 
+  traitId: cyborg_chain_knockback
+  displayName: "연쇄 넉백"
+  icon: {fileID: 0}
+  description: "무기 공격으로 밀린 적이 다른 적에 부딪히면 그 적도 밀어냅니다. 추가 피해는 없습니다."
+  tier: 2
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 7
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: 0c801b94d42140e7a69586465c4bcf7a, type: 2}

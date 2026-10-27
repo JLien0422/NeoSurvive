@@ -14,6 +14,7 @@ namespace NeoSurvive.Buff
             public float RemainingTime;
             public uint? BuffId;
             public uint Stacks;
+            public System.Action OnExpired;
         }
 
         private readonly List<BuffEntry> activeBuffs = new List<BuffEntry>();
@@ -23,7 +24,7 @@ namespace NeoSurvive.Buff
             AddBuffInternal(buff, null, 1, buff != null ? buff.Duration : 0f);
         }
 
-        public void AddBuffWithId(uint buffId, IBuff buff, uint stacks = 1, float? durationOverride = null, bool refreshIfExists = true)
+        public void AddBuffWithId(uint buffId, IBuff buff, uint stacks = 1, float? durationOverride = null, bool refreshIfExists = true, System.Action onExpired = null)
         {
             if (buff == null) return;
 
@@ -32,7 +33,7 @@ namespace NeoSurvive.Buff
                 RemoveBuffById(buffId);
             }
 
-            AddBuffInternal(buff, buffId, stacks, durationOverride ?? buff.Duration);
+            AddBuffInternal(buff, buffId, stacks, durationOverride ?? buff.Duration, onExpired);
         }
 
         public void SetOrRefreshNetworkBuff(uint buffId, IBuff buff, float remainingTime, uint stacks = 1)
@@ -53,6 +54,7 @@ namespace NeoSurvive.Buff
                     activeBuffs.RemoveAt(i);
                 }
             }
+            RestoreActiveControlFlags();
         }
 
         public HashSet<uint> GetActiveNetworkBuffIds()
@@ -73,7 +75,7 @@ namespace NeoSurvive.Buff
             return activeBuffs.Count > 0;
         }
 
-        private void AddBuffInternal(IBuff buff, uint? buffId, uint stacks, float duration)
+        private void AddBuffInternal(IBuff buff, uint? buffId, uint stacks, float duration, System.Action onExpired = null)
         {
             if (buff == null) return;
 
@@ -82,7 +84,8 @@ namespace NeoSurvive.Buff
                 Buff = buff,
                 RemainingTime = duration,
                 BuffId = buffId,
-                Stacks = stacks
+                Stacks = stacks,
+                OnExpired = onExpired
             });
 
             buff.Apply(gameObject);
@@ -100,7 +103,22 @@ namespace NeoSurvive.Buff
                 {
                     entry.Buff.Remove(gameObject);
                     activeBuffs.RemoveAt(i);
+                    RestoreActiveControlFlags();
+                    entry.OnExpired?.Invoke();
                 }
+            }
+        }
+
+        private void RestoreActiveControlFlags()
+        {
+            // CC 하나가 만료되어도 남아 있는 기절/속박/혼란은 유지합니다.
+            var flags = GetComponent<StatusFlags>();
+            if (flags == null) return;
+            foreach (var entry in activeBuffs)
+            {
+                if (entry.Buff is StunDebuff) { flags.moveBlocked = true; flags.attackBlocked = true; }
+                if (entry.Buff is RootDebuff) flags.moveBlocked = true;
+                if (entry.Buff is FrenzyDebuff) flags.frenzy = true;
             }
         }
     }

@@ -9,6 +9,10 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public class DigitalShield : MonoBehaviour
     {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
         [Header("Prefab")]
         [SerializeField] private GameObject shieldWavePrefab;
 
@@ -60,7 +64,7 @@ namespace NeoSurvive.Weapon
         {
             timer += Time.deltaTime;
 
-            if (timer >= fireRate)
+            if (timer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
             {
                 timer = 0f;
                 Fire();
@@ -147,7 +151,7 @@ namespace NeoSurvive.Weapon
                 Quaternion.identity
             );
 
-            vfx.transform.localScale = Vector3.one * vfxScale;
+            vfx.transform.localScale = Vector3.one * TraitStat(vfxScale, RunTraitStat.ShieldRadius);
 
             // ★ 추가: 플레이어를 따라가도록 부모 설정
             if (followTarget != null)

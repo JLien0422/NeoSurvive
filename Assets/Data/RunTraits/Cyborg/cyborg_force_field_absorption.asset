@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_force_field_absorption
+  m_EditorClassIdentifier: 
+  traitId: cyborg_force_field_absorption
+  displayName: "역장 흡수"
+  icon: {fileID: 0}
+  description: "실드 접촉·해머 찍기·테슬라 타격으로 준 피해의 일정 비율을 보호막으로 얻습니다. 보호막은 받는 피해를 체력보다 먼저 흡수합니다."
+  tier: 2
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 9
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: f4dcd6647c2d424e87336ee6eb25fb66, type: 2}

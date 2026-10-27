@@ -5,6 +5,8 @@ namespace NeoSurvive.Weapon
 {
     public class PlasmaPhotonProjectile : MonoBehaviour
     {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
         [Header("Movement")]
         public float speed = 14f;
         public float lifeTime = 3f;
@@ -56,11 +58,15 @@ namespace NeoSurvive.Weapon
 
         private void Update()
         {
-            transform.position += (Vector3)(dir * speed * Time.deltaTime);
+            Vector2 before = transform.position;
+            transform.position += (Vector3)(dir * TraitStat(speed, RunTraitStat.ProjectileSpeed) * Time.deltaTime);
+            var body = GetComponent<Collider2D>();
+            RunTraitProjectileErasure.SweepCollider(sourceWeapon, body, before);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (RunTraitProjectileErasure.TryErase(sourceWeapon, other)) return;
             // 🔒 Enemy만 타격 (Player, Weapon, 벽 전부 차단)
             if (!other.CompareTag("Enemy"))
                 return;
@@ -83,10 +89,10 @@ namespace NeoSurvive.Weapon
             // 2) 디버프 적용(대상이 무엇이든 GameObject에 적용)
             GameObject target = other.gameObject;
 
-            if (applySlow)       BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration));
-            if (applyStun)       BuffUtil.Apply(target, new StunDebuff(stunDuration));
-            if (applyRoot)       BuffUtil.Apply(target, new RootDebuff(rootDuration));
-            if (applyBlind)      BuffUtil.Apply(target, new BlindDebuff(blindDuration));
+            RunTraitStatus.ApplySlow(target, sourceWeapon, applySlow ? slowMul : 1f, applySlow ? slowDuration : 0f);
+            if (applyStun)       BuffUtil.Apply(target, new StunDebuff(RunTraitWeaponStats.Scale(sourceWeapon, stunDuration, RunTraitStat.ControlDuration)));
+            if (applyRoot)       BuffUtil.Apply(target, new RootDebuff(RunTraitWeaponStats.Scale(sourceWeapon, rootDuration, RunTraitStat.ControlDuration)));
+            if (applyBlind)      BuffUtil.Apply(target, new BlindDebuff(RunTraitWeaponStats.Scale(sourceWeapon, blindDuration, RunTraitStat.ControlDuration)));
             if (applyVulnerable) BuffUtil.Apply(target, new VulnerableDebuff(vulnerableMul, vulnerableDuration));
 
             if (destroyOnHit) Destroy(gameObject);

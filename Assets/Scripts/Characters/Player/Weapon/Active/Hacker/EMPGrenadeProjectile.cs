@@ -19,6 +19,8 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class EMPGrenadeProjectile : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Optional Visual")]
     [SerializeField] private GameObject explosionEffectPrefab;
     [SerializeField] private float explosionEffectLifetime = 0.7f; // ★ 추가
@@ -128,10 +130,11 @@ namespace NeoSurvive.Weapon
       if (explosionEffectPrefab != null)
       {
         GameObject effect = Instantiate(explosionEffectPrefab, explodePos, Quaternion.identity); // ★ 수정
+        effect.transform.localScale *= TraitStat(1f, RunTraitStat.ExplosionRadius);
         Destroy(effect, explosionEffectLifetime); // ★ 추가
       }
 
-      Collider2D[] hits = Physics2D.OverlapCircleAll(explodePos, explosionRadius);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(explodePos, TraitStat(explosionRadius, RunTraitStat.ExplosionRadius));
       HashSet<int> processedIds = new HashSet<int>();
 
       foreach (Collider2D hit in hits)
@@ -212,9 +215,7 @@ namespace NeoSurvive.Weapon
         */
 
         // ===== Enemy 처리 =====
-        Enemy enemy = hit.GetComponent<Enemy>();
-        if (enemy == null)
-          enemy = hit.GetComponentInParent<Enemy>();
+        Character enemy = RunTraitTarget.Find(hit);
 
         if (enemy != null)
         {
@@ -226,6 +227,7 @@ namespace NeoSurvive.Weapon
             continue;
 
           enemy.TakeDamage(damage, sourceWeapon);
+          RunTraitStatus.ApplySlow(enemy.gameObject, sourceWeapon);
           if (applyStun)
           {
             ApplyStun(enemy.gameObject, stunDuration);
@@ -255,6 +257,14 @@ namespace NeoSurvive.Weapon
         }
       }
 
+      var replay = new RunTraitAttackSnapshot {
+        shape = RunTraitAttackSnapshot.Shape.Circle, origin = explodePos,
+        range = TraitStat(explosionRadius, RunTraitStat.ExplosionRadius), damage = damage,
+        weapon = sourceWeapon, stun = applyStun, controlDuration = TraitStat(stunDuration, RunTraitStat.ControlDuration),
+        vfx = explosionEffectPrefab, vfxScale = TraitStat(1f, RunTraitStat.ExplosionRadius),
+        vfxLifetime = explosionEffectLifetime
+      };
+      RunTraitSpecialRuntime.Repeat(sourceWeapon, RunTraitSpecialKind.Echo, explosionEffectLifetime, replay.Replay);
       Destroy(gameObject);
     }
 
@@ -323,7 +333,7 @@ namespace NeoSurvive.Weapon
       if (target == null)
         return;
 
-      BuffUtil.Apply(target, new StunDebuff(duration));
+      RunTraitControl.Apply(target, new StunDebuff(TraitStat(duration, RunTraitStat.ControlDuration)), sourceWeapon);
     }
 
     private void OnDrawGizmosSelected()

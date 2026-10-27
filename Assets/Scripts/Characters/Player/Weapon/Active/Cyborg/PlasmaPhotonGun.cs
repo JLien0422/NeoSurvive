@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class PlasmaPhotonGun : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("References")]
     public PlasmaPhotonBeam beamPrefab;
 
@@ -91,7 +95,7 @@ namespace NeoSurvive.Weapon
 
       if (beamVfxPrefab != null)
       {
-        float beamLength = range * beamVfxScaleX;
+        float beamLength = TraitStat(range, RunTraitStat.AttackRange) * beamVfxScaleX;
         Vector3 vfxPos = beamStartPos + (Vector3)(dir * (beamLength * 0.5f));
 
         GameObject vfx = Instantiate(beamVfxPrefab, vfxPos, rot);
@@ -157,7 +161,7 @@ namespace NeoSurvive.Weapon
     {
       Vector3 origin = transform.position;
 
-      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, TraitStat(range, RunTraitStat.AttackRange));
 
       Transform closest = null;
       float closestDist = float.MaxValue;
@@ -190,7 +194,7 @@ namespace NeoSurvive.Weapon
 
         float d = Vector2.Distance(origin, targetTransform.position);
 
-        if (d < closestDist && d <= range)
+        if (d < closestDist && d <= TraitStat(range, RunTraitStat.AttackRange))
         {
           closestDist = d;
           closest = targetTransform;

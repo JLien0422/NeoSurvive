@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_extended_range
+  m_EditorClassIdentifier: 
+  traitId: cyborg_extended_range
+  displayName: "사정 연장"
+  icon: {fileID: 0}
+  description: "장당 10%, 최대 30% 증가합니다. 포톤·너클·볼트는 사거리·탄속, 톱은 이동속도, 브레스는 사거리·폭에 적용합니다."
+  tier: 1
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 6
+  maxStacks: 3
+  effect:
+  - {fileID: 11400000, guid: 9dd7963390f548be81ea878a94642b2f, type: 2}

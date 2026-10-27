@@ -33,7 +33,6 @@ public class TrashThrowPattern : BossPatternBase
 
     if (PlayerTarget == null) yield break;
 
-    var wait = new WaitForSeconds(throwInterval);
     for (int i = 0; i < throwCount && BossAlive; i++)
     {
       if (PlayerTarget == null) yield break;
@@ -45,25 +44,26 @@ public class TrashThrowPattern : BossPatternBase
       impactCenter.z = 0f;
       yield return PlayTelegraphCircle(impactCenter, impactRadius, telegraphDuration);
 
+      if (!BossAlive || PlayerTarget == null) yield break;
       // 경고 지점 플레이어 피해
       ApplyImpactDamage(impactCenter);
 
       // 충돌 지점 반경 내 랜덤 분열
       SpawnSplitTrash(impactCenter);
 
-      yield return wait;
+      yield return WaitForPatternSeconds(throwInterval);
     }
   }
 
   private void ApplyImpactDamage(Vector3 center)
   {
     var hits = Physics2D.OverlapCircleAll(center, impactRadius);
+    var processed = new System.Collections.Generic.HashSet<int>();
     foreach (var hit in hits)
     {
-      if (hit == null || !hit.CompareTag("Player")) continue;
-      if (hit.TryGetComponent<Player>(out var p))
+      if (TryGetDamageTarget(hit, out var p) && processed.Add(p.GetInstanceID()))
       {
-        GameAnalyticsTracker.TrackBossPatternHit(nameof(TrashThrowPattern), "falling_trash", impactDamage, p);
+        if (p is Player player) GameAnalyticsTracker.TrackBossPatternHit(nameof(TrashThrowPattern), "falling_trash", impactDamage, player);
         p.TakeDamage(impactDamage);
       }
     }
@@ -81,6 +81,7 @@ public class TrashThrowPattern : BossPatternBase
         continue;
 
       GameObject trash = Instantiate(splitObstaclePrefab, spawnPos, Quaternion.identity);
+      trash.GetComponent<TrashObstacle>()?.SetAttackOwner(BossRef);
       IgnoreCollisionWithBoss(trash);
       if (trash.TryGetComponent<Rigidbody2D>(out var rb))
         rb.velocity = Vector2.zero;

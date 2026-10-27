@@ -5,6 +5,10 @@ namespace NeoSurvive.Weapon
 {
   public class EnergyShield : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Orb Prefab")]
     public GameObject shieldOrbPrefab;
 
@@ -61,7 +65,7 @@ namespace NeoSurvive.Weapon
     {
       if (target == null) return;
 
-      currentAngle += rotationSpeed * Time.deltaTime;
+      currentAngle += TraitStat(rotationSpeed, RunTraitStat.RotationSpeed) * Time.deltaTime;
 
       if (currentAngle >= 360f)
         currentAngle -= 360f;
@@ -179,8 +183,8 @@ namespace NeoSurvive.Weapon
         float rad = ang * Mathf.Deg2Rad;
 
         Vector3 offset = new Vector3(
-          Mathf.Cos(rad) * radius,
-          Mathf.Sin(rad) * radius,
+          Mathf.Cos(rad) * TraitStat(radius, RunTraitStat.OrbitRadius),
+          Mathf.Sin(rad) * TraitStat(radius, RunTraitStat.OrbitRadius),
           0f
         );
 

@@ -6,6 +6,8 @@ namespace NeoSurvive.Weapon
 {
   public class BoosterFistProjectile : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Runtime")]
     public float damage;
     public float speed;
@@ -133,11 +135,13 @@ namespace NeoSurvive.Weapon
 
       RotateToDirection();
 
-      transform.position += dir * speed * Time.deltaTime;
+      Vector2 before = transform.position;
+      transform.position += dir * TraitStat(speed, RunTraitStat.ProjectileSpeed) * Time.deltaTime;
+      RunTraitProjectileErasure.Sweep(sourceWeapon, before, transform.position, hitRadius);
 
       CheckHitByOverlap();
 
-      if (Vector3.Distance(startPos, transform.position) >= maxDistance)
+      if (Vector3.Distance(startPos, transform.position) >= TraitStat(maxDistance, RunTraitStat.AttackRange))
       {
         DestroyProjectile();
       }
@@ -255,6 +259,8 @@ namespace NeoSurvive.Weapon
         return;
 
       character.TakeDamage(Mathf.Max(1f, damage), sourceWeapon);
+            RunTraitStatus.ApplyKnockback(character.gameObject, sourceWeapon,
+                Player.Instance != null ? (Vector2)Player.Instance.transform.position : (Vector2)transform.position);
 
       HandleAfterHit(character.transform);
     }

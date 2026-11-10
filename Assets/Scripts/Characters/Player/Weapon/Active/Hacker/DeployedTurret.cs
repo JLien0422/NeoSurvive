@@ -5,6 +5,8 @@ namespace NeoSurvive.Weapon
 {
   public class DeployedTurret : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     private float damage;
     private float range;
     private float fireRate;
@@ -15,6 +17,8 @@ namespace NeoSurvive.Weapon
     private Vector3 fireOffset = Vector3.zero;
 
     private float fireTimer;
+    private float lifetime;
+    private float age;
 
     private WeaponBase sourceWeapon;
 
@@ -63,7 +67,8 @@ namespace NeoSurvive.Weapon
         }
       }
 
-      Destroy(gameObject, lifeTime);
+      lifetime = lifeTime;
+      age = 0f;
 
       SpriteRenderer sr = GetComponent<SpriteRenderer>();
       if (sr == null)
@@ -78,10 +83,16 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
+      age += Time.deltaTime;
+      if (age >= TraitStat(lifetime, RunTraitStat.Lifetime))
+      {
+        Destroy(gameObject);
+        return;
+      }
       FollowPlayerIfMaster();
 
       fireTimer += Time.deltaTime;
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Attack();
         fireTimer = 0f;

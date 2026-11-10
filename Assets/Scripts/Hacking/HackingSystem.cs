@@ -9,7 +9,8 @@ using System;
 /// 해킹 시스템 매니저
 /// - 패턴 발동 시 해킹오브젝트 생성
 /// - 미니게임 시작/종료 관리
-/// - 해커/사이보그: 게임시간 유지 (실시간). 미니게임은 unscaledDeltaTime
+/// - 해커 미니게임 중에는 인게임 시간만 0.8배. 미니게임 제한 시간은 unscaledDeltaTime
+/// - 사이보그 해킹은 게임 시간을 유지
 /// </summary>
 public class HackingSystem : MonoBehaviour
 {
@@ -69,6 +70,19 @@ public class HackingSystem : MonoBehaviour
     private HackingMinigameBase currentMinigame;
     private bool isHacking = false;
 
+    // 해커 미니게임 동안 이동, 탄, 쿨타임, 인게임 시계가 같이 느려진다.
+    // 미니게임 제한 시간은 unscaledDeltaTime이라 실제 시간은 그대로다.
+    private const float MinigameWorldTimeScale = 0.8f;
+    private bool minigameSlowMotion;
+
+    // 인스펙터에 둔 패널 위치는 접힌 자리다. SliceFrame만 화면 끝에 남고, 해킹 때 패널 전체가 들어온다.
+    private const float PanelSlideDuration = 0.22f;
+    private RectTransform hackingPanelRect;
+    private Vector2 panelClosedPosition;
+    private float panelOpenX;
+    private Coroutine panelSlideCoroutine;
+    private bool hackingPanelOpen;
+
     // 사이보그 해킹 관련
     private Coroutine cyborgHackingCoroutine; // 사이보그 해킹 코루틴 참조
     private CyborgZoneTimerVisual cyborgZoneVisual; // 바닥 수비 원 + 시계방향 타이머
@@ -97,6 +111,7 @@ public class HackingSystem : MonoBehaviour
             return;
 
         SaveCyborgSettings();
+        EndMinigameSlowMotion();
     }
 
     private void OnApplicationQuit()
@@ -195,9 +210,13 @@ public class HackingSystem : MonoBehaviour
             $"\n FrequencyOverride={frequencyOverrideRoot != null}" +
             $"\n NetworkBridge={networkBridgeRoot != null}");
 
-        // 모든 루트 비활성화 후 패널도 비활성화
+        hackingPanelRect = hackingUIPanel.GetComponent<RectTransform>();
+        panelClosedPosition = hackingPanelRect.anchoredPosition;
+
+        // 패널은 끄지 않는다. SliceFrame이 자식이라 끄면 평소 화면의 오른쪽 테두리까지 사라진다.
         SetAllRootsInactive();
-        hackingUIPanel.SetActive(false);
+        hackingUIPanel.SetActive(true);
+        hackingPanelRect.anchoredPosition = panelClosedPosition;
     }
 
     // ─────────────────────────────────────────────
@@ -249,10 +268,7 @@ public class HackingSystem : MonoBehaviour
 
         if (IsCurrentPlayerHacker())
         {
-            if (hackingUIPanel != null)
-                hackingUIPanel.SetActive(true);
-
-            // 해커 미니게임 중에도 전투 시간은 흐른다. Time.timeScale을 건드리지 않는다.
+            ShowHackingPanel();
             StartMinigame(objectType, onSuccess, onFailure);
         }
         else
@@ -303,6 +319,9 @@ public class HackingSystem : MonoBehaviour
                 StartFrequencyOverride(wrappedSuccess, wrappedFailure);
                 break;
         }
+
+        if (currentMinigame != null)
+            BeginMinigameSlowMotion();
     }
 
     // ─────────────────────────────────────────────
@@ -531,11 +550,116 @@ public class HackingSystem : MonoBehaviour
         // 모든 루트 비활성화
         SetAllRootsInactive();
 
-        // UI 패널 비활성화
-        if (hackingUIPanel != null)
-            hackingUIPanel.SetActive(false);
-
         currentMinigame = null;
+        EndMinigameSlowMotion();
+        HideHackingPanel();
+    }
+
+    private void ShowHackingPanel()
+    {
+        if (hackingUIPanel == null || hackingPanelRect == null)
+            return;
+
+        StopPanelSlide();
+        hackingUIPanel.SetActive(true);
+        panelOpenX = GetPanelOpenX();
+        hackingPanelOpen = true;
+        panelSlideCoroutine = StartCoroutine(SlideHackingPanel(panelOpenX));
+    }
+
+    private void HideHackingPanel()
+    {
+        if (hackingPanelRect == null || !hackingPanelOpen || !isActiveAndEnabled)
+        {
+            hackingPanelOpen = false;
+            return;
+        }
+
+        hackingPanelOpen = false;
+        StopPanelSlide();
+        panelSlideCoroutine = StartCoroutine(SlideHackingPanel(panelClosedPosition.x));
+    }
+
+    private float GetPanelOpenX()
+    {
+        Vector2 current = hackingPanelRect.anchoredPosition;
+        hackingPanelRect.anchoredPosition = panelClosedPosition;
+        Canvas.ForceUpdateCanvases();
+
+        float openX = panelClosedPosition.x;
+        RectTransform canvasRect = hackingPanelRect.parent as RectTransform;
+        if (canvasRect != null)
+        {
+            Vector3[] canvasCorners = new Vector3[4];
+            canvasRect.GetWorldCorners(canvasCorners);
+            Vector3[] panelCorners = new Vector3[4];
+            hackingPanelRect.GetWorldCorners(panelCorners);
+
+            float worldDelta = panelCorners[2].x - canvasCorners[2].x;
+            if (worldDelta < 1f)
+                worldDelta = hackingPanelRect.rect.width * 0.5f;
+
+            Vector3 localDelta = hackingPanelRect.parent.InverseTransformVector(new Vector3(worldDelta, 0f, 0f));
+            openX = panelClosedPosition.x - localDelta.x;
+        }
+
+        hackingPanelRect.anchoredPosition = current;
+        return openX;
+    }
+
+    private IEnumerator SlideHackingPanel(float targetX)
+    {
+        float fromX = hackingPanelRect.anchoredPosition.x;
+        float duration = Mathf.Max(0.01f, PanelSlideDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float u = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - (1f - u) * (1f - u);
+            float x = Mathf.Lerp(fromX, targetX, eased);
+            hackingPanelRect.anchoredPosition = new Vector2(x, panelClosedPosition.y);
+            yield return null;
+        }
+
+        hackingPanelRect.anchoredPosition = new Vector2(targetX, panelClosedPosition.y);
+        panelSlideCoroutine = null;
+    }
+
+    private void StopPanelSlide()
+    {
+        if (panelSlideCoroutine == null)
+            return;
+
+        StopCoroutine(panelSlideCoroutine);
+        panelSlideCoroutine = null;
+    }
+
+    private void LateUpdate()
+    {
+        if (!minigameSlowMotion || Time.timeScale <= 0f)
+            return;
+
+        if (!Mathf.Approximately(Time.timeScale, MinigameWorldTimeScale))
+            Time.timeScale = MinigameWorldTimeScale;
+    }
+
+    private void BeginMinigameSlowMotion()
+    {
+        minigameSlowMotion = true;
+        if (Time.timeScale > 0f)
+            Time.timeScale = MinigameWorldTimeScale;
+    }
+
+    private void EndMinigameSlowMotion()
+    {
+        if (!minigameSlowMotion)
+            return;
+
+        minigameSlowMotion = false;
+        if (Time.timeScale > 0f)
+            Time.timeScale = 1f;
     }
 
     // ─────────────────────────────────────────────

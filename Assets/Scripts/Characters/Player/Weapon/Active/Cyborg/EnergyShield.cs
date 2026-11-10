@@ -5,6 +5,10 @@ namespace NeoSurvive.Weapon
 {
   public class EnergyShield : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Orb Prefab")]
     public GameObject shieldOrbPrefab;
 
@@ -61,7 +65,7 @@ namespace NeoSurvive.Weapon
     {
       if (target == null) return;
 
-      currentAngle += rotationSpeed * Time.deltaTime;
+      currentAngle += TraitStat(rotationSpeed, RunTraitStat.RotationSpeed) * Time.deltaTime;
 
       if (currentAngle >= 360f)
         currentAngle -= 360f;
@@ -107,6 +111,30 @@ namespace NeoSurvive.Weapon
       if (row.baseorbcount > 0) baseOrbCount = row.baseorbcount;
       if (row.maxorbcount > 0) maxOrbCount = row.maxorbcount;
       if (row.masterdamagefactor > 0f) masterDamageFactor = row.masterdamagefactor;
+
+      UpdateDisposableBarrier();
+    }
+
+    private void UpdateDisposableBarrier()
+    {
+      if (target == null)
+        return;
+
+      bool enable = enableMaster && currentLevel >= 5;
+      EnergyShieldBarrier barrier = target.GetComponent<EnergyShieldBarrier>();
+
+      if (!enable)
+      {
+        if (barrier != null)
+          barrier.enabled = false;
+        return;
+      }
+
+      if (barrier == null)
+        barrier = target.gameObject.AddComponent<EnergyShieldBarrier>();
+
+      barrier.rechargeSeconds = EnergyShieldBarrier.DefaultRechargeSeconds;
+      barrier.enabled = true;
     }
 
     private void RebuildOrbs()
@@ -179,8 +207,8 @@ namespace NeoSurvive.Weapon
         float rad = ang * Mathf.Deg2Rad;
 
         Vector3 offset = new Vector3(
-          Mathf.Cos(rad) * radius,
-          Mathf.Sin(rad) * radius,
+          Mathf.Cos(rad) * TraitStat(radius, RunTraitStat.OrbitRadius),
+          Mathf.Sin(rad) * TraitStat(radius, RunTraitStat.OrbitRadius),
           0f
         );
 
@@ -198,6 +226,49 @@ namespace NeoSurvive.Weapon
       }
 
       orbs.Clear();
+
+      if (target != null)
+      {
+        EnergyShieldBarrier barrier = target.GetComponent<EnergyShieldBarrier>();
+        if (barrier != null)
+          barrier.enabled = false;
+      }
+    }
+  }
+
+  public class EnergyShieldBarrier : MonoBehaviour
+  {
+    public const float DefaultRechargeSeconds = 8f;
+
+    public float rechargeSeconds = DefaultRechargeSeconds;
+
+    private bool armed = true;
+    private float cooldown;
+
+    private void OnEnable()
+    {
+      armed = true;
+      cooldown = 0f;
+    }
+
+    private void Update()
+    {
+      if (armed)
+        return;
+
+      cooldown -= Time.deltaTime;
+      if (cooldown <= 0f)
+        armed = true;
+    }
+
+    public bool TryConsume()
+    {
+      if (!isActiveAndEnabled || !armed)
+        return false;
+
+      armed = false;
+      cooldown = rechargeSeconds;
+      return true;
     }
   }
 }

@@ -38,7 +38,8 @@ namespace NeoSurvive.Weapon
     [SerializeField] private Vector3 iconScale = new Vector3(0.45f, 0.45f, 1f);
     [SerializeField] private int iconSortingOrder = 50;
 
-    private float timer;
+    private float elapsed;
+    private WeaponBase amplificationSource;
     private GameObject iconObject;
     private SpriteRenderer iconRenderer;
 
@@ -57,17 +58,17 @@ namespace NeoSurvive.Weapon
       Current = this;
 
       // ★ 유지시간 시작
-      timer = duration;
+      elapsed = 0f;
     }
 
     private void Update()
     {
-      timer -= Time.deltaTime;
+      elapsed += Time.deltaTime;
 
       // =========================
       // ★ 유지시간 종료 시 표식 제거
       // =========================
-      if (timer <= 0f)
+      if (elapsed >= RunTraitWeaponStats.Scale(amplificationSource, duration, RunTraitStat.AmplificationDuration))
       {
         Destroy(this);
       }
@@ -82,6 +83,7 @@ namespace NeoSurvive.Weapon
       {
         Current = null;
       }
+      GetComponent<RunTraitAmplificationReceiver>()?.RemoveOriginal(amplificationSource);
 
       if (iconObject != null)
       {
@@ -95,7 +97,7 @@ namespace NeoSurvive.Weapon
     /// 표식 유지시간 갱신
     /// - 이미 표식된 Enemy를 다시 맞췄을 때 사용
     /// </summary>
-    public void Refresh(float newDuration, Sprite markIcon)
+    public void Refresh(float newDuration, Sprite markIcon, WeaponBase sourceWeapon = null)
     {
       // =========================
       // ★ 다른 대상에게 표식이 있다면 제거
@@ -109,8 +111,12 @@ namespace NeoSurvive.Weapon
       Current = this;
 
       duration = newDuration;
-      timer = duration;
+      elapsed = 0f;
+      amplificationSource = sourceWeapon;
 
+      RunTraitAmplificationReceiver.Record(RunTraitTarget.Find(this), sourceWeapon,
+        RunTraitWeaponStats.Amplification(sourceWeapon, HackerWeaponDamageMultiplier),
+        RunTraitWeaponStats.Scale(sourceWeapon, newDuration, RunTraitStat.AmplificationDuration), hackerOnly: true);
       UpdateIcon(markIcon);
     }
 
@@ -153,7 +159,15 @@ namespace NeoSurvive.Weapon
       if (!WeaponManager.IsMarkedDamageBonusSource(sourceWeapon))
         return amount;
 
-      return amount * HackerWeaponDamageMultiplier;
+      return amount * RunTraitWeaponStats.Amplification(amplificationSource, HackerWeaponDamageMultiplier);
+    }
+
+    public void RefreshTransferMetadata()
+    {
+      float remaining = RunTraitWeaponStats.Scale(amplificationSource, duration, RunTraitStat.AmplificationDuration) - elapsed;
+      if (remaining <= 0f) { GetComponent<RunTraitAmplificationReceiver>()?.RemoveOriginal(amplificationSource); return; }
+      RunTraitAmplificationReceiver.Record(RunTraitTarget.Find(this), amplificationSource,
+        RunTraitWeaponStats.Amplification(amplificationSource, HackerWeaponDamageMultiplier), remaining, hackerOnly: true);
     }
   }
 }

@@ -36,13 +36,44 @@ public abstract class BossPatternBase : MonoBehaviour
 
   public virtual void RefreshPlayerTarget(Transform player)
   {
-    if (player != null)
-      PlayerTarget = player;
+    PlayerTarget = player;
   }
 
   public abstract IEnumerator RunPatternCoroutine();
 
   protected bool BossAlive => BossRef != null && !BossRef.IsDead;
+
+  // 26-10-22 Xabuna: 대기/예고 중 받은 CC도 공격 직전에 확인합니다.
+  protected IEnumerator WaitForPatternSeconds(float duration)
+  {
+    float elapsed = 0f;
+    while (BossAlive && (elapsed < duration || !BossRef.CanAttack))
+    {
+      if (BossRef.CanAttack) elapsed += Time.deltaTime;
+      yield return null;
+    }
+  }
+
+  protected IEnumerator WaitForMovementReady()
+  {
+    while (BossAlive && (!BossRef.CanMove || !BossRef.CanAttack || BossRef.IsKnockedBack))
+    {
+      if (BossRb != null && !BossRef.IsKnockedBack) BossRb.velocity = Vector2.zero;
+      yield return null;
+    }
+  }
+
+  protected void SetPatternVelocity(Vector2 velocity)
+  {
+    if (BossRb == null || !BossAlive || BossRef.IsKnockedBack || BossRef.TraitStatus.isPulled) return;
+    BossRb.velocity = BossRef.CanMove ? velocity * BossRef.MovementMultiplier : Vector2.zero;
+  }
+
+  protected bool TryGetDamageTarget(Collider2D collider, out Character victim)
+  {
+    victim = collider != null ? collider.GetComponentInParent<Character>() : null;
+    return BossAlive && BossRef.CanAttack && RunTraitTarget.CanBossDamage(BossRef, victim, BossRef.TraitStatus.frenzy);
+  }
 
   protected void PlayBossAnimTrigger(string triggerName)
   {
@@ -109,7 +140,7 @@ public abstract class BossPatternBase : MonoBehaviour
       ApplyTelegraphSorting(instance);
     }
 
-    yield return new WaitForSeconds(duration);
+    yield return WaitForPatternSeconds(duration);
 
     if (instance != null)
       Destroy(instance);
@@ -135,7 +166,7 @@ public abstract class BossPatternBase : MonoBehaviour
       ApplyTelegraphSorting(instance);
     }
 
-    yield return new WaitForSeconds(duration);
+    yield return WaitForPatternSeconds(duration);
 
     if (instance != null)
       Destroy(instance);

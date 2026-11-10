@@ -38,7 +38,7 @@ public class ChargeShockwavePattern : BossPatternBase
     if (!BossAlive || PlayerTarget == null) yield break;
 
     if (BossRb != null)
-      BossRb.velocity = Vector2.zero;
+      SetPatternVelocity(Vector2.zero);
 
     PlayBossAnimTrigger("Map1Boss Pattern2 Charging");
 
@@ -56,19 +56,21 @@ public class ChargeShockwavePattern : BossPatternBase
     bool dashDamageDealt = false;
     while (elapsed < dashMaxDuration && BossAlive)
     {
+      yield return WaitForMovementReady();
+      if (!BossAlive || PlayerTarget == null) yield break;
       elapsed += Time.deltaTime;
       float checkDistance = GetEffectiveCheckDistance();
 
-      if (TryHitPlayerDuringDash(checkDistance, out Player hitPlayer))
+      if (TryHitPlayerDuringDash(checkDistance, out Character hitPlayer))
       {
         if (!dashDamageDealt && dashCollisionDamage > 0f && hitPlayer != null)
         {
-          GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "dash_collision", dashCollisionDamage, hitPlayer);
+          if (hitPlayer is Player player) GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "dash_collision", dashCollisionDamage, player);
           hitPlayer.TakeDamage(dashCollisionDamage);
           dashDamageDealt = true;
         }
         if (BossRb != null)
-          BossRb.velocity = Vector2.zero;
+          SetPatternVelocity(Vector2.zero);
         break;
       }
 
@@ -76,7 +78,7 @@ public class ChargeShockwavePattern : BossPatternBase
       if (IsBlockedByEnemy(dir, checkDistance))
       {
         if (BossRb != null)
-          BossRb.velocity = Vector2.zero;
+          SetPatternVelocity(Vector2.zero);
         break;
       }
 
@@ -86,26 +88,27 @@ public class ChargeShockwavePattern : BossPatternBase
         if (hit.collider != null)
         {
           if (BossRb != null)
-            BossRb.velocity = Vector2.zero;
+            SetPatternVelocity(Vector2.zero);
           break;
         }
       }
 
       if (BossRb != null)
-        BossRb.velocity = dir * dashSpeed;
+        SetPatternVelocity(dir * dashSpeed);
 
       yield return null;
     }
 
     if (BossRb != null)
-      BossRb.velocity = Vector2.zero;
+      SetPatternVelocity(Vector2.zero);
 
     PlayBossAnimTrigger("Map1Boss Pattern2 Brake");
 
     // 크게 점프하는 타이밍 연출(탑다운에서는 딜레이 처리)
     if (jumpDelay > 0f)
-      yield return new WaitForSeconds(jumpDelay);
+      yield return WaitForPatternSeconds(jumpDelay);
 
+    if (!BossAlive || PlayerTarget == null) yield break;
     PlayBossAnimTrigger("Map1Boss Pattern2 Stamp");
 
     ApplyShockwaveDamage();
@@ -123,22 +126,21 @@ public class ChargeShockwavePattern : BossPatternBase
     return Mathf.Max(wallCheckDistance, predictedTravel);
   }
 
-  private bool TryHitPlayerDuringDash(float checkDistance, out Player hitPlayer)
+  private bool TryHitPlayerDuringDash(float checkDistance, out Character hitPlayer)
   {
     hitPlayer = null;
     float queryRadius = Mathf.Max(playerHitRadius, checkDistance);
     var overlaps = Physics2D.OverlapCircleAll(transform.position, queryRadius);
     foreach (var overlap in overlaps)
     {
-      if (overlap == null || !overlap.CompareTag("Player"))
-        continue;
+      if (!TryGetDamageTarget(overlap, out Character target)) continue;
 
       Vector2 closest = overlap.ClosestPoint(transform.position);
       float sqrDist = ((Vector2)transform.position - closest).sqrMagnitude;
       if (sqrDist > playerHitRadius * playerHitRadius)
         continue;
 
-      overlap.TryGetComponent<Player>(out hitPlayer);
+      hitPlayer = target;
       return true;
     }
 
@@ -167,12 +169,12 @@ public class ChargeShockwavePattern : BossPatternBase
   private void ApplyShockwaveDamage()
   {
     var hits = Physics2D.OverlapCircleAll(transform.position, shockwaveRadius);
+    var processed = new System.Collections.Generic.HashSet<int>();
     foreach (var c in hits)
     {
-      if (c == null || !c.CompareTag("Player")) continue;
-      if (c.TryGetComponent<Player>(out var p))
+      if (TryGetDamageTarget(c, out var p) && processed.Add(p.GetInstanceID()))
       {
-        GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "shockwave", shockwaveDamage, p);
+        if (p is Player player) GameAnalyticsTracker.TrackBossPatternHit(nameof(ChargeShockwavePattern), "shockwave", shockwaveDamage, player);
         p.TakeDamage(shockwaveDamage);
       }
     }
@@ -190,6 +192,7 @@ public class ChargeShockwavePattern : BossPatternBase
       if (!TryFindNonOverlappingRingPosition(i, count, out Vector3 pos))
         continue;
       GameObject trash = Instantiate(ringTrashPrefab, pos, Quaternion.identity);
+      trash.GetComponent<TrashObstacle>()?.SetAttackOwner(BossRef);
       IgnoreCollisionWithBoss(trash);
       list.Add(trash);
     }
@@ -237,7 +240,6 @@ public class ChargeShockwavePattern : BossPatternBase
       yield break;
 
     int thrown = 0;
-    var wait = new WaitForSeconds(throwInterval);
 
     while (thrown < maxThrowsFromRing && BossAlive)
     {
@@ -255,6 +257,7 @@ public class ChargeShockwavePattern : BossPatternBase
       GameObject trash = ringTrash[index];
       ringTrash.RemoveAt(index); // 보스가 던지면 소모
       thrown++;
+      trash.GetComponent<TrashObstacle>()?.SetAttackOwner(BossRef);
 
       Vector2 dir = ((Vector2)PlayerTarget.position - (Vector2)trash.transform.position).normalized;
       if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
@@ -268,7 +271,7 @@ public class ChargeShockwavePattern : BossPatternBase
         trash.transform.position += (Vector3)(dir * 0.2f);
       }
 
-      yield return wait;
+      yield return WaitForPatternSeconds(throwInterval);
     }
   }
 

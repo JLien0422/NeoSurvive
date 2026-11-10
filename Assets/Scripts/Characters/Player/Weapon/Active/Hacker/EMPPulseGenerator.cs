@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class EMPPulseGenerator : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Stats")]
     public GameObject empFieldPrefab;
 
@@ -30,7 +34,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       fireTimer += Time.deltaTime;
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.DeploymentCooldown))
       {
         SpawnEMPField();
         fireTimer = 0f;
@@ -55,6 +59,15 @@ namespace NeoSurvive.Weapon
       {
         var src = GetComponentInParent<WeaponSource>();
         field.Initialize(damage, areaSize, duration, currentLevel >= 5, src != null ? src.weaponData : null);
+        var effect = RunTraitSpecialRuntime.Effect(src?.weaponData, RunTraitSpecialKind.DeploymentClone);
+        if (effect != null)
+        {
+          var clone = Instantiate(empFieldPrefab, spawnPosition + Vector3.right * 0.6f, Quaternion.identity);
+          RunTraitCloneLifetime.Track(clone, effect);
+          var cloneField = clone.GetComponent<EMPField>();
+          if (cloneField != null)
+            cloneField.Initialize(effect.Scale(damage), effect.Scale(areaSize), effect.Scale(duration), currentLevel >= 5, src?.weaponData, effect.efficiency);
+        }
       }
     }
 

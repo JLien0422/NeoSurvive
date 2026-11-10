@@ -161,7 +161,9 @@ namespace NeoSurvive.Weapon
       // =========================
       if (character != null)
       {
-        character.TakeDamage(damage, sourceWeapon);
+        using (new RunTraitDamageContext.Scope(forceFieldContact: true))
+          character.TakeDamage(damage, sourceWeapon);
+        RunTraitStatus.ApplySlow(character.gameObject, sourceWeapon);
 
         return;
       }

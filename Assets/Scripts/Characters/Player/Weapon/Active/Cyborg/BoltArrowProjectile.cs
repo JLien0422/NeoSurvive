@@ -6,6 +6,8 @@ namespace NeoSurvive.Weapon
 {
   public class BoltArrowProjectile : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Runtime")]
     private Vector3 dir;
     private float damage;
@@ -101,7 +103,7 @@ namespace NeoSurvive.Weapon
       if (destroyed)
         return;
 
-      Transform target = FindClosestTarget(maxDistance);
+      Transform target = FindClosestTarget(TraitStat(maxDistance, RunTraitStat.AttackRange));
 
       if (target != null)
       {
@@ -112,11 +114,13 @@ namespace NeoSurvive.Weapon
 
       RotateToDirection();
 
-      transform.position += dir * speed * Time.deltaTime;
+      Vector2 before = transform.position;
+      transform.position += dir * TraitStat(speed, RunTraitStat.ProjectileSpeed) * Time.deltaTime;
+      RunTraitProjectileErasure.Sweep(sourceWeapon, before, transform.position, hitRadius);
 
       CheckHitByOverlap();
 
-      if (Vector3.Distance(startPos, transform.position) >= maxDistance)
+      if (Vector3.Distance(startPos, transform.position) >= TraitStat(maxDistance, RunTraitStat.AttackRange))
       {
         DestroyProjectile();
       }
@@ -216,13 +220,11 @@ namespace NeoSurvive.Weapon
         return;
 
       character.TakeDamage(Mathf.Max(1f, damage), sourceWeapon);
+        RunTraitStatus.ApplySlow(character.gameObject, sourceWeapon);
 
       if (master)
       {
-        Enemy enemy = character.GetComponent<Enemy>();
-
-        if (enemy == null)
-          enemy = character.GetComponentInParent<Enemy>();
+        Character enemy = RunTraitTarget.Find(character);
 
         if (enemy != null)
           ApplyOverload(enemy.gameObject);

@@ -23,6 +23,10 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class EMPGrenade : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Projectile")]
     [SerializeField] private GameObject grenadeProjectilePrefab;   // 실제 날아가는 수류탄 프리팹
     [SerializeField] private Transform firePoint;                  // 수류탄이 생성되는 시작 위치
@@ -74,7 +78,7 @@ namespace NeoSurvive.Weapon
       fireTimer += Time.deltaTime;
 
       // fireRate마다 한 번씩 수류탄 투척 시도
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         fireTimer = 0f;
         TryThrowGrenade();

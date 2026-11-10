@@ -7,6 +7,10 @@ namespace NeoSurvive.Weapon
 {
   public class LaserSword : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Stats")]
     public float damage = 12f;
     public float range = 2.2f;
@@ -58,7 +62,7 @@ namespace NeoSurvive.Weapon
     {
       fireTimer += Time.deltaTime;
 
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Attack();
         fireTimer = 0f;
@@ -133,6 +137,14 @@ namespace NeoSurvive.Weapon
       Debug.DrawRay(transform.position, forward * range, Color.red, 0.2f);
 
       SpawnSweepEffect(forward);
+      var replay = new RunTraitAttackSnapshot {
+        shape = RunTraitAttackSnapshot.Shape.Fan, origin = transform.position, forward = forward,
+        range = range, angle = TraitStat(angle, RunTraitStat.AttackAngle), damage = damage,
+        mask = hitMask, weapon = GetComponentInParent<WeaponSource>()?.weaponData,
+        applyPhysicalKnockback = true, vfx = sweepPrefab, vfxOffset = sweepSpawnOffset,
+        vfxScale = sweepScale, vfxLifetime = sweepDuration
+      };
+      RunTraitSpecialRuntime.Repeat(replay.weapon, RunTraitSpecialKind.Afterimage, sweepDuration, replay.Replay);
 
       // ★ 변경:
       // 기존: OverlapCircleAll(transform.position, range, hitMask)
@@ -167,7 +179,7 @@ namespace NeoSurvive.Weapon
 
         Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
 
-        if (Vector3.Angle(forward, dirToTarget) > angle * 0.5f)
+        if (Vector3.Angle(forward, dirToTarget) > TraitStat(angle, RunTraitStat.AttackAngle) * 0.5f)
           continue;
 
         // =========================
@@ -185,6 +197,8 @@ namespace NeoSurvive.Weapon
 
             var src = GetComponentInParent<WeaponSource>();
             character.TakeDamage(damage, src != null ? src.weaponData : null);
+            RunTraitStatus.ApplyKnockback(character.gameObject, src != null ? src.weaponData : null,
+                Player.Instance != null ? (Vector2)Player.Instance.transform.position : (Vector2)transform.position);
 
             continue;
           }
@@ -298,7 +312,7 @@ namespace NeoSurvive.Weapon
 
         Transform targetTransform = hit.transform;
 
-        Enemy enemy = hit.GetComponentInParent<Enemy>();
+        Character enemy = RunTraitTarget.Find(hit);
 
         if (enemy != null)
           targetTransform = enemy.transform;

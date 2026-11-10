@@ -125,6 +125,7 @@ namespace NeoSurvive.Weapon
         processedIds.Add(id);
 
         character.TakeDamage(tickDamage, sourceWeapon);
+        RunTraitStatus.ApplySlow(character.gameObject, sourceWeapon);
         return true;
       }
 

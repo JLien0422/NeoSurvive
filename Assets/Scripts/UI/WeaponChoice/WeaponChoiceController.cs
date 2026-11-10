@@ -488,8 +488,8 @@ public class WeaponChoiceController : MonoBehaviour
         if (isNewWeapon)
             return "Lv.1  ·  신규 무기";
 
-        if (currentLevel >= MAX_WEAPON_LEVEL)
-            return $"Lv.{MAX_WEAPON_LEVEL} (MASTER)";
+        if (currentLevel + 1 >= MAX_WEAPON_LEVEL)
+            return $"Lv.{MAX_WEAPON_LEVEL}  ·  마스터";
 
         return $"Lv.{currentLevel} → Lv.{currentLevel + 1}";
     }

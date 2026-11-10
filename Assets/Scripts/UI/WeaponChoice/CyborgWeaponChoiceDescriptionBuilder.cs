@@ -97,7 +97,7 @@ public static class CyborgWeaponChoiceDescriptionBuilder
             case "plasmaphotongun":
                 return levelText +
                     $"직선 에너지 빔을 발사해 경로상의 적을 타격합니다.\n" +
-                    $"피해 {F(row.basedamage)}, 사거리 {F(row.range)}, 발사간격 {F(row.fireinterval)}초{BuildPlasmaPhotonEffectSuffix(row)}";
+                    $"피해 {F(row.basedamage)}, 사거리 {F(row.range)}, 발사간격 {F(row.fireinterval)}초, 굵기 {F(row.width)}{BuildPlasmaPhotonEffectSuffix(row)}";
 
             case "gravityhammer":
                 return levelText +
@@ -123,7 +123,7 @@ public static class CyborgWeaponChoiceDescriptionBuilder
             case "chainsaw":
                 return levelText +
                     $"회전하는 체인톱이 적에게 연속 피해를 줍니다.\n" +
-                    $"피해 {F(row.damage)}, 체력비례 {Percent(row.hpratiodamage)}, 명중쿨 {F(row.hitcooldown)}초, 속도 {F(row.speed)}, 타격반경 {F(row.hitradius * row.radiusscale)}";
+                    $"피해 {F(row.damage)}, 명중쿨 {F(row.hitcooldown)}초, 지속 {F(row.lifetime)}초, 대기 {F(row.spawninterval)}초, 크기 {F(row.hitradius * row.radiusscale)}, 슬로우 {Percent(row.slowmul)} {F(row.slowduration)}초";
 
             case "blastbreath":
                 return levelText +
@@ -146,7 +146,7 @@ public static class CyborgWeaponChoiceDescriptionBuilder
                 return $"5레벨 달성 효과:\n2회 공격마다 사거리와 피해가 {F(row.mastermultiplier)}배로 강화됩니다.\n최대 동시 타격 {row.maxtargetsatlv5}명";
 
             case "energyshield":
-                return $"5레벨 달성 효과:\n방패 접촉 피해가 {F(row.masterdamagefactor)}배로 강화됩니다.\n방패 {row.maxorbcount}개까지 확장";
+                return $"5레벨 달성 효과:\n방패 접촉 피해가 {F(row.masterdamagefactor)}배로 강화됩니다.\n방패 {row.maxorbcount}개까지 확장\n일회용 보호막이 다음 피격 1회를 막고 {F(EnergyShieldBarrier.DefaultRechargeSeconds)}초 뒤 다시 생깁니다.";
 
             case "plasmaphotongun":
                 return $"5레벨 달성 효과:\n빔에 맞은 적이 추가 피해를 더 크게 받습니다.\n{BuildPlasmaPhotonMasterEffectText(row)}";
@@ -164,7 +164,7 @@ public static class CyborgWeaponChoiceDescriptionBuilder
                 return $"5레벨 달성 효과:\n적중 시 과부하 스택을 쌓고 {row.overloadstackstoexplode}스택에서 광역 폭발합니다.\n폭발 반경 {F(row.overloadexplosionradius)}, 피해계수 {F(row.overloadexplosiondamagefactor)}";
 
             case "chainsaw":
-                return $"5레벨 달성 효과:\n톱날이 커지며 체력 비례 피해가 강화됩니다.\n체력비례 {Percent(row.hpratiodamage)}, 크기배율 {F(row.radiusscale)}";
+                return $"5레벨 달성 효과:\n톱날이 더 오래 돌고, 더 자주, 더 크게 칩니다.\n지속 {F(row.lifetime)}초, 명중쿨 {F(row.hitcooldown)}초, 크기 {F(row.hitradius * row.radiusscale)}";
 
             case "blastbreath":
                 return $"5레벨 달성 효과:\n화염이 냉기로 바뀌어 적을 빙결시킵니다.\n빙결 {F(row.freezeduration)}초{BuildBlastBreathColdSuffix(row)}";

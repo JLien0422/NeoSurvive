@@ -25,8 +25,9 @@ namespace NeoSurvive.Weapon
     [SerializeField] private string enemyProjectileObjectName = "Shooter_Projectile";
 
     private WeaponBase sourceWeapon;
+    private float controlScale = 1f;
 
-    public void Initialize(float damage, float radius, float duration, bool destroyProjectile, WeaponBase weaponBase = null)
+    public void Initialize(float damage, float radius, float duration, bool destroyProjectile, WeaponBase weaponBase = null, float performance = 1f)
     {
       this.damage = damage;
       float expansionMul = Player.Instance != null ? Player.Instance.GetCompileNodeExpansionMultiplier() : 1f;
@@ -34,6 +35,7 @@ namespace NeoSurvive.Weapon
       this.duration = duration;
       this.destroyProjectile = destroyProjectile;
       this.sourceWeapon = weaponBase;
+      controlScale = performance;
 
       transform.localScale = new Vector3(radius, radius, 1f);
 
@@ -48,8 +50,6 @@ namespace NeoSurvive.Weapon
         DestroyEnemyProjectiles();
       }
 
-      Destroy(gameObject, duration);
-
       var sr = GetComponent<SpriteRenderer>();
       if (sr == null)
       {
@@ -63,6 +63,11 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       elapsed += Time.deltaTime;
+      if (elapsed >= RunTraitWeaponStats.Scale(sourceWeapon, duration, RunTraitStat.Lifetime))
+      {
+        Destroy(gameObject);
+        return;
+      }
 
       if (destroyProjectile)
       {
@@ -80,16 +85,17 @@ namespace NeoSurvive.Weapon
     {
       Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
 
+      var processed = new System.Collections.Generic.HashSet<int>();
       foreach (var hit in hits)
       {
-        if (hit == null)
-          continue;
-
-        if (hit.CompareTag("Enemy"))
+        if (hit == null) continue;
+        Character character = hit.GetComponentInParent<Character>();
+        if (character != null && (RunTraitTarget.IsCombatant(character)
+          || hit.CompareTag("Enemy") || character.CompareTag("Enemy")))
         {
-          if (hit.TryGetComponent<Character>(out var character))
-            character.TakeDamage(damage, sourceWeapon);
-
+          if (!processed.Add(character.GetInstanceID())) continue;
+          character.TakeDamage(damage, sourceWeapon);
+          RunTraitStatus.ApplySlow(character.gameObject, sourceWeapon, durationScale: controlScale);
           continue;
         }
 

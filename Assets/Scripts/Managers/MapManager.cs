@@ -21,8 +21,8 @@ public class MapManager : MonoBehaviour
   [Tooltip("기본 바닥 타일 후보와 가중치. 예: tile 50, 1-1 20, 3 20, 3-1 10")]
   public List<WeightedTilePrefab> baseTilePrefabs = new();
 
-  [Tooltip("낮은 확률로 기본 타일 위에 추가 생성되는 데코 타일 프리팹")]
-  public List<GameObject> decoTilePrefabs = new();
+  [Tooltip("기본 타일 위에 추가로 깔리는 데코 타일과 가중치. 데코가 생성될 때 가중치 비율대로 하나가 선택된다.")]
+  public List<WeightedTilePrefab> decoTilePrefabs = new();
 
   [HideInInspector] public GameObject baseTilePrefab; // 기존 씬 참조 유지용 fallback
 
@@ -292,48 +292,15 @@ public class MapManager : MonoBehaviour
 
   private bool TrySelectBaseTile(System.Random prng, out int selectedIndex, out GameObject selectedPrefab)
   {
-    selectedIndex = -1;
-    selectedPrefab = null;
-
-    float totalWeight = 0f;
-    for (int i = 0; i < baseTilePrefabs.Count; i++)
-    {
-      WeightedTilePrefab entry = baseTilePrefabs[i];
-      if (entry == null || entry.prefab == null || entry.weight <= 0f)
-        continue;
-
-      totalWeight += entry.weight;
-    }
-
-    if (totalWeight <= 0f)
-    {
-      if (baseTilePrefab == null)
-        return false;
-
-      selectedIndex = 0;
-      selectedPrefab = baseTilePrefab;
+    if (TrySelectWeightedPrefab(baseTilePrefabs, prng, out selectedIndex, out selectedPrefab))
       return true;
-    }
 
-    float roll = (float)(prng.NextDouble() * totalWeight);
-    float cumulative = 0f;
+    if (baseTilePrefab == null)
+      return false;
 
-    for (int i = 0; i < baseTilePrefabs.Count; i++)
-    {
-      WeightedTilePrefab entry = baseTilePrefabs[i];
-      if (entry == null || entry.prefab == null || entry.weight <= 0f)
-        continue;
-
-      cumulative += entry.weight;
-      if (roll <= cumulative)
-      {
-        selectedIndex = i;
-        selectedPrefab = entry.prefab;
-        return true;
-      }
-    }
-
-    return false;
+    selectedIndex = 0;
+    selectedPrefab = baseTilePrefab;
+    return true;
   }
 
   private void TrySpawnDecoTile(Vector2Int coord, System.Random prng)
@@ -347,11 +314,10 @@ public class MapManager : MonoBehaviour
     if (IsDecoTileBlocked(coord))
       return;
 
-    int decoIndex = PickValidDecoIndex(prng);
-    if (decoIndex < 0)
+    if (!TrySelectWeightedPrefab(decoTilePrefabs, prng, out int decoIndex, out GameObject decoPrefab))
       return;
 
-    GameObject decoTile = GetFromPool(decoPool, decoIndex, decoTilePrefabs[decoIndex]);
+    GameObject decoTile = GetFromPool(decoPool, decoIndex, decoPrefab);
     decoTile.name = $"DecoTile_{decoIndex}";
     decoTile.transform.position = new Vector3(coord.x * actualTileSize, coord.y * actualTileSize, tileZValue);
     decoTile.transform.rotation = Quaternion.identity;
@@ -360,31 +326,50 @@ public class MapManager : MonoBehaviour
     activeDecoTiles.Add(coord, decoTile);
   }
 
-  private int PickValidDecoIndex(System.Random prng)
+  private static bool TrySelectWeightedPrefab(
+    List<WeightedTilePrefab> entries,
+    System.Random prng,
+    out int selectedIndex,
+    out GameObject selectedPrefab)
   {
-    int validCount = 0;
-    for (int i = 0; i < decoTilePrefabs.Count; i++)
-    {
-      if (decoTilePrefabs[i] != null)
-        validCount++;
-    }
+    selectedIndex = -1;
+    selectedPrefab = null;
 
-    if (validCount == 0)
-      return -1;
+    if (entries == null)
+      return false;
 
-    int selectedValidIndex = prng.Next(0, validCount);
-    for (int i = 0; i < decoTilePrefabs.Count; i++)
+    float totalWeight = 0f;
+    for (int i = 0; i < entries.Count; i++)
     {
-      if (decoTilePrefabs[i] == null)
+      WeightedTilePrefab entry = entries[i];
+      if (entry == null || entry.prefab == null || entry.weight <= 0f)
         continue;
 
-      if (selectedValidIndex == 0)
-        return i;
-
-      selectedValidIndex--;
+      totalWeight += entry.weight;
     }
 
-    return -1;
+    if (totalWeight <= 0f)
+      return false;
+
+    float roll = (float)(prng.NextDouble() * totalWeight);
+    float cumulative = 0f;
+
+    for (int i = 0; i < entries.Count; i++)
+    {
+      WeightedTilePrefab entry = entries[i];
+      if (entry == null || entry.prefab == null || entry.weight <= 0f)
+        continue;
+
+      cumulative += entry.weight;
+      if (roll <= cumulative)
+      {
+        selectedIndex = i;
+        selectedPrefab = entry.prefab;
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private bool IsDecoTileBlocked(Vector2Int coord)

@@ -18,6 +18,16 @@ public class Boss : Character
     public static event System.Action OnBossDefeated;
 
     private Animator bossAnimator;
+    private NeoSurvive.Buff.StatusFlags traitStatus;
+    private NeoSurvive.Buff.KnockbackDebuff traitKnockback;
+
+    public NeoSurvive.Buff.StatusFlags TraitStatus => traitStatus != null ? traitStatus
+        : (traitStatus = GetComponent<NeoSurvive.Buff.StatusFlags>() ?? gameObject.AddComponent<NeoSurvive.Buff.StatusFlags>());
+    public bool CanMove => RunTraitBossControl.CanMove(TraitStatus);
+    public bool CanAttack => RunTraitBossControl.CanAttack(TraitStatus) && !IsKnockedBack;
+    public bool IsKnockedBack => (traitKnockback != null ? traitKnockback
+        : (traitKnockback = GetComponent<NeoSurvive.Buff.KnockbackDebuff>()))?.IsKnockbackActive ?? false;
+    public float MovementMultiplier => RunTraitBossControl.MovementMultiplier(TraitStatus);
 
     /// <summary>
     /// UI에 표시할 보스 이름을 반환합니다.
@@ -33,7 +43,23 @@ public class Boss : Character
     protected override void Awake()
     {
         base.Awake();
+        ApplyExhibitionHp();
         bossAnimator = GetComponentInChildren<Animator>(true);
+    }
+
+    private void ApplyExhibitionHp()
+    {
+        float multiplier = EnemyStatDB.ExhibitionHpMultiplier;
+        if (maxHP == null || multiplier >= 1f)
+            return;
+
+        float halved = Mathf.Max(1f, maxHP.BaseValue * multiplier);
+        maxHP.BaseValue = halved;
+        if (currentHP == null)
+            return;
+
+        currentHP.BaseValue = halved;
+        currentHP.CurrentValue = halved;
     }
 
     /// <summary>

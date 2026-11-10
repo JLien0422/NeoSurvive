@@ -112,7 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 6
   hpRatioDamage: 0.05
-  useHpRatioDamage: 1
+  useHpRatioDamage: 0
   useCurrentHpRatio: 0
   hitCooldown: 0.2
   enemyMask:
@@ -122,7 +122,7 @@ MonoBehaviour:
   speed: 8
   halfWidth: 7
   halfHeight: 4
-  infiniteLifetime: 1
+  infiniteLifetime: 0
   lifetime: 8
   radiusScale: 1
   hitRadius: 0.6

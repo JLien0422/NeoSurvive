@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class SurgeBlade : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Stats")]
     public float damage = 20f;
     public float range = 3.0f;
@@ -56,7 +60,7 @@ namespace NeoSurvive.Weapon
     {
       fireTimer += Time.deltaTime;
 
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Attack();
         fireTimer = 0f;
@@ -123,7 +127,7 @@ namespace NeoSurvive.Weapon
       if (InGameSoundManager.Instance != null)
         InGameSoundManager.Instance.PlaySurgeBladeFire();
 
-      float useRange = range;
+      float useRange = TraitStat(range, RunTraitStat.ThrustRange);
       float useDamage = damage;
 
       bool empowered = false;
@@ -202,6 +206,8 @@ namespace NeoSurvive.Weapon
 
             var src = GetComponentInParent<WeaponSource>();
             character.TakeDamage(useDamage, src != null ? src.weaponData : null);
+            RunTraitStatus.ApplyKnockback(character.gameObject, src != null ? src.weaponData : null,
+                Player.Instance != null ? (Vector2)Player.Instance.transform.position : (Vector2)transform.position);
 
             damaged++;
 
@@ -236,6 +242,14 @@ namespace NeoSurvive.Weapon
       }
 
       SpawnSurgeEffect(forward, empowered);
+      var replay = new RunTraitAttackSnapshot {
+        shape = RunTraitAttackSnapshot.Shape.Box, origin = origin, forward = forward,
+        range = TraitStat(range, RunTraitStat.ThrustRange), width = hitWidth, damage = damage,
+        maxTargets = currentMaxTargets, mask = hitMask, weapon = GetComponentInParent<WeaponSource>()?.weaponData,
+        applyPhysicalKnockback = true, vfx = surgePrefab, vfxOffset = surgeSpawnOffset,
+        vfxScale = surgeScale, vfxLifetime = surgeDuration
+      };
+      RunTraitSpecialRuntime.Repeat(replay.weapon, RunTraitSpecialKind.Afterimage, surgeDuration, replay.Replay);
     }
 
     private void BuildThrustBox(
@@ -330,7 +344,7 @@ namespace NeoSurvive.Weapon
 
         Transform targetTransform = hit.transform;
 
-        Enemy enemy = hit.GetComponentInParent<Enemy>();
+        Character enemy = RunTraitTarget.Find(hit);
 
         if (enemy != null)
           targetTransform = enemy.transform;

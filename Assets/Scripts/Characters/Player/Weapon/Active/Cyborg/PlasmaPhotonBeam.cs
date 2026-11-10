@@ -31,7 +31,11 @@ namespace NeoSurvive.Weapon
 
     public bool applyVulnerable = false;
     public float vulnerableMul = 2f;
-    public float vulnerableDuration = 2.0f;
+    public float vulnerableDuration = 5.0f;
+
+    [Header("Beam Width")]
+    public float beamWidthScale = 1f;
+    public float baseBeamRadius = 0.35f;
 
     private const string weaponId = "plasmaphotongun";
     private int currentLevel = 1;
@@ -81,6 +85,7 @@ namespace NeoSurvive.Weapon
       if (row.vulnerablemul > 0f) vulnerableMul = row.vulnerablemul;
       if (row.vulnerableduration > 0f) vulnerableDuration = row.vulnerableduration;
 
+      beamWidthScale = row.width > 0f ? row.width : 1f;
       destroyOnHit = row.destroyonhit >= 1f;
     }
 
@@ -91,11 +96,9 @@ namespace NeoSurvive.Weapon
       Vector3 origin = transform.position;
       float finalDamage = baseDamage * Mathf.Max(0.01f, outgoingMul);
 
-      // ★ 변경:
-      // 기존에는 hitMask가 있으면 해당 레이어만 Raycast해서
-      // 자판기 레이어가 빠져 있으면 절대 맞지 않았음.
-      // 이제 전체 Raycast 후 TryHitTarget에서 실제 타격 대상인지 판단.
-      RaycastHit2D[] hits = Physics2D.RaycastAll(origin, dir, range);
+      float radius = Mathf.Max(0.05f, baseBeamRadius * Mathf.Max(0.05f, beamWidthScale));
+      float traitRange = RunTraitWeaponStats.Scale(sourceWeapon, range, RunTraitStat.AttackRange);
+      RaycastHit2D[] hits = Physics2D.CircleCastAll(origin, radius, dir, traitRange);
 
       System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
@@ -106,6 +109,7 @@ namespace NeoSurvive.Weapon
         if (hit.collider == null)
           continue;
 
+        if (RunTraitProjectileErasure.TryErase(sourceWeapon, hit.collider)) continue;
         if (TryHitTarget(hit.collider, finalDamage, owner, sourceWeapon))
         {
           hitCount++;
@@ -130,6 +134,9 @@ namespace NeoSurvive.Weapon
 
       if (character != null)
       {
+        if (owner != null && character == owner)
+          return false;
+
         bool isInHitMask =
           hitMask.value == 0 ||
           ((1 << character.gameObject.layer) & hitMask.value) != 0 ||
@@ -145,7 +152,7 @@ namespace NeoSurvive.Weapon
           return false;
 
         character.TakeDamage(damage, sourceWeapon);
-        ApplyDebuffs(character.gameObject);
+        ApplyDebuffs(character.gameObject, sourceWeapon);
 
         hitIds.Add(id);
         return true;
@@ -177,22 +184,21 @@ namespace NeoSurvive.Weapon
       return false;
     }
 
-    private void ApplyDebuffs(GameObject target)
+    private void ApplyDebuffs(GameObject target, WeaponBase sourceWeapon)
     {
       if (target == null)
         return;
 
-      if (applySlow)
-        BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration));
+      RunTraitStatus.ApplySlow(target, sourceWeapon, applySlow ? slowMul : 1f, applySlow ? slowDuration : 0f);
 
       if (applyStun)
-        BuffUtil.Apply(target, new StunDebuff(stunDuration));
+        BuffUtil.Apply(target, new StunDebuff(RunTraitWeaponStats.Scale(sourceWeapon, stunDuration, RunTraitStat.ControlDuration)));
 
       if (applyRoot)
-        BuffUtil.Apply(target, new RootDebuff(rootDuration));
+        BuffUtil.Apply(target, new RootDebuff(RunTraitWeaponStats.Scale(sourceWeapon, rootDuration, RunTraitStat.ControlDuration)));
 
       if (applyBlind)
-        BuffUtil.Apply(target, new BlindDebuff(blindDuration));
+        BuffUtil.Apply(target, new BlindDebuff(RunTraitWeaponStats.Scale(sourceWeapon, blindDuration, RunTraitStat.ControlDuration)));
 
       if (applyVulnerable)
         BuffUtil.Apply(target, new VulnerableDebuff(vulnerableMul, vulnerableDuration));

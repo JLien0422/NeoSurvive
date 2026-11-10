@@ -322,7 +322,7 @@ public class EnemyController : MonoBehaviour
 
     contactDamageTimer -= tickInterval;
 
-    if (statusFlags != null && statusFlags.attackBlocked) return;
+    if (statusFlags != null && (statusFlags.attackBlocked || statusFlags.IsRunTraitStaggered)) return;
 
     Character contactTarget = GetContactDamageTarget();
     if (contactTarget == null) return;
@@ -424,7 +424,7 @@ public class EnemyController : MonoBehaviour
   private void FixedUpdate()
   {
     // (추가) 속박/기절 등 이동 불가면 즉시 정지
-    if (statusFlags != null && statusFlags.moveBlocked)
+    if (statusFlags != null && (statusFlags.moveBlocked || statusFlags.IsRunTraitStaggered))
     {
       if (rb != null) rb.velocity = Vector2.zero;
       return;

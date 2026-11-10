@@ -356,11 +356,17 @@ public class Player : Character
       amount *= GetNanoArmorDamageMultiplier();
     }
 
-    base.TakeDamage(amount, sourceWeapon);
+    EnergyShieldBarrier barrier = GetComponent<EnergyShieldBarrier>();
+    if (amount > 0f && barrier != null && barrier.TryConsume())
+      amount = 0f;
 
-    if (amount > 0f && HasTrait("reactive_exoskeleton"))
+    float hpBeforeHit = currentHP != null ? currentHP.CurrentValue : 0f;
+    base.TakeDamage(amount, sourceWeapon);
+    float hpLost = Mathf.Max(0f, hpBeforeHit - currentHP.CurrentValue);
+
+    if (hpLost > 0f && HasTrait("reactive_exoskeleton"))
     {
-      TriggerReactiveExoskeleton(amount);
+      TriggerReactiveExoskeleton(hpLost);
     }
   }
 
@@ -481,6 +487,7 @@ public class Player : Character
   {
     if (IsDead) return;
     base.Die();
+    GetComponent<SpriteHitFlash>()?.Clear();
 
     Debug.Log($"{gameObject.name} (플레이어)가 죽었습니다!");
     GameAnalyticsTracker.TrackPlayerDeath(this);

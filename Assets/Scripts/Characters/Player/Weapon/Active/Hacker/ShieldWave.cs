@@ -14,6 +14,8 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public class ShieldWave : MonoBehaviour
     {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
         [Header("Visual Lifetime")]
         [SerializeField] private float visibleLifetime = 0.18f;
 
@@ -62,13 +64,22 @@ namespace NeoSurvive.Weapon
             this.sourceWeapon = sourceWeapon;
 
             ProcessCircleHit();
+            var replay = new RunTraitAttackSnapshot {
+                shape = RunTraitAttackSnapshot.Shape.Circle, origin = transform.position,
+                range = TraitStat(this.hitRadius, RunTraitStat.ShieldRadius), damage = damage, weapon = sourceWeapon,
+                knockbackSpeed = RunTraitWeaponStats.KnockbackVelocity(knockbackForce,
+                    TraitStat(1f, RunTraitStat.KnockbackDistance), TraitStat(1f, RunTraitStat.ControlDuration)),
+                knockbackDuration = TraitStat(knockbackDuration, RunTraitStat.ControlDuration),
+                vfxLifetime = visibleLifetime
+            };
+            RunTraitSpecialRuntime.Repeat(sourceWeapon, RunTraitSpecialKind.Echo, visibleLifetime, replay.Replay);
             Destroy(gameObject, visibleLifetime);
         }
 
         private void ProcessCircleHit()
         {
-            HashSet<Enemy> processed = new HashSet<Enemy>();
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, hitRadius);
+            HashSet<Character> processed = new HashSet<Character>();
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, TraitStat(hitRadius, RunTraitStat.ShieldRadius));
             bool playedSound = false;
 
             foreach (var hit in hits)
@@ -78,9 +89,7 @@ namespace NeoSurvive.Weapon
                 // =========================
                 // 1. 기존 Enemy 처리
                 // =========================
-                Enemy enemy = hit.GetComponent<Enemy>();
-                if (enemy == null)
-                    enemy = hit.GetComponentInParent<Enemy>();
+                Character enemy = RunTraitTarget.Find(hit);
 
                 if (enemy != null && enemy.CompareTag(enemyTag))
                 {
@@ -106,13 +115,22 @@ namespace NeoSurvive.Weapon
                         knockDir = Vector2.right;
 
                     enemy.TakeDamage(damage, sourceWeapon);
+                    RunTraitStatus.ApplySlow(enemy.gameObject, sourceWeapon);
 
                     KnockbackDebuff knockback = enemy.GetComponent<KnockbackDebuff>();
 
                     if (knockback == null)
                         knockback = enemy.gameObject.AddComponent<KnockbackDebuff>();
 
-                    knockback.ApplyKnockback(knockDir * knockbackForce, knockbackDuration);
+                    knockback.ApplyKnockback(
+                        knockDir * RunTraitWeaponStats.KnockbackVelocity(knockbackForce,
+                            TraitStat(1f, RunTraitStat.KnockbackDistance), TraitStat(1f, RunTraitStat.ControlDuration)),
+                        TraitStat(knockbackDuration, RunTraitStat.ControlDuration),
+                        RunTraitControl.Expiry(enemy, sourceWeapon, TraitStat(knockbackDuration, RunTraitStat.ControlDuration),
+                            (next, time) => (next.GetComponent<KnockbackDebuff>() ?? next.gameObject.AddComponent<KnockbackDebuff>())
+                                .ApplyKnockback(((Vector2)next.transform.position - (Vector2)enemy.transform.position).normalized
+                                    * RunTraitWeaponStats.KnockbackVelocity(knockbackForce,
+                                        TraitStat(1f, RunTraitStat.KnockbackDistance), TraitStat(1f, RunTraitStat.ControlDuration)), time)));
 
                     if (isMaster)
                     {

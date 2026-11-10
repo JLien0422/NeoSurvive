@@ -5,6 +5,10 @@ namespace NeoSurvive.Weapon
 {
   public class BoosterKnuckle : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("Projectile")]
     public GameObject fistProjectilePrefab;
     public Transform firePoint;
@@ -61,7 +65,7 @@ namespace NeoSurvive.Weapon
     {
       timer += Time.deltaTime;
 
-      if (timer >= fireRate)
+      if (timer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Fire();
         timer = 0f;
@@ -192,7 +196,7 @@ namespace NeoSurvive.Weapon
 
     private Transform FindClosestTarget(Vector3 origin)
     {
-      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, range);
+      Collider2D[] hits = Physics2D.OverlapCircleAll(origin, TraitStat(range, RunTraitStat.AttackRange));
 
       Transform closest = null;
       float minDist = float.MaxValue;

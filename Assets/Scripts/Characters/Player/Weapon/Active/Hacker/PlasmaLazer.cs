@@ -5,6 +5,9 @@ using NeoSurvive.Core;
 
 public class PlasmaLazer : MonoBehaviour
 {
+  [SerializeField, Min(0.001f)] private float beamHitWidth = 0.1f;
+  private Vector3 baseVisualScale;
+  private float baseTrailWidth;
   public float damage = 5f;
   public float range = 10f;
   public float bulletSpeed = 2000f;
@@ -34,6 +37,10 @@ public class PlasmaLazer : MonoBehaviour
   // - 원본 레이저만 true
   // - 분열 레이저는 false로 해서 무한 분열 방지
   private bool canSplit = true;
+  private bool ricochetPending, ricochetDone, finished;
+  private Vector2 ricochetOrigin;
+  private Vector3 firingOrigin;
+  private RunTraitAttackSnapshot replay;
 
   [Header("Master Split Settings")]
   [SerializeField] private int splitCount = 2;
@@ -41,8 +48,11 @@ public class PlasmaLazer : MonoBehaviour
 
   private void Start()
   {
+    baseVisualScale = transform.localScale;
     if (trailRenderer == null)
       trailRenderer = GetComponent<TrailRenderer>();
+    if (trailRenderer != null)
+      baseTrailWidth = trailRenderer.widthMultiplier;
   }
 
   private void Update()
@@ -51,6 +61,7 @@ public class PlasmaLazer : MonoBehaviour
 
     if (elapsed >= duration)
     {
+      FinishAttack();
       Destroy(gameObject);
       return;
     }
@@ -60,8 +71,13 @@ public class PlasmaLazer : MonoBehaviour
     if (reachedMaxRange)
       return;
 
+    float widthMultiplier = RunTraitWeaponStats.Scale(sourceWeapon, 1f, RunTraitStat.BeamWidth);
+    transform.localScale = new Vector3(baseVisualScale.x, baseVisualScale.y * widthMultiplier, baseVisualScale.z);
+    if (trailRenderer != null)
+      trailRenderer.widthMultiplier = baseTrailWidth * widthMultiplier;
+    float effectiveRange = RunTraitWeaponStats.Scale(sourceWeapon, range, RunTraitStat.AttackRange);
     float moveDist = bulletSpeed * Time.deltaTime;
-    float remainingRange = range > 0f ? range - traveledDistance : float.PositiveInfinity;
+    float remainingRange = effectiveRange > 0f ? effectiveRange - traveledDistance : float.PositiveInfinity;
 
     if (remainingRange <= 0f)
     {
@@ -74,7 +90,11 @@ public class PlasmaLazer : MonoBehaviour
     if (moveDist <= 0f)
       return;
 
-    RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, direction, moveDist);
+    // 기존 특성이 없을 때는 원래의 선 판정을 유지합니다.
+    RaycastHit2D[] hits = widthMultiplier <= 1f
+      ? Physics2D.RaycastAll(transform.position, direction, moveDist)
+      : Physics2D.BoxCastAll(transform.position, new Vector2(0.001f, beamHitWidth * widthMultiplier),
+          Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg, direction, moveDist);
     System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
     foreach (var hit in hits)
@@ -82,16 +102,18 @@ public class PlasmaLazer : MonoBehaviour
       if (hit.collider == null)
         continue;
 
-      Enemy enemy = hit.collider.GetComponentInParent<Enemy>();
+      Character enemy = RunTraitTarget.Find(hit.collider);
 
       if (enemy != null)
       {
         if (!CanApplyDamageToEnemy(enemy))
           continue;
 
-        enemy.TakeDamage(damage, sourceWeapon);
-        currentHitCount++;
         damagedEnemyIds.Add(enemy.GetInstanceID());
+        using (new RunTraitDamageContext.Scope(secondary: !canSplit, deferRicochet: true))
+          enemy.TakeDamage(damage, sourceWeapon);
+        currentHitCount++;
+        if (!ricochetPending) { ricochetOrigin = hit.point; ricochetPending = true; }
 
         if (isMaster && canSplit)
         {
@@ -125,8 +147,10 @@ public class PlasmaLazer : MonoBehaviour
     transform.position += direction * moveDist;
     traveledDistance += moveDist;
 
-    if (range > 0f && traveledDistance >= range)
+    if (effectiveRange > 0f && traveledDistance >= effectiveRange)
       reachedMaxRange = true;
+    if (reachedMaxRange || currentHitCount >= maxDamageTargets)
+      FlushRicochet();
   }
 
   public void Initialize(
@@ -151,6 +175,17 @@ public class PlasmaLazer : MonoBehaviour
 
     this.isMaster = isMaster;
     this.canSplit = canSplit;
+    firingOrigin = transform.position;
+    finished = false;
+    ricochetPending = false;
+    ricochetDone = false;
+    replay = new RunTraitAttackSnapshot {
+      shape = RunTraitAttackSnapshot.Shape.Beam, origin = firingOrigin, forward = this.direction,
+      range = RunTraitWeaponStats.Scale(sourceWeapon, this.range, RunTraitStat.AttackRange),
+      width = RunTraitWeaponStats.Scale(sourceWeapon, 1f, RunTraitStat.BeamWidth) <= 1f ? 0f
+        : RunTraitWeaponStats.Scale(sourceWeapon, beamHitWidth, RunTraitStat.BeamWidth),
+      damage = damage, maxTargets = maxDamageTargets, weapon = sourceWeapon
+    };
 
     elapsed = 0f;
     alpha = 1f;
@@ -170,7 +205,22 @@ public class PlasmaLazer : MonoBehaviour
     }
   }
 
-  private bool CanApplyDamageToEnemy(Enemy enemy)
+  private void FinishAttack()
+  {
+    if (finished || !canSplit) return;
+    finished = true;
+    FlushRicochet();
+    RunTraitSpecialRuntime.Repeat(sourceWeapon, RunTraitSpecialKind.Echo, 0f, replay.Replay);
+  }
+
+  private void FlushRicochet()
+  {
+    if (ricochetDone || !canSplit || !ricochetPending) return;
+    ricochetDone = true;
+    RunTraitSpecialRuntime.Ricochet(ricochetOrigin, null, sourceWeapon, damage, damagedEnemyIds);
+  }
+
+  private bool CanApplyDamageToEnemy(Character enemy)
   {
     if (enemy == null)
       return false;
@@ -194,19 +244,19 @@ public class PlasmaLazer : MonoBehaviour
 
   // ★ 수정:
   // 원본 레이저가 이미 맞춘 적도 분열 대상으로 허용
-  private void SplitToNearbyEnemies(Enemy hitEnemy, Vector2 splitStartPoint)
+  private void SplitToNearbyEnemies(Character hitEnemy, Vector2 splitStartPoint)
   {
     if (hitEnemy == null)
       return;
 
-    Enemy[] enemies = FindObjectsOfType<Enemy>();
+    Character[] enemies = FindObjectsOfType<Character>();
 
-    List<Enemy> candidates = new List<Enemy>();
+    List<Character> candidates = new List<Character>();
     HashSet<int> candidateIds = new HashSet<int>();
 
-    foreach (Enemy enemy in enemies)
+    foreach (Character enemy in enemies)
     {
-      if (enemy == null)
+      if (!RunTraitTarget.IsCombatant(enemy))
         continue;
 
       if (enemy == hitEnemy)
@@ -236,7 +286,7 @@ public class PlasmaLazer : MonoBehaviour
 
     int createdCount = 0;
 
-    foreach (Enemy targetEnemy in candidates)
+    foreach (Character targetEnemy in candidates)
     {
       if (targetEnemy == null)
         continue;
@@ -247,6 +297,11 @@ public class PlasmaLazer : MonoBehaviour
         continue;
 
       GameObject splitObj = Instantiate(gameObject, splitStartPoint, Quaternion.identity);
+      // 보정된 원본을 복제하므로 기본 두께로 돌린 뒤 자식이 특성을 한 번만 적용합니다.
+      splitObj.transform.localScale = baseVisualScale;
+      TrailRenderer splitTrail = splitObj.GetComponent<TrailRenderer>();
+      if (splitTrail != null)
+        splitTrail.widthMultiplier = baseTrailWidth;
       splitObj.SetActive(true);
 
       PlasmaLazer splitLaser = splitObj.GetComponent<PlasmaLazer>();

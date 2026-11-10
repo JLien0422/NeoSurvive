@@ -32,6 +32,17 @@ public class SpriteHitFlash : MonoBehaviour
         _flashRoutine = StartCoroutine(FlashRoutine());
     }
 
+    public void Clear()
+    {
+        if (_flashRoutine != null)
+        {
+            StopCoroutine(_flashRoutine);
+            _flashRoutine = null;
+        }
+
+        SetFlash(0f);
+    }
+
     private IEnumerator FlashRoutine()
     {
         SetFlash(1f);

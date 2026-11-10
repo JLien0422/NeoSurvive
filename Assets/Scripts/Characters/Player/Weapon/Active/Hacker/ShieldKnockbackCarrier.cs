@@ -10,7 +10,7 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public class ShieldKnockbackCarrier : MonoBehaviour
     {
-        private Enemy ownerEnemy;
+        private Character ownerEnemy;
         private Rigidbody2D rb;
 
         private float collisionDamage;
@@ -25,7 +25,7 @@ namespace NeoSurvive.Weapon
         private bool triggered = false;
 
         public void Initialize(
-            Enemy ownerEnemy,
+            Character ownerEnemy,
             float collisionDamage,
             float collisionDetectRadius,
             float collisionImpactRadius,
@@ -89,9 +89,7 @@ namespace NeoSurvive.Weapon
             {
                 if (hit == null) continue;
 
-                Enemy other = hit.GetComponent<Enemy>();
-                if (other == null)
-                    other = hit.GetComponentInParent<Enemy>();
+                Character other = RunTraitTarget.Find(hit);
 
                 if (other == null) continue;
                 if (other == ownerEnemy) continue;
@@ -106,16 +104,14 @@ namespace NeoSurvive.Weapon
         {
             triggered = true;
 
-            HashSet<Enemy> impacted = new HashSet<Enemy>();
+            HashSet<Character> impacted = new HashSet<Character>();
             Collider2D[] hits = Physics2D.OverlapCircleAll(impactCenter, collisionImpactRadius);
 
             foreach (var hit in hits)
             {
                 if (hit == null) continue;
 
-                Enemy enemy = hit.GetComponent<Enemy>();
-                if (enemy == null)
-                    enemy = hit.GetComponentInParent<Enemy>();
+                Character enemy = RunTraitTarget.Find(hit);
 
                 if (enemy == null) continue;
                 if (!enemy.CompareTag(enemyTag)) continue;

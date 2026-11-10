@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using NeoSurvive.Buff;
 using NeoSurvive.Core;
 
 namespace NeoSurvive.Weapon
@@ -8,12 +9,16 @@ namespace NeoSurvive.Weapon
   [RequireComponent(typeof(Collider2D))]
   public class ChainSaw : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Damage")]
     public float damage = 6f;
-    public float hpRatioDamage = 0.05f;
-    public bool useHpRatioDamage = true;
+    public float hpRatioDamage = 0f;
+    public bool useHpRatioDamage = false;
     public bool useCurrentHpRatio = false;
     public float hitCooldown = 0.2f;
+    [Range(0.05f, 1f)] public float slowMul = 0.8f;
+    public float slowDuration = 1.5f;
     public LayerMask enemyMask;
     public string enemyTag = "Enemy";
 
@@ -23,8 +28,9 @@ namespace NeoSurvive.Weapon
     public float halfHeight = 3.5f;
 
     [Header("Lifetime")]
-    public bool infiniteLifetime = true;
-    public float lifetime = 8f;
+    public bool infiniteLifetime = false;
+    public float lifetime = 6f;
+    public float downtime = 2.5f;
 
     [Header("Visual / Size")]
     public float radiusScale = 1.0f;
@@ -49,6 +55,7 @@ namespace NeoSurvive.Weapon
     private readonly Dictionary<int, float> lastHitTime = new();
 
     private float lifeTimer;
+    private bool coolingDown;
     private bool initialized = false;
 
     private Rigidbody2D rb;
@@ -140,18 +147,21 @@ namespace NeoSurvive.Weapon
         return;
       }
 
-      transform.localScale = Vector3.one * radiusScale;
-
       if (!infiniteLifetime)
       {
         lifeTimer -= Time.deltaTime;
 
         if (lifeTimer <= 0f)
         {
-          Destroy(gameObject);
-          return;
+          coolingDown = !coolingDown;
+          lifeTimer = coolingDown ? downtime : lifetime;
         }
       }
+
+      transform.localScale = coolingDown ? Vector3.zero : Vector3.one * radiusScale;
+
+      if (coolingDown)
+        return;
 
       if (rb != null)
       {
@@ -159,7 +169,9 @@ namespace NeoSurvive.Weapon
         rb.angularVelocity = 0f;
       }
 
+      Vector2 previous = transform.position;
       MoveRectBound();
+      RunTraitProjectileErasure.Sweep(sourceWeapon, previous, transform.position, hitRadius * radiusScale);
       DamageTargets();
       SpinVisual();
 
@@ -197,7 +209,7 @@ namespace NeoSurvive.Weapon
 
       Vector3 nextPos =
         transform.position +
-        (Vector3)(moveDir * speed * Time.deltaTime);
+        (Vector3)(moveDir * TraitStat(speed, RunTraitStat.MovementSpeed) * Time.deltaTime);
 
       float minX = center.x - halfWidth;
       float maxX = center.x + halfWidth;
@@ -244,6 +256,7 @@ namespace NeoSurvive.Weapon
         hitRadius * radiusScale
       );
 
+      RunTraitProjectileErasure.Circle(sourceWeapon, transform.position, hitRadius * radiusScale);
       float now = Time.time;
 
       foreach (var hit in hits)
@@ -295,7 +308,7 @@ namespace NeoSurvive.Weapon
         int id = character.gameObject.GetInstanceID();
 
         if (lastHitTime.TryGetValue(id, out float last) &&
-            now - last < hitCooldown)
+            now - last < TraitStat(hitCooldown, RunTraitStat.HitInterval))
           return false;
 
         lastHitTime[id] = now;
@@ -315,6 +328,11 @@ namespace NeoSurvive.Weapon
           CacheSourceWeapon();
 
         character.TakeDamage(finalDamage, sourceWeapon);
+            RunTraitStatus.ApplyKnockback(character.gameObject, sourceWeapon,
+                Player.Instance != null ? (Vector2)Player.Instance.transform.position : (Vector2)transform.position);
+
+        if (enemy != null)
+          ApplySlow(enemy.gameObject);
 
         if (debugLog)
           Debug.Log($"[ChainSaw] Hit Character {character.name} dmg={finalDamage}");
@@ -336,7 +354,7 @@ namespace NeoSurvive.Weapon
         int id = mb.gameObject.GetInstanceID();
 
         if (lastHitTime.TryGetValue(id, out float last) &&
-            now - last < hitCooldown)
+            now - last < TraitStat(hitCooldown, RunTraitStat.HitInterval))
           return false;
 
         lastHitTime[id] = now;
@@ -350,6 +368,18 @@ namespace NeoSurvive.Weapon
       }
 
       return false;
+    }
+
+    private void ApplySlow(GameObject target)
+    {
+      if (target == null || slowDuration <= 0f)
+        return;
+
+      BuffHandler handler = target.GetComponent<BuffHandler>();
+      if (handler == null)
+        handler = target.AddComponent<BuffHandler>();
+
+      handler.ReplaceBuff(new SlowDebuff(slowMul, slowDuration));
     }
 
     private bool IsEnemyCollider(Collider2D hit)
@@ -453,6 +483,9 @@ namespace NeoSurvive.Weapon
     {
       ApplyStatsFromCSV(level);
 
+      if (!coolingDown)
+        lifeTimer = lifetime;
+
       Debug.Log(
         $"[ChainSaw] Lv.{level} " +
         $"damage={damage}, " +
@@ -489,11 +522,20 @@ namespace NeoSurvive.Weapon
         return;
       }
 
+      useHpRatioDamage = false;
+
       if (row.damage > 0f) damage = row.damage;
-      if (row.hpratiodamage > 0f) hpRatioDamage = row.hpratiodamage;
       if (row.hitcooldown > 0f) hitCooldown = row.hitcooldown;
       if (row.speed > 0f) speed = row.speed;
       if (row.radiusscale > 0f) radiusScale = row.radiusscale;
+      if (row.lifetime > 0f)
+      {
+        lifetime = row.lifetime;
+        infiniteLifetime = false;
+      }
+      if (row.spawninterval > 0f) downtime = row.spawninterval;
+      if (row.slowmul > 0f) slowMul = row.slowmul;
+      if (row.slowduration > 0f) slowDuration = row.slowduration;
       if (row.hitradius > 0f) hitRadius = row.hitradius;
       if (row.halfwidth > 0f) halfWidth = row.halfwidth;
       if (row.halfheight > 0f) halfHeight = row.halfheight;

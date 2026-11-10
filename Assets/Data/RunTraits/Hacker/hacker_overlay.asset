@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_overlay
+  m_EditorClassIdentifier: 
+  traitId: hacker_overlay
+  displayName: "오버레이"
+  icon: {fileID: 0}
+  description: "최적화 필드와 피스톨 마스터 표식의 증폭 수치에 장당 10%p를 더합니다. 최대 50%p. 기본 증폭 20%는 최대 중첩 시 70%가 됩니다. 무기 공격력 증가가 아닙니다."
+  tier: 0
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 3
+  maxStacks: 5
+  effect:
+  - {fileID: 11400000, guid: 3752ed7c47d74abf8af485651be94367, type: 2}

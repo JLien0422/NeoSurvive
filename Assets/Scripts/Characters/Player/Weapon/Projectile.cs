@@ -53,10 +53,10 @@ namespace NeoSurvive.Weapon
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
       // "Enemy" 태그로 적/보스 통합 체크 (Enemy, Boss 모두 태그가 "Enemy"임)
-      if (collision.CompareTag("Enemy"))
+      Character character = collision.GetComponentInParent<Character>();
+      if (character != null && (RunTraitTarget.IsCombatant(character)
+        || collision.CompareTag("Enemy") || character.CompareTag("Enemy")))
       {
-        // Character 베이스 컴포넌트로 TakeDamage 호출
-        if (!collision.gameObject.TryGetComponent(out Character character)) return;
 
         character.TakeDamage(damage, sourceWeapon);
         OnHitEvent?.Invoke();

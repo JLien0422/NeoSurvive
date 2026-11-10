@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_afterimage_attack
+  m_EditorClassIdentifier: 
+  traitId: cyborg_afterimage_attack
+  displayName: "잔상 공격"
+  icon: {fileID: 0}
+  description: "공격 종료 0.2초 뒤 반투명 잔상이 같은 공격을 피해 50%로 1회 반복합니다. 잔상은 다시 잔상을 만들지 않습니다. 만렙 특수 효과인 균열·2배 찌르기·블랙홀은 적용하지 않습니다."
+  tier: 2
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 5
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: 9d772bd4c36b44098cdc398ca7a0da50, type: 2}

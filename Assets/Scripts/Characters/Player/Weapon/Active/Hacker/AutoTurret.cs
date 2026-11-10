@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class AutoTurret : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     [Header("터렛 생성기 설정")]
     public GameObject dronePrefab;
     public GameObject projectilePrefab;
@@ -82,7 +86,7 @@ namespace NeoSurvive.Weapon
     private void Update()
     {
       elpased += Time.deltaTime;
-      if (elpased < installCooldown) return;
+      if (elpased < TraitStat(installCooldown, RunTraitStat.DeploymentCooldown)) return;
 
       Vector2 randomOffset = Random.insideUnitCircle * 0.5f;
       Vector3 spawnPos = transform.position + (Vector3)randomOffset;
@@ -146,24 +150,29 @@ namespace NeoSurvive.Weapon
         IsMasterLevel
       );
 
+      var cloneEffect = RunTraitSpecialRuntime.Effect(src?.weaponData, RunTraitSpecialKind.DeploymentClone);
+      if (cloneEffect != null)
+        SpawnExtraTurret(spawnPos + Vector3.right * 0.6f, src?.weaponData, cloneEffect.efficiency);
       if (Player.Instance != null && Player.Instance.HasTrait("bandwidth_expansion"))
       {
         SpawnExtraTurret(spawnPos + Vector3.right * 0.6f, src != null ? src.weaponData : null);
       }
     }
 
-    private void SpawnExtraTurret(Vector3 spawnPos, WeaponBase sourceWeapon)
+    private void SpawnExtraTurret(Vector3 spawnPos, WeaponBase sourceWeapon, float? performance = null)
     {
       if (dronePrefab == null)
         return;
 
       GameObject extraDrone = Instantiate(dronePrefab, spawnPos, Quaternion.identity);
+      if (performance.HasValue)
+        RunTraitCloneLifetime.Track(extraDrone, RunTraitSpecialRuntime.Effect(sourceWeapon, RunTraitSpecialKind.DeploymentClone));
       DeployedTurret extraTurret = extraDrone.GetComponent<DeployedTurret>();
 
       if (extraTurret == null)
         return;
 
-      float cloneMul = Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f;
+      float cloneMul = performance ?? (Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f);
 
       extraTurret.Initialize(
         damage * cloneMul,

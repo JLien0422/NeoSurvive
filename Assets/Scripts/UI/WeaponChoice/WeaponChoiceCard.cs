@@ -15,6 +15,8 @@ public class WeaponChoiceCard : MonoBehaviour
 
     [Header("Colors")]
     [SerializeField] private Color newWeaponLevelColor = new Color(0.35f, 1f, 0.72f);
+    [SerializeField] private Color levelUpLevelColor = new Color(1f, 0.86f, 0.2f, 1f);
+    [SerializeField] private Color masterLevelColor = new Color(1f, 0.28f, 0.28f, 1f);
     [SerializeField] private Color logicHeaderColor = new Color(0.918f, 0.969f, 1f);
     [SerializeField] private Color statHeaderColor = new Color(0.384f, 0.867f, 0.961f);
     [SerializeField] private Color statValueColor = new Color(0.725f, 0.957f, 1f);
@@ -22,13 +24,10 @@ public class WeaponChoiceCard : MonoBehaviour
     private WeaponBase currentWeapon;
     private Action<WeaponBase> onClick;
     private RectTransform synergyContainer;
-    private Color levelUpLevelColor = new Color(1f, 0.82f, 0.22f);
 
     private void Awake()
     {
         ValidateReferences();
-        if (levelText != null)
-            levelUpLevelColor = levelText.color;
     }
 
     /// <summary>
@@ -83,14 +82,21 @@ public class WeaponChoiceCard : MonoBehaviour
         levelText.enabled = true;
         levelText.alpha = 1f;
         levelText.richText = true;
-        levelText.color = levelInfo.Contains("신규 무기")
-            ? newWeaponLevelColor
-            : levelUpLevelColor;
+        levelText.color = ResolveLevelColor(levelInfo);
         RefreshSynergyTags(weapon);
         levelText.transform.SetAsLastSibling();
 
         clickButton.onClick.RemoveAllListeners();
         clickButton.onClick.AddListener(HandleClick);
+    }
+
+    private Color ResolveLevelColor(string levelInfo)
+    {
+        if (levelInfo.Contains("마스터"))
+            return masterLevelColor;
+        if (levelInfo.Contains("신규"))
+            return newWeaponLevelColor;
+        return levelUpLevelColor;
     }
 
     /// <summary>

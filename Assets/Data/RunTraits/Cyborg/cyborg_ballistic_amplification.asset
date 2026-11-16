@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_ballistic_amplification
+  m_EditorClassIdentifier: 
+  traitId: cyborg_ballistic_amplification
+  displayName: "탄도 증폭"
+  icon: {fileID: 0}
+  description: "원거리 무기의 피해가 장당 10% 증가합니다. 최대 50%. 빔·주먹·볼트·톱 틱·브레스 틱에 적용합니다."
+  tier: 0
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 6
+  maxStacks: 5
+  effect:
+  - {fileID: 11400000, guid: 5087aead811f40629085af0d784398f0, type: 2}

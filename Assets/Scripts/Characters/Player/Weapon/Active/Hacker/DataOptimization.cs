@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
     public class DataOptimization : MonoBehaviour
     {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
         public GameObject fieldPrefab;
 
         [Header("VFX")]
@@ -42,11 +46,11 @@ namespace NeoSurvive.Weapon
 
         private void Update()
         {
-            if (fireRate <= 0f) return;
+            if (TraitStat(fireRate, RunTraitStat.DeploymentCooldown) <= 0f) return;
 
             timer += Time.deltaTime;
 
-            if (timer >= fireRate)
+            if (timer >= TraitStat(fireRate, RunTraitStat.DeploymentCooldown))
             {
                 timer = 0f;
                 SpawnField();
@@ -77,12 +81,24 @@ namespace NeoSurvive.Weapon
                     currentLevel >= 5,
                     masterSlowMultiplier,
                     masterSlowDuration,
-                    srcWeapon: null
+                    srcWeapon: GetComponentInParent<WeaponSource>()?.weaponData,
+                    fieldLifetime: fieldDuration
                 );
-
-                Destroy(obj, fieldDuration);
             }
 
+            var source = GetComponentInParent<WeaponSource>()?.weaponData;
+            var effect = RunTraitSpecialRuntime.Effect(source, RunTraitSpecialKind.DeploymentClone);
+            if (effect != null)
+            {
+                var clone = Instantiate(fieldPrefab, spawnPos + Vector3.left * 0.6f, Quaternion.identity);
+                RunTraitCloneLifetime.Track(clone, effect);
+                var cloneField = clone.GetComponent<DataField>();
+                if (cloneField != null)
+                    cloneField.Initialize(new Vector2(fieldWidth, fieldHeight) * effect.efficiency,
+                        damageBuffMultiplier, buffDuration, currentLevel >= 5,
+                        masterSlowMultiplier, masterSlowDuration, source,
+                        effect.Scale(fieldDuration), effect.efficiency);
+            }
             StartCoroutine(FieldVFXRoutine(spawnPos));
         }
 
@@ -107,9 +123,12 @@ namespace NeoSurvive.Weapon
             }
 
             // ★ 수정: fieldDuration이 짧아도 Middle이 최소 시간은 보이도록 처리
-            float middleDuration = Mathf.Max(middleMinDuration, fieldDuration - startVfxDuration);
-
-            yield return new WaitForSeconds(middleDuration);
+            float elapsed = startVfxDuration;
+            while (elapsed < Mathf.Max(startVfxDuration + middleMinDuration, TraitStat(fieldDuration, RunTraitStat.Lifetime)))
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
 
             if (middleVfx != null)
                 Destroy(middleVfx);

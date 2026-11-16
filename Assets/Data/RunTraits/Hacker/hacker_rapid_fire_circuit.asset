@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_rapid_fire_circuit
+  m_EditorClassIdentifier: 
+  traitId: hacker_rapid_fire_circuit
+  displayName: "연사 회로"
+  icon: {fileID: 0}
+  description: "사격 공격 주기가 장당 10% 감소합니다. 최대 30%. 피스톨·라이플 발사, 드론·포탑 공격 주기에 적용하며 포탑 설치 쿨타임은 제외합니다."
+  tier: 1
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 0
+  maxStacks: 3
+  effect:
+  - {fileID: 11400000, guid: 0cea2dc33a0a402bb2ed0dd587038495, type: 2}

@@ -833,11 +833,19 @@ public sealed class HackerSynergyHud : MonoBehaviour
             row.Rect.gameObject.SetActive(true);
             if (boundToScenePanel)
             {
-                float rowHeight = row.Rect.rect.height > 1f ? row.Rect.rect.height : RowHeight;
-                Vector2 position = row.Rect.anchoredPosition;
-                position.y = -cursorY;
-                row.Rect.anchoredPosition = position;
-                cursorY += rowHeight;
+                var layout = row.Rect.parent.GetComponent<UnityEngine.UI.LayoutGroup>();
+                if (layout != null && layout.isActiveAndEnabled)
+                {
+                    row.Rect.SetSiblingIndex(index);
+                }
+                else
+                {
+                    float rowHeight = row.Rect.rect.height > 1f ? row.Rect.rect.height : RowHeight;
+                    Vector2 position = row.Rect.anchoredPosition;
+                    position.y = -cursorY;
+                    row.Rect.anchoredPosition = position;
+                    cursorY += rowHeight;
+                }
             }
             else
             {

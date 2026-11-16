@@ -18,6 +18,7 @@ namespace NeoSurvive.Weapon
     private WeaponBase sourceWeapon;
 
     private Rigidbody2D rb;
+    private float nextHitVfxTime;
 
     [Header("Projectile Block Radius")]
     [SerializeField] private float projectileBlockRadius = 0.8f;
@@ -161,7 +162,15 @@ namespace NeoSurvive.Weapon
       // =========================
       if (character != null)
       {
-        character.TakeDamage(damage, sourceWeapon);
+        using (new RunTraitDamageContext.Scope(forceFieldContact: true))
+          character.TakeDamage(damage, sourceWeapon);
+        RunTraitStatus.ApplySlow(character.gameObject, sourceWeapon);
+        // 접촉 데미지 주기는 유지하고, 매 물리 프레임 이펙트가 쌓이는 것만 막는다.
+        if (character is Enemy && Time.time >= nextHitVfxTime && TryGetComponent<WeaponHitVfx>(out var hitVfx))
+        {
+          hitVfx.PlaySustained(character.transform, character.transform.position - transform.position);
+          nextHitVfxTime = Time.time + 0.1f;
+        }
 
         return;
       }

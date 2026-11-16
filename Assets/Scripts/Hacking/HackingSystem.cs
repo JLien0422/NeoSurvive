@@ -9,7 +9,8 @@ using System;
 /// 해킹 시스템 매니저
 /// - 패턴 발동 시 해킹오브젝트 생성
 /// - 미니게임 시작/종료 관리
-/// - 해커/사이보그: 게임시간 유지 (실시간). 미니게임은 unscaledDeltaTime
+/// - 해커 미니게임 중에는 인게임 시간만 0.8배. 미니게임 제한 시간은 unscaledDeltaTime
+/// - 사이보그 해킹은 게임 시간을 유지
 /// </summary>
 public class HackingSystem : MonoBehaviour
 {
@@ -43,9 +44,9 @@ public class HackingSystem : MonoBehaviour
     [Header("사이보그 해킹 설정")]
     [SerializeField, Range(0.5f, 15f), Tooltip("수비 원 반경 (월드 유닛). 적 감지·바닥 원 크기 공통")]
     private float cyborgZoneRadius = 2.5f;
-    [SerializeField, Range(1f, 30f), Tooltip("수비 제한 시간 (초)")]
+    [SerializeField, Range(1f, 30f), Tooltip("해킹 제한 시간(초). 절반은 적이 기준 미만인 성공 시간, 절반은 기준 이상인 실패 시간. 10초면 진척도는 초당 20%")]
     private float cyborgTotalTime = 10f;
-    [SerializeField, Range(1, 10), Tooltip("원 안 허용 적 수. 이 값 초과 시 즉시 실패")]
+    [SerializeField, Range(1, 10), Tooltip("원 안 적이 이 수 이상이면 진척도가 멈춥니다. 그보다 적으면 초당 20%(제한 시간 10초 기준)로 오릅니다.")]
     private int cyborgMaxEnemyCount = 3;
     [SerializeField, Range(0.02f, 0.5f), Tooltip("수비 원 테두리 두께")]
     private float cyborgZoneBorderWidth = 0.08f;
@@ -58,7 +59,7 @@ public class HackingSystem : MonoBehaviour
 
     private const string KEY_CYBORG_ZONE_RADIUS = "HackingSystem_CyborgZoneRadius";
     private const string KEY_CYBORG_TOTAL_TIME = "HackingSystem_CyborgTotalTime";
-    private const string KEY_CYBORG_MAX_ENEMY = "HackingSystem_CyborgMaxEnemyCount";
+    private const string KEY_CYBORG_MAX_ENEMY = "HackingSystem_CyborgPauseEnemyCount";
     private const string KEY_CYBORG_BORDER_WIDTH = "HackingSystem_CyborgBorderWidth";
     private const string KEY_CYBORG_BG_ALPHA = "HackingSystem_CyborgBackgroundAlpha";
     private const string KEY_CYBORG_FILL_ALPHA = "HackingSystem_CyborgTimerFillAlpha";
@@ -68,6 +69,19 @@ public class HackingSystem : MonoBehaviour
     // 현재 진행 중인 미니게임
     private HackingMinigameBase currentMinigame;
     private bool isHacking = false;
+
+    // 해커 미니게임 동안 이동, 탄, 쿨타임, 인게임 시계가 같이 느려진다.
+    // 미니게임 제한 시간은 unscaledDeltaTime이라 실제 시간은 그대로다.
+    private const float MinigameWorldTimeScale = 0.8f;
+    private bool minigameSlowMotion;
+
+    // 인스펙터에 둔 패널 위치는 접힌 자리다. SliceFrame만 화면 끝에 남고, 해킹 때 패널 전체가 들어온다.
+    private const float PanelSlideDuration = 0.22f;
+    private RectTransform hackingPanelRect;
+    private Vector2 panelClosedPosition;
+    private float panelOpenX;
+    private Coroutine panelSlideCoroutine;
+    private bool hackingPanelOpen;
 
     // 사이보그 해킹 관련
     private Coroutine cyborgHackingCoroutine; // 사이보그 해킹 코루틴 참조
@@ -97,6 +111,7 @@ public class HackingSystem : MonoBehaviour
             return;
 
         SaveCyborgSettings();
+        EndMinigameSlowMotion();
     }
 
     private void OnApplicationQuit()
@@ -195,9 +210,13 @@ public class HackingSystem : MonoBehaviour
             $"\n FrequencyOverride={frequencyOverrideRoot != null}" +
             $"\n NetworkBridge={networkBridgeRoot != null}");
 
-        // 모든 루트 비활성화 후 패널도 비활성화
+        hackingPanelRect = hackingUIPanel.GetComponent<RectTransform>();
+        panelClosedPosition = hackingPanelRect.anchoredPosition;
+
+        // 패널은 끄지 않는다. SliceFrame이 자식이라 끄면 평소 화면의 오른쪽 테두리까지 사라진다.
         SetAllRootsInactive();
-        hackingUIPanel.SetActive(false);
+        hackingUIPanel.SetActive(true);
+        hackingPanelRect.anchoredPosition = panelClosedPosition;
     }
 
     // ─────────────────────────────────────────────
@@ -211,10 +230,12 @@ public class HackingSystem : MonoBehaviour
         var player = FindObjectOfType<Player>();
         if (player == null) return;
 
-        // 활성 미니게임은 NumberSequence, NetworkBridge
+        // 활성 미니게임 4종. 주파수 오버라이드는 제외.
         GameObject[] prefabs = {
             securityTurretPrefab,
-            satelliteUplinkPrefab
+            satelliteUplinkPrefab,
+            electricFencePrefab,
+            synapseServerPrefab
         };
 
         // null 제거 후 랜덤 선택
@@ -247,15 +268,12 @@ public class HackingSystem : MonoBehaviour
 
         if (IsCurrentPlayerHacker())
         {
-            if (hackingUIPanel != null)
-                hackingUIPanel.SetActive(true);
-
-            // 해커 미니게임 중에도 전투 시간은 흐른다. Time.timeScale을 건드리지 않는다.
+            ShowHackingPanel();
             StartMinigame(objectType, onSuccess, onFailure);
         }
         else
         {
-            // 사이보그: 게임 시간 유지, 바닥 수비 원 10초 방어
+            // 사이보그: 게임 시간 유지. 원 안이 비어 있을 때만 진척도가 오른다.
             StartCyborgHacking(onSuccess, onFailure, hackPosition);
         }
     }
@@ -289,7 +307,7 @@ public class HackingSystem : MonoBehaviour
                 StartNumberSequence(wrappedSuccess, wrappedFailure);
                 break;
             case HackableObjectType.ElectricFence:
-                StartCommandBypass(wrappedSuccess, wrappedFailure);
+                StartWheelBar(wrappedSuccess, wrappedFailure);
                 break;
             case HackableObjectType.SatelliteUplink:
                 StartNetworkBridge(wrappedSuccess, wrappedFailure);
@@ -301,6 +319,9 @@ public class HackingSystem : MonoBehaviour
                 StartFrequencyOverride(wrappedSuccess, wrappedFailure);
                 break;
         }
+
+        if (currentMinigame != null)
+            BeginMinigameSlowMotion();
     }
 
     // ─────────────────────────────────────────────
@@ -318,6 +339,16 @@ public class HackingSystem : MonoBehaviour
         Slider timeGauge = FindSlider(numberSequenceRoot, "TimeGauge");
 
         minigame.SetPreMadeUI(btnGrid, timeGauge);
+        minigame.Initialize(onSuccess, onFailure);
+    }
+
+    private void StartWheelBar(System.Action onSuccess, System.Action onFailure)
+    {
+        if (commandBypassRoot == null) { Debug.LogWarning("[HackingSystem] CommandBypass_Root 없음!"); return; }
+        commandBypassRoot.gameObject.SetActive(true);
+
+        WheelBarMatchMinigame minigame = GetOrAddMinigame<WheelBarMatchMinigame>(commandBypassRoot.gameObject);
+        currentMinigame = minigame;
         minigame.Initialize(onSuccess, onFailure);
     }
 
@@ -396,7 +427,7 @@ public class HackingSystem : MonoBehaviour
     // ─────────────────────────────────────────────
 
     /// <summary>
-    /// 사이보그 해킹 시작: 바닥 수비 원 10초 방어 (미니게임 없음)
+    /// 사이보그 해킹 시작: 바닥 수비 원. 미니게임 없음.
     /// </summary>
     private void StartCyborgHacking(System.Action onSuccess, System.Action onFailure, Vector3 zoneCenter)
     {
@@ -416,21 +447,47 @@ public class HackingSystem : MonoBehaviour
 
     /// <summary>
     /// 사이보그 해킹 코루틴
-    /// - 10초 동안 원 안 적이 cyborgMaxEnemyCount 이하 유지 시 성공
-    /// - 적이 cyborgMaxEnemyCount 초과 시 즉시 실패
-    /// - 플레이어 위치는 검사하지 않음
+    /// - 원 안 적이 기준 미만이면 진척도가 초당 (100 / 필요 시간)% 증가. 제한 시간 10초, 기준 3명이면 초당 20%
+    /// - 원 안 적이 기준 이상이면 진척도는 멈추고, 그 시간이 쌓임
+    /// - 기준 미만인 시간이 제한 시간의 절반이면 성공. 기준 이상인 시간이 절반이면 실패
+    /// - 플레이어 위치는 검사하지 않음. 원은 해킹 오브젝트 위치에 생긴다
     /// </summary>
     private IEnumerator CyborgHackingCoroutine(Vector3 zoneCenter, System.Action onSuccess, System.Action onFailure)
     {
-        float elapsed = 0f;
+        float requiredCleanTime = Mathf.Max(0.01f, cyborgTotalTime * 0.5f);
+        float failEnemyTime = requiredCleanTime;
+        int pauseAtEnemyCount = Mathf.Max(1, cyborgMaxEnemyCount);
+        float cleanTime = 0f;
+        float enemyTime = 0f;
 
-        while (elapsed < cyborgTotalTime)
+        if (cyborgZoneVisual != null)
+            cyborgZoneVisual.SetProgress(0f);
+
+        while (true)
         {
-            elapsed += Time.deltaTime;
-
             int enemyCount = CountEnemiesInZone(zoneCenter, cyborgZoneRadius);
+            bool occupied = enemyCount >= pauseAtEnemyCount;
 
-            if (enemyCount > cyborgMaxEnemyCount)
+            if (occupied)
+                enemyTime += Time.deltaTime;
+            else
+                cleanTime += Time.deltaTime;
+
+            if (cyborgZoneVisual != null)
+            {
+                cyborgZoneVisual.SetProgress(cleanTime / requiredCleanTime);
+                cyborgZoneVisual.SetBorderColor(occupied ? Color.red : Color.cyan);
+            }
+
+            if (cleanTime >= requiredCleanTime)
+            {
+                cyborgHackingCoroutine = null;
+                EndHacking();
+                onSuccess?.Invoke();
+                yield break;
+            }
+
+            if (enemyTime >= failEnemyTime)
             {
                 cyborgHackingCoroutine = null;
                 EndHacking();
@@ -438,19 +495,8 @@ public class HackingSystem : MonoBehaviour
                 yield break;
             }
 
-            if (cyborgZoneVisual != null)
-            {
-                float remainingNormalized = 1f - (elapsed / cyborgTotalTime);
-                cyborgZoneVisual.SetTimeRemaining(remainingNormalized);
-                cyborgZoneVisual.SetBorderColor(GetZoneBorderColor(enemyCount));
-            }
-
             yield return null;
         }
-
-        cyborgHackingCoroutine = null;
-        EndHacking();
-        onSuccess?.Invoke();
     }
 
     private int CountEnemiesInZone(Vector3 center, float radius)
@@ -463,6 +509,13 @@ public class HackingSystem : MonoBehaviour
             if (col == null || !col.CompareTag("Enemy"))
                 continue;
 
+            Enemy enemyBody =
+                col.GetComponent<Enemy>()
+                ?? col.GetComponentInParent<Enemy>();
+
+            if (enemyBody != null && enemyBody.IsDead)
+                continue;
+
             EnemyController enemy =
                 col.GetComponent<EnemyController>()
                 ?? col.GetComponentInParent<EnemyController>();
@@ -471,17 +524,6 @@ public class HackingSystem : MonoBehaviour
         }
 
         return uniqueEnemies.Count;
-    }
-
-    private Color GetZoneBorderColor(int enemyCount)
-    {
-        if (enemyCount <= 0)
-            return Color.cyan;
-
-        if (enemyCount <= cyborgMaxEnemyCount)
-            return new Color(1f, 0.75f, 0.1f);
-
-        return Color.red;
     }
 
     // ─────────────────────────────────────────────
@@ -508,11 +550,116 @@ public class HackingSystem : MonoBehaviour
         // 모든 루트 비활성화
         SetAllRootsInactive();
 
-        // UI 패널 비활성화
-        if (hackingUIPanel != null)
-            hackingUIPanel.SetActive(false);
-
         currentMinigame = null;
+        EndMinigameSlowMotion();
+        HideHackingPanel();
+    }
+
+    private void ShowHackingPanel()
+    {
+        if (hackingUIPanel == null || hackingPanelRect == null)
+            return;
+
+        StopPanelSlide();
+        hackingUIPanel.SetActive(true);
+        panelOpenX = GetPanelOpenX();
+        hackingPanelOpen = true;
+        panelSlideCoroutine = StartCoroutine(SlideHackingPanel(panelOpenX));
+    }
+
+    private void HideHackingPanel()
+    {
+        if (hackingPanelRect == null || !hackingPanelOpen || !isActiveAndEnabled)
+        {
+            hackingPanelOpen = false;
+            return;
+        }
+
+        hackingPanelOpen = false;
+        StopPanelSlide();
+        panelSlideCoroutine = StartCoroutine(SlideHackingPanel(panelClosedPosition.x));
+    }
+
+    private float GetPanelOpenX()
+    {
+        Vector2 current = hackingPanelRect.anchoredPosition;
+        hackingPanelRect.anchoredPosition = panelClosedPosition;
+        Canvas.ForceUpdateCanvases();
+
+        float openX = panelClosedPosition.x;
+        RectTransform canvasRect = hackingPanelRect.parent as RectTransform;
+        if (canvasRect != null)
+        {
+            Vector3[] canvasCorners = new Vector3[4];
+            canvasRect.GetWorldCorners(canvasCorners);
+            Vector3[] panelCorners = new Vector3[4];
+            hackingPanelRect.GetWorldCorners(panelCorners);
+
+            float worldDelta = panelCorners[2].x - canvasCorners[2].x;
+            if (worldDelta < 1f)
+                worldDelta = hackingPanelRect.rect.width * 0.5f;
+
+            Vector3 localDelta = hackingPanelRect.parent.InverseTransformVector(new Vector3(worldDelta, 0f, 0f));
+            openX = panelClosedPosition.x - localDelta.x;
+        }
+
+        hackingPanelRect.anchoredPosition = current;
+        return openX;
+    }
+
+    private IEnumerator SlideHackingPanel(float targetX)
+    {
+        float fromX = hackingPanelRect.anchoredPosition.x;
+        float duration = Mathf.Max(0.01f, PanelSlideDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float u = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - (1f - u) * (1f - u);
+            float x = Mathf.Lerp(fromX, targetX, eased);
+            hackingPanelRect.anchoredPosition = new Vector2(x, panelClosedPosition.y);
+            yield return null;
+        }
+
+        hackingPanelRect.anchoredPosition = new Vector2(targetX, panelClosedPosition.y);
+        panelSlideCoroutine = null;
+    }
+
+    private void StopPanelSlide()
+    {
+        if (panelSlideCoroutine == null)
+            return;
+
+        StopCoroutine(panelSlideCoroutine);
+        panelSlideCoroutine = null;
+    }
+
+    private void LateUpdate()
+    {
+        if (!minigameSlowMotion || Time.timeScale <= 0f)
+            return;
+
+        if (!Mathf.Approximately(Time.timeScale, MinigameWorldTimeScale))
+            Time.timeScale = MinigameWorldTimeScale;
+    }
+
+    private void BeginMinigameSlowMotion()
+    {
+        minigameSlowMotion = true;
+        if (Time.timeScale > 0f)
+            Time.timeScale = MinigameWorldTimeScale;
+    }
+
+    private void EndMinigameSlowMotion()
+    {
+        if (!minigameSlowMotion)
+            return;
+
+        minigameSlowMotion = false;
+        if (Time.timeScale > 0f)
+            Time.timeScale = 1f;
     }
 
     // ─────────────────────────────────────────────

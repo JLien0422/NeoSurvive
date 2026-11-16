@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4736266353959827432}
   - component: {fileID: 6980524721920368778}
+  - component: {fileID: 1263532294945583718}
   m_Layer: 0
   m_Name: ShieldWave
   m_TagString: Untagged
@@ -45,3 +46,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visibleLifetime: 0.18
+--- !u!114 &1263532294945583718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515475878241952546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 1109181838661558234, guid: 26e62bd98a383e64882139a9609859f3, type: 3}
+  lifetime: 0.28
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.5, y: 0.5, z: 1}
+  tint: {r: 0.35, g: 0.8, b: 1, a: 1}
+  animationSpeed: 1
+  alignToAttackDirection: 0

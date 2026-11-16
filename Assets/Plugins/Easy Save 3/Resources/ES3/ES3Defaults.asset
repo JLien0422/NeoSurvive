@@ -35,14 +35,15 @@ MonoBehaviour:
     referenceMode: 2
     serializationDepthLimit: 64
     assemblyNames:
+    - AllIn1SpriteShaderAssembly
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
     - Domain_Reload
-    - endel.nativewebsocket
     - GameAnalyticsSDK
     - MCPForUnity.Runtime
     - Sirenix.OdinInspector.Modules.Unity.Addressables
     - Sirenix.OdinInspector.Modules.UnityLocalization
+    - UIEffect
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0
   autoUpdateReferences: 1

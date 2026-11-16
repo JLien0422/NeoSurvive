@@ -37,7 +37,7 @@ namespace NeoSurvive.Buff
                 player = GetComponentInParent<Player>();
         }
 
-        public void ApplyKnockback(Vector2 velocity, float duration)
+        public void ApplyKnockback(Vector2 velocity, float duration, System.Action onExpired = null)
         {
             if (rb == null) return;
 
@@ -51,10 +51,10 @@ namespace NeoSurvive.Buff
             if (knockbackRoutine != null)
                 StopCoroutine(knockbackRoutine);
 
-            knockbackRoutine = StartCoroutine(KnockbackRoutine(velocity, duration));
+            knockbackRoutine = StartCoroutine(KnockbackRoutine(velocity, duration, onExpired));
         }
 
-        private IEnumerator KnockbackRoutine(Vector2 velocity, float duration)
+        private IEnumerator KnockbackRoutine(Vector2 velocity, float duration, System.Action onExpired)
         {
             IsKnockbackActive = true;
 
@@ -66,6 +66,7 @@ namespace NeoSurvive.Buff
             IsKnockbackActive = false;
 
             knockbackRoutine = null;
+            onExpired?.Invoke();
         }
     }
 }

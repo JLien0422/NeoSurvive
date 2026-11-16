@@ -424,7 +424,7 @@ public static class GameAnalyticsTracker
             case HackableObjectType.SecurityTurret:
                 return "NumberSequence";
             case HackableObjectType.ElectricFence:
-                return "CommandBypass";
+                return "WheelBarMatch";
             case HackableObjectType.SatelliteUplink:
                 return "NetworkBridge";
             case HackableObjectType.SynapseServer:

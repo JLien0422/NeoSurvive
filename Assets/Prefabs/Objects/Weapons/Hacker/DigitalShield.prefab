@@ -46,9 +46,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shieldWavePrefab: {fileID: 1515475878241952546, guid: daea01269be94854e92daa9556af9c2a, type: 3}
-  shieldWaveVfxPrefab: {fileID: 1902381050476728993, guid: 808a8c49f4fd4c042a1f06be0dcda9bb, type: 3}
-  vfxLifetime: 0.5
-  vfxScale: 2.7
+  chargeVfxPrefab: {fileID: 5798792806481249808, guid: 01c953971bb66944f95053f9530c04c0, type: 3}
+  chargeVfxLifetime: 0.55
+  chargeVfxScale: 0.75
+  shieldWaveVfxPrefab: {fileID: 2012846353150024727, guid: a2b49a782d376624586f8379cc881a3e, type: 3}
+  vfxLifetime: 0.8
+  vfxScale: 0.85
   fireRate: 4
   damage: 12
   hitRadius: 2.5

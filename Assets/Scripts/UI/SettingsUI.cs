@@ -501,12 +501,12 @@ public class SettingsUI : MonoBehaviour
             UpdateSfxVolumeText();
         }
 
-        // 백그라운드 음소거 토글
+        // 화면의 ON은 백그라운드에서도 소리가 나는 상태입니다.
         if (muteOnFocusLostToggle != null)
         {
             ConfigureToggleWithSprites(
                 muteOnFocusLostToggle,
-                settingsManager.muteOnFocusLost,
+                !settingsManager.muteOnFocusLost,
                 muteOnFocusLostOnSprite,
                 muteOnFocusLostOffSprite,
                 OnMuteOnFocusLostChanged);
@@ -663,7 +663,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (settingsManager != null)
         {
-            settingsManager.SetMuteOnFocusLost(isOn);
+            settingsManager.SetMuteOnFocusLost(!isOn);
             settingsManager.SaveSettings();
         }
     }

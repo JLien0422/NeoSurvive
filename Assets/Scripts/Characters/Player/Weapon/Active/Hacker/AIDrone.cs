@@ -6,6 +6,10 @@ namespace NeoSurvive.Weapon
 {
   public class AIDrone : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     public Animator anim;
     public AnimationClip attackClip;
     public GameObject projectilePrefab;
@@ -176,6 +180,8 @@ namespace NeoSurvive.Weapon
         desiredSubCount *= 2;
       }
 
+      if (RunTraitSpecialRuntime.Effect(GetComponentInParent<WeaponSource>()?.weaponData, RunTraitSpecialKind.DeploymentClone) != null)
+        desiredSubCount += 1;
       for (int i = subDrones.Count - 1; i >= 0; i--)
       {
         if (subDrones[i] == null)
@@ -185,6 +191,19 @@ namespace NeoSurvive.Weapon
       }
 
       int currentSubCount = subDrones.Count;
+
+      // 26-10-22 Xabuna: 특성을 제거하면 기본/마스터 드론 수까지 되돌립니다.
+      if (currentSubCount > desiredSubCount)
+      {
+        for (int i = currentSubCount - 1; i >= desiredSubCount; i--)
+        {
+          subDrones[i].gameObject.SetActive(false);
+          Destroy(subDrones[i].gameObject);
+          subDrones.RemoveAt(i);
+        }
+        if (IsMasterLevel) CreateLaserNet();
+        return;
+      }
 
       if (currentSubCount >= desiredSubCount)
         return;
@@ -328,8 +347,14 @@ namespace NeoSurvive.Weapon
       UpdateAnimationSpeed();
     }
 
+    private float nextTraitCountCheck;
     protected void Update()
     {
+      if (!isSubDrone && Time.time >= nextTraitCountCheck)
+      {
+        nextTraitCountCheck = Time.time + 0.5f;
+        UpdateSubDroneCount(currentLevel);
+      }
       if (player != null)
       {
         Vector3 targetPos = player.transform.position + offset;
@@ -337,7 +362,7 @@ namespace NeoSurvive.Weapon
         transform.position = Vector3.Lerp(
           transform.position,
           targetPos,
-          Time.deltaTime * followSpeed
+          Time.deltaTime * TraitStat(followSpeed, RunTraitStat.FollowSpeed)
         );
       }
       else
@@ -349,7 +374,7 @@ namespace NeoSurvive.Weapon
       {
         fireElapsed += Time.deltaTime;
 
-        if (fireElapsed >= 1f / attackSpeed)
+        if (fireElapsed >= TraitStat(1f / Mathf.Max(0.0001f, attackSpeed), RunTraitStat.AttackInterval))
         {
           Attack();
           fireElapsed = 0f;
@@ -446,7 +471,7 @@ namespace NeoSurvive.Weapon
         float markedDistance =
           Vector3.Distance(transform.position, markedTarget.position);
 
-        if (markedDistance <= detectionRange)
+        if (markedDistance <= TraitStat(detectionRange, RunTraitStat.DetectionRange))
         {
           return markedTarget;
         }
@@ -455,7 +480,7 @@ namespace NeoSurvive.Weapon
       Collider2D[] hitEnemies =
         Physics2D.OverlapCircleAll(
           transform.position,
-          detectionRange,
+          TraitStat(detectionRange, RunTraitStat.DetectionRange),
           LayerMask.GetMask("Enemy")
         );
 
@@ -463,7 +488,7 @@ namespace NeoSurvive.Weapon
         return null;
 
       GameObject closestEnemy = null;
-      float minDistance = detectionRange;
+      float minDistance = TraitStat(detectionRange, RunTraitStat.DetectionRange);
 
       for (int i = 0; i < hitEnemies.Length; i++)
       {

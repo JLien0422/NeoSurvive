@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_bandwidth_expansion
+  m_EditorClassIdentifier: 
+  traitId: hacker_bandwidth_expansion
+  displayName: "\uB300\uC5ED\uD3ED \uD655\uC7A5"
+  icon: {fileID: -1592633639, guid: d0c558814b124214080844b1f07f14b0, type: 3}
+  description: "\uC124\uCE58 \uC2DC \uC131\uB2A5 50%\uC758 \uBD84\uC2E0\uC744 1\uAC1C
+    \uB9CC\uB4ED\uB2C8\uB2E4. \uB4DC\uB860\uC740 \uBD84\uC2E0 \uB300\uC2E0 1\uAE30\uB97C
+    \uCD94\uAC00\uD569\uB2C8\uB2E4. \uBD84\uC2E0\uC740 \uBD84\uC2E0\uC744 \uB9CC\uB4E4\uC9C0
+    \uC54A\uC2B5\uB2C8\uB2E4."
+  tier: 2
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 4
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: 6b561c16affe4b74b63e400fcb456991, type: 2}

@@ -30,6 +30,9 @@ namespace NeoSurvive.Weapon
 
         private bool initialized = false;
         private bool destroyedHandled = false;
+        private WeaponBase traitSourceWeapon;
+        private float baseHealth;
+        private float appliedHealthMultiplier = 1f;
 
         public void Initialize(
             float hp,
@@ -42,9 +45,14 @@ namespace NeoSurvive.Weapon
             float fieldEndVfxLifetime,
             float baseEndVfxLifetime,
             float vfxScale,
-            float bodyVfxScale)
+            float bodyVfxScale, WeaponBase sourceWeapon = null)
         {
-            currentHP = new Stat(hp);
+            traitSourceWeapon = sourceWeapon;
+            baseHealth = hp;
+            appliedHealthMultiplier = RunTraitWeaponStats.Scale(traitSourceWeapon, 1f, RunTraitStat.DecoyHealth);
+            float effectiveHealth = Mathf.Max(1f, hp * appliedHealthMultiplier);
+            maxHP = new Stat(effectiveHealth);
+            currentHP = new Stat(effectiveHealth);
 
             this.spawnPrisonOnDeath = spawnPrison;
             this.prisonDuration = prisonDur;
@@ -73,6 +81,17 @@ namespace NeoSurvive.Weapon
         private void LateUpdate()
         {
             transform.position = fixedPosition;
+            if (!initialized || IsDead) return;
+            float multiplier = RunTraitWeaponStats.Scale(traitSourceWeapon, 1f, RunTraitStat.DecoyHealth);
+            if (!Mathf.Approximately(multiplier, appliedHealthMultiplier))
+            {
+                float healthRatio = currentHP.CurrentValue / Mathf.Max(1f, maxHP.GetValue());
+                float newMax = Mathf.Max(1f, baseHealth * multiplier);
+                maxHP.BaseValue = newMax;
+                currentHP.BaseValue = newMax;
+                currentHP.CurrentValue = newMax * healthRatio;
+                appliedHealthMultiplier = multiplier;
+            }
         }
 
         public override void TakeDamage(float amount, WeaponBase sourceWeapon)
@@ -267,7 +286,8 @@ namespace NeoSurvive.Weapon
 
             prisonScript.Initialize(
                 prisonRange,
-                prisonDuration
+                prisonDuration,
+                traitSourceWeapon
             );
         }
     }
@@ -298,15 +318,17 @@ namespace NeoSurvive.Weapon
     {
         private float range;
         private float duration;
+        private WeaponBase sourceWeapon;
 
-        public void Initialize(float range, float duration)
+        public void Initialize(float range, float duration, WeaponBase sourceWeapon = null)
         {
             this.range = range;
-            this.duration = duration;
+            this.duration = RunTraitWeaponStats.Scale(sourceWeapon, duration, RunTraitStat.ControlDuration);
+            this.sourceWeapon = sourceWeapon;
 
             ApplySnareOnce();
 
-            Destroy(gameObject, duration);
+            Destroy(gameObject, this.duration);
         }
 
         private void ApplySnareOnce()
@@ -317,24 +339,23 @@ namespace NeoSurvive.Weapon
                     range
                 );
 
+            var processed = new System.Collections.Generic.HashSet<int>();
             foreach (var hit in hits)
             {
                 if (hit == null)
                     continue;
 
-                Enemy enemy =
-                    hit.GetComponentInParent<Enemy>();
+                Character enemy =
+                    RunTraitTarget.Find(hit);
 
-                if (enemy == null)
+                if (enemy == null || !processed.Add(enemy.GetInstanceID()))
                     continue;
 
                 if (!enemy.CompareTag("Enemy"))
                     continue;
 
-                BuffUtil.Apply(
-                    enemy.gameObject,
-                    new RootDebuff(duration)
-                );
+                RunTraitControl.Apply(enemy.gameObject, new RootDebuff(duration), sourceWeapon);
+                RunTraitStatus.ApplySlow(enemy.gameObject, sourceWeapon);
             }
         }
 

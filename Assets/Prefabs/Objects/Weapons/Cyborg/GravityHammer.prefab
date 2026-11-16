@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8022605189912104762}
   - component: {fileID: 674975220863687976}
   - component: {fileID: 5449484472645019898}
+  - component: {fileID: 4997990122826300391}
   m_Layer: 0
   m_Name: GravityHammer
   m_TagString: Untagged
@@ -70,10 +71,10 @@ MonoBehaviour:
   swingEffectDuration: 0.5
   swingEffectOffset: 0.6
   swingEffectScale: 3
-  impactEffectPrefab: {fileID: 5601618747534386316, guid: 89ec5e14a5319c44abbc6e8d6eeec9c7, type: 3}
+  impactEffectPrefab: {fileID: 5406732388418306556, guid: 6b1c533d4958bbf4698d728a9030beec, type: 3}
   impactEffectDuration: 0.6
   impactEffectOffset: 1
-  impactEffectScale: 3
+  impactEffectScale: 1.35
   debugLog: 1
   debugDraw: 1
 --- !u!95 &5449484472645019898
@@ -97,3 +98,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4997990122826300391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6192236778656128220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 3941864857399925052, guid: f19d701b21b3fe3408dc0cb575ddcc40, type: 3}
+  lifetime: 0.45
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.65, y: 0.65, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  maxAnimationSpeed: 1.5
+  alignToAttackDirection: 0
+  sustainedHitLifetime: 0.4

@@ -9,6 +9,10 @@ namespace NeoSurvive.Weapon
   /// </summary>
   public class LinkPistol : MonoBehaviour
   {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
     public GameObject projectilePrefab;
 
     [Header("총알 설정")]
@@ -81,7 +85,7 @@ namespace NeoSurvive.Weapon
     {
       fireTimer += Time.deltaTime;
 
-      if (fireTimer >= fireRate)
+      if (fireTimer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
       {
         Attack();
         fireTimer = 0f;
@@ -141,7 +145,7 @@ namespace NeoSurvive.Weapon
           markOnHit = obj.AddComponent<LinkPistolMarkOnHit>();
         }
 
-        markOnHit.Init(5f, masterMarkIcon);
+        markOnHit.Init(5f, masterMarkIcon, GetComponentInParent<WeaponSource>()?.weaponData);
       }
     }
 

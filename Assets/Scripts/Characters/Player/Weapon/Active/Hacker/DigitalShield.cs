@@ -9,12 +9,19 @@ namespace NeoSurvive.Weapon
     /// </summary>
     public class DigitalShield : MonoBehaviour
     {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
         [Header("Prefab")]
         [SerializeField] private GameObject shieldWavePrefab;
 
         [Header("VFX")]
+        [SerializeField] private GameObject chargeVfxPrefab;
+        [SerializeField] private float chargeVfxLifetime = 0.55f;
+        [SerializeField] private float chargeVfxScale = 0.75f;
         [SerializeField] private GameObject shieldWaveVfxPrefab;
-        [SerializeField] private float vfxLifetime = 0.5f;
+        [SerializeField] private float vfxLifetime = 0.8f;
         [SerializeField] private float vfxScale = 1.0f;
 
         [Header("Runtime Stats (CSV 적용값)")]
@@ -60,7 +67,7 @@ namespace NeoSurvive.Weapon
         {
             timer += Time.deltaTime;
 
-            if (timer >= fireRate)
+            if (timer >= TraitStat(fireRate, RunTraitStat.AttackInterval))
             {
                 timer = 0f;
                 Fire();
@@ -139,15 +146,26 @@ namespace NeoSurvive.Weapon
         // =========================
         private void SpawnShieldWaveVFX(Vector3 spawnPos, Transform followTarget)
         {
-            if (shieldWaveVfxPrefab == null) return;
+            SpawnVisualVFX(chargeVfxPrefab, spawnPos, followTarget, chargeVfxScale, chargeVfxLifetime);
+            SpawnVisualVFX(shieldWaveVfxPrefab, spawnPos, followTarget, vfxScale, vfxLifetime);
+        }
+
+        private void SpawnVisualVFX(
+            GameObject prefab,
+            Vector3 spawnPos,
+            Transform followTarget,
+            float scale,
+            float lifetime)
+        {
+            if (prefab == null) return;
 
             GameObject vfx = Instantiate(
-                shieldWaveVfxPrefab,
+                prefab,
                 spawnPos,
                 Quaternion.identity
             );
 
-            vfx.transform.localScale = Vector3.one * vfxScale;
+            vfx.transform.localScale = Vector3.one * TraitStat(scale, RunTraitStat.ShieldRadius);
 
             // ★ 추가: 플레이어를 따라가도록 부모 설정
             if (followTarget != null)
@@ -156,7 +174,7 @@ namespace NeoSurvive.Weapon
                 vfx.transform.localPosition = Vector3.zero;
             }
 
-            Destroy(vfx, vfxLifetime);
+            Destroy(vfx, lifetime);
         }
 
         public void OnLevelUp(int newLevel)

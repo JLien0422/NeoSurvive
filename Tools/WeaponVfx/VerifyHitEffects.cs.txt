@@ -1,0 +1,77 @@
+// Run this method body through Unity MCP execute_code while in Play Mode.
+// Creates only temporary VFX hosts, never weapon damage logic or scene assets.
+if (!Application.isPlaying) throw new System.InvalidOperationException("Play Mode required");
+if (EditorApplication.isPaused || (!Application.runInBackground && !Application.isFocused))
+    throw new System.InvalidOperationException("Resume and focus Game View before checking timed destruction");
+if (Time.timeScale <= 0f) throw new System.InvalidOperationException("Unpause before checking VFX lifetime");
+string root = "Assets/Prefabs/Objects/Weapons/";
+string[] paths = {
+    root + "Hacker/Effects/GFX_EMP_Pulse.prefab",
+    root + "Hacker/Effects/ShieldWave.prefab",
+    root + "Hacker/DroneLaserNet.prefab",
+    root + "Cyborg/ChainSaw.prefab",
+    root + "Cyborg/GravityHammer.prefab",
+    root + "Cyborg/SurgeBlade.prefab",
+    root + "Cyborg/TeslaCoilArmor.prefab",
+    root + "Cyborg/Effects/ShieldOrb.prefab",
+    root + "Cyborg/Effects/BreathArea.prefab",
+    "Assets/Art/Animations/Objects/Weapons/Cyborg/PlasmaPhoton/Plasma Photon Beam.prefab"
+};
+var spawned = new System.Collections.Generic.List<GameObject>();
+var hosts = new System.Collections.Generic.List<GameObject>();
+var failures = new System.Collections.Generic.List<string>();
+int checkedCount = 0;
+foreach (var path in paths) {
+    var asset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+    if (asset == null) throw new System.Exception("Missing prefab " + path);
+    var sources = asset.GetComponentsInChildren<NeoSurvive.Weapon.WeaponHitVfx>(true);
+    if (sources.Length == 0) throw new System.Exception("Missing VFX component " + path);
+    foreach (var source in sources) {
+        var before = new System.Collections.Generic.HashSet<int>();
+        foreach (var a in UnityEngine.Object.FindObjectsOfType<Animator>()) before.Add(a.GetInstanceID());
+        var host = new GameObject("__WeaponVfxQA"); hosts.Add(host);
+        var hit = host.AddComponent<NeoSurvive.Weapon.WeaponHitVfx>();
+        EditorUtility.CopySerialized(source, hit);
+        var so = new SerializedObject(hit);
+        float lifetime = Mathf.Max(0.1f, so.FindProperty("sustainedHitLifetime").floatValue);
+        host.transform.position = new Vector3(10000f,10000f,0f);
+        hit.PlaySustained(host.transform, Vector3.right);
+        hit.PlaySustained(host.transform, Vector3.right); // Same target must not restart/stack.
+        int created = 0;
+        foreach (var a in UnityEngine.Object.FindObjectsOfType<Animator>()) {
+            if (before.Contains(a.GetInstanceID())) continue;
+            created++; spawned.Add(a.gameObject);
+            var clips = a.runtimeAnimatorController.animationClips;
+            if (clips.Length != 1) throw new System.Exception("Expected single clip " + path);
+            var clip = clips[0];
+            float expected = Mathf.Max(so.FindProperty("animationSpeed").floatValue, clip.length/lifetime);
+            if (Mathf.Abs(a.speed-expected)>0.001f) failures.Add(path+": speed mismatch");
+            if (a.transform.parent != null) failures.Add(path+": parented effect");
+            if (AnimationUtility.GetAnimationClipSettings(clip).loopTime) failures.Add(path+": loop enabled");
+            var binding = new EditorCurveBinding {path="",type=typeof(SpriteRenderer),propertyName="m_Sprite"};
+            var keys = AnimationUtility.GetObjectReferenceCurve(clip,binding);
+            if (keys == null || keys.Length < 2) throw new System.Exception("Missing sprite keys " + path);
+            for(int k=0;k<keys.Length-1;k++) if(keys[k].value==null) failures.Add(path+": missing frame "+k);
+            if(keys[keys.Length-1].value!=null) failures.Add(path+": final sprite not empty");
+        }
+        if (created != 1) failures.Add(path+": expected one spawned animator, got "+created);
+        checkedCount++;
+    }
+}
+SessionState.SetString("NeoSurvive.VfxQA", "PENDING");
+float start = Time.time;
+double deadline = EditorApplication.timeSinceStartup + 10.0;
+EditorApplication.CallbackFunction poll = null;
+poll = () => {
+    bool timeout = EditorApplication.timeSinceStartup > deadline;
+    if (Application.isPlaying && Time.time-start<0.7f && !timeout) return;
+    EditorApplication.update -= poll;
+    if(timeout || !Application.isPlaying) failures.Add("Playback stopped or timed out before lifetime check");
+    foreach(var go in spawned) if(go!=null) {failures.Add("Effect survived beyond lifetime: "+go.name); UnityEngine.Object.DestroyImmediate(go);}
+    foreach(var go in hosts) if(go!=null) UnityEngine.Object.DestroyImmediate(go);
+    string result = "checked="+checkedCount+", failures="+failures.Count+" "+string.Join("; ",failures.ToArray());
+    SessionState.SetString("NeoSurvive.VfxQA", result);
+    if(failures.Count==0) Debug.Log("[WeaponVfxQA] PASS "+result); else Debug.LogError("[WeaponVfxQA] FAIL "+result);
+};
+EditorApplication.update += poll;
+return "Checking "+checkedCount+" hit configurations. Read SessionState.GetString(\"NeoSurvive.VfxQA\", \"missing\") after 0.3 game seconds.";

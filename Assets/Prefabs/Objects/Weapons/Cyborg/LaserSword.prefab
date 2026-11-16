@@ -96,10 +96,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitEffectPrefab: {fileID: 4855111246632576351, guid: 32a9a8ce5ad00514e83f7db9aba959d9, type: 3}
-  lifetime: 0.35
+  lifetime: 0.3
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: 0, y: 0, z: 0}
-  scale: {x: 1, y: 1, z: 1}
+  scale: {x: 0.5, y: 0.5, z: 1}
   tint: {r: 1, g: 1, b: 1, a: 1}
   animationSpeed: 1
   alignToAttackDirection: 0

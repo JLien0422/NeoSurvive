@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7025330092140550850}
   - component: {fileID: -4315742687912966545}
-  - component: {fileID: -2408586812976270693}
   m_Layer: 0
   m_Name: BlastBreath
   m_TagString: Untagged
@@ -47,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   breathAreaPrefab: {fileID: 7298700397245030376, guid: 4db68faff4fb90347ae4b10d9a991e9e, type: 3}
   firePoint: {fileID: 0}
-  normalVfxPrefab: {fileID: 1972399332442294733, guid: 852f883b27d029744836df2d026044b5, type: 3}
+  normalVfxPrefab: {fileID: 1475347686836778678, guid: 87bd97b899af12a4a8fe93aef768b4bd, type: 3}
   masterVfxPrefab: {fileID: 6650713890720122230, guid: 95db955b3e28b2a4e8e65f76fe55dbb8, type: 3}
   vfxDurationOffset: 0.05
-  vfxScale: 1
-  spawnForwardOffset: 0.3
-  areaCenterOffset: 0.8
+  vfxScale: 0.75
+  spawnForwardOffset: 0.15
+  areaCenterOffset: 0.5
   damagePerTick: 4
   range: 4.5
   width: 2.2

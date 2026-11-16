@@ -79,16 +79,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamPrefab: {fileID: -1439210674848907678, guid: dd7b8db874614bf4aa34b5101ff57c48, type: 3}
-  beamVfxPrefab: {fileID: 4893028135031577043, guid: dd7b8db874614bf4aa34b5101ff57c48, type: 3}
+  beamVfxPrefab: {fileID: 6649362557325437441, guid: b1c52eb72a3416c4da1acbbfb1f4692f, type: 3}
   muzzleVfxPrefab: {fileID: 9128456324047244128, guid: 65e4b9b1dab5adc49984e53c36bf3766, type: 3}
   beamVfxDuration: 0.45
   beamVfxScaleX: 0.4
-  beamVfxScaleY: 0.6
+  beamVfxScaleY: 0.35
   muzzleVfxDuration: 0.2
   fireOffset: 0.35
   beamStartOffset: 0.35
   fireInterval: 0.35
   range: 10
+  beamWidthScale: 1
 --- !u!212 &2899125142992121904
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -155,4 +156,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyToSpriteRenderers: 1
   applyToParticleSystems: 1
+  applyToTMPTexts: 1
   isProjectile: 0

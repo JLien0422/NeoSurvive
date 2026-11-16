@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6968330183356017119}
   - component: {fileID: 959460679001019517}
   - component: {fileID: 3486777969655930452}
+  - component: {fileID: 2877826719368921197}
   m_Layer: 0
   m_Name: DroneLaserNet
   m_TagString: Untagged
@@ -151,3 +152,23 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &2877826719368921197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8694115992042890356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 1109181838661558234, guid: 26e62bd98a383e64882139a9609859f3, type: 3}
+  lifetime: 0.28
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.5, y: 0.5, z: 1}
+  tint: {r: 0.35, g: 0.8, b: 1, a: 1}
+  animationSpeed: 1
+  alignToAttackDirection: 0

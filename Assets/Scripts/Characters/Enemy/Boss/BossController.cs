@@ -46,12 +46,16 @@ public class BossController : MonoBehaviour
   /// <summary>직전에 실행한 <see cref="patternsInOrder"/> 인덱스. 랜덤 시 같은 패턴 연속 방지용.</summary>
   private int lastPatternIndex = -1;
   private Vector3 originalScale;
+  private Animator traitAnimator;
+  private bool animationPaused, lastFrenzy;
+  private float savedAnimationSpeed = 1f;
 
   private void Awake()
   {
     boss = GetComponent<Boss>();
     rb = GetComponent<Rigidbody2D>();
     bossColliders = GetComponentsInChildren<Collider2D>(true);
+    traitAnimator = GetComponentInChildren<Animator>(true);
     rb.gravityScale = 0f;
     rb.freezeRotation = true;
     originalScale = transform.localScale;
@@ -76,6 +80,7 @@ public class BossController : MonoBehaviour
   private void OnDisable()
   {
     StopAllCoroutines();
+    RestoreAnimation();
   }
 
   private IEnumerator PatternLoopCoroutine()
@@ -114,6 +119,8 @@ public class BossController : MonoBehaviour
 
   private IEnumerator RunSinglePattern(BossPatternBase pattern, WaitForSeconds waitBetween)
   {
+    while (boss != null && !boss.IsDead && !boss.CanAttack) yield return null;
+    if (boss == null || boss.IsDead) yield break;
     pattern.RefreshPlayerTarget(playerTarget);
 
     chaseEnabled = false;
@@ -169,10 +176,12 @@ public class BossController : MonoBehaviour
     searchTimer += Time.deltaTime;
     collisionSyncTimer += Time.deltaTime;
 
-    if (searchTimer >= SEARCH_INTERVAL)
+    bool frenzy = boss.TraitStatus.frenzy;
+    if (searchTimer >= SEARCH_INTERVAL || frenzy != lastFrenzy)
     {
       FindPlayer();
       searchTimer = 0f;
+      lastFrenzy = frenzy;
     }
 
     if (collisionSyncTimer >= COLLISION_SYNC_INTERVAL)
@@ -182,6 +191,7 @@ public class BossController : MonoBehaviour
     }
 
     FacePlayer();
+    UpdateControlAnimation();
   }
 
   private void FixedUpdate()
@@ -192,6 +202,10 @@ public class BossController : MonoBehaviour
       return;
     }
 
+    // 강제 이동은 넉백이 소유하며 추적/패턴이 속도를 덮어쓰지 않습니다.
+    if (boss.IsKnockedBack || boss.TraitStatus.isPulled) return;
+    if (!boss.CanMove) { rb.velocity = Vector2.zero; return; }
+
     if (chaseEnabled)
       MoveTowardPlayer();
   }
@@ -201,17 +215,47 @@ public class BossController : MonoBehaviour
 
   private void FindPlayer()
   {
-    GameObject playerObj = GameObject.FindWithTag("Player");
-    if (playerObj != null)
-      playerTarget = playerObj.transform;
+    playerTarget = null;
+    if (boss.TraitStatus.frenzy)
+    {
+      float nearest = float.PositiveInfinity;
+      foreach (var candidate in FindObjectsOfType<Character>())
+      {
+        if (!RunTraitTarget.IsCombatant(candidate) || candidate == boss || candidate.IsDead) continue;
+        float distance = (candidate.transform.position - transform.position).sqrMagnitude;
+        if (distance < nearest) { nearest = distance; playerTarget = candidate.transform; }
+      }
+    }
+    else
+    {
+      GameObject playerObj = GameObject.FindWithTag("Player");
+      if (playerObj != null) playerTarget = playerObj.transform;
+    }
+    if (patternsInOrder != null)
+      foreach (var pattern in patternsInOrder)
+        if (pattern != null) pattern.RefreshPlayerTarget(playerTarget);
   }
 
   private void MoveTowardPlayer()
   {
-    if (playerTarget == null) return;
+    if (playerTarget == null) { rb.velocity = Vector2.zero; return; }
 
     Vector2 direction = (playerTarget.position - transform.position).normalized;
-    rb.velocity = direction * moveSpeed;
+    rb.velocity = direction * moveSpeed * boss.MovementMultiplier;
+  }
+
+  private void UpdateControlAnimation()
+  {
+    if (traitAnimator == null) return;
+    if (boss.IsDead || boss.CanAttack) { RestoreAnimation(); return; }
+    if (!animationPaused) { savedAnimationSpeed = traitAnimator.speed; animationPaused = true; }
+    traitAnimator.speed = 0f;
+  }
+
+  private void RestoreAnimation()
+  {
+    if (animationPaused && traitAnimator != null) traitAnimator.speed = savedAnimationSpeed;
+    animationPaused = false;
   }
 
   private void FacePlayer()

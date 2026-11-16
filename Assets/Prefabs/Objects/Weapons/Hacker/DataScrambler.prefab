@@ -57,6 +57,6 @@ MonoBehaviour:
   attackVfxDuration: 0.5
   attackVfxOffset: 1
   attackVfxScale: 1
-  explosionVfxPrefab: {fileID: 0}
+  explosionVfxPrefab: {fileID: 6541629313973856808, guid: 197d570a64f9c40469fd1b7514560cf1, type: 3}
   explosionVfxLifetime: 0.7
   explosionVfxScale: 1

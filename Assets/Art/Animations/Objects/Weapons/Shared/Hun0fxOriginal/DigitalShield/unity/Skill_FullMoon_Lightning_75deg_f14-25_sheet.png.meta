@@ -1,0 +1,356 @@
+fileFormatVersion: 2
+guid: 169a17cfaecfaf903403e66129a68466
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 4096
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85f9568283b956c38fa89e3359bda77c
+      internalID: 57006059911165464
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c18e50b971156a3fe10d2e3bdd6a361f
+      internalID: 11272789763947090
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_2
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 288
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a129b81eb350186bdaa2c30ddc2b227a
+      internalID: 40859551575580906
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09493373ff1e795c9f21302f41e5e31c
+      internalID: 38134072626963348
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_4
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2f03105bdf631e85a2abfb7d1e349ea
+      internalID: 9399207237139193
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_5
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 192
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88f2706953388e4cf7014773a5fa79ba
+      internalID: 47675949668205106
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b7b79bb24b9cbf6b3ab4cf821f5a34a
+      internalID: 48388788271309977
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_7
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0e12fabf15fd8172327b8cbe376e544
+      internalID: 71533081384512286
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_8
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 96
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df55a5ece9b6822d0dc9aac6917a9995
+      internalID: 56136199201225998
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08e97dc892fef2c7431792d9c6031d1e
+      internalID: 4524338518476990
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_10
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d92d90dcc1bf6eba5fe21ea6f90cf3dc
+      internalID: 16741425630898234
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skill_FullMoon_Lightning_75deg_f14-25_11
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 192
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5095, y: 0.5475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e19cf719b74b9c50394d9424e8a05aed
+      internalID: 29055932432015285
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 7ca3017b04e38791e1bcca14626b4a12
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Skill_FullMoon_Lightning_75deg_f14-25_0: 57006059911165464
+      Skill_FullMoon_Lightning_75deg_f14-25_1: 11272789763947090
+      Skill_FullMoon_Lightning_75deg_f14-25_2: 40859551575580906
+      Skill_FullMoon_Lightning_75deg_f14-25_3: 38134072626963348
+      Skill_FullMoon_Lightning_75deg_f14-25_4: 9399207237139193
+      Skill_FullMoon_Lightning_75deg_f14-25_5: 47675949668205106
+      Skill_FullMoon_Lightning_75deg_f14-25_6: 48388788271309977
+      Skill_FullMoon_Lightning_75deg_f14-25_7: 71533081384512286
+      Skill_FullMoon_Lightning_75deg_f14-25_8: 56136199201225998
+      Skill_FullMoon_Lightning_75deg_f14-25_9: 4524338518476990
+      Skill_FullMoon_Lightning_75deg_f14-25_10: 16741425630898234
+      Skill_FullMoon_Lightning_75deg_f14-25_11: 29055932432015285
+  spritePackingTag:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

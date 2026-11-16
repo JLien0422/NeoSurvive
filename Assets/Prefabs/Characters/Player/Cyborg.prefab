@@ -36,7 +36,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -266,6 +266,7 @@ MonoBehaviour:
   chestPrefab: {fileID: 7376150064209060376, guid: fa3f81593e813d745aa1a3898c493fe1, type: 3}
   spawnIndicatorPrefab: {fileID: 6704079310065015180, guid: b16fbae1044eff74a9596c647bf3aaea, type: 3}
   dropDelay: 0.8
+  dropOnLevelUp: 0
   spawnRadius: 2.5
 --- !u!114 &5818224129184398627
 MonoBehaviour:

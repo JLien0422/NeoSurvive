@@ -185,7 +185,11 @@ namespace NeoSurvive.Weapon
 
       GameObject vfx = Instantiate(prefab, center, rot);
 
-      vfx.transform.localScale = Vector3.one * vfxScale;
+      WeaponSource traitSource = GetComponentInParent<WeaponSource>();
+      WeaponBase traitWeapon = traitSource != null ? traitSource.weaponData : null;
+      vfx.transform.localScale = new Vector3(
+        RunTraitWeaponStats.Scale(traitWeapon, vfxScale, RunTraitStat.AttackRange),
+        RunTraitWeaponStats.Scale(traitWeapon, vfxScale, RunTraitStat.BreathWidth), vfxScale);
 
       Destroy(vfx, areaDuration + vfxDurationOffset);
     }
@@ -220,7 +224,7 @@ namespace NeoSurvive.Weapon
 
         Transform targetTransform = h.transform;
 
-        Enemy enemy = h.GetComponentInParent<Enemy>();
+        Character enemy = RunTraitTarget.Find(h);
 
         if (enemy != null)
           targetTransform = enemy.transform;

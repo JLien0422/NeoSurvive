@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: cyborg_afterglow_retention
+  m_EditorClassIdentifier: 
+  traitId: cyborg_afterglow_retention
+  displayName: "잔광 유지"
+  icon: {fileID: 0}
+  description: "감속 지속시간이 장당 10% 증가합니다. 최대 30%. 포톤·브레스는 기존 감속·빙결·속박 시간에도 적용합니다."
+  tier: 1
+  targetCharacter: 1
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 8
+  maxStacks: 3
+  effect:
+  - {fileID: 11400000, guid: beb393aef2a7408094a32f1efc6e2395, type: 2}

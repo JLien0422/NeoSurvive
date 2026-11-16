@@ -216,11 +216,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitEffectPrefab: {fileID: 320992752529835931, guid: 8958a82e23b31ef4c9fef2a759bd7650, type: 3}
-  lifetime: 0.32
+  hitEffectPrefab: {fileID: 1109181838661558234, guid: 26e62bd98a383e64882139a9609859f3, type: 3}
+  lifetime: 0.28
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: 0, y: 0, z: 0}
-  scale: {x: 1, y: 1, z: 1}
-  tint: {r: 1, g: 1, b: 1, a: 1}
+  scale: {x: 0.5, y: 0.5, z: 1}
+  tint: {r: 0.35, g: 0.8, b: 1, a: 1}
   animationSpeed: 1
   alignToAttackDirection: 0

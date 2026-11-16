@@ -1,0 +1,165 @@
+{
+ "frames": [
+  {
+   "filename": "spr_lightning_ring_96px_00",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_ring_96px_01",
+   "frame": {
+    "x": 96,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_ring_96px_02",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_ring_96px_03",
+   "frame": {
+    "x": 0,
+    "y": 96,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_ring_96px_04",
+   "frame": {
+    "x": 96,
+    "y": 96,
+    "w": 96,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 96
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "hun0fx Pixel Studio",
+  "image": "spr_lightning_ring_96px_sheet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 288,
+   "h": 192
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "spr_lightning_ring_96px",
+    "from": 0,
+    "to": 4,
+    "direction": "forward"
+   }
+  ],
+  "fps": 15,
+  "loop": false,
+  "origin_px": [
+   48,
+   48
+  ],
+  "effect": "spr_lightning_ring",
+  "kind": "spr",
+  "element": "lightning",
+  "category": "blast",
+  "source_frames": 5,
+  "frame_range": [
+   1,
+   5
+  ],
+  "palette": [
+   "#002d5a",
+   "#004c7d",
+   "#005f92",
+   "#0075aa",
+   "#008fc8",
+   "#019fdb",
+   "#17aae0",
+   "#34b5e3",
+   "#4bbfe7",
+   "#5dc6ea",
+   "#70cdec",
+   "#85d7f1",
+   "#9be0f4",
+   "#b7ebf8",
+   "#dffbfe",
+   "#e8ffff"
+  ]
+ }
+}

@@ -40,7 +40,6 @@ public class HackingSystemEditor : Editor
         HackingSystem system = (HackingSystem)target;
         SerializedProperty radiusProp = serializedObject.FindProperty("cyborgZoneRadius");
         SerializedProperty timeProp = serializedObject.FindProperty("cyborgTotalTime");
-        SerializedProperty maxEnemyProp = serializedObject.FindProperty("cyborgMaxEnemyCount");
 
         if (radiusProp == null)
             return;
@@ -77,9 +76,11 @@ public class HackingSystemEditor : Editor
             serializedObject.ApplyModifiedProperties();
         }
 
+        float totalTime = timeProp != null ? timeProp.floatValue : 0f;
+        float halfTime = totalTime * 0.5f;
         string label =
             $"Cyborg Zone\nR={radiusProp.floatValue:F2}\n" +
-            $"T={(timeProp != null ? timeProp.floatValue : 0f):F0}s  MaxEnemy={(maxEnemyProp != null ? maxEnemyProp.intValue : 0)}";
+            $"T={totalTime:F0}s  Under 3 enemies {halfTime:F0}s success / 3+ enemies {halfTime:F0}s fail";
         Handles.Label(center + Vector3.up * (radius + 0.35f), label, EditorStyles.whiteBoldLabel);
 
         DrawNearbyHackableRanges(center, radius);

@@ -1,5 +1,59 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3912673624374545097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4730721150855057969}
+  - component: {fileID: 5973455567394149991}
+  m_Layer: 0
+  m_Name: ColdHitVfx
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4730721150855057969
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3912673624374545097}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6631947100050050265}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5973455567394149991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3912673624374545097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 4855111246632576351, guid: 32a9a8ce5ad00514e83f7db9aba959d9, type: 3}
+  lifetime: 0.3
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.5, y: 0.5, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  maxAnimationSpeed: 1.5
+  alignToAttackDirection: 0
+  sustainedHitLifetime: 0.4
 --- !u!1 &7298700397245030376
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,6 +67,7 @@ GameObject:
   - component: {fileID: 5467992296785758030}
   - component: {fileID: -8457013940859991320}
   - component: {fileID: 7731170382589058677}
+  - component: {fileID: 2026759986803143803}
   m_Layer: 0
   m_Name: BreathArea
   m_TagString: Untagged
@@ -32,7 +87,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4730721150855057969}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5719037657131952622
@@ -51,6 +107,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   enemyTag: Enemy
+  coldHitVfx: {fileID: 5973455567394149991}
   freezeOnHit: 1
   freezeDuration: 1.25
   freezeAsStun: 1
@@ -137,4 +194,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyToSpriteRenderers: 1
   applyToParticleSystems: 1
+  applyToTMPTexts: 1
   isProjectile: 0
+--- !u!114 &2026759986803143803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7298700397245030376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 4498566517191698002, guid: 22d2ebc603c56c14584c6bb2854e26fc, type: 3}
+  lifetime: 0.8
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.55, y: 0.55, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  maxAnimationSpeed: 1.5
+  alignToAttackDirection: 0
+  sustainedHitLifetime: 0.8

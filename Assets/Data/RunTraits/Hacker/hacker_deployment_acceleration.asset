@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_deployment_acceleration
+  m_EditorClassIdentifier: 
+  traitId: hacker_deployment_acceleration
+  displayName: "\uBC30\uD3EC \uAC00\uC18D"
+  icon: {fileID: -284671049, guid: 9e854f073fcff50439cc5c0478590c04, type: 3}
+  description: "\uD3EC\uD0D1\xB7\uB514\uCF54\uC774\xB7\uD384\uC2A4\xB7\uCD5C\uC801\uD654\uC758
+    \uC804\uAC1C \uCFE8\uD0C0\uC784\uC774 \uC7A5\uB2F9 10% \uAC10\uC18C\uD569\uB2C8\uB2E4.
+    \uCD5C\uB300 30%. \uB4DC\uB860 \uCD94\uC885\uC18D\uB3C4\uB294 \uC7A5\uB2F9 10%
+    \uC99D\uAC00\uD569\uB2C8\uB2E4. \uCD5C\uB300 30%."
+  tier: 1
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 4
+  maxStacks: 3
+  effect:
+  - {fileID: 11400000, guid: 17d6cb086ace437198e9f74cef60bf35, type: 2}

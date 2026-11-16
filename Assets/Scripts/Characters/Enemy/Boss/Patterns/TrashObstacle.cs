@@ -19,6 +19,15 @@ public class TrashObstacle : Character
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
+    private Boss attackOwner;
+    private bool confusedAttack;
+
+    // 발사 당시의 소속을 보관합니다. 이후 CC 변경이 이미 날아가는 투척물의 소속을 바꾸지 않습니다.
+    public void SetAttackOwner(Boss owner)
+    {
+        attackOwner = owner;
+        confusedAttack = owner != null && owner.TraitStatus.frenzy;
+    }
 
     protected override void Awake()
     {
@@ -65,8 +74,8 @@ public class TrashObstacle : Character
         if (collision == null || IsDead)
             return;
 
-        if (!collision.collider.CompareTag("Player"))
-            return;
+        Character victim = collision.collider.GetComponentInParent<Character>();
+        if (!RunTraitTarget.CanBossDamage(attackOwner, victim, confusedAttack)) return;
 
         if (rb == null)
             return;
@@ -75,7 +84,7 @@ public class TrashObstacle : Character
             minImpactSpeed * minImpactSpeed)
             return;
 
-        if (collision.collider.TryGetComponent<Player>(out var player))
+        if (victim is Player player)
         {
             GameAnalyticsTracker.TrackBossPatternHit(
                 nameof(TrashObstacle),
@@ -84,8 +93,9 @@ public class TrashObstacle : Character
                 player
             );
 
-            player.TakeDamage(impactDamage);
         }
+
+        victim.TakeDamage(impactDamage);
 
         Die();
     }

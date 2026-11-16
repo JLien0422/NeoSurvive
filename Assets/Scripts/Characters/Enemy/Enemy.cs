@@ -11,8 +11,8 @@ public class Enemy : Character
 
   // (추가) 외부(AI/무기/피해처리)에서 참조하기 쉬운 헬퍼
   public StatusFlags Status => _enemyFlags != null ? _enemyFlags : (_enemyFlags = GetComponent<StatusFlags>() ?? gameObject.AddComponent<StatusFlags>()); // (추가)
-  public bool CanMove => !Status.moveBlocked;   // (추가)
-  public bool CanAttack => !Status.attackBlocked; // (추가)
+  public bool CanMove => !Status.moveBlocked && !Status.IsRunTraitStaggered;
+  public bool CanAttack => !Status.attackBlocked && !Status.IsRunTraitStaggered;
   public bool IsBlinded => Status.blinded;      // (추가)
   public bool IsFrenzy => Status.frenzy;        // (추가)
 

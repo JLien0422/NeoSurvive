@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_cascade
+  m_EditorClassIdentifier: 
+  traitId: hacker_cascade
+  displayName: "\uCE90\uC2A4\uCF00\uC774\uB4DC"
+  icon: {fileID: -1343093871, guid: 1265f56282d35094fb7f53f4fff08533, type: 3}
+  description: "\uC99D\uD3ED \uB300\uC0C1 \uCC98\uCE58 \uC2DC \uBC18\uACBD 3.5 \uC548\uC758
+    \uC801\uC5D0\uAC8C \uC99D\uD3ED\uC744 \uD6A8\uC728 50%, \uC9C0\uC18D\uC2DC\uAC04
+    3\uCD08\uB85C \uC62E\uAE41\uB2C8\uB2E4. \uC62E\uACA8\uC9C4 \uC99D\uD3ED\uC740
+    \uB2E4\uC2DC \uC62E\uACA8\uC9C0\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+  tier: 2
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 3
+  maxStacks: 1
+  effect:
+  - {fileID: 11400000, guid: 3700fb6d0a7a454e8d1611862e7c5fef, type: 2}

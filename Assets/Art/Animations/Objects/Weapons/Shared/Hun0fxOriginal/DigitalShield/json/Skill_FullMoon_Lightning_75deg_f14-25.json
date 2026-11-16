@@ -1,0 +1,321 @@
+{
+ "frames": [
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_00",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_01",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_02",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_03",
+   "frame": {
+    "x": 0,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_04",
+   "frame": {
+    "x": 192,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_05",
+   "frame": {
+    "x": 384,
+    "y": 96,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_06",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_07",
+   "frame": {
+    "x": 192,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_08",
+   "frame": {
+    "x": 384,
+    "y": 192,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_09",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_10",
+   "frame": {
+    "x": 192,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 67
+  },
+  {
+   "filename": "Skill_FullMoon_Lightning_75deg_f14-25_11",
+   "frame": {
+    "x": 384,
+    "y": 288,
+    "w": 192,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 192,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 192,
+    "h": 96
+   },
+   "duration": 133
+  }
+ ],
+ "meta": {
+  "app": "hun0fx Pixel Studio",
+  "image": "Skill_FullMoon_Lightning_75deg_f14-25_sheet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 576,
+   "h": 384
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Skill_FullMoon_Lightning_75deg_f14-25",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ],
+  "fps": 15,
+  "loop": false,
+  "origin_px": [
+   97.8,
+   43.4
+  ],
+  "effect": "Skill_FullMoon_Lightning",
+  "kind": "fx",
+  "element": "lightning",
+  "category": "cast",
+  "camera_deg": 75,
+  "seed": 1,
+  "source_frames": 33,
+  "frame_range": [
+   14,
+   25
+  ],
+  "palette": [
+   "#003361",
+   "#004e80",
+   "#00659b",
+   "#007ab3",
+   "#0396d0",
+   "#08adeb",
+   "#2cb6e7",
+   "#50bee4",
+   "#5bccf3",
+   "#6ad0f2",
+   "#71d1f1",
+   "#86cfe6",
+   "#81dbf8",
+   "#9be2f7",
+   "#beeef9",
+   "#e2fcfe"
+  ]
+ }
+}

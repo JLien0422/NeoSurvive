@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c575bf60124d5b9385c1b0212699c8, type: 3}
+  m_Name: hacker_aiming_link
+  m_EditorClassIdentifier: 
+  traitId: hacker_aiming_link
+  displayName: "\uC870\uC900 \uB9C1\uD06C"
+  icon: {fileID: -1376304744, guid: 4ba0eb9aadb4cd547abb7b324d9eb8f2, type: 3}
+  description: "\uC0AC\uACA9 \uBB34\uAE30\uC758 \uACF5\uACA9 \uD53C\uD574\uAC00 \uC7A5\uB2F9
+    10% \uC99D\uAC00\uD569\uB2C8\uB2E4. \uCD5C\uB300 50%."
+  tier: 0
+  targetCharacter: 0
+  isCommonTrait: 0
+  requiresWeaponTag: 1
+  requiredTag: 0
+  maxStacks: 5
+  effect:
+  - {fileID: 11400000, guid: 5087aead811f40629085af0d784398f0, type: 2}

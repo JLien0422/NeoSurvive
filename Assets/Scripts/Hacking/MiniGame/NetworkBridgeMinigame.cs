@@ -45,6 +45,7 @@ public class NetworkBridgeMinigame : HackingMinigameBase
 
     [Header("라인 설정")]
     [SerializeField] private float lineThickness = 12f;
+    private const float DropHitSize = 100f;
 
     private int completedConnections = 0;
     private float remainingTime = 0f;
@@ -335,27 +336,54 @@ public class NetworkBridgeMinigame : HackingMinigameBase
 
     private ConnectionNode FindNodeUnderPointer(PointerEventData eventData)
     {
-        if (eventData == null || EventSystem.current == null)
+        if (eventData == null)
             return null;
 
-        var hits = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, hits);
+        ConnectionNode best = null;
+        float bestDistance = float.MaxValue;
+        float half = DropHitSize * 0.5f;
 
-        for (int i = 0; i < hits.Count; i++)
+        FindClosestNode(leftNodes, eventData, half, ref best, ref bestDistance);
+        FindClosestNode(rightNodes, eventData, half, ref best, ref bestDistance);
+        return best;
+    }
+
+    private void FindClosestNode(
+        List<ConnectionNode> nodes,
+        PointerEventData eventData,
+        float half,
+        ref ConnectionNode best,
+        ref float bestDistance)
+    {
+        for (int i = 0; i < nodes.Count; i++)
         {
-            GameObject hitObject = hits[i].gameObject;
-            if (hitObject == null)
+            ConnectionNode node = nodes[i];
+            if (node == null || node == selectedNode)
                 continue;
 
-            ConnectionNode hitNode = hitObject.GetComponent<ConnectionNode>();
-            if (hitNode == null)
-                hitNode = hitObject.GetComponentInParent<ConnectionNode>();
+            RectTransform rect = node.transform as RectTransform;
+            if (rect == null)
+                continue;
 
-            if (hitNode != null && hitNode != selectedNode)
-                return hitNode;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    rect,
+                    eventData.position,
+                    eventData.pressEventCamera,
+                    out Vector2 local))
+            {
+                continue;
+            }
+
+            if (Mathf.Abs(local.x) > half || Mathf.Abs(local.y) > half)
+                continue;
+
+            float distance = local.sqrMagnitude;
+            if (distance >= bestDistance)
+                continue;
+
+            bestDistance = distance;
+            best = node;
         }
-
-        return null;
     }
 
     private RectTransform dragPreview;

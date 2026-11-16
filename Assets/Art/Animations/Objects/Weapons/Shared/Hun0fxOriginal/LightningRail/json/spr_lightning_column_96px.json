@@ -1,0 +1,231 @@
+{
+ "frames": [
+  {
+   "filename": "spr_lightning_column_96px_00",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_01",
+   "frame": {
+    "x": 96,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_02",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_03",
+   "frame": {
+    "x": 288,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_04",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_05",
+   "frame": {
+    "x": 96,
+    "y": 192,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_06",
+   "frame": {
+    "x": 192,
+    "y": 192,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  },
+  {
+   "filename": "spr_lightning_column_96px_07",
+   "frame": {
+    "x": 288,
+    "y": 192,
+    "w": 96,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 192
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "hun0fx Pixel Studio",
+  "image": "spr_lightning_column_96px_sheet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 384,
+   "h": 384
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "spr_lightning_column_96px",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ],
+  "fps": 15,
+  "loop": true,
+  "origin_px": [
+   47.1,
+   95.4
+  ],
+  "effect": "spr_lightning_column",
+  "kind": "spr",
+  "element": "lightning",
+  "category": "strike",
+  "source_frames": 8,
+  "frame_range": [
+   1,
+   8
+  ],
+  "palette": [
+   "#003869",
+   "#004f85",
+   "#005289",
+   "#005b93",
+   "#0073ad",
+   "#008ecc",
+   "#00a5e5",
+   "#08b1ef",
+   "#24baf1",
+   "#3dc3f3",
+   "#57ccf5",
+   "#7cd9f8",
+   "#a6e8fa",
+   "#bff1fc",
+   "#d5f8fe",
+   "#e5feff"
+  ]
+ }
+}

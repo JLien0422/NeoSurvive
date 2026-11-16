@@ -17,10 +17,16 @@ public class EnemyStatDB
     public float hpScaleStartMultiplier = 0.416667f;
     public float hpScaleEndMultiplier = 8.75f;
 
+    // 전시용 임시. 1이면 원래 체력. 되돌릴 때는 이 값만 1로 바꾸면 됩니다.
+    public const float ExhibitionHpMultiplier = 0.5f;
+
     public float GetHpMultiplier(float gameTime)
     {
         if (hpScaleDurationSec <= 0f)
-            return hpScaleStartMultiplier > 0f ? hpScaleStartMultiplier : 1f;
+        {
+            float fallback = hpScaleStartMultiplier > 0f ? hpScaleStartMultiplier : 1f;
+            return fallback * ExhibitionHpMultiplier;
+        }
 
         float t = gameTime / hpScaleDurationSec;
         if (t < 0f)
@@ -32,6 +38,7 @@ public class EnemyStatDB
         float multiplier = hpScaleStartMultiplier
             + (hpScaleEndMultiplier - hpScaleStartMultiplier) * curve;
 
-        return multiplier > 0f ? multiplier : 1f;
+        float resolved = multiplier > 0f ? multiplier : 1f;
+        return resolved * ExhibitionHpMultiplier;
     }
 }

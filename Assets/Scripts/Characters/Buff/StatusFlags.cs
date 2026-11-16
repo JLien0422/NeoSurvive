@@ -14,6 +14,8 @@ namespace NeoSurvive.Buff
     public bool attackBlocked;   // 기절 등
     public bool blinded;         // 실명
     public bool frenzy;          // 광란(적 AI 타겟 변경 등)
+    [System.NonSerialized] public float runTraitStaggerUntil;
+    public bool IsRunTraitStaggered => Time.time < runTraitStaggerUntil;
 
     [Header("강제 이동")]
     // 마그네틱 비컨 등 외부 힘에 의해 강제 견인 중인지 여부

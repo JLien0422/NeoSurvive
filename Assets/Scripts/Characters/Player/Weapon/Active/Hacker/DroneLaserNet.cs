@@ -162,6 +162,8 @@ namespace NeoSurvive.Weapon
         if (enemy.TryGetComponent<Character>(out Character character))
         {
           character.TakeDamage(damagePerTick, sourceWeapon);
+          if (character is Enemy && TryGetComponent<WeaponHitVfx>(out var hitVfx))
+            hitVfx.PlaySustained(character.transform, character.transform.position - transform.position);
         }
       }
     }

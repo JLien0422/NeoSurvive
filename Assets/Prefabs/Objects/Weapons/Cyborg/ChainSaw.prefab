@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9217191601215895476}
   - component: {fileID: 189806787830236226}
   - component: {fileID: 4485312531882447933}
+  - component: {fileID: 4175274147436130313}
   m_Layer: 0
   m_Name: ChainSaw
   m_TagString: Untagged
@@ -112,7 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 6
   hpRatioDamage: 0.05
-  useHpRatioDamage: 1
+  useHpRatioDamage: 0
   useCurrentHpRatio: 0
   hitCooldown: 0.2
   enemyMask:
@@ -122,7 +123,7 @@ MonoBehaviour:
   speed: 8
   halfWidth: 7
   halfHeight: 4
-  infiniteLifetime: 1
+  infiniteLifetime: 0
   lifetime: 8
   radiusScale: 1
   hitRadius: 0.6
@@ -199,4 +200,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyToSpriteRenderers: 1
   applyToParticleSystems: 1
+  applyToTMPTexts: 1
   isProjectile: 0
+--- !u!114 &4175274147436130313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068046529786470421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 4855111246632576351, guid: 32a9a8ce5ad00514e83f7db9aba959d9, type: 3}
+  lifetime: 0.3
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.5, y: 0.5, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  alignToAttackDirection: 0

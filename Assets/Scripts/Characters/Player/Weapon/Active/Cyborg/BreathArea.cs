@@ -7,6 +7,8 @@ namespace NeoSurvive.Weapon
 {
   public class BreathArea : MonoBehaviour
   {
+    private float TraitStat(float value, RunTraitStat stat) => RunTraitWeaponStats.Scale(sourceWeapon, value, stat);
+
     [Header("Filter")]
     public LayerMask enemyMask;
     public string enemyTag = "Enemy";
@@ -18,6 +20,9 @@ namespace NeoSurvive.Weapon
     private float width;
     private bool coldMode;
     private WeaponBase sourceWeapon;
+
+    [Header("Cold Hit VFX")]
+    [SerializeField] private WeaponHitVfx coldHitVfx;
 
     private float life;
     private float timer;
@@ -65,6 +70,9 @@ namespace NeoSurvive.Weapon
 
     private void Update()
     {
+      // 브레스 판정이 유지되는 동안에는 피해 틱 사이에도 소거합니다.
+      RunTraitProjectileErasure.Box(sourceWeapon, transform.position,
+        new Vector2(TraitStat(range, RunTraitStat.AttackRange), TraitStat(width, RunTraitStat.BreathWidth)), transform.eulerAngles.z);
       life += Time.deltaTime;
 
       if (life >= duration)
@@ -84,7 +92,7 @@ namespace NeoSurvive.Weapon
 
     private void TickDamage()
     {
-      Vector2 boxSize = new Vector2(range, width);
+      Vector2 boxSize = new Vector2(TraitStat(range, RunTraitStat.AttackRange), TraitStat(width, RunTraitStat.BreathWidth));
       float angleZ = transform.eulerAngles.z;
 
       Collider2D[] hits = Physics2D.OverlapBoxAll(
@@ -148,6 +156,12 @@ namespace NeoSurvive.Weapon
           damagedIds.Add(id);
 
           character.TakeDamage(damagePerTick, sourceWeapon);
+          if (character is Enemy)
+          {
+            WeaponHitVfx hitVfx = coldMode && coldHitVfx != null ? coldHitVfx : GetComponent<WeaponHitVfx>();
+            if (hitVfx != null)
+              hitVfx.PlaySustained(character.transform, character.transform.position - transform.position);
+          }
 
           ApplyColdEffects(character.gameObject);
 
@@ -197,21 +211,23 @@ namespace NeoSurvive.Weapon
 
     private void ApplyColdEffects(GameObject target)
     {
+      RunTraitStatus.ApplySlow(target, sourceWeapon,
+          coldMode && applySlowInCold ? slowMul : 1f,
+          coldMode && applySlowInCold ? slowDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f) : 0f);
       if (!coldMode)
         return;
 
       if (target == null)
         return;
 
-      if (applySlowInCold)
-        BuffUtil.Apply(target, new SlowDebuff(slowMul, slowDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
+
 
       if (freezeOnHit)
       {
         if (freezeAsStun)
-          BuffUtil.Apply(target, new StunDebuff(freezeDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
+          BuffUtil.Apply(target, new StunDebuff(TraitStat(freezeDuration, RunTraitStat.ControlDuration) * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
         else
-          BuffUtil.Apply(target, new RootDebuff(freezeDuration * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
+          BuffUtil.Apply(target, new RootDebuff(TraitStat(freezeDuration, RunTraitStat.ControlDuration) * (Player.Instance != null ? Player.Instance.GetSuperconductiveCircuitsDurationMultiplier() : 1f)));
       }
     }
 

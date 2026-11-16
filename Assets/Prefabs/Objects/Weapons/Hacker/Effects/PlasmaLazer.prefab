@@ -4843,6 +4843,7 @@ GameObject:
   - component: {fileID: -226211378614959398}
   - component: {fileID: 9003968359049257690}
   - component: {fileID: -7585996391917912252}
+  - component: {fileID: 7813247190632514801}
   m_Layer: 0
   m_Name: PlasmaLazer
   m_TagString: Untagged
@@ -4885,7 +4886,6 @@ MonoBehaviour:
   elapsed: 0
   alpha: 1
   trailRenderer: {fileID: 9003968359049257690}
-  beamEffectPrefab: {fileID: 8939610345789605955, guid: ddb9badf17773864a9321c14b413c913, type: 3}
   splitCount: 2
   splitSearchRange: 20
 --- !u!96 &9003968359049257690
@@ -5017,3 +5017,25 @@ MonoBehaviour:
   applyToParticleSystems: 1
   applyToTMPTexts: 1
   isProjectile: 0
+--- !u!114 &7813247190632514801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7537406376116908388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39ea05459dca4e02a453be602412f79e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  hitEffectPrefab: {fileID: 2564784328936515809, guid: ae2d3b24fc0680e6f619938d1ef74506, type: 3}
+  lifetime: 0.34
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scale: {x: 0.75, y: 0.75, z: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  animationSpeed: 1
+  maxAnimationSpeed: 1.5
+  alignToAttackDirection: 0
+  sustainedHitLifetime: 0.4

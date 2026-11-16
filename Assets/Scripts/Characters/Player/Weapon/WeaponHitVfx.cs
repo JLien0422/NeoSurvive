@@ -17,9 +17,36 @@ namespace NeoSurvive.Weapon
     [SerializeField] private Vector3 scale = Vector3.one;
     [SerializeField] private Color tint = Color.white;
     [SerializeField, Min(0.1f)] private float animationSpeed = 1f;
+    [SerializeField, Min(0.1f)] private float maxAnimationSpeed = 1.5f;
     [SerializeField] private bool alignToAttackDirection;
 
-    public void Play(Vector3 hitPosition, Vector3 attackDirection)
+    [Header("Sustained Damage Readability")]
+    [SerializeField, Min(0.1f)] private float sustainedHitLifetime = 0.4f;
+    private readonly int[] recentTargets = new int[32];
+    private readonly float[] recentTargetExpiry = new float[32];
+
+    // Damage ticks remain unchanged. A target's visual finishes before another starts.
+    public void PlaySustained(Transform target, Vector3 attackDirection)
+    {
+      if (target == null || hitEffectPrefab == null) return;
+      int targetId = target.GetInstanceID();
+      int available = -1;
+      for (int i = 0; i < recentTargets.Length; i++)
+      {
+        if (recentTargetExpiry[i] <= Time.time) available = i;
+        else if (recentTargets[i] == targetId) return;
+      }
+      // Bound simultaneous sustained effects per source without per-tick allocations.
+      if (available < 0) return;
+      float duration = Mathf.Max(0.1f, sustainedHitLifetime);
+      recentTargets[available] = targetId;
+      recentTargetExpiry[available] = Time.time + duration;
+      Spawn(hitEffectPrefab, target.position, attackDirection, positionOffset,
+        rotationOffset, scale, tint, animationSpeed, maxAnimationSpeed, duration,
+        alignToAttackDirection);
+    }
+
+    public void Play(Vector3 hitPosition, Vector3 attackDirection, float maxLifetime = float.PositiveInfinity)
     {
       Spawn(
         hitEffectPrefab,
@@ -30,7 +57,8 @@ namespace NeoSurvive.Weapon
         scale,
         tint,
         animationSpeed,
-        lifetime,
+        maxAnimationSpeed,
+        Mathf.Max(0.01f, Mathf.Min(lifetime, maxLifetime)),
         alignToAttackDirection
       );
     }
@@ -44,6 +72,7 @@ namespace NeoSurvive.Weapon
       Vector3 effectScale,
       Color effectTint,
       float effectAnimationSpeed,
+      float effectMaxAnimationSpeed,
       float effectLifetime,
       bool alignToDirection)
     {
@@ -87,7 +116,10 @@ namespace NeoSurvive.Weapon
           if (clips != null && clips.Length > 0 && clips[0] != null)
           {
             // 원본 프레임을 생략하지 않고, 무기별 표시 시간 안에 한 번만 재생한다.
-            fittedSpeed = Mathf.Max(fittedSpeed, clips[0].length / effectLifetime);
+            fittedSpeed = Mathf.Min(
+              Mathf.Max(fittedSpeed, clips[0].length / effectLifetime),
+              effectMaxAnimationSpeed > 0f ? effectMaxAnimationSpeed : 1.5f
+            );
           }
         }
 

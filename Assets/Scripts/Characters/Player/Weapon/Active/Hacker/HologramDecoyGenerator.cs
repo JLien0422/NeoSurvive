@@ -5,6 +5,10 @@ namespace NeoSurvive.Weapon
 {
     public class HologramDecoyGenerator : MonoBehaviour
     {
+    private NeoSurvive.Weapon.WeaponSource runTraitSource;
+    private float TraitStat(float value, RunTraitStat stat) =>
+        RunTraitWeaponStats.Scale(this, ref runTraitSource, value, stat);
+
         [Header("Stats")]
         public GameObject decoyPrefab;
 
@@ -54,7 +58,7 @@ namespace NeoSurvive.Weapon
         {
             timer += Time.deltaTime;
 
-            if (timer >= cooldown && !spawning)
+            if (timer >= TraitStat(cooldown, RunTraitStat.DeploymentCooldown) && !spawning)
             {
                 StartCoroutine(SpawnDecoyRoutine());
                 timer = 0f;
@@ -103,39 +107,47 @@ namespace NeoSurvive.Weapon
                     fieldEndLifetime,
                     baseEndLifetime,
                     vfxScale,
-                    bodyVfxScale
+                    bodyVfxScale,
+                    GetComponentInParent<WeaponSource>()?.weaponData
                 );
             }
 
+            var cloneEffect = RunTraitSpecialRuntime.Effect(GetComponentInParent<WeaponSource>()?.weaponData, RunTraitSpecialKind.DeploymentClone);
+            if (cloneEffect != null) SpawnExtraDecoy(spawnPos + Vector3.left * 0.7f, cloneEffect.efficiency);
             if (Player.Instance != null && Player.Instance.HasTrait("bandwidth_expansion"))
             {
                 SpawnExtraDecoy(spawnPos + Vector3.left * 0.7f);
             }
         }
 
-        private void SpawnExtraDecoy(Vector3 spawnPos)
+        private void SpawnExtraDecoy(Vector3 spawnPos, float? performance = null)
         {
             if (decoyPrefab == null) return;
 
             GameObject obj = Instantiate(decoyPrefab, spawnPos, Quaternion.identity);
 
+            if (performance.HasValue)
+                RunTraitCloneLifetime.Track(obj, RunTraitSpecialRuntime.Effect(
+                    GetComponentInParent<WeaponSource>()?.weaponData, RunTraitSpecialKind.DeploymentClone));
+
             if (obj.TryGetComponent<HologramDecoy>(out var decoy))
             {
-                float cloneMul = Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f;
+                float cloneMul = performance ?? (Player.Instance != null ? Player.Instance.GetBandwidthExpansionCloneMultiplier() : 1f);
                 bool spawnPrison = currentLevel >= 5;
 
                 decoy.Initialize(
                     hp * cloneMul,
                     spawnPrison,
-                    prisonDuration,
-                    prisonRange,
+                    prisonDuration * cloneMul,
+                    prisonRange * cloneMul,
                     bodyVfxPrefab,
                     fieldEndVfxPrefab,
                     baseEndVfxPrefab,
                     fieldEndLifetime,
                     baseEndLifetime,
                     vfxScale,
-                    bodyVfxScale * cloneMul
+                    bodyVfxScale * cloneMul,
+                    GetComponentInParent<WeaponSource>()?.weaponData
                 );
             }
         }
